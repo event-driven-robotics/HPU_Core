@@ -1,0 +1,10 @@
+# ignore all logs
+*.git
+
+# ignore stuff folders
+mug
+
+# ignore Vivado subfolders
+Vivado/*
+# but NOT xpr file
+!Vivado/*.xpr
