@@ -20,8 +20,8 @@ library ieee;
 library common_lib;
     use common_lib.utilities_pkg.all;
 
-library work;
-    use work.aer_pkg.all;
+library HPU_lib;
+    use HPU_lib.aer_pkg.all;
 
 
 --****************************

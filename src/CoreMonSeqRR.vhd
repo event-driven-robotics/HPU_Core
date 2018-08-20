@@ -15,8 +15,8 @@ library std;
 library neuelab_lib;
     use neuelab_lib.NEComponents_pkg.all;
 
-library work;
-    use work.aer_pkg.C_INTERNAL_DSIZE;
+library HPU_lib;
+    use HPU_lib.aer_pkg.all;
 
 
 --****************************

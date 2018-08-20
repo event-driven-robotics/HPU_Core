@@ -6,13 +6,14 @@ library ieee;
     use ieee.std_logic_1164.all;
     use ieee.numeric_std.all;
 
-library work;
-    use work.aer_pkg.all;
+library HPU_lib;
+    use HPU_lib.aer_pkg.all;
 
 library neuserial_lib;
     use neuserial_lib.NSComponents_pkg.all;
 
 library neuelab_lib;
+    use neuelab_lib.NEComponents_pkg.all;
 
 library datapath_lib;
     use datapath_lib.DPComponents_pkg.neuserial_PAER_arbiter;
@@ -352,11 +353,11 @@ architecture str of neuserial_core is
     signal  i_AuxRx_HSSAER   : std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
 
 
-    for all : neuserial_loopback     use entity neuserial_lib.neuserial_loopback(beh);
-    for all : hpu_tx_datapath        use entity datapath_lib.hpu_tx_datapath(str);
-    for all : hpu_rx_datapath        use entity datapath_lib.hpu_rx_datapath(str);
-    for all : neuserial_PAER_arbiter use entity datapath_lib.neuserial_PAER_arbiter(rtl);
-    for all : CoreMonSeqRR           use entity neuelab_lib.CoreMonSeqRR(str);
+--    for all : neuserial_loopback     use entity neuserial_lib.neuserial_loopback(beh);
+--    for all : hpu_tx_datapath        use entity datapath_lib.hpu_tx_datapath(str);
+--    for all : hpu_rx_datapath        use entity datapath_lib.hpu_rx_datapath(str);
+--    for all : neuserial_PAER_arbiter use entity datapath_lib.neuserial_PAER_arbiter(rtl);
+--    for all : CoreMonSeqRR           use entity neuelab_lib.CoreMonSeqRR(str);
 
 
 begin

@@ -10,9 +10,9 @@
 library ieee;
     use ieee.std_logic_1164.all;
 
-library work;
-    use work.aer_pkg.all;
-    use work.aer_pkg.C_INTERNAL_DSIZE;
+library HPU_lib;
+    use HPU_lib.aer_pkg.all;
+    use HPU_lib.aer_pkg.C_INTERNAL_DSIZE;
 
 package NSComponents_pkg is
 

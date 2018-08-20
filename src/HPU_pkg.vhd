@@ -11,8 +11,8 @@ library ieee;
     use ieee.std_logic_1164.all;
     use ieee.numeric_std.all;
 
-library work;
-    use work.aer_pkg.all;
+library HPU_lib;
+    use HPU_lib.aer_pkg.all;
 
 
 package HPUComponents_pkg is

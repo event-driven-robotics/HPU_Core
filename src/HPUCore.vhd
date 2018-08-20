@@ -1,9 +1,9 @@
 library ieee;
     use ieee.std_logic_1164.all;
 
-library work;
-    use work.aer_pkg.all;
-    use work.HPUComponents_pkg.all;
+library HPU_lib;
+    use HPU_lib.aer_pkg.all;
+    use HPU_lib.HPUComponents_pkg.all;
     
 library neuserial_lib;
 

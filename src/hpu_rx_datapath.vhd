@@ -1,14 +1,14 @@
 library ieee;
     use ieee.std_logic_1164.all;
 
-library work;
-    use work.aer_pkg.all;
+library HPU_lib;
+    use HPU_lib.aer_pkg.all;
 
 library datapath_lib;
     use datapath_lib.DPComponents_pkg.all;
 
-library work;
-    use work.aer_pkg.C_INTERNAL_DSIZE;
+library HPU_lib;
+    use HPU_lib.aer_pkg.C_INTERNAL_DSIZE;
 
 entity hpu_rx_datapath is
     generic (

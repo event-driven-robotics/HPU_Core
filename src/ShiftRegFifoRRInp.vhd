@@ -5,6 +5,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+library HPU_lib;
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
@@ -49,7 +51,7 @@ architecture rtl of ShiftRegFifoRRInp is
 
 begin
 
-  iShiftRegFifo : entity work.ShiftRegFifo
+  iShiftRegFifo : entity HPU_lib.ShiftRegFifo
     generic map (
       width           => width,
       depth           => depth,

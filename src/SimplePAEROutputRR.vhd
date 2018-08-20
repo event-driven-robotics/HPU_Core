@@ -124,7 +124,7 @@ begin
       UnderflowxSO   => open
       );
 
-  --iShiftRegFifoRROut : entity work.ShiftRegFifoRROut
+  --iShiftRegFifoRROut : entity HPU_lib.ShiftRegFifoRROut
   --  generic map (
   --    width           => internal_width,
   --    depth           => input_fifo_depth,

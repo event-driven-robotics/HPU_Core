@@ -1,8 +1,8 @@
 library ieee;
     use ieee.std_logic_1164.all;
 
-library work;
-    use work.aer_pkg.all;
+library HPU_lib;
+    use HPU_lib.aer_pkg.all;
 
 library datapath_lib;
     use datapath_lib.DPComponents_pkg.all;
@@ -171,7 +171,7 @@ begin
 
     begin
 
-        ii_paer_nrst <= nRst and EnablePAER_i;
+        ii_paer_nrst <= nRst and EnablePAER_i;        -- Modified from OR to AND logic - Maurizio Casti, 07/24/2018 
 
         u_simplePAEROutput : SimplePAEROutputRR
             generic map (
@@ -227,7 +227,7 @@ begin
 
     begin
 
-        ii_hssaer_nrst <= nRst and EnableHSSAER_i;
+        ii_hssaer_nrst <= nRst and EnableHSSAER_i;            -- Modified from OR to AND logic - Maurizio Casti, 07/24/2018 
 
 
         u_hssaer_tx_splitter : neuserial_PAER_splitter
