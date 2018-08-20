@@ -1,0 +1,4 @@
+# This file is automatically written.  Do not modify.
+proc gen_USERPARAMETER_C_PAER_DSIZE_ENABLEMENT {C_TX_HAS_PAER C_RX_HAS_PAER } {expr {$C_TX_HAS_PAER || $C_RX_HAS_PAER}}
+proc gen_USERPARAMETER_C_RX_HSSAER_N_CHAN_ENABLEMENT {C_RX_HAS_HSSAER } {expr $C_RX_HAS_HSSAER == true}
+proc gen_USERPARAMETER_C_TX_HSSAER_N_CHAN_ENABLEMENT {C_TX_HAS_HSSAER } {expr $C_TX_HAS_HSSAER == true}
