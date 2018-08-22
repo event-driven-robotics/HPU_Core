@@ -664,7 +664,7 @@ AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => open,
 	
 	-- Control interface
-	rst        => i_reset -- i_reset 
+	rst        => '1' -- i_reset 
 	);
 
 
@@ -756,7 +756,7 @@ AXI_EMULATOR_i : axi4lite_bfm_v00
 -- --------------------------------------------------
 -- AER Device Emulators
 -- --------------------------------------------------
-AER_DEVICE_EMULATOR_L_i : AER_Device_Emulator 
+L_AER_DEVICE_EMULATOR_i : AER_Device_Emulator 
 	port map(
 
 		-- AER Device asynchronous output interface
@@ -774,7 +774,7 @@ AER_DEVICE_EMULATOR_L_i : AER_Device_Emulator
 		rst			=> i_reset
 ); 
 
-AER_DEVICE_EMULATOR_R_i : AER_Device_Emulator 
+R_AER_DEVICE_EMULATOR_i : AER_Device_Emulator 
 	port map(
 
 		-- AER Device asynchronous output interface
@@ -792,7 +792,7 @@ AER_DEVICE_EMULATOR_R_i : AER_Device_Emulator
 		rst			=> i_reset
 ); 
 
-AER_DEVICE_EMULATOR_Aux_i : AER_Device_Emulator 
+AUX_AER_DEVICE_EMULATOR_i : AER_Device_Emulator 
 	port map(
 
 		-- AER Device asynchronous output interface
