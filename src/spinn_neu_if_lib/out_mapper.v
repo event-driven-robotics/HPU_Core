@@ -48,7 +48,11 @@ module out_mapper #
         // output AER device interface
         output      [AER_WIDTH-1:0] oaer_data,
         output             			oaer_vld,
-        input  wire        			oaer_rdy
+        input  wire        			oaer_rdy,
+        
+        // Command output
+        output reg                  cmd_start,
+        output reg                  cmd_stop
     );
 
     //---------------------------------------------------------------
@@ -68,14 +72,20 @@ module out_mapper #
     localparam FIFO_WIDTH  = 32;
 
 
+
+
+
+
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //--------------------------- control ---------------------------
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //------------------------- out_mapper --------------------------
     // NOTE: must throw away non-multicast packets!
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    wire    mc_pkt;
-    wire    parity_chk;
+    wire mc_pkt;
+    wire parity_chk;
+    wire fifo_full;
+    wire fifo_empty;    
 
     // check if multicast packet
     assign mc_pkt = ~opkt_data[7] & ~opkt_data[6];
@@ -105,14 +115,35 @@ module out_mapper #
 
     wire write;
     wire read;
-    wire fifo_full;
-    wire fifo_empty;
+ 
+    //---------------------------------------------------------------
+    // Commands
+    
+    wire cmd_vld, cmd_flag;   // Signals for command recongnition
+    
 
+
+    assign cmd_flag = (opkt_data[39:8] == 32'h80000000) | (opkt_data[39:8] == 32'h40000000);
+    assign cmd_vld = cmd_flag & opkt_vld & mc_pkt & parity_chk;     
+    
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            cmd_start <= 0;
+            cmd_stop  <= 0;
+            end 
+        else begin
+            cmd_start <= (opkt_data[39:8] == 32'h80000000) & cmd_vld;
+            cmd_stop  <= (opkt_data[39:8] == 32'h40000000) & cmd_vld;
+            end
+        end    
+
+    //---------------------------------------------------------------
+    // Data
+    
     integer i;
-
-
-    assign write = ~fifo_full  & opkt_vld & mc_pkt & parity_chk;
-    assign read  = ~fifo_empty & oaer_rdy;
+   
+    assign write   = ~cmd_flag & ~fifo_full & opkt_vld & mc_pkt & parity_chk;
+    assign read    = ~fifo_empty & oaer_rdy;
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin

@@ -651,7 +651,7 @@ L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 
 AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
     generic map (
-    HAS_ID     => "true",
+    HAS_ID     => "false",
     ID         => 3
     )
 	port map (
@@ -664,7 +664,7 @@ AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => open,
 	
 	-- Control interface
-	rst        => '1' -- i_reset 
+	rst        => i_reset 
 	);
 
 
