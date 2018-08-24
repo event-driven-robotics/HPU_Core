@@ -82,7 +82,18 @@ module spinn_neu_if #
         output wire [31:0] oaer_addr,
         output wire        oaer_vld,
         input  wire        oaer_rdy,
+                
+        // Command from SpiNNaker
+        input  wire [31:0] cmd_start_key,
+        input  wire [31:0] cmd_stop_key, 
+        output wire        cmd_start,
+        output wire        cmd_stop,
         
+        // Controls
+        input wire         dump_off,
+        input wire         dump_on,
+
+        // Debug Port       
         output wire  [2:0] dbg_rxstate,
         output wire  [1:0] dbg_txstate,
         output wire        dbg_ipkt_vld,
@@ -92,6 +103,60 @@ module spinn_neu_if #
         
     );
 
+// *****************************************************************************************************
+//  VHDL Component Declaration
+// 
+//  component spinn_neu_if
+//    	generic (
+//        C_PSPNNLNK_WIDTH              : natural range 1 to 32 := 32
+//            );
+//      port (
+//        rst                           : in  std_logic;
+//        clk_32                        : in  std_logic;
+//        
+//        dump_mode                     : out std_logic;
+//        parity_err                    : out std_logic;
+//        rx_err                        : out std_logic;
+//    
+//        -- input SpiNNaker link interface
+//        data_2of7_from_spinnaker      : in  std_logic_vector(6 downto 0); 
+//        ack_to_spinnaker              : out std_logic;
+//    
+//        -- output SpiNNaker link interface
+//        data_2of7_to_spinnaker        : out std_logic_vector(6 downto 0);
+//        ack_from_spinnaker            : in  std_logic;
+//    
+//        -- input AER device interface
+//        iaer_addr                     : in  std_logic_vector(C_PSPNNLNK_WIDTH-1 downto 0);
+//        iaer_vld                      : in  std_logic;
+//        iaer_rdy                      : out std_logic;
+//    
+//        -- output AER device interface
+//        oaer_addr                     : out std_logic_vector(C_PSPNNLNK_WIDTH-1 downto 0);
+//        oaer_vld                      : out std_logic;
+//        oaer_rdy                      : in  std_logic;
+//        
+//        -- Command from SpiNNaker
+//        cmd_start_key                 : in  std_logic_vector(6 downto 0); 
+//        cmd_stop_key                  : in  std_logic_vector(6 downto 0); 
+//        cmd_start                     : out std_logic;
+//        cmd_stop                      : out std_logic;
+//
+//        -- Controls
+//        dump_off                      : in std_logic;
+//        dump_on                       : in std_logic;
+//           
+//        -- Debug ports
+//        
+//        dbg_rxstate                   : out std_logic_vector(2 downto 0);
+//        dbg_txstate                   : out std_logic_vector(1 downto 0);
+//        dbg_ipkt_vld                  : out std_logic;
+//        dbg_ipkt_rdy                  : out std_logic;
+//        dbg_opkt_vld                  : out std_logic;
+//        dbg_opkt_rdy                  : out std_logic
+//  ); 
+//  end component;
+// *****************************************************************************************************
 
     wire        clk_sync;
     wire        clk_mod;
@@ -117,6 +182,11 @@ module spinn_neu_if #
     wire [71:0] i_opkt_data;
     wire        i_opkt_vld;
     wire        i_opkt_rdy;
+    
+    wire        i_cmd_start;
+    wire        i_cmd_stop;
+    wire        i_dump_on;
+    wire        i_dump_off;
 
 
     assign clk_sync = clk_32;
@@ -194,15 +264,19 @@ module spinn_neu_if #
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     out_mapper om
     (
-        .rst        (rst),
-        .clk        (clk_mod),
-        .parity_err (parity_err),
-        .opkt_data  (i_opkt_data),
-        .opkt_vld   (i_opkt_vld),
-        .opkt_rdy   (i_opkt_rdy),
-        .oaer_data  (i_oaer_addr),
-        .oaer_vld   (i_oaer_vld),
-        .oaer_rdy   (i_oaer_rdy)
+        .rst           (rst),
+        .clk           (clk_mod),
+        .parity_err    (parity_err),
+        .opkt_data     (i_opkt_data),
+        .opkt_vld      (i_opkt_vld),
+        .opkt_rdy      (i_opkt_rdy),
+        .oaer_data     (i_oaer_addr),
+        .oaer_vld      (i_oaer_vld),
+        .oaer_rdy      (i_oaer_rdy),
+        .cmd_start_key (cmd_start_key),
+        .cmd_stop_key  (cmd_stop_key),
+        .cmd_start     (i_cmd_start),
+        .cmd_stop      (i_cmd_stop)
     );
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -220,7 +294,9 @@ module spinn_neu_if #
         .iaer_rdy  (i_iaer_rdy),
         .ipkt_data (i_ipkt_data),
         .ipkt_vld  (i_ipkt_vld),
-        .ipkt_rdy  (i_ipkt_rdy)
+        .ipkt_rdy  (i_ipkt_rdy),
+        .dump_on   (i_dump_on),
+        .dump_off  (i_dump_off)
     );
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -246,6 +322,11 @@ module spinn_neu_if #
     assign dbg_ipkt_rdy = i_ipkt_rdy;
     assign dbg_opkt_vld = i_opkt_vld;
     assign dbg_opkt_rdy = i_opkt_rdy;
+    
+    assign i_dump_on    = i_cmd_stop | dump_on;
+    assign i_dump_off   = i_cmd_start | dump_off;
+    assign cmd_start    = i_cmd_start;
+    assign cmd_stop     = i_cmd_stop;
 
 
 endmodule

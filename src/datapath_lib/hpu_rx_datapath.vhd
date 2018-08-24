@@ -68,7 +68,13 @@ entity hpu_rx_datapath is
         -- GTP
         RxGtpHighBits_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
 
-
+        -- SpiNNlink controls
+        -----------------------------
+        Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0);
+        Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);
+        Spnn_cmd_start_o        : out std_logic;
+        Spnn_cmd_stop_o         : out std_logic;
+                
         -----------------------------
         -- Source Interfaces
         -----------------------------
@@ -402,7 +408,18 @@ DBG_FIFO_4 <= DBG_FIFO4;
            oaer_addr                  => i_InPaerSrc(3).idx,           -- out std_logic_vector(C_OUTPUT_DSIZE-1 downto 0);
            oaer_vld                   => i_InPaerSrc(3).vld,           -- out std_logic;                                  
            oaer_rdy                   => i_InPaerDst(3).rdy,           -- in  std_logic;                                  
+
+           -- Command from SpiNNaker
+           cmd_start_key              => Spnn_cmd_start_key_i,         -- in  std_logic_vector(31 downto 0);
+           cmd_stop_key               => Spnn_cmd_stop_key_i,          -- in  std_logic_vector(31 downto 0);
+           cmd_start                  => Spnn_cmd_start_o,             -- out std_logic;
+           cmd_stop                   => Spnn_cmd_stop_o,              -- out std_logic;
            
+           -- Controls
+           dump_off                   => '0',                          -- in  std_logic;
+           dump_on                    => '0',                          -- in  std_logic;
+
+           -- Debug Port                
            dbg_rxstate                => open,
            dbg_txstate                => open,
            dbg_ipkt_vld               => open,

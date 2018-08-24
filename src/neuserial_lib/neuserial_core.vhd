@@ -213,7 +213,10 @@ entity neuserial_core is
         LRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
         RRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
         AuxRxSpnnlnkStat_o      : out t_RxSpnnlnkStat;
-
+        
+        Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0); 
+        Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);
+        
         --
         -- LED drivers
         ---------------------
@@ -400,6 +403,8 @@ architecture str of neuserial_core is
     signal  i_Tx_data_2of7_to_spinnaker   : std_logic_vector(6 downto 0);
     signal  i_TX_ack_from_spinnaker       : std_logic;
     
+    signal  i_Spnn_cmd_start              : std_logic;
+    signal  i_Spnn_cmd_stop               : std_logic;   
 
 
 --    for all : neuserial_loopback     use entity neuserial_lib.neuserial_loopback(beh);
@@ -581,7 +586,6 @@ begin
             --HSSAERChanCfg_i      => TxHSSaerChanCfg_i,           -- in  t_hssaerCfg_array(C_HSSAER_N_CHAN-1 downto 0);
             -- GTP
 
-
             -----------------------------
             -- Sequencer interface
             -----------------------------
@@ -589,7 +593,11 @@ begin
             FromSeqSrcRdy_i      => i_txSeqSrcRdy,               -- in  std_logic;
             FromSeqDstRdy_o      => i_txSeqDstRdy,               -- out std_logic;
 
-
+            -- SpiNNlink controls
+            -----------------------------
+            Spnn_Dump_on_i      => i_Spnn_cmd_stop,              -- in  std_logic;
+            Spnn_Dump_off_i     => i_Spnn_cmd_start,             -- in  std_logic;
+        
             -----------------------------
             -- Destination interfaces
             -----------------------------
@@ -678,7 +686,13 @@ begin
             -- GTP
             RxGtpHighbits_i      => c_LRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
 
-
+            -- SpiNNlink controls
+            -----------------------------
+            Spnn_cmd_start_key_i => Spnn_cmd_start_key_i,        -- in  std_logic_vector(31 downto 0);
+            Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0);
+            Spnn_cmd_start_o     => open,                        -- out std_logic;
+            Spnn_cmd_stop_o      => open,                        -- out std_logic;
+            
             -----------------------------
             -- Source interfaces
             -----------------------------
@@ -788,7 +802,13 @@ begin
             -- GTP
             RxGtpHighbits_i      => c_RRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
 
-
+            -- SpiNNlink controls
+            -----------------------------
+            Spnn_cmd_start_key_i => Spnn_cmd_start_key_i,        -- in  std_logic_vector(31 downto 0);
+            Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0);
+            Spnn_cmd_start_o     => open,                        -- out std_logic;
+            Spnn_cmd_stop_o      => open,                        -- out std_logic;
+            
             -----------------------------
             -- Source interfaces
             -----------------------------
@@ -897,6 +917,12 @@ begin
             -- GTP
             RxGtpHighbits_i      => c_AuxRxGtpHighBits,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
 
+            -- SpiNNlink controls
+            -----------------------------
+            Spnn_cmd_start_key_i => Spnn_cmd_start_key_i,        -- in  std_logic_vector(31 downto 0);
+            Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0);
+            Spnn_cmd_start_o     => i_Spnn_cmd_start,            -- out std_logic;
+            Spnn_cmd_stop_o      => i_Spnn_cmd_stop,             -- out std_logic;
 
             -----------------------------
             -- Source interfaces

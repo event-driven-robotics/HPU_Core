@@ -72,7 +72,6 @@ entity hpu_tx_datapath is
         --HSSaerChanCfg_i         : in  t_hssaerCfg_array(C_HSSAER_N_CHAN-1 downto 0);
         -- GTP
 
-
         -----------------------------
         -- Sequencer Interface
         -----------------------------
@@ -80,7 +79,11 @@ entity hpu_tx_datapath is
         FromSeqSrcRdy_i         : in  std_logic;
         FromSeqDstRdy_o         : out std_logic;
 
-
+        -- SpiNNlink controls
+        -----------------------------
+        Spnn_Dump_on_i          : in  std_logic;
+        Spnn_Dump_off_i         : in  std_logic;
+        
         -----------------------------
         -- Destination interfaces
         -----------------------------
@@ -390,8 +393,19 @@ begin
         -- output AER device interface
             oaer_addr                    => open,           -- out std_logic_vector(C_OUTPUT_DSIZE-1 downto 0);
             oaer_vld                     => open,           -- out std_logic;                                  
-            oaer_rdy                     => '0',           -- in  std_logic;                                  
+            oaer_rdy                     => '0',            -- in  std_logic;                                  
+
+        -- Command from SpiNNaker 
+            cmd_start_key              => (others => '0'),  -- in  std_logic_vector(31 downto 0);
+            cmd_stop_key               => (others => '0'),  -- in  std_logic_vector(31 downto 0);
+            cmd_start                  => open,             -- out std_logic;
+            cmd_stop                   => open,             -- out std_logic;
         
+        -- Controls
+            dump_off                   => Spnn_Dump_off_i,  -- in  std_logic;
+            dump_on                    => Spnn_Dump_on_i,   -- in  std_logic;
+
+        -- Debug Port           
             dbg_rxstate                  => open,
             dbg_txstate                  => open,
             dbg_ipkt_vld                 => open,

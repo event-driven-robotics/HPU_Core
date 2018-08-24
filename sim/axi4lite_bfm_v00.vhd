@@ -152,6 +152,8 @@ begin
         when "SARE_CH1" => address:=x"00000074"; regnum:=27;
         when "SARE_CH2" => address:=x"00000078"; regnum:=28;
         when "SARE_CH3" => address:=x"0000007C"; regnum:=29;
+        when "STARTKEY" => address:=x"00000080"; regnum:=30;
+        when "STOPKEY " => address:=x"00000084"; regnum:=31;
 
         when others =>   assert (FALSE) report "In accesing REGISTER" severity ERROR;
     end case;

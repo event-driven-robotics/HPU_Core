@@ -79,8 +79,14 @@ package NSComponents_pkg is
             HSSaerChanEn_i          : in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
             -- GTP
             RxGtpHighBits_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-
-
+    
+            -- SpiNNlink controls
+            -----------------------------
+            Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0);
+            Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);
+            Spnn_cmd_start_o        : out std_logic;
+            Spnn_cmd_stop_o         : out std_logic;
+                    
             -----------------------------
             -- Source Interfaces
             -----------------------------
@@ -183,15 +189,18 @@ package NSComponents_pkg is
         --HSSaerChanCfg_i         : in  t_hssaerCfg_array(C_HSSAER_N_CHAN-1 downto 0);
         -- GTP
 
-
         -----------------------------
         -- Sequencer Interface
         -----------------------------
         FromSeqDataIn_i         : in  std_logic_vector(C_INPUT_DSIZE-1 downto 0);
         FromSeqSrcRdy_i         : in  std_logic;
         FromSeqDstRdy_o         : out std_logic;
-
-
+    
+        -- SpiNNlink controls
+        -----------------------------
+        Spnn_Dump_on_i          : in  std_logic;
+        Spnn_Dump_off_i         : in  std_logic;
+            
         -----------------------------
         -- Destination interfaces
         -----------------------------

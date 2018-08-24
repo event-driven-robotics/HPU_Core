@@ -147,6 +147,9 @@ LRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
 RRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
 AuxRxSpnnlnkStat_i             : in  t_RxSpnnlnkStat;
 
+Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);
+Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0); 
+
 DBG_CTRL_reg                   : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 DBG_ctrl_rd                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 
@@ -275,6 +278,8 @@ architecture rtl of neuserial_axilite is
     signal  i_HSSAER_AUX_RX_MSK_reg  : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_HSSAER_AUX_RX_ERR_CNT_reg : t_RxErrStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
     signal  i_HSSAER_AUX_RX_ERR_THR_reg : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_SPNN_START_KEY_reg  : std_logic_vector (31 downto 0);
+    signal  i_SPNN_STOP_KEY_reg   : std_logic_vector (31 downto 0);
 
     signal  i_CTRL_rd             : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_LPBK_CNFG_rd        : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -306,6 +311,8 @@ architecture rtl of neuserial_axilite is
     signal  i_HSSAER_AUX_RX_ERR_CNT_rd : t_RxErrStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
     signal  i_readRxErrCnt : std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
     signal  i_HSSAER_AUX_RX_ERR_THR_rd : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_SPNN_START_KEY_rd   : std_logic_vector (31 downto 0);
+    signal  i_SPNN_STOP_KEY_rd    : std_logic_vector (31 downto 0);
 
 
     signal  i_rawHSSaerErr  : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -427,6 +434,9 @@ begin
                     '0';
 
     RxFifoThresholdNumData_o <= i_FIFOTHRESH_reg(10 downto 0);
+    
+    Spnn_cmd_start_key_o <= i_SPNN_START_KEY_reg;
+    Spnn_cmd_stop_key_o  <= i_SPNN_STOP_KEY_reg;
 
     p_hssaer_rx_err : process (LRxSaerStat_i, RRxSaerStat_i)
     begin
@@ -609,6 +619,8 @@ begin
                 i_HSSAER_AUX_RX_ERR_reg <= (others => '0');
                 i_HSSAER_AUX_RX_MSK_reg <= (others => '0');
                 i_HSSAER_AUX_RX_ERR_THR_reg <= X"10_10_10_10";
+                i_SPNN_START_KEY_reg <= x"80000000";
+                i_SPNN_STOP_KEY_reg  <= x"40000000";
 
                 WriteTxBuffer_o <= '0';
                 i_cleanTimer  <= '0';
@@ -839,6 +851,23 @@ begin
 
                        -- i_HSSAER_AUX_CH3_ERR_CNT_reg Read Only register
                        -- when 31 =>
+ 
+                       -- i_SPNN_START_KEY_reg
+                       when 32 =>
+                          for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
+                               if (S_AXI_WSTRB(byte_index) = '1') then
+                                  i_SPNN_START_KEY_reg(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
+                               end if;
+                          end loop;      
+
+                       -- i_SPNN_STOP_KEY_reg
+                       when 33 =>
+                          for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
+                               if (S_AXI_WSTRB(byte_index) = '1') then
+                                  i_SPNN_STOP_KEY_reg(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
+                               end if;
+                          end loop;                 
+                       
 
                         when others => null;
 
@@ -954,7 +983,8 @@ begin
                           i_RX_CTRL_rd, i_TX_CTRL_rd, i_RX_CNFG_rd, i_TX_CNFG_rd,
                           i_IP_CONFIG_rd, i_FIFOTHRESH_rd, i_LPBK_CNFG_AUX_rd, i_ID_rd, i_AUX_CTRL_rd,
                           i_HSSAER_AUX_RX_ERR_rd, i_HSSAER_AUX_RX_MSK_rd,
-                          i_readRxErrCnt, i_HSSAER_AUX_RX_ERR_THR_rd, i_HSSAER_AUX_RX_ERR_CNT_rd )
+                          i_readRxErrCnt, i_HSSAER_AUX_RX_ERR_THR_rd, i_HSSAER_AUX_RX_ERR_CNT_rd,
+                          i_SPNN_START_KEY_rd, i_SPNN_STOP_KEY_rd )
     begin
         if (S_AXI_ARESETN = '0') then
             regDataOut <= (others => '0');
@@ -1702,6 +1732,23 @@ begin
         i_aux_err_cnt_msk <= v_err_of_msk & v_err_to_msk & v_err_rx_msk & v_err_ko_msk;
     
     end process p_aux_err;
+
+
+    -- ------------------------------------------------------------------------
+    -- SpiNNaker START Key Command
+    -- ------------------------------------------------------------------------
+    -- i_SPNN_START_KEY_rd r/w
+
+    i_SPNN_START_KEY_rd <= i_SPNN_START_KEY_reg;
+    
+    
+    -- ------------------------------------------------------------------------
+    -- SpiNNaker STOP Key Command
+    -- ------------------------------------------------------------------------
+    -- i_SPNN_STOP_KEY_rd r/w
+
+    i_SPNN_STOP_KEY_rd <= i_SPNN_STOP_KEY_reg;
+
 
     DBG_CTRL_reg <=  i_CTRL_reg;
     DBG_ctrl_rd  <=  i_CTRL_rd;

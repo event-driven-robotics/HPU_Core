@@ -31,7 +31,11 @@ module in_mapper #
         // SpiNNaker packet interface
         output      [71:0] 			ipkt_data,
         output             			ipkt_vld,
-        input  wire        			ipkt_rdy
+        input  wire        			ipkt_rdy,
+        
+        // Commands
+        input wire                  dump_on,
+        input wire                  dump_off
     );
 
     //---------------------------------------------------------------
@@ -48,25 +52,56 @@ module in_mapper #
     // dump events from AER device if SpiNNaker not responding!
     // dump after 128 cycles without SpiNNaker response
     //---------------------------------------------------------------
-    reg              [7:0] dump_ctr;
+    reg              [7:0] spnnlnk_timeout_cnt;
+    reg                    spnnlnk_timeout;
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            dump_ctr <= 8'd128;
-            dump_mode <= 1'b0;
+            spnnlnk_timeout_cnt <= 8'd128;
+            spnnlnk_timeout     <= 1'b0;
         end else begin
-            dump_mode <= 1'b0;
+            spnnlnk_timeout <= 1'b0;
             if (ipkt_rdy) begin
-                dump_ctr <= 8'd128;  // spinn_driver ready resets counter
-            end else if (dump_ctr != 5'd0) begin
-                dump_ctr <= dump_ctr - 1;
+                spnnlnk_timeout_cnt <= 8'd128;  // spinn_driver ready resets counter
+            end else if (spnnlnk_timeout_cnt != 5'd0) begin
+                spnnlnk_timeout_cnt <= spnnlnk_timeout_cnt - 1;
             end else begin
-                dump_ctr <= dump_ctr;  // no change!
-                dump_mode <= 1'b1;
+                spnnlnk_timeout_cnt <= spnnlnk_timeout_cnt;  // no change!
+                spnnlnk_timeout <= 1'b1;
             end
         end
     end
     //---------------------------------------------------------------
+    
+    //---------------------------------------------------------------
+    // a "start" command allow to send data to SpiNNaker
+    // a "stop" command stops sending data 
+    //---------------------------------------------------------------
+    reg               cmd_dump;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) 
+            cmd_dump <= 1'b1;
+        else begin
+            if (dump_on) 
+                cmd_dump <= 1'b1;
+            else if (dump_off) 
+                cmd_dump <= 1'b0;
+            end
+        end
+    //---------------------------------------------------------------   
+
+    //---------------------------------------------------------------
+    // Dump 
+    //---------------------------------------------------------------
+    
+    always @(posedge clk or posedge rst) begin
+        if (rst) 
+            dump_mode <= 1'b1;
+        else 
+            dump_mode <= cmd_dump | spnnlnk_timeout;
+        end
+    //---------------------------------------------------------------       
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //---------------------- packet interface -----------------------
@@ -132,7 +167,7 @@ module in_mapper #
 
     assign iaer_rdy   = ~fifo_full | dump_mode;
 
-    assign ipkt_vld   = ~fifo_empty;
+    assign ipkt_vld   = ~fifo_empty & ~dump_mode;
     assign ipkt_data  = {32'h0, data_fifo[0]};
 
 endmodule

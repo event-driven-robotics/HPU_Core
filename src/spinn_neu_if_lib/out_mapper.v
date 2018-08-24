@@ -50,7 +50,9 @@ module out_mapper #
         output             			oaer_vld,
         input  wire        			oaer_rdy,
         
-        // Command output
+        // Command from SpiNNaker 
+        input  wire [31:0]          cmd_start_key,
+        input  wire [31:0]          cmd_stop_key, 
         output reg                  cmd_start,
         output reg                  cmd_stop
     );
@@ -123,7 +125,7 @@ module out_mapper #
     
 
 
-    assign cmd_flag = (opkt_data[39:8] == 32'h80000000) | (opkt_data[39:8] == 32'h40000000);
+    assign cmd_flag = (opkt_data[39:8] == cmd_start_key) | (opkt_data[39:8] == cmd_stop_key);
     assign cmd_vld = cmd_flag & opkt_vld & mc_pkt & parity_chk;     
     
     always @(posedge clk or posedge rst) begin
@@ -132,8 +134,8 @@ module out_mapper #
             cmd_stop  <= 0;
             end 
         else begin
-            cmd_start <= (opkt_data[39:8] == 32'h80000000) & cmd_vld;
-            cmd_stop  <= (opkt_data[39:8] == 32'h40000000) & cmd_vld;
+            cmd_start <= (opkt_data[39:8] == cmd_start_key) & cmd_vld;
+            cmd_stop  <= (opkt_data[39:8] == cmd_stop_key) & cmd_vld;
             end
         end    
 

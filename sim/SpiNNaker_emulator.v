@@ -411,7 +411,7 @@ begin
     wait (LoutAck != LoutAck_r);
 
     if (HAS_ID == "true")  pkt_data[27:0] = pkt_data[27:0] + 1; 
-    if (HAS_ID == "false") pkt_data = pkt_data + 32'h10000000;
+    if (HAS_ID == "false") pkt_data = pkt_data + 32'h08000000;
     
 
   end

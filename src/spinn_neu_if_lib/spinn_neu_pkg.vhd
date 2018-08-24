@@ -43,6 +43,18 @@ component spinn_neu_if
 		oaer_vld					: out std_logic;
 		oaer_rdy					: in  std_logic;
 		
+        -- Command from SpiNNaker 
+        cmd_start_key               : in  std_logic_vector(31 downto 0); 
+        cmd_stop_key                : in  std_logic_vector(31 downto 0); 
+        cmd_start                   : out std_logic;
+        cmd_stop                    : out std_logic;
+
+        -- Controls
+        dump_off                    : in std_logic;
+        dump_on                     : in std_logic;
+    
+        -- Debug ports
+		
 		dbg_rxstate					: out std_logic_vector(2 downto 0);
 		dbg_txstate					: out std_logic_vector(1 downto 0);
 		dbg_ipkt_vld				: out std_logic;
@@ -52,5 +64,9 @@ component spinn_neu_if
 	); 
 end component;
 
+type SpnnCmd_type is record
+    cmd_start_key : std_logic_vector(31 downto 0);
+    cmd_stop_key  : std_logic_vector(31 downto 0);
+end record SpnnCmd_type;
 
 end package spinn_neu_pkg;
