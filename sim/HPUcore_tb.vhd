@@ -454,6 +454,7 @@ signal data_to_AER_L			: std_logic_vector(23 downto 0);
 signal req_to_AER_L    			: std_logic;
 signal ack_from_AER_L     		: std_logic;
 signal AER_device_enable_L		: std_logic;
+signal SPNN_device_enable_L		: std_logic;
 
 signal data_from_AER_R			: std_logic_vector(23 downto 0);
 signal req_from_AER_R			: std_logic;
@@ -462,6 +463,7 @@ signal data_to_AER_R			: std_logic_vector(23 downto 0);
 signal req_to_AER_R    			: std_logic;
 signal ack_from_AER_R     		: std_logic;
 signal AER_device_enable_R		: std_logic;
+signal SPNN_device_enable_R 	: std_logic;
 
 signal data_from_AER_Aux		: std_logic_vector(23 downto 0);
 signal req_from_AER_Aux			: std_logic;
@@ -470,6 +472,7 @@ signal data_to_AER_Aux			: std_logic_vector(23 downto 0);
 signal req_to_AER_Aux    		: std_logic;
 signal ack_from_AER_Aux     	: std_logic;
 signal AER_device_enable_Aux	: std_logic;
+signal SPNN_device_enable_Aux	: std_logic;
  
 signal data_from_AER_Tx			: std_logic_vector(23 downto 0);
 signal req_from_AER_Tx			: std_logic;
@@ -478,6 +481,7 @@ signal data_to_AER_Tx			: std_logic_vector(23 downto 0);
 signal req_to_AER_Tx    		: std_logic;
 signal ack_from_AER_Tx     		: std_logic;
 signal AER_device_enable_Tx		: std_logic;
+signal SPNN_device_enable_Tx	: std_logic;
 
 -- Clocks
 signal HSSAER_ClkLS_p      		: std_logic;
@@ -628,7 +632,7 @@ R_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => open,
 	
 	-- Control interface
-	rst        => '1' -- i_reset
+	rst        => SPNN_device_enable_R -- i_reset
 	);
 
 L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
@@ -646,12 +650,12 @@ L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => open,
 	
 	-- Control interface
-	rst        => '1' -- i_reset
+	rst        => SPNN_device_enable_L -- i_reset
 	);
 
 AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
     generic map (
-    HAS_ID     => "false",
+    HAS_ID     => "true",
     ID         => 3
     )
 	port map (
@@ -664,7 +668,7 @@ AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => open,
 	
 	-- Control interface
-	rst        => i_reset 
+	rst        => SPNN_device_enable_Aux -- i_reset
 	);
 
 
@@ -683,7 +687,7 @@ TX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => Tx_ack_from_spinnaker,
 	
 	-- Control interface
-	rst        => i_reset
+	rst        => SPNN_device_enable_Tx -- i_reset
 	);
 
 
@@ -1086,19 +1090,34 @@ Enable_AER_Proc : process
 		AER_device_enable_Tx  <= '0';
 
 		wait for 100 us;
-		AER_device_enable_L   <= '1';
+		AER_device_enable_L   <= '0';
 		AER_device_enable_R   <= '0';
 		AER_device_enable_Aux <= '0';
 		AER_device_enable_Tx  <= '0';
 		wait;
 end process Enable_AER_Proc;
 
+Enable_SPNN_Proc : process
+	begin
+		SPNN_device_enable_L   <= '1';
+		SPNN_device_enable_R   <= '1';
+		SPNN_device_enable_Aux <= '1';
+		SPNN_device_enable_Tx  <= '1';
+
+		wait for 100 us;
+		SPNN_device_enable_L   <= '0';
+		SPNN_device_enable_R   <= '0';
+		SPNN_device_enable_Aux <= '0';
+		SPNN_device_enable_Tx  <= '0';
+		wait;
+end process Enable_SPNN_Proc;
+
 Axis_HPU_proc : process
 	begin
 		M_Axis_TREADY_HPU   <= '1';
 
-		wait for 2000 us;
-		M_Axis_TREADY_HPU   <= '0';
+--		wait for 2000 us;
+--		M_Axis_TREADY_HPU   <= '0';
 		wait;
 end process Axis_HPU_proc;
 
