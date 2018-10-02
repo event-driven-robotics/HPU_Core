@@ -53,7 +53,7 @@ entity HPUcore_tb is
     generic (
         CLK_PERIOD                  : integer := 10;   -- CLK period [ns]
         C_S_AXI_DATA_WIDTH          : natural := 32;
-        C_S_AXI_ADDR_WIDTH          : natural := 7;
+        C_S_AXI_ADDR_WIDTH          : natural := 8;
         C_ENC_NUM_OF_STEPS          : natural := 1970; -- Limit of incremental encoder
         NUM_OF_TRANSMITTER          : integer := 32;
         NUM_OF_RECEIVER             : natural := 32;
@@ -390,7 +390,11 @@ end component ;
 component SpiNNaker_Emulator 
     generic (
         HAS_ID       : string;
-        ID           : natural
+        ID           : natural;
+        HAS_TX       : string;
+        TX_FILE      : string;
+        HAS_RX       : string;
+        RX_FILE      : string
         ); 
 		port (
 		
@@ -619,8 +623,12 @@ begin
 -- --------------------------------------------------	
 R_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
     generic map (
-    HAS_ID     => "true",
-    ID         => 1
+    HAS_ID     => "false",
+    ID         => 1,
+    HAS_TX     => "false",
+    TX_FILE    => "../../../../../sim/Data_To_R.txt",
+    HAS_RX     => "false",
+    RX_FILE    => ""
     )
 	port map (
 	-- SpiNNaker link asynchronous output interface
@@ -637,8 +645,12 @@ R_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 
 L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
     generic map (
-    HAS_ID     => "true",
-    ID         => 2
+    HAS_ID     => "false",
+    ID         => 2,
+    HAS_TX     => "false",
+    TX_FILE    => "../../../../../sim/Data_To_L.txt",
+    HAS_RX     => "false",
+    RX_FILE    => ""
     )
 	port map (
 	-- SpiNNaker link asynchronous output interface
@@ -655,8 +667,12 @@ L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 
 AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
     generic map (
-    HAS_ID     => "true",
-    ID         => 3
+    HAS_ID     => "false",
+    ID         => 3,
+    HAS_TX     => "true",
+    TX_FILE    => "../../../../../sim/Data_To_AUX.txt",
+    HAS_RX     => "false",
+    RX_FILE    => "u"
     )
 	port map (
 	-- SpiNNaker link asynchronous output interface
@@ -675,7 +691,11 @@ AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 TX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
     generic map (
     HAS_ID     => "false",
-    ID         => 0
+    ID         => 0,
+    HAS_TX     => "false",
+    TX_FILE    => "",
+    HAS_RX     => "true",
+    RX_FILE    => "Data_From_TX.txt"
     )
 	port map (
 	-- SpiNNaker link asynchronous output interface
@@ -855,8 +875,8 @@ HPUCORE_i : HPUCore
 
         -- DO NOT EDIT BELOW THIS LINE ---------------------
         -- Bus protocol parameters, do not add to or delete
-        C_S_AXI_DATA_WIDTH          => 32,				--	: integer              := 32;
-        C_S_AXI_ADDR_WIDTH          => 7,				--	: integer              := 7;
+        C_S_AXI_DATA_WIDTH          => C_S_AXI_DATA_WIDTH,				--	: integer              := 32;
+        C_S_AXI_ADDR_WIDTH          => C_S_AXI_ADDR_WIDTH,				--	: integer              := 7;
         C_S_AXI_MIN_SIZE            => X"000001FF",		--	: std_logic_vector     := X"000001FF";
         C_USE_WSTRB                 => 1,				--	: integer              := 1;
         C_DPHASE_TIMEOUT            => 8,				--	: integer              := 8;
@@ -1107,8 +1127,10 @@ Enable_SPNN_Proc : process
 		wait for 100 us;
 		SPNN_device_enable_L   <= '0';
 		SPNN_device_enable_R   <= '0';
-		SPNN_device_enable_Aux <= '0';
 		SPNN_device_enable_Tx  <= '0';
+		
+		wait for 348 us;
+	    SPNN_device_enable_Aux <= '0';
 		wait;
 end process Enable_SPNN_Proc;
 

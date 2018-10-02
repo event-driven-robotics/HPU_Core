@@ -34,11 +34,14 @@
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 `timescale 1ns / 1ps
 
-
 module SpiNNaker_Emulator #
  (
-   parameter HAS_ID = "false",
-   parameter ID     = 0
+   parameter HAS_ID  = "false",
+   parameter ID      = 0,
+   parameter HAS_TX  = "false",
+   parameter TX_FILE = "tx_file.txt",
+   parameter HAS_RX  = "false",
+   parameter RX_FILE = "rx_file.txt"
   ) 
  ( 
   // SpiNNaker link asynchronous output interface
@@ -320,6 +323,8 @@ wire        parity;
 
 reg        LoutAck_r;
 
+integer infile0; //file descriptors
+
 assign parity = ~(^pkt_data);
 assign packet = {pkt_data, 7'b0000000, parity};
 
@@ -336,6 +341,8 @@ begin
   
   if (HAS_ID == "true")  pkt_data  = {ID, 28'h0000000}; 
   if (HAS_ID == "false") pkt_data  = {32'h00000000}; 
+  
+  if (HAS_TX == "true") infile0=$fopen(TX_FILE,"r");   //"r" means reading and "w" means writing
 
   Lout = 0;
 
@@ -344,6 +351,11 @@ begin
 
   forever 
   begin
+  
+      //read the contents of the file as hexadecimal values into register "A".
+  if ((HAS_TX == "true") & (! $feof(infile0))) //read if "end of file" is not reached (and TX is enabled).
+      $fscanf(infile0,"%h\n",pkt_data);       //scan each line and get the value as an hexadecimal
+
     # SPL_HSDLY
     Lout = Lout ^ encode_2of7 ({01'b0, packet[3:0]});
 
@@ -410,8 +422,8 @@ begin
     LoutAck_r = LoutAck;
     wait (LoutAck != LoutAck_r);
 
-    if (HAS_ID == "true")  pkt_data[27:0] = pkt_data[27:0] + 1; 
-    if (HAS_ID == "false") pkt_data = pkt_data + 32'h08000000;
+//    if (HAS_ID == "true")  pkt_data[27:0] = pkt_data[27:0] + 1; 
+//    if (HAS_ID == "false") pkt_data = pkt_data + 32'h08000000;
     
 
   end
@@ -428,11 +440,20 @@ reg [31:0] key = 0;
 wire [3:0] rec_data;
 wire       rec_eop;
 
+// File operation
+integer outfile0; //file descriptors
+
 assign rec_data = decode_nrz_2of7 (Lin, Lin_r);
 assign rec_eop  = eop_nrz_2of7 (Lin, Lin_r);
 
 initial
 begin
+
+  //The $fopen function opens a file and returns a multi-channel descriptor 
+  //in the format of an unsized integer. 
+  if (HAS_RX == "true") outfile0=$fopen(RX_FILE,"w");   //"r" means reading and "w" means writing
+
+
   Lin_r = 0;
   LinAck = 0;
 
@@ -443,8 +464,7 @@ begin
   LinAck = 1;
   Lin_r = Lin;
 
-  forever
-  begin
+  forever begin
     wait (complete_nrz_2of7 (Lin, Lin_r));
     # SPL_HSDLY
     if (!rec_eop) rec_packet_sr = {rec_packet_sr[35:0],rec_data};
@@ -459,6 +479,9 @@ begin
                   rec_packet_sr[23:20],
                   rec_packet_sr[27:24],
                   rec_packet_sr[31:28]};
+                  
+        //Write the value into text files.
+        if (HAS_RX == "true") $fdisplay(outfile0,"%h",{header,key}); //write as hexadecimal
         end;
     LinAck = ~LinAck;
     Lin_r = Lin;
