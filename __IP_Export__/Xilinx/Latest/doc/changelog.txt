@@ -1,6 +1,0 @@
-********************************************
-Version 3.0 - Maurizio Casti
-- Added the SpiNNink feature
-
-********************************************
-Version 2.2 - Francesco Diotalevi
