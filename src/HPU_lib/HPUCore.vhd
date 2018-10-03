@@ -1,9 +1,12 @@
 -- ------------------------------------------------------------------------------
 -- 
---  Revision 1.1:  07/25/2018
+--  Version 3.0:  07/25/2018
 --  - Added SpiNNlink capabilities
 --    (M. Casti - IIT)
 --    
+--  Version 3.1:  03/10/2018
+--  - START/STOP Commands for SpiNNlink
+--    (M. Casti - IIT)
 -- ------------------------------------------------------------------------------
 
 
@@ -91,7 +94,7 @@ entity HPUCore is
 
         -- DO NOT EDIT BELOW THIS LINE ---------------------
         -- Bus protocol parameters, do not add to or delete
-        C_S_AXI_ADDR_WIDTH             : integer              := 7;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
+        C_S_AXI_ADDR_WIDTH             : integer              := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
         C_S_AXI_DATA_WIDTH             : integer              := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
         C_S_AXI_MIN_SIZE               : std_logic_vector     := X"000001FF";
         C_USE_WSTRB                    : integer              := 1;

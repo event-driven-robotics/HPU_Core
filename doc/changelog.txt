@@ -1,6 +1,9 @@
 ********************************************
-Version 3.0 - Maurizio Casti
-- Added the SpiNNink feature
+Version 3.0:  07/25/2018
+- Added SpiNNlink capabilities
+  (M. Casti - IIT)
 
 ********************************************
-Version 2.2 - Francesco Diotalevi
+Version 2.2
+- Original HPU Core functions (AER/HSSAER interfaces)
+  (F. Diotalevi - IIT)
