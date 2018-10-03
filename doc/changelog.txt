@@ -1,5 +1,10 @@
 ********************************************
-Version 3.0:  07/25/2018
+Version 3.1:  27th, August 2018
+- Added the START/STOP Feature to SpiNNlink
+  (M. Casti - IIT)
+
+********************************************
+Version 3.0:  9th, August 2018
 - Added SpiNNlink capabilities
   (M. Casti - IIT)
 

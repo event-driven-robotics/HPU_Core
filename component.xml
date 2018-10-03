@@ -3923,8 +3923,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>1</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2018-10-03T09:17:35Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>2</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2018-10-03T09:38:01Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
