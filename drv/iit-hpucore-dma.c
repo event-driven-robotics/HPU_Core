@@ -76,7 +76,7 @@
 #define HPU_AUX_RX_ERR_CH3_REG  0x7C
 
 /* magic constants */
-#define HPU_VER_MAGIC 		    0x48505521
+#define HPU_VER_MAGIC 		    0x42303130
 
 #define HPU_CTRL_DMA_RUNNING    0x0001
 #define HPU_CTRL_ENDMA		    0x0002
@@ -91,6 +91,7 @@
 #define HPU_RXCTRL_LRXHSSAER_EN     0x00000001
 #define HPU_RXCTRL_LRXPAER_EN       0x00000002
 #define HPU_RXCTRL_LRXFTP_EN        0x00000004
+#define HPU_RXCTRL_SPINNL_EN        0x00000008
 #define HPU_RXCTRL_LRXHSSAERCH0_EN  0x00000100
 #define HPU_RXCTRL_LRXHSSAERCH1_EN  0x00000200
 #define HPU_RXCTRL_LRXHSSAERCH2_EN  0x00000400
@@ -99,10 +100,12 @@
 #define HPU_RXCTRL_RRXHSSAER_EN     0x00010000
 #define HPU_RXCTRL_RRXPAER_EN       0x00020000
 #define HPU_RXCTRL_RRXFTP_EN        0x00040000
+#define HPU_RXCTRL_SPINNR_EN        0x00080000
 #define HPU_RXCTRL_RRXHSSAERCH0_EN  0x01000000
 #define HPU_RXCTRL_RRXHSSAERCH1_EN  0x02000000
 #define HPU_RXCTRL_RRXHSSAERCH2_EN  0x04000000
 #define HPU_RXCTRL_RRXHSSAERCH3_EN  0x08000000
+
 
 #define HPU_MSK_INT_RXFIFOFULL    0x004
 #define HPU_MSK_INT_TSTAMPWRAPPED 0x080
@@ -115,6 +118,7 @@
 #define HPU_AUXCTRL_AUXRXHSSAER_EN     0x00000001
 #define HPU_AUXCTRL_AUXRXPAER_EN       0x00000002
 #define HPU_AUXCTRL_AUXRXFTP_EN        0x00000004
+#define HPU_AUXCTRL_AUXSPINN_EN        0x00000008
 #define HPU_AUXCTRL_AUXRXHSSAERCH0_EN  0x00000100
 #define HPU_AUXCTRL_AUXRXHSSAERCH1_EN  0x00000200
 #define HPU_AUXCTRL_AUXRXHSSAERCH2_EN  0x00000400
@@ -135,6 +139,8 @@
 #define HPU_IOCTL_GET_AUX_CNT3   15
 #define HPU_IOCTL_GET_LOST_CNT   16
 #define HPU_IOCTL_SET_HSSAER_CH  17
+#define HPU_IOCTL_SET_LOOP_CFG   18
+#define HPU_IOCTL_SET_SPINN      19
 
 #define MSG_PREFIX "IIT-hpu: "
 
@@ -153,9 +159,7 @@ MODULE_PARM_DESC(pn, "Pool num");
 module_param(to, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 MODULE_PARM_DESC(to, "DMA TimeOut in ms");
 
-
-
-enum hssaersrc { left_eye=0, right_eye, aux};
+enum hssaersrc { left_eye=0, right_eye, aux, spinn};
 
 typedef struct ch_en_hssaer {
 	enum hssaersrc hssaer_src;
@@ -173,9 +177,9 @@ typedef struct aux_cnt {
 struct hpu_priv;
 
 typedef struct ip_regs {
-    uint32_t reg_offset;
-    char rw;
-    uint32_t data;
+	uint32_t reg_offset;
+	char rw;
+	uint32_t data;
 } ip_regs_t;
 
 struct hpu_buf {
@@ -193,8 +197,8 @@ struct hpu_priv {
 	int id;
 	unsigned int irq;
 	struct mutex access_lock;
-    unsigned int hpu_is_opened;
-    
+	unsigned int hpu_is_opened;
+
 	void __iomem *regs;
 	uint32_t ctrl_reg;
 	//unsigned int wraptimes;
@@ -205,8 +209,12 @@ struct hpu_priv {
 
 	/* dma */
 	struct dma_chan *dma_chan;
+	struct dma_chan *dma_tx_chan;
 	struct dma_pool *dma_pool;
 	struct hpu_buf *dma_ring; // dma_ring[HPU_POOL_NUM];
+	void *dma_tx_buf;
+	dma_addr_t dma_tx_buf_phys;
+	struct semaphore dma_tx_sem;
 	int buf_index;
 	int filled;
 	spinlock_t ring_lock;
@@ -219,19 +227,28 @@ static dev_t hpu_devt;
 static DEFINE_IDA(hpu_ida);
 
 static int hpu_dma_submit_buffer(struct hpu_priv *priv,
-					             struct hpu_buf *buf);
+				 struct hpu_buf *buf);
 
 static void hpu_dma_free_pool(struct hpu_priv *priv);
 
+static int _hpu_chardev_close(struct hpu_priv *priv);
 
 static void read_generic_reg(u32 *par, void __iomem *reg_addr)
 {
-    *par=readl(reg_addr);
+	*par=readl(reg_addr);
 }
 
 static void write_generic_reg(u32 par, void __iomem *reg_addr)
 {
 	writel(par,reg_addr);
+}
+
+static void hpu_tx_dma_callback(void *arg)
+{
+	struct hpu_priv *priv = arg;
+
+//	dev_dbg(&priv->pdev->dev, "TX DMA OK\n");
+	up(&priv->dma_tx_sem);
 }
 
 static void hpu_dma_callback(void *_buffer)
@@ -240,14 +257,14 @@ static void hpu_dma_callback(void *_buffer)
 	struct hpu_priv *priv = buffer->priv;
 
 	spin_lock(&priv->ring_lock);
-	dev_dbg(&priv->pdev->dev, "DMA cb\n"); 
+	dev_dbg(&priv->pdev->dev, "DMA cb\n");
 	if (priv->filled == (pn - 1)) {
 		hpu_dma_submit_buffer(priv, &priv->dma_ring[priv->buf_index]);
 
 		/* forcefully advance index. 1pkt lost */
 		priv->buf_index =
 			(priv->buf_index + 1) & (pn - 1);
-        // printk("pkt loss\n");
+		// printk("pkt loss\n");
 		priv->cnt_pktloss++;
 		dma_async_issue_pending(priv->dma_chan);
 	} else {
@@ -261,8 +278,9 @@ static void hpu_dma_callback(void *_buffer)
 	spin_unlock(&priv->ring_lock);
 }
 
+
 static int hpu_read_chunk(struct hpu_priv *priv,
-				int maxlen, void* __user buf)
+			  int maxlen, void* __user buf)
 {
 	struct hpu_buf *item;
 	int time_left;
@@ -285,7 +303,7 @@ static int hpu_read_chunk(struct hpu_priv *priv,
 		dev_dbg(&priv->pdev->dev, "wait for dma\n");
 		time_left =
 			wait_for_completion_timeout(&priv->rx_cmp,
-						msecs_to_jiffies(to));
+						    msecs_to_jiffies(to));
 
 		if (time_left == 0) {
 			dev_err(&priv->pdev->dev, "DMA timed out\n");
@@ -305,7 +323,7 @@ static int hpu_read_chunk(struct hpu_priv *priv,
 #if 0
 	status =
 		dma_async_is_tx_complete(priv->dma_chan,
-					item->cookie, NULL, NULL);
+					 item->cookie, NULL, NULL);
 	if (status != DMA_COMPLETE) {
 		dev_err(&priv->pdev->dev,
 			"Was going to read descriptor with status \'%s\'\n",
@@ -315,10 +333,10 @@ static int hpu_read_chunk(struct hpu_priv *priv,
 	}
 #endif
 	buf_count = ps - item->read_index;
-    length = min(maxlen, buf_count);
-    
+	length = min(maxlen, buf_count);
+
 //     tmp_ptr = item->virt + item->read_index;
-//     
+//
 //     j=0;
 //     while (1) {
 //         ok=1;j++;
@@ -333,12 +351,12 @@ static int hpu_read_chunk(struct hpu_priv *priv,
 //                 break;
 //             }
 //         }
-//         if (ok) 
+//         if (ok)
 //             break;
 //     }
-    
-	dev_dbg(&priv->pdev->dev, "going to read %d bytes from offset %d\n", 
-        length, item->read_index);
+
+	dev_dbg(&priv->pdev->dev, "going to read %d bytes from offset %d\n",
+		length, item->read_index);
 
 	memcpy(priv->tmp_buf, item->virt + item->read_index, length);
 
@@ -370,23 +388,64 @@ static int hpu_read_chunk(struct hpu_priv *priv,
 	return length;
 }
 
+static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
+				     size_t lenght, loff_t *offset)
+{
+	int ret;
+	struct hpu_priv *priv = fp->private_data;
+	struct dma_async_tx_descriptor *dma_desc;
+	dma_cookie_t cookie;
+
+	/* for now allow only one pair TS+VAL that is 4+4 bytes */
+	if (lenght != 8)
+		return -EINVAL;
+
+	if (copy_from_user(priv->dma_tx_buf, buf, lenght))
+	    return -EINVAL;
+
+	ret = down_timeout(&priv->dma_tx_sem, HZ);
+
+	if (ret < 0) {
+		dev_warn(&priv->pdev->dev, "TX DMA stuck?\n");
+		return ret;
+	}
+	dev_dbg(&priv->pdev->dev, "Firing TX DMA (%x)- stat: 0x%x, ctrl 0x%x\n",
+		((unsigned int*)priv->dma_tx_buf)[1],
+		readl(priv->regs + HPU_RAWSTAT_REG),
+		readl(priv->regs + HPU_CTRL_REG));
+
+	dma_desc = dmaengine_prep_slave_single(priv->dma_tx_chan,
+					       priv->dma_tx_buf_phys,
+					       lenght,
+					       DMA_MEM_TO_DEV,
+					       DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
+
+	dma_desc->callback = hpu_tx_dma_callback;
+	dma_desc->callback_param = priv;
+
+	cookie = dmaengine_submit(dma_desc);
+	dma_async_issue_pending(priv->dma_tx_chan);
+
+	return lenght;
+}
+
 static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
-			    loff_t * offset)
+				loff_t * offset)
 {
 	int ret;
 	struct hpu_priv *priv = fp->private_data;
 	int read = 0;
-	u32 msk, val;
+	u32 msk;
 
-    // Unmask RXFIFOFULL interrupt
-    msk=readl(priv->regs + HPU_IRQMASK_REG);
-    msk|=HPU_MSK_INT_RXFIFOFULL;
-    writel(msk, priv->regs + HPU_IRQMASK_REG);
-    rx_fifo_full = 0;
+	// Unmask RXFIFOFULL interrupt
+	msk=readl(priv->regs + HPU_IRQMASK_REG);
+	msk|=HPU_MSK_INT_RXFIFOFULL;
+	writel(msk, priv->regs + HPU_IRQMASK_REG);
+	rx_fifo_full = 0;
 
 	dev_dbg(&priv->pdev->dev, "----tot to read %d\n", length);
 	while (length > 0) {
-		if (rx_fifo_full==1) 
+		if (rx_fifo_full==1)
 			goto error_rx_fifo_full;
 
 		ret = hpu_read_chunk(priv, length, buf + read);
@@ -403,45 +462,13 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 	return read;
 
 
-	error_rx_fifo_full:
-    mutex_lock(&priv->access_lock);
-    
-    // Read CTRL_Register and Disable The IP
-    val = readl(priv->regs + HPU_CTRL_REG);
-    val = val & ~HPU_CTRL_ENDMA;
-    writel( val, priv->regs + HPU_CTRL_REG);
-//	stat= readl_poll_timeout_atomic(priv->regs + HPU_CTRL_REG, val, !(val & HPU_CTRL_DMA_RUNNING), 1, (1<<30)-1);
-//    if (stat) {
-//        printk(KERN_INFO MSG_PREFIX "No events coming: TIMEOUT\n");
-        val = readl(priv->regs + HPU_CTRL_REG);
-        val = val | HPU_CTRL_RESETDMASTREAM;
-        writel( val, priv->regs + HPU_CTRL_REG);
-//    }
-    
-   	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
-	priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
-	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-	writel(0x00000000 , priv->regs + HPU_RXCTRL_REG);
-	writel(0x00000000 , priv->regs + HPU_AUX_RXCTRL_REG);
-	mdelay(100);
-    dmaengine_terminate_all(priv->dma_chan);
-	dma_release_channel(priv->dma_chan);
+error_rx_fifo_full:
 
-//   	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
- //   priv->ctrl_reg |=  HPU_CTRL_FLUSHFIFOS;
-//	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-
-
-	hpu_dma_free_pool(priv);
-
-    // UnLock resource
-  	priv->hpu_is_opened=0;
-
-
-    mutex_unlock(&priv->access_lock);
-
-
-
+	/*
+	 * AM: I kept the same behaviour here as before, but I'm not sure it
+	 * is sane to force a close when a read fails.
+	 */
+	_hpu_chardev_close(priv);
 	return -ENOMEM;
 }
 
@@ -450,11 +477,32 @@ static int hpu_dma_init(struct hpu_priv *priv)
 	priv->dma_chan = dma_request_slave_channel(&priv->pdev->dev, "rx");
 
 	if (IS_ERR_OR_NULL(priv->dma_chan)) {
+		dev_err(&priv->pdev->dev, "Can't bind RX DMA chan\n");
 		priv->dma_chan = NULL;
 		return -ENODEV;
 	}
 
+	priv->dma_tx_chan = dma_request_slave_channel(&priv->pdev->dev, "tx");
+
+	if (IS_ERR_OR_NULL(priv->dma_tx_chan)) {
+		dma_release_channel(priv->dma_chan);
+		priv->dma_tx_chan = NULL;
+		dev_err(&priv->pdev->dev, "Can't bind TX DMA chan\n");
+		return -ENODEV;
+	}
+
 	return 0;
+}
+
+static void hpu_dma_release(struct hpu_priv *priv)
+{
+	if (priv->dma_chan) {
+		dma_release_channel(priv->dma_chan);
+		hpu_dma_free_pool(priv);
+	}
+
+	if (priv->dma_tx_chan)
+		dma_release_channel(priv->dma_tx_chan);
 }
 
 static int hpu_dma_alloc_pool(struct hpu_priv *priv)
@@ -462,7 +510,7 @@ static int hpu_dma_alloc_pool(struct hpu_priv *priv)
 	int i;
 
 	priv->dma_pool = dma_pool_create(HPU_DRIVER_NAME, &priv->pdev->dev,
-					ps, 4, 0);
+					 ps, 4, 0);
 
 	if (!priv->dma_pool) {
 		dev_err(&priv->pdev->dev, "Error creating DMA pool\n");
@@ -470,7 +518,6 @@ static int hpu_dma_alloc_pool(struct hpu_priv *priv)
 	}
 
 	for (i = 0; i < pn; i++) {
-
 		priv->dma_ring[i].virt =
 			(unsigned char *)dma_pool_alloc(priv->dma_pool, GFP_KERNEL,
 							&priv->dma_ring[i].phys);
@@ -478,9 +525,9 @@ static int hpu_dma_alloc_pool(struct hpu_priv *priv)
 		if (!priv->dma_ring[i].virt)
 			return -ENOMEM;
 
-        // Just to be sure that 0x55 is a unitialized buffer
-        //memset(priv->dma_ring[i].virt,0x55,ps);
-	//	priv->dma_ring[i].read_index = 0;
+		// Just to be sure that 0x55 is a unitialized buffer
+		//memset(priv->dma_ring[i].virt,0x55,ps);
+		//	priv->dma_ring[i].read_index = 0;
 	}
 	priv->buf_index = 0;
 	priv->filled = 0;
@@ -494,7 +541,7 @@ static void hpu_dma_free_pool(struct hpu_priv *priv)
 
 	for (i = 0; i < pn; i++) {
 		dma_pool_free(priv->dma_pool,
-			priv->dma_ring[i].virt, priv->dma_ring[i].phys);
+			      priv->dma_ring[i].virt, priv->dma_ring[i].phys);
 		priv->dma_ring[i].virt = NULL;
 	}
 
@@ -503,16 +550,16 @@ static void hpu_dma_free_pool(struct hpu_priv *priv)
 }
 
 static int hpu_dma_submit_buffer(struct hpu_priv *priv,
-					struct hpu_buf *buf)
+				 struct hpu_buf *buf)
 {
 	struct dma_async_tx_descriptor *dma_desc;
 	dma_cookie_t cookie;
 //    printk("ps: %d\n",ps);
 	dma_desc = dmaengine_prep_slave_single(priv->dma_chan,
-					buf->phys,
-					ps,
-					DMA_DEV_TO_MEM,
-					DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
+					       buf->phys,
+					       ps,
+					       DMA_DEV_TO_MEM,
+					       DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
 
 	dma_desc->callback = hpu_dma_callback;
 	dma_desc->callback_param = buf;
@@ -544,33 +591,29 @@ static int hpu_dma_submit_pool(struct hpu_priv *priv)
 static int hpu_chardev_open(struct inode *i, struct file *f)
 {
 	int ret = 0;
-    u32 msk;
+	u32 msk;
 	struct hpu_priv *priv = container_of(i->i_cdev,
-						struct hpu_priv, cdev);
+					     struct hpu_priv, cdev);
 //	printk("OPEN========================\n");
 	f->private_data = priv;
-    
-    // Lock resource
-	mutex_lock(&priv->access_lock);
-    if (priv->hpu_is_opened==1) {
-        
-        // UnLock resource
-	    mutex_unlock(&priv->access_lock);
 
-        return -EBUSY;
+	// Lock resource
+	mutex_lock(&priv->access_lock);
+	if (priv->hpu_is_opened==1) {
+
+		// UnLock resource
+		mutex_unlock(&priv->access_lock);
+
+		return -EBUSY;
         }
-        
+
   	priv->hpu_is_opened=1;
 
-    
+
 //	priv->dma_close = false;
 	ret = hpu_dma_init(priv);
 	if (ret) {
-		dev_err(&priv->pdev->dev, "Error: can't get DMA channel\n");
-        
-        // UnLock resource
-        mutex_unlock(&priv->access_lock);
-
+		mutex_unlock(&priv->access_lock);
 		return ret;
 	}
 
@@ -579,75 +622,69 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	 * partial allocation has been possibly done.
 	 */
 	if (ret) {
-		dev_err(&priv->pdev->dev, "Error allocating memory from DMA pool\n");
+		dev_err(&priv->pdev->dev, "Error allocating memory from RX DMA pool\n");
 		goto err_dealloc_dma;
 	}
 
 	ret = hpu_dma_submit_pool(priv);
 	if (ret) {
-		dev_err(&priv->pdev->dev,"Error in submitting DMA descriptor\n");
+		dev_err(&priv->pdev->dev,"Error in submitting RX DMA descriptor\n");
 		goto err_dealloc_dma;
 	}
+	dma_async_issue_pending(priv->dma_chan);
 
+	if (!test_dma) {
+		// Unmask RXFIFOFULL interrupt
+		msk=readl(priv->regs + HPU_IRQMASK_REG);
+		msk|=HPU_MSK_INT_RXFIFOFULL;
+		writel(msk, priv->regs + HPU_IRQMASK_REG);
+	}
 
-    dma_async_issue_pending(priv->dma_chan);
-
-
-   if (!test_dma) {
-       // Unmask RXFIFOFULL interrupt
-       msk=readl(priv->regs + HPU_IRQMASK_REG);
-       msk|=HPU_MSK_INT_RXFIFOFULL;
-    writel(msk, priv->regs + HPU_IRQMASK_REG);
-   }
-
-	// Enable channel 0, 1 and 2 and also HSSAER  
+	// Enable channel 0, 1 and 2 and also HSSAER
 	// writel(HPU_RXCTRL_LRXHSSAERCH2_EN | HPU_RXCTRL_LRXHSSAERCH1_EN | HPU_RXCTRL_LRXHSSAERCH0_EN | HPU_RXCTRL_RRXHSSAER_EN |
- //           HPU_RXCTRL_RRXHSSAERCH2_EN | HPU_RXCTRL_RRXHSSAERCH1_EN | HPU_RXCTRL_RRXHSSAERCH0_EN | HPU_RXCTRL_LRXHSSAER_EN ,
- //           priv->regs + HPU_RXCTRL_REG);
-    // printk ("HPU_RXCTRL_REG: 0x%08X\n",readl(priv->regs + HPU_RXCTRL_REG));
-	// Enable channel 0, 1 and 2 and also HSSAER for AUX channel  
+	//           HPU_RXCTRL_RRXHSSAERCH2_EN | HPU_RXCTRL_RRXHSSAERCH1_EN | HPU_RXCTRL_RRXHSSAERCH0_EN | HPU_RXCTRL_LRXHSSAER_EN ,
+	//           priv->regs + HPU_RXCTRL_REG);
+	// printk ("HPU_RXCTRL_REG: 0x%08X\n",readl(priv->regs + HPU_RXCTRL_REG));
+	// Enable channel 0, 1 and 2 and also HSSAER for AUX channel
 	// writel(HPU_AUXCTRL_AUXRXHSSAERCH2_EN | HPU_AUXCTRL_AUXRXHSSAERCH1_EN | HPU_AUXCTRL_AUXRXHSSAERCH0_EN | HPU_AUXCTRL_AUXRXHSSAER_EN,
 	//        priv->regs + HPU_AUX_RXCTRL_REG);
-    
+
   	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg |=  HPU_CTRL_FLUSHFIFOS ;
 	priv->ctrl_reg |=  HPU_CTRL_FULLTS ;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-    
+
   	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg |=  HPU_CTRL_ENINT | HPU_CTRL_ENDMA;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 
 
-    // UnLock resource
+	// UnLock resource
 	mutex_unlock(&priv->access_lock);
-    
+
 	return 0;
 
 err_dealloc_dma:
+	hpu_dma_release(priv);
 
-	dma_release_channel(priv->dma_chan);
-	hpu_dma_free_pool(priv);
-
-    // UnLock resource
+	// UnLock resource
 	mutex_unlock(&priv->access_lock);
 
 	return ret;
 }
 
-static int hpu_chardev_close(struct inode *i, struct file *fp)
+static int _hpu_chardev_close(struct hpu_priv *priv)
 {
-	struct hpu_priv *priv = fp->private_data;
 	uint32_t val;
 //    int stat;
 
-    // Lock resource
-    mutex_lock(&priv->access_lock);
-    
-    // Read CTRL_Register and Disable The IP
-    val = readl(priv->regs + HPU_CTRL_REG);
-    val = val & ~HPU_CTRL_ENDMA;
-    writel( val, priv->regs + HPU_CTRL_REG);
+	// Lock resource
+	mutex_lock(&priv->access_lock);
+
+	// Read CTRL_Register and Disable The IP
+	val = readl(priv->regs + HPU_CTRL_REG);
+	val = val & ~HPU_CTRL_ENDMA;
+	writel( val, priv->regs + HPU_CTRL_REG);
 //	stat= readl_poll_timeout_atomic(priv->regs + HPU_CTRL_REG, val, !(val & HPU_CTRL_DMA_RUNNING), 1, (1<<30)-1);
 //    if (stat) {
 //        printk(KERN_INFO MSG_PREFIX "No events coming: TIMEOUT\n");
@@ -655,30 +692,30 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
         val = val | HPU_CTRL_RESETDMASTREAM;
         writel( val, priv->regs + HPU_CTRL_REG);
 //    }
-    
+
    	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 	writel(0x00000000 , priv->regs + HPU_RXCTRL_REG);
 	writel(0x00000000 , priv->regs + HPU_AUX_RXCTRL_REG);
+	/* TX reg to reset val */
+	writel(0x0, priv->regs + HPU_TXCTRL_REG);
 	mdelay(100);
-    dmaengine_terminate_all(priv->dma_chan);
-	dma_release_channel(priv->dma_chan);
 
-//   	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
- //   priv->ctrl_reg |=  HPU_CTRL_FLUSHFIFOS;
-//	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-
-
-	hpu_dma_free_pool(priv);
-
-    // UnLock resource
+	hpu_dma_release(priv);
+	// UnLock resource
   	priv->hpu_is_opened=0;
 
-
-    mutex_unlock(&priv->access_lock);
+	mutex_unlock(&priv->access_lock);
 
 	return 0;
+}
+
+static int hpu_chardev_close(struct inode *i, struct file *fp)
+{
+	struct hpu_priv *priv = fp->private_data;
+
+	return _hpu_chardev_close(priv);
 }
 
 /*************************************************************************************
@@ -688,180 +725,180 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 static irqreturn_t hpu_irq_handler(int irq, void *pdev) {
 
 	struct hpu_priv *priv = platform_get_drvdata(pdev);
-    u32 intr;
-    uint32_t reg;
-    uint32_t msk;
+	u32 intr;
+	uint32_t reg;
+	uint32_t msk;
 
 	irqreturn_t retval = 0;
 
    	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg &= ~HPU_CTRL_ENINT;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-    
+
   	intr = readl(priv->regs + HPU_IRQ_REG);
-    //printk("irq.intr: 0x%08X\n",intr);
-    //printk("irq.raw: 0x%08X\n",readl(priv->regs + HPU_RAWSTAT_REG));
-    //printk("irq.msk: 0x%08X\n",readl(priv->regs + HPU_IRQMASK_REG));
+	//printk("irq.intr: 0x%08X\n",intr);
+	//printk("irq.raw: 0x%08X\n",readl(priv->regs + HPU_RAWSTAT_REG));
+	//printk("irq.msk: 0x%08X\n",readl(priv->regs + HPU_IRQMASK_REG));
 
-    if (intr & HPU_MSK_INT_TSTAMPWRAPPED) {
-        //priv->wraptimes++;
-        //printk(KERN_INFO MSG_PREFIX "IRQ: TIME STAMP WRAPPED %d\n", readl( priv->regs + HPU_WRAP_REG)); //priv->wraptimes);
-        writel(HPU_MSK_INT_TSTAMPWRAPPED, priv->regs + HPU_IRQ_REG);
-        retval = IRQ_HANDLED;
-    }
+	if (intr & HPU_MSK_INT_TSTAMPWRAPPED) {
+		//priv->wraptimes++;
+		//printk(KERN_INFO MSG_PREFIX "IRQ: TIME STAMP WRAPPED %d\n", readl( priv->regs + HPU_WRAP_REG)); //priv->wraptimes);
+		writel(HPU_MSK_INT_TSTAMPWRAPPED, priv->regs + HPU_IRQ_REG);
+		retval = IRQ_HANDLED;
+	}
 
-    if (intr & HPU_MSK_INT_RXBUFFREADY) {
-        printk(KERN_INFO MSG_PREFIX "IRQ: RXBUFFREADY\n");
-        writel(HPU_MSK_INT_RXBUFFREADY, priv->regs + HPU_IRQ_REG);
-        retval = IRQ_HANDLED;
-    }
+	if (intr & HPU_MSK_INT_RXBUFFREADY) {
+		printk(KERN_INFO MSG_PREFIX "IRQ: RXBUFFREADY\n");
+		writel(HPU_MSK_INT_RXBUFFREADY, priv->regs + HPU_IRQ_REG);
+		retval = IRQ_HANDLED;
+	}
 
-    if (intr & HPU_MSK_INT_RXFIFOFULL) {
-        printk(KERN_INFO MSG_PREFIX "IRQ: RXFIFOFULL\n");
-        // Flush the FIFO
-      	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
-	    priv->ctrl_reg |=  HPU_CTRL_FLUSHFIFOS ;
-    	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-        // Delete the interrupt
-        writel(HPU_MSK_INT_RXFIFOFULL, priv->regs + HPU_IRQ_REG);
-        // Deactivate RXFIFOFULL interrupt
-    	msk=readl(priv->regs + HPU_IRQMASK_REG);
-    	msk&=(~HPU_MSK_INT_RXFIFOFULL);
-    	writel(msk, priv->regs + HPU_IRQMASK_REG);
-   
-        rx_fifo_full = 1; 
-        retval = IRQ_HANDLED;
-    }
+	if (intr & HPU_MSK_INT_RXFIFOFULL) {
+		printk(KERN_INFO MSG_PREFIX "IRQ: RXFIFOFULL\n");
+		// Flush the FIFO
+		priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
+		priv->ctrl_reg |=  HPU_CTRL_FLUSHFIFOS ;
+		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+		// Delete the interrupt
+		writel(HPU_MSK_INT_RXFIFOFULL, priv->regs + HPU_IRQ_REG);
+		// Deactivate RXFIFOFULL interrupt
+		msk=readl(priv->regs + HPU_IRQMASK_REG);
+		msk&=(~HPU_MSK_INT_RXFIFOFULL);
+		writel(msk, priv->regs + HPU_IRQMASK_REG);
 
-    if (intr & HPU_MSK_INT_GLBLRXERR_KO) {
-    	uint8_t num_channel = 0;
-    	int i;
-    	int is_aux=0;
-        printk(KERN_INFO MSG_PREFIX "IRQ: RX KO Err\n");
+		rx_fifo_full = 1;
+		retval = IRQ_HANDLED;
+	}
 
-        // Detect which RX HSSAER channel is enabled
-        reg = readl(priv->regs + HPU_RXCTRL_REG);
-        if (reg&0x1) // Check Left SAER 
-        	num_channel = num_channel | (reg&(0xF<<8))>>8 ;
-        if (reg&0x10000) // Check Right SAER 
-        	num_channel = num_channel | (reg&(0xF<<24))>>24 ;
-       	reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-       	if (reg&0x1) {// Check Left Aux Saer
-        	num_channel = num_channel | (reg&(0xF<<8))>>8 ;
-        	is_aux = 1;
-        }
-        if (!is_aux)
-        	printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes\n");
-        else {
-        	printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes or Aux\n");
-	        for (i=0;i<4;i++) {
-	        	if (num_channel&(1<<i))
-	        		printk(KERN_INFO MSG_PREFIX "Aux CNT %d 0x%08X\n", i, readl(priv->regs + (HPU_AUX_RX_ERR_CH0_REG+i*4)));
-	        }
-        }
-        // Delete the interrupt
-        writel(HPU_MSK_INT_GLBLRXERR_KO, priv->regs + HPU_IRQ_REG);    
-        retval = IRQ_HANDLED;
-    }
+	if (intr & HPU_MSK_INT_GLBLRXERR_KO) {
+		uint8_t num_channel = 0;
+		int i;
+		int is_aux=0;
+		printk(KERN_INFO MSG_PREFIX "IRQ: RX KO Err\n");
 
-    if (intr & HPU_MSK_INT_GLBLRXERR_RX) {
-    	uint8_t num_channel = 0;
-    	int i;
-    	int is_aux=0;
-        printk(KERN_INFO MSG_PREFIX "IRQ: RX RX Err\n");
+		// Detect which RX HSSAER channel is enabled
+		reg = readl(priv->regs + HPU_RXCTRL_REG);
+		if (reg&0x1) // Check Left SAER
+			num_channel = num_channel | (reg&(0xF<<8))>>8 ;
+		if (reg&0x10000) // Check Right SAER
+			num_channel = num_channel | (reg&(0xF<<24))>>24 ;
+		reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
+		if (reg&0x1) {// Check Left Aux Saer
+			num_channel = num_channel | (reg&(0xF<<8))>>8 ;
+			is_aux = 1;
+		}
+		if (!is_aux)
+			printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes\n");
+		else {
+			printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes or Aux\n");
+			for (i=0;i<4;i++) {
+				if (num_channel&(1<<i))
+					printk(KERN_INFO MSG_PREFIX "Aux CNT %d 0x%08X\n", i, readl(priv->regs + (HPU_AUX_RX_ERR_CH0_REG+i*4)));
+			}
+		}
+		// Delete the interrupt
+		writel(HPU_MSK_INT_GLBLRXERR_KO, priv->regs + HPU_IRQ_REG);
+		retval = IRQ_HANDLED;
+	}
 
-        // Detect which RX HSSAER channel is enabled
-        reg = readl(priv->regs + HPU_RXCTRL_REG);
-        if (reg&0x1) // Check Left SAER 
-        	num_channel = num_channel | (reg&(0xF<<8))>>8 ;
-        if (reg&0x10000) // Check Right SAER 
-        	num_channel = num_channel | (reg&(0xF<<24))>>24 ;
-       	reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-       	if (reg&0x1) {// Check Left Aux Saer
-        	num_channel = num_channel | (reg&(0xF<<8))>>8 ;
-        	is_aux = 1;
-        }
-        if (!is_aux)
-        	printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes\n");
-        else {
-        	printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes or Aux\n");
-	        for (i=0;i<4;i++) {
-	        	if (num_channel&(1<<i))
-	        		printk(KERN_INFO MSG_PREFIX "Aux CNT %d 0x%08X\n", i, readl(priv->regs + (HPU_AUX_RX_ERR_CH0_REG+i*4)));
-	        }
-        }
-        // Delete the interrupt
-        writel(HPU_MSK_INT_GLBLRXERR_RX, priv->regs + HPU_IRQ_REG);    
-        retval = IRQ_HANDLED;
-    }
+	if (intr & HPU_MSK_INT_GLBLRXERR_RX) {
+		uint8_t num_channel = 0;
+		int i;
+		int is_aux=0;
+		printk(KERN_INFO MSG_PREFIX "IRQ: RX RX Err\n");
 
-    if (intr & HPU_MSK_INT_GLBLRXERR_TO) {
-    	uint8_t num_channel = 0;
-    	int i;
-    	int is_aux=0;
-        printk(KERN_INFO MSG_PREFIX "IRQ: RX TO Err\n");
+		// Detect which RX HSSAER channel is enabled
+		reg = readl(priv->regs + HPU_RXCTRL_REG);
+		if (reg&0x1) // Check Left SAER
+			num_channel = num_channel | (reg&(0xF<<8))>>8 ;
+		if (reg&0x10000) // Check Right SAER
+			num_channel = num_channel | (reg&(0xF<<24))>>24 ;
+		reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
+		if (reg&0x1) {// Check Left Aux Saer
+			num_channel = num_channel | (reg&(0xF<<8))>>8 ;
+			is_aux = 1;
+		}
+		if (!is_aux)
+			printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes\n");
+		else {
+			printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes or Aux\n");
+			for (i=0;i<4;i++) {
+				if (num_channel&(1<<i))
+					printk(KERN_INFO MSG_PREFIX "Aux CNT %d 0x%08X\n", i, readl(priv->regs + (HPU_AUX_RX_ERR_CH0_REG+i*4)));
+			}
+		}
+		// Delete the interrupt
+		writel(HPU_MSK_INT_GLBLRXERR_RX, priv->regs + HPU_IRQ_REG);
+		retval = IRQ_HANDLED;
+	}
 
-        // Detect which RX HSSAER channel is enabled
-        reg = readl(priv->regs + HPU_RXCTRL_REG);
-        if (reg&0x1) // Check Left SAER 
-        	num_channel = num_channel | (reg&(0xF<<8))>>8 ;
-        if (reg&0x10000) // Check Right SAER 
-        	num_channel = num_channel | (reg&(0xF<<24))>>24 ;
-       	reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-       	if (reg&0x1) {// Check Left Aux Saer
-        	num_channel = num_channel | (reg&(0xF<<8))>>8 ;
-        	is_aux = 1;
-        }
-        if (!is_aux)
-        	printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes\n");
-        else {
-        	printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes or Aux\n");
-	        for (i=0;i<4;i++) {
-	        	if (num_channel&(1<<i))
-	        		printk(KERN_INFO MSG_PREFIX "Aux CNT %d 0x%08X\n", i, readl(priv->regs + (HPU_AUX_RX_ERR_CH0_REG+i*4)));
-	        }
-        }
-        // Delete the interrupt
-        writel(HPU_MSK_INT_GLBLRXERR_TO, priv->regs + HPU_IRQ_REG);    
-        retval = IRQ_HANDLED;
-    }
+	if (intr & HPU_MSK_INT_GLBLRXERR_TO) {
+		uint8_t num_channel = 0;
+		int i;
+		int is_aux=0;
+		printk(KERN_INFO MSG_PREFIX "IRQ: RX TO Err\n");
 
-    if (intr & HPU_MSK_INT_GLBLRXERR_OF) {
-    	uint8_t num_channel = 0;
-    	int i;
-    	int is_aux=0;
-        printk(KERN_INFO MSG_PREFIX "IRQ: RX OF Err\n");
+		// Detect which RX HSSAER channel is enabled
+		reg = readl(priv->regs + HPU_RXCTRL_REG);
+		if (reg&0x1) // Check Left SAER
+			num_channel = num_channel | (reg&(0xF<<8))>>8 ;
+		if (reg&0x10000) // Check Right SAER
+			num_channel = num_channel | (reg&(0xF<<24))>>24 ;
+		reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
+		if (reg&0x1) {// Check Left Aux Saer
+			num_channel = num_channel | (reg&(0xF<<8))>>8 ;
+			is_aux = 1;
+		}
+		if (!is_aux)
+			printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes\n");
+		else {
+			printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes or Aux\n");
+			for (i=0;i<4;i++) {
+				if (num_channel&(1<<i))
+					printk(KERN_INFO MSG_PREFIX "Aux CNT %d 0x%08X\n", i, readl(priv->regs + (HPU_AUX_RX_ERR_CH0_REG+i*4)));
+			}
+		}
+		// Delete the interrupt
+		writel(HPU_MSK_INT_GLBLRXERR_TO, priv->regs + HPU_IRQ_REG);
+		retval = IRQ_HANDLED;
+	}
 
-        // Detect which RX HSSAER channel is enabled
-        reg = readl(priv->regs + HPU_RXCTRL_REG);
-        if (reg&0x1) // Check Left SAER 
-        	num_channel = num_channel | (reg&(0xF<<8))>>8 ;
-        if (reg&0x10000) // Check Right SAER 
-        	num_channel = num_channel | (reg&(0xF<<24))>>24 ;
-       	reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-       	if (reg&0x1) {// Check Left Aux Saer
-        	num_channel = num_channel | (reg&(0xF<<8))>>8 ;
-        	is_aux = 1;
-        }
-        if (!is_aux)
-        	printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes\n");
-        else {
-        	printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes or Aux\n");
-	        for (i=0;i<4;i++) {
-	        	if (num_channel&(1<<i))
-	        		printk(KERN_INFO MSG_PREFIX "Aux CNT %d 0x%08X\n", i, readl(priv->regs + (HPU_AUX_RX_ERR_CH0_REG+i*4)));
-	        }
-        }
-        // Delete the interrupt
-        writel(HPU_MSK_INT_GLBLRXERR_OF, priv->regs + HPU_IRQ_REG);    
-        retval = IRQ_HANDLED;
-    }
+	if (intr & HPU_MSK_INT_GLBLRXERR_OF) {
+		uint8_t num_channel = 0;
+		int i;
+		int is_aux=0;
+		printk(KERN_INFO MSG_PREFIX "IRQ: RX OF Err\n");
+
+		// Detect which RX HSSAER channel is enabled
+		reg = readl(priv->regs + HPU_RXCTRL_REG);
+		if (reg&0x1) // Check Left SAER
+			num_channel = num_channel | (reg&(0xF<<8))>>8 ;
+		if (reg&0x10000) // Check Right SAER
+			num_channel = num_channel | (reg&(0xF<<24))>>24 ;
+		reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
+		if (reg&0x1) {// Check Left Aux Saer
+			num_channel = num_channel | (reg&(0xF<<8))>>8 ;
+			is_aux = 1;
+		}
+		if (!is_aux)
+			printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes\n");
+		else {
+			printk(KERN_INFO MSG_PREFIX "HSSAER error in Left or Right Eyes or Aux\n");
+			for (i=0;i<4;i++) {
+				if (num_channel&(1<<i))
+					printk(KERN_INFO MSG_PREFIX "Aux CNT %d 0x%08X\n", i, readl(priv->regs + (HPU_AUX_RX_ERR_CH0_REG+i*4)));
+			}
+		}
+		// Delete the interrupt
+		writel(HPU_MSK_INT_GLBLRXERR_OF, priv->regs + HPU_IRQ_REG);
+		retval = IRQ_HANDLED;
+	}
 
    	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg |= HPU_CTRL_ENINT;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 
-    retval = IRQ_HANDLED;
+	retval = IRQ_HANDLED;
 	return retval;
 }
 
@@ -870,180 +907,217 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 	unsigned int ret;
 	unsigned int val=0;
 	unsigned int ctrl_reg;
-    ip_regs_t temp_reg;
-    aux_cnt_t aux_cnt_reg;
-    ch_en_hssaer_t ch_en_hssaer;
-    unsigned int reg;
+	ip_regs_t temp_reg;
+	aux_cnt_t aux_cnt_reg;
+	ch_en_hssaer_t ch_en_hssaer;
+	unsigned int reg, reg2;
 
 	struct hpu_priv *priv = fp->private_data;
 
 	dev_dbg(&priv->pdev->dev, "ioctl %x\n", cmd);
 
 	switch (cmd) {
-    
+
 	case _IOR(0x0, HPU_IOCTL_READTIMESTAMP, unsigned int):
-        ret=readl(priv->regs + HPU_WRAP_REG);
-        if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
-            goto cfuser_err;
+		ret=readl(priv->regs + HPU_WRAP_REG);
+		if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
+			goto cfuser_err;
 		// dev_info(&priv->pdev->dev, "Reading time stamp %d\n", ret);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_CLEARTIMESTAMP, unsigned int):
 		writel(0,priv->regs + HPU_WRAP_REG);
-        //priv->wraptimes=0;
+		//priv->wraptimes=0;
 		// dev_info(&priv->pdev->dev, "Cleared the timestamp\n");
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_READVERSION, unsigned int):
-        ret=readl(priv->regs + HPU_VER_REG);
-        if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
-            goto cfuser_err;
+		ret=readl(priv->regs + HPU_VER_REG);
+		if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
+			goto cfuser_err;
 		dev_info(&priv->pdev->dev, "Reading version %d\n", ret);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SETDMALENGTH, unsigned int):
-        if( copy_from_user (&val, (unsigned int *)arg, sizeof(val)) )
-            goto cfuser_err;
-        // if dma is enabled then disable and also flush fifo
-       	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
-        ctrl_reg =  readl(priv->regs + HPU_CTRL_REG);
-        if (priv->ctrl_reg & HPU_CTRL_ENDMA) {
-            priv->ctrl_reg &= !HPU_CTRL_ENDMA;
-            priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
-            writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-            }
-        if (test_dma)
-    		writel((val&HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,priv->regs + HPU_DMA_REG);
-        else
-            writel(val&HPU_DMA_LENGTH_MASK,priv->regs + HPU_DMA_REG);
-       	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
-        priv->ctrl_reg |= HPU_CTRL_ENDMA;
-        writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+		if( copy_from_user (&val, (unsigned int *)arg, sizeof(val)) )
+			goto cfuser_err;
+		// if dma is enabled then disable and also flush fifo
+		priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
+		ctrl_reg =  readl(priv->regs + HPU_CTRL_REG);
+		if (priv->ctrl_reg & HPU_CTRL_ENDMA) {
+			priv->ctrl_reg &= !HPU_CTRL_ENDMA;
+			priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
+			writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+		}
+		if (test_dma)
+			writel((val&HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,priv->regs + HPU_DMA_REG);
+		else
+			writel(val&HPU_DMA_LENGTH_MASK,priv->regs + HPU_DMA_REG);
+		priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
+		priv->ctrl_reg |= HPU_CTRL_ENDMA;
+		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SETTIMESTAMP, unsigned int *):
-        if( copy_from_user (&val, (unsigned int *)arg, sizeof(val)) )
-            goto cfuser_err;
-        // if dma is enabled then disable and also flush fifo
-       	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
-        if (val)
-            priv->ctrl_reg |= HPU_CTRL_FULLTS ;
-        else
-            priv->ctrl_reg &= ~HPU_CTRL_FULLTS ;
-            
-        writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+		if( copy_from_user (&val, (unsigned int *)arg, sizeof(val)) )
+			goto cfuser_err;
+		// if dma is enabled then disable and also flush fifo
+		priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
+		if (val)
+			priv->ctrl_reg |= HPU_CTRL_FULLTS ;
+		else
+			priv->ctrl_reg &= ~HPU_CTRL_FULLTS ;
+
+		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 		break;
 
-    case _IOWR(0x0, HPU_IOCTL_GEN_REG, struct ip_regs *):
-       if (copy_from_user(&temp_reg, (struct ip_regs *)arg, sizeof(temp_reg)))
-           goto cfuser_err;
+	case _IOWR(0x0, HPU_IOCTL_GEN_REG, struct ip_regs *):
+		if (copy_from_user(&temp_reg, (struct ip_regs *)arg, sizeof(temp_reg)))
+			goto cfuser_err;
 
-       if (temp_reg.rw==0) {
-	       read_generic_reg(&temp_reg.data, priv->regs + temp_reg.reg_offset);
-           
-           if (copy_to_user((struct ip_regs *)arg, &temp_reg, sizeof(temp_reg)))
-               goto cfuser_err;
-       }
-       else {
-	       write_generic_reg(temp_reg.data,priv->regs + temp_reg.reg_offset);
-       }
-       break;
+		if (temp_reg.rw==0) {
+			read_generic_reg(&temp_reg.data, priv->regs + temp_reg.reg_offset);
+
+			if (copy_to_user((struct ip_regs *)arg, &temp_reg, sizeof(temp_reg)))
+				goto cfuser_err;
+		}
+		else {
+			write_generic_reg(temp_reg.data,priv->regs + temp_reg.reg_offset);
+		}
+		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_PS, unsigned int *):
-        ret=ps;
-        if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
-            goto cfuser_err;
+		ret=ps;
+		if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
+			goto cfuser_err;
 		break;
 
 
 	case _IOW(0x0, HPU_IOCTL_SET_AUX_THRS, struct aux_cnt *):
-        if( copy_from_user (&aux_cnt_reg, (struct aux_cnt *)arg, sizeof(aux_cnt_reg)) )
-            goto cfuser_err;
+		if( copy_from_user (&aux_cnt_reg, (struct aux_cnt *)arg, sizeof(aux_cnt_reg)) )
+			goto cfuser_err;
 
-       	reg=readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
-       	// Normalize to num of errors, avoiding not valid errors
-       	aux_cnt_reg.err = aux_cnt_reg.err % nomeaning_err;
-       	// Clear the relevant byte
+		reg=readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+		// Normalize to num of errors, avoiding not valid errors
+		aux_cnt_reg.err = aux_cnt_reg.err % nomeaning_err;
+		// Clear the relevant byte
 		reg = reg & (~((0xFF)<<(aux_cnt_reg.err*8)));
 		// Write the register
-       	writel((0xFF&aux_cnt_reg.cnt_val)<<(aux_cnt_reg.err*8) | reg, priv->regs + HPU_AUX_RX_ERR_THRS_REG);
-       	// Read and print the register
-       	reg=readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+		writel((0xFF&aux_cnt_reg.cnt_val)<<(aux_cnt_reg.err*8) | reg, priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+		// Read and print the register
+		reg=readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
 		printk(KERN_DEBUG MSG_PREFIX "HPU_AUX_RX_ERR_THRS_REG 0x%08X\n", reg);
 
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_THRS, unsigned int *):
-        ret=readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
-        if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
-            goto cfuser_err;
+		ret=readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+		if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
+			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT0, unsigned int *):
-        ret=readl(priv->regs + HPU_AUX_RX_ERR_CH0_REG);
-        if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
-            goto cfuser_err;
+		ret=readl(priv->regs + HPU_AUX_RX_ERR_CH0_REG);
+		if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
+			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT1, unsigned int *):
-        ret=readl(priv->regs + HPU_AUX_RX_ERR_CH1_REG);
-        if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
-            goto cfuser_err;
+		ret=readl(priv->regs + HPU_AUX_RX_ERR_CH1_REG);
+		if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
+			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT2, unsigned int *):
-        ret=readl(priv->regs + HPU_AUX_RX_ERR_CH2_REG);
-        if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
-            goto cfuser_err;
+		ret=readl(priv->regs + HPU_AUX_RX_ERR_CH2_REG);
+		if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
+			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT3, unsigned int *):
-        ret=readl(priv->regs + HPU_AUX_RX_ERR_CH3_REG);
-        if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
-            goto cfuser_err;
+		ret=readl(priv->regs + HPU_AUX_RX_ERR_CH3_REG);
+		if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
+			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_LOST_CNT, unsigned int *):
-        ret=priv->cnt_pktloss;
-        priv->cnt_pktloss=0;
-        if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
-            goto cfuser_err;
+		ret=priv->cnt_pktloss;
+		priv->cnt_pktloss=0;
+		if( copy_to_user((unsigned int *)arg, &ret, sizeof(unsigned int)) )
+			goto cfuser_err;
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_HSSAER_CH, struct ch_en_hssaer *):
-        if( copy_from_user (&ch_en_hssaer, (struct ch_en_hssaer *)arg, sizeof(ch_en_hssaer)) )
-            goto cfuser_err;
+		if( copy_from_user (&ch_en_hssaer, (struct ch_en_hssaer *)arg, sizeof(ch_en_hssaer)) )
+			goto cfuser_err;
 
-        if (ch_en_hssaer.hssaer_src<left_eye || ch_en_hssaer.hssaer_src>aux)
+		if (ch_en_hssaer.hssaer_src<left_eye || ch_en_hssaer.hssaer_src>aux) {
 			printk(KERN_ALERT MSG_PREFIX "Error in enabling channels\n");
-		else {
-	        if (ch_en_hssaer.hssaer_src==left_eye) {
-	        	reg = HPU_RXCTRL_LRXHSSAER_EN | ((ch_en_hssaer.en_channels)<<8);
-	        }
-	        else if (ch_en_hssaer.hssaer_src==right_eye) {
-	        	reg = HPU_RXCTRL_RRXHSSAER_EN | ((ch_en_hssaer.en_channels)<<24);
-	        }
-	        else if (ch_en_hssaer.hssaer_src==aux) {
-	        	reg = HPU_AUXCTRL_AUXRXHSSAER_EN | ((ch_en_hssaer.en_channels)<<8);
-	        }
-
-	        if ((ch_en_hssaer.hssaer_src==left_eye) || (ch_en_hssaer.hssaer_src==right_eye))
-	        	writel(reg, priv->regs + HPU_RXCTRL_REG);
-	        else
-	        	writel(reg, priv->regs + HPU_AUX_RXCTRL_REG);
+			return -EINVAL;
+		} else {
+			if (ch_en_hssaer.hssaer_src == aux) {
+				reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
+				reg |= HPU_AUXCTRL_AUXRXHSSAER_EN | ((ch_en_hssaer.en_channels)<<8);
+				writel(reg, priv->regs + HPU_AUX_RXCTRL_REG);
+			} else {
+				reg = readl(priv->regs + HPU_RXCTRL_REG);
+				/* don't overwrite spinn cfg, clear the rest */
+				reg &= HPU_RXCTRL_SPINNL_EN | HPU_RXCTRL_SPINNR_EN;
+				if (ch_en_hssaer.hssaer_src == left_eye) {
+					reg |= HPU_RXCTRL_LRXHSSAER_EN | ((ch_en_hssaer.en_channels) << 8);
+				} else {/* right */
+					reg |= HPU_RXCTRL_RRXHSSAER_EN | ((ch_en_hssaer.en_channels) << 24);
+				}
+			}
+			writel(reg, priv->regs + HPU_RXCTRL_REG);
 		}
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_SPINN, unsigned int *):
+		if (copy_from_user (&val, (unsigned int *)arg, sizeof(val))) {
+			goto cfuser_err;
+		} else {
+			reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
+			reg2 = readl(priv->regs + HPU_RXCTRL_REG);
+			if (val) {
+				reg |= HPU_AUXCTRL_AUXSPINN_EN;
+				reg2 |= HPU_RXCTRL_SPINNL_EN | HPU_RXCTRL_SPINNR_EN;
+				/* magic from Maurizio */
+				writel(0x68, priv->regs + HPU_TXCTRL_REG);
+				dev_dbg(&priv->pdev->dev, "spinn enable\n");
+			} else {
+				reg &= ~HPU_AUXCTRL_AUXSPINN_EN;
+				reg2 &= ~(HPU_RXCTRL_SPINNL_EN | HPU_RXCTRL_SPINNR_EN);
+				/* TX reg to reset val as per FD datasheet */
+				writel(0x0, priv->regs + HPU_TXCTRL_REG);
+				dev_dbg(&priv->pdev->dev, "spinn disable\n");
+			}
+			writel(reg2, priv->regs + HPU_RXCTRL_REG);
+			writel(reg, priv->regs + HPU_AUX_RXCTRL_REG);
+			dev_dbg(&priv->pdev->dev, "spinn - AUXRXCTRL reg 0x%x", reg);
+		}
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_LOOP_CFG, unsigned int *):
+		if (copy_from_user (&val, (unsigned int *)arg, sizeof(val)))
+			goto cfuser_err;
+
+		reg = readl(priv->regs + HPU_CTRL_REG);
+		reg &= ~(BIT(22) | BIT(23));
+		reg |= (val & 3) << 22;
+		writel(reg, priv->regs + HPU_CTRL_REG);
+		dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x", reg);
 		break;
 
 	default:
 		return -EINVAL;
-
 	}
 
 	return 0;
 
-	cfuser_err: 
-		printk(KERN_ALERT MSG_PREFIX "Copy from user space failed\n");
-		return -EFAULT;
+cfuser_err:
+	printk(KERN_ALERT MSG_PREFIX "Copy from user space failed\n");
+	return -EFAULT;
 
 }
 
@@ -1051,6 +1125,7 @@ static struct file_operations hpu_fops = {
 	.open = hpu_chardev_open,
 	.owner = THIS_MODULE,
 	.read = hpu_chardev_read,
+	.write = hpu_chardev_write,
 	.release = hpu_chardev_close,
 	.unlocked_ioctl = hpu_ioctl,
 };
@@ -1076,10 +1151,10 @@ static int hpu_register_chardev(struct hpu_priv *priv)
 	}
 
 	device_create(hpu_class, NULL, priv->devt, priv,
-			HPU_NAME_FMT, priv->id);
+		      HPU_NAME_FMT, priv->id);
 
 	printk(KERN_INFO MSG_PREFIX "Registered device major: %d, minor:%d\n",
-		MAJOR(priv->devt), MINOR(priv->devt));
+	       MAJOR(priv->devt), MINOR(priv->devt));
 
 	return 0;
 }
@@ -1101,28 +1176,39 @@ static int hpu_probe(struct platform_device *pdev)
 	int i;
 	u32 ver;
 
+
+	/* FIXME: handle error path resource free */
+
 	printk(KERN_DEBUG MSG_PREFIX "Probing hpu\n");
 	priv = kmalloc(sizeof(struct hpu_priv), GFP_KERNEL);
 	if (!priv) {
 		dev_err(&pdev->dev, "Can't alloc priv mem\n");
 		return -ENOMEM;
 	}
-	priv->hpu_is_opened=0;
-    
-    priv->dma_ring= kmalloc(pn*sizeof(struct hpu_buf), GFP_KERNEL);
-    	if (!(priv->dma_ring)) {
+	priv->hpu_is_opened = 0;
+	sema_init(&priv->dma_tx_sem, 1);
+
+	priv->dma_ring = kmalloc(pn*sizeof(struct hpu_buf), GFP_KERNEL);
+	if (!(priv->dma_ring)) {
 		dev_err(&pdev->dev, "Can't alloc priv mem for dma_ring\n");
 		return -ENOMEM;
 	}
-    priv->tmp_buf= kmalloc(ps*sizeof(unsigned char), GFP_KERNEL);
-    	if (!(priv->tmp_buf)) {
+	priv->tmp_buf = kmalloc(ps*sizeof(unsigned char), GFP_KERNEL);
+	if (!(priv->tmp_buf)) {
 		dev_err(&pdev->dev, "Can't alloc priv mem for tmp_buf\n");
 		return -ENOMEM;
 	}
 
-    
+	priv->dma_tx_buf = dma_alloc_coherent(&pdev->dev, 8,
+					      &priv->dma_tx_buf_phys, GFP_KERNEL);
+
+	if (!priv->dma_tx_buf) {
+		dev_err(&pdev->dev, "Can't alloc DMA mem for TX\n");
+		return -ENOMEM;
+	}
+
 	mutex_init(&priv->access_lock);
-    
+
 	platform_set_drvdata(pdev, priv);
 	priv->pdev = pdev;
 	priv->reading_done = false;
@@ -1145,8 +1231,8 @@ static int hpu_probe(struct platform_device *pdev)
 		kfree(priv);
 		return -ENODEV;
 	}
-    
-    // Register the IRQ handler
+
+	// Register the IRQ handler
 	priv->irq = platform_get_irq(pdev, 0);
 	if (priv->irq < 0) {
 		printk(KERN_ALERT MSG_PREFIX "Error getting irq\n");
@@ -1160,16 +1246,16 @@ static int hpu_probe(struct platform_device *pdev)
 
 	priv->cnt_pktloss=0;
 
- 	//priv->wraptimes=0;
-    
-    // Unmask timestamp interrupt
+	//priv->wraptimes=0;
+
+	// Unmask timestamp interrupt
 	// writel(HPU_MSK_INT_TSTAMPWRAPPED, priv->regs + HPU_IRQMASK_REG);
-    // Set Burst entity of DMA
-    if (test_dma)
-	    writel( ((ps / 4 - 1)&HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON, priv->regs + HPU_DMA_REG);
-    else
-	    writel((ps / 4 - 1)&HPU_DMA_LENGTH_MASK, priv->regs + HPU_DMA_REG);
-    
+	// Set Burst entity of DMA
+	if (test_dma)
+		writel( ((ps / 4 - 1)&HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON, priv->regs + HPU_DMA_REG);
+	else
+		writel((ps / 4 - 1)&HPU_DMA_LENGTH_MASK, priv->regs + HPU_DMA_REG);
+
 	init_completion(&priv->rx_cmp);
 
 	for (i = 0; i < pn; i++)
@@ -1183,8 +1269,10 @@ static int hpu_remove(struct platform_device *pdev)
 {
 	struct hpu_priv *priv = platform_get_drvdata(pdev);
 
+	/* FIXME: resource release ! */
+
 	priv->ctrl_reg=readl(priv->regs + HPU_CTRL_REG);
-    priv->ctrl_reg &= ~HPU_CTRL_ENINT & ~HPU_CTRL_ENDMA;
+	priv->ctrl_reg &= ~HPU_CTRL_ENINT & ~HPU_CTRL_ENDMA;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 	free_irq(priv->irq, pdev);
 
@@ -1194,7 +1282,7 @@ static int hpu_remove(struct platform_device *pdev)
 }
 
 static struct of_device_id hpu_of_match[] = {
-	{ .compatible = "iit.it,HPUCore-1.1", },
+	{ .compatible = "iit.it,HPU-Core-3.0", },
 	{}
 };
 
@@ -1226,7 +1314,7 @@ static int __init hpu_module_init(void)
 	int ret;
 
 	ret = alloc_chrdev_region(&hpu_devt, 0, HPU_MINOR_COUNT,
-				HPU_DEV_NAME);
+				  HPU_DEV_NAME);
 	if (ret < 0) {
 		printk(KERN_ALERT MSG_PREFIX
 		       "Error allocating space for device: %d\n", ret);
@@ -1244,7 +1332,7 @@ static int __init hpu_module_init(void)
 		printk(KERN_ALERT MSG_PREFIX "Error registering platform drv\n");
 		goto unreg_class;
 	}
-        
+
 	return 0;
 
 unreg_class:
