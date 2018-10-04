@@ -17,6 +17,7 @@
 #include <linux/iopoll.h>
 #include <linux/cdev.h>
 #include <linux/idr.h>
+#include <linux/debugfs.h>
 #include <linux/device.h>
 #include <linux/fs.h>
 #include <linux/kernel.h>
@@ -128,7 +129,7 @@
 #define HPU_IOCTL_READVERSION		3
 #define HPU_IOCTL_SETDMALENGTH		4
 #define HPU_IOCTL_SETTIMESTAMP		7
-#define HPU_IOCTL_GEN_REG		8
+/* 8 is not used anymore */
 #define HPU_IOCTL_GET_PS		9
 #define HPU_IOCTL_SET_AUX_THRS		10
 #define HPU_IOCTL_GET_AUX_THRS		11
@@ -140,6 +141,35 @@
 #define HPU_IOCTL_SET_HSSAER_CH		17
 #define HPU_IOCTL_SET_LOOP_CFG		18
 #define HPU_IOCTL_SET_SPINN		19
+
+static struct debugfs_reg32 hpu_regs[] = {
+	{"HPU_CTRL_REG",		0x00},
+	{"HPU_RXDATA_REG",		0x08},
+	{"HPU_RXTIME_REG",		0x0C},
+	{"HPU_DMA_REG",			0x14},
+	{"HPU_RAWSTAT_REG",		0x18},
+	{"HPU_IRQ_REG",			0x1C},
+	{"HPU_IRQMASK_REG",		0x20},
+	{"HPU_WRAP_REG",		0x28},
+	{"HPU_HSSAER_STAT_REG",		0x34},
+	{"HPU_HSSAER_RXERR_REG",	0x38},
+	{"HPU_HSSAER_RXMSK_REG",	0x3C},
+	{"HPU_RXCTRL_REG",		0x40},
+	{"HPU_TXCTRL_REG",		0x44},
+	{"HPU_RXPAERCNFG_REG",		0x48},
+	{"HPU_TXPAERCNFG_REG",		0x4C},
+	{"HPU_IPCFONFIG_REG",		0x50},
+	{"HPU_FIFOTHRESHOLD_REG",	0x54},
+	{"HPU_VER_REG",			0x5C},
+	{"HPU_AUX_RXCTRL_REG",		0x60},
+	{"HPU_AUX_RX_ERR_REG",		0x64},
+	{"HPU_AUX_RX_MSK_REG",		0x68},
+	{"HPU_AUX_RX_ERR_THRS_REG", 	0x6C},
+	{"HPU_AUX_RX_ERR_CH0_REG",	0x70},
+	{"HPU_AUX_RX_ERR_CH1_REG",	0x74},
+	{"HPU_AUX_RX_ERR_CH2_REG",	0x78},
+	{"HPU_AUX_RX_ERR_CH3_REG",	0x7C},
+};
 
 static short int test_dma = 0;
 static short int rx_fifo_full = 0;
@@ -172,12 +202,6 @@ typedef struct aux_cnt {
 
 struct hpu_priv;
 
-typedef struct ip_regs {
-	uint32_t reg_offset;
-	char rw;
-	uint32_t data;
-} ip_regs_t;
-
 struct hpu_buf {
 	dma_addr_t phys;
 	void *virt;
@@ -187,6 +211,7 @@ struct hpu_buf {
 };
 
 struct hpu_priv {
+	struct dentry *regset;
 	struct cdev cdev;
 	struct platform_device *pdev;
 	dev_t devt;
@@ -215,6 +240,7 @@ struct hpu_priv {
 	unsigned int cnt_pktloss;
 };
 
+static struct dentry *hpu_debugfsdir = NULL;
 static struct class *hpu_class = NULL;
 static dev_t hpu_devt;
 static DEFINE_IDA(hpu_ida);
@@ -222,16 +248,6 @@ static DEFINE_IDA(hpu_ida);
 static int hpu_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
 static void hpu_dma_free_pool(struct hpu_priv *priv);
 static int _hpu_chardev_close(struct hpu_priv *priv);
-
-static void read_generic_reg(u32 *par, void __iomem *reg_addr)
-{
-	*par = readl(reg_addr);
-}
-
-static void write_generic_reg(u32 par, void __iomem *reg_addr)
-{
-	writel(par, reg_addr);
-}
 
 static void hpu_tx_dma_callback(void *arg)
 {
@@ -789,7 +805,6 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 	unsigned int ret;
 	unsigned int val = 0;
 	unsigned int ctrl_reg;
-	ip_regs_t temp_reg;
 	aux_cnt_t aux_cnt_reg;
 	ch_en_hssaer_t ch_en_hssaer;
 	unsigned int reg, reg2;
@@ -855,24 +870,6 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 			priv->ctrl_reg &= ~HPU_CTRL_FULLTS;
 
 		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-		break;
-
-	case _IOWR(0x0, HPU_IOCTL_GEN_REG, struct ip_regs *):
-		if (copy_from_user(&temp_reg, (struct ip_regs *)arg,
-				   sizeof(temp_reg)))
-			goto cfuser_err;
-
-		if (temp_reg.rw == 0) {
-			read_generic_reg(&temp_reg.data,
-					 priv->regs + temp_reg.reg_offset);
-
-			if (copy_to_user((struct ip_regs *)arg, &temp_reg,
-					 sizeof(temp_reg)))
-				goto cfuser_err;
-		} else {
-			write_generic_reg(temp_reg.data,
-					  priv->regs + temp_reg.reg_offset);
-		}
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_PS, unsigned int *):
@@ -1083,9 +1080,11 @@ static int hpu_probe(struct platform_device *pdev)
 {
 	struct hpu_priv *priv;
 	struct resource *res;
+	struct debugfs_regset32 *regset;
 	unsigned int result;
 	int i;
 	u32 ver;
+	char buf[128];
 
 	/* FIXME: handle error path resource free */
 
@@ -1146,14 +1145,14 @@ static int hpu_probe(struct platform_device *pdev)
 
 	priv->irq = platform_get_irq(pdev, 0);
 	if (priv->irq < 0) {
-		dev_err(&priv->pdev->dev, "Error getting irq\n");
+		dev_err(&pdev->dev, "Error getting irq\n");
 		return -EPERM;
 	}
 	result =
 	    request_irq(priv->irq, hpu_irq_handler, IRQF_SHARED, "int_hpucore",
 			pdev);
 	if (result) {
-		dev_err(&priv->pdev->dev, "Error requesting irq: %i\n",
+		dev_err(&pdev->dev, "Error requesting irq: %i\n",
 		       result);
 		return -EPERM;
 	}
@@ -1174,6 +1173,19 @@ static int hpu_probe(struct platform_device *pdev)
 		priv->dma_ring[i].priv = priv;
 
 	hpu_register_chardev(priv);
+
+	sprintf(buf, "regdump.%x", res->start);
+	if (hpu_debugfsdir) {
+		regset = devm_kzalloc(&pdev->dev, sizeof(*regset), GFP_KERNEL);
+		if (!regset)
+			return 0;
+		regset->regs = hpu_regs;
+		regset->nregs = ARRAY_SIZE(hpu_regs);
+		regset->base = priv->regs;
+
+		priv->regset = debugfs_create_regset32(buf, 0444, hpu_debugfsdir, regset);
+	}
+
 	return 0;
 }
 
@@ -1182,7 +1194,7 @@ static int hpu_remove(struct platform_device *pdev)
 	struct hpu_priv *priv = platform_get_drvdata(pdev);
 
 	/* FIXME: resource release ! */
-
+	debugfs_remove(priv->regset);
 	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg &= ~HPU_CTRL_ENINT & ~HPU_CTRL_ENDMA;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
@@ -1213,6 +1225,7 @@ static struct platform_driver hpu_platform_driver = {
 static void __exit hpu_module_remove(void)
 {
 	platform_driver_unregister(&hpu_platform_driver);
+	debugfs_remove_recursive(hpu_debugfsdir);
 	class_destroy(hpu_class);
 
 	if (hpu_devt) {
@@ -1236,6 +1249,8 @@ static int __init hpu_module_init(void)
 		printk(KERN_ALERT "Error creating class " HPU_CLASS_NAME " \n");
 		goto unreg_chrreg;
 	}
+
+	hpu_debugfsdir = debugfs_create_dir("hpu", NULL);
 
 	ret = platform_driver_register(&hpu_platform_driver);
 	if (ret) {
