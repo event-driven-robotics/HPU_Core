@@ -141,8 +141,6 @@
 #define HPU_IOCTL_SET_LOOP_CFG		18
 #define HPU_IOCTL_SET_SPINN		19
 
-#define MSG_PREFIX "IIT-hpu: "
-
 static short int test_dma = 0;
 static short int rx_fifo_full = 0;
 static int ps = HPU_POOL_SIZE;
@@ -686,17 +684,17 @@ static void hpu_handle_err(struct hpu_priv *priv)
 	}
 
 	if (!is_aux)
-		printk(KERN_INFO MSG_PREFIX
+		dev_info(&priv->pdev->dev,
 		       "HSSAER error in Left or Right Eyes\n");
 	else {
-		printk(KERN_INFO MSG_PREFIX
+		dev_info(&priv->pdev->dev,
 		       "HSSAER error in Left or Right Eyes or Aux\n");
 		for (i = 0; i < 4; i++) {
 			if (num_channel & (1 << i))
-				printk(KERN_INFO MSG_PREFIX
-				       "Aux CNT %d 0x%08X\n", i,
-				       readl(priv->regs +
-					     (HPU_AUX_RX_ERR_CH0_REG + i * 4)));
+				dev_info(&priv->pdev->dev,
+					 "Aux CNT %d 0x%08X\n", i,
+					 readl(priv->regs +
+					       (HPU_AUX_RX_ERR_CH0_REG + i * 4)));
 		}
 	}
 }
@@ -724,13 +722,13 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	}
 
 	if (intr & HPU_MSK_INT_RXBUFFREADY) {
-		printk(KERN_INFO MSG_PREFIX "IRQ: RXBUFFREADY\n");
+		dev_info(&priv->pdev->dev, "IRQ: RXBUFFREADY\n");
 		writel(HPU_MSK_INT_RXBUFFREADY, priv->regs + HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
 	if (intr & HPU_MSK_INT_RXFIFOFULL) {
-		printk(KERN_INFO MSG_PREFIX "IRQ: RXFIFOFULL\n");
+		dev_info(&priv->pdev->dev, "IRQ: RXFIFOFULL\n");
 		/* Flush the FIFO */
 		priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
 		priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
@@ -747,7 +745,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	}
 
 	if (intr & HPU_MSK_INT_GLBLRXERR_KO) {
-		printk(KERN_INFO MSG_PREFIX "IRQ: RX KO Err\n");
+		dev_info(&priv->pdev->dev, "IRQ: RX KO Err\n");
 		hpu_handle_err(priv);
 		/* Clear the interrupt */
 		writel(HPU_MSK_INT_GLBLRXERR_KO, priv->regs + HPU_IRQ_REG);
@@ -755,7 +753,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	}
 
 	if (intr & HPU_MSK_INT_GLBLRXERR_RX) {
-		printk(KERN_INFO MSG_PREFIX "IRQ: RX RX Err\n");
+		dev_info(&priv->pdev->dev, "IRQ: RX RX Err\n");
 		hpu_handle_err(priv);
 		/* Clear the interrupt */
 		writel(HPU_MSK_INT_GLBLRXERR_RX, priv->regs + HPU_IRQ_REG);
@@ -763,7 +761,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	}
 
 	if (intr & HPU_MSK_INT_GLBLRXERR_TO) {
-		printk(KERN_INFO MSG_PREFIX "IRQ: RX TO Err\n");
+		dev_info(&priv->pdev->dev, "IRQ: RX TO Err\n");
 		hpu_handle_err(priv);
 		/* Clear the interrupt */
 		writel(HPU_MSK_INT_GLBLRXERR_TO, priv->regs + HPU_IRQ_REG);
@@ -771,7 +769,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	}
 
 	if (intr & HPU_MSK_INT_GLBLRXERR_OF) {
-		printk(KERN_INFO MSG_PREFIX "IRQ: RX OF Err\n");
+		dev_info(&priv->pdev->dev, "IRQ: RX OF Err\n");
 		hpu_handle_err(priv);
 		/* Clear the interrupt */
 		writel(HPU_MSK_INT_GLBLRXERR_OF, priv->regs + HPU_IRQ_REG);
@@ -900,8 +898,9 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		       priv->regs + HPU_AUX_RX_ERR_THRS_REG);
 		/* Read and print the register */
 		reg = readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
-		printk(KERN_DEBUG MSG_PREFIX "HPU_AUX_RX_ERR_THRS_REG 0x%08X\n",
-		       reg);
+
+		dev_dbg(&priv->pdev->dev,
+			"HPU_AUX_RX_ERR_THRS_REG 0x%08X\n", reg);
 
 		break;
 
@@ -955,7 +954,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 
 		if (ch_en_hssaer.hssaer_src < left_eye ||
 		    ch_en_hssaer.hssaer_src > aux) {
-			printk(KERN_ALERT MSG_PREFIX
+			dev_err(&priv->pdev->dev,
 			       "Error in enabling channels\n");
 			return -EINVAL;
 		} else {
@@ -1028,7 +1027,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 	return 0;
 
 cfuser_err:
-	printk(KERN_ALERT MSG_PREFIX "Copy from user space failed\n");
+	dev_err(&priv->pdev->dev, "Copy from user space failed\n");
 	return -EFAULT;
 
 }
@@ -1065,7 +1064,7 @@ static int hpu_register_chardev(struct hpu_priv *priv)
 	device_create(hpu_class, NULL, priv->devt, priv,
 		      HPU_NAME_FMT, priv->id);
 
-	printk(KERN_INFO MSG_PREFIX "Registered device major: %d, minor:%d\n",
+	dev_info(&priv->pdev->dev, "Registered device major: %d, minor:%d\n",
 	       MAJOR(priv->devt), MINOR(priv->devt));
 
 	return 0;
@@ -1090,7 +1089,7 @@ static int hpu_probe(struct platform_device *pdev)
 
 	/* FIXME: handle error path resource free */
 
-	printk(KERN_DEBUG MSG_PREFIX "Probing hpu\n");
+	dev_dbg(&pdev->dev, "Probing hpu\n");
 	priv = kmalloc(sizeof(struct hpu_priv), GFP_KERNEL);
 	if (!priv) {
 		dev_err(&pdev->dev, "Can't alloc priv mem\n");
@@ -1131,7 +1130,7 @@ static int hpu_probe(struct platform_device *pdev)
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	priv->regs = devm_ioremap_resource(&pdev->dev, res);
 	if (IS_ERR(priv->regs)) {
-		printk(KERN_ERR MSG_PREFIX "HPU has no regs in DT\n");
+		dev_err(&pdev->dev, "HPU has no regs in DT\n");
 		kfree(priv);
 		return PTR_ERR(priv->regs);
 	}
@@ -1139,7 +1138,7 @@ static int hpu_probe(struct platform_device *pdev)
 	ver = readl(priv->regs + HPU_VER_REG);
 
 	if (ver != HPU_VER_MAGIC) {
-		printk(KERN_ERR MSG_PREFIX "HPU IP has wrong version: %x\n",
+		dev_err(&pdev->dev, "HPU IP has wrong version: %x\n",
 		       ver);
 		kfree(priv);
 		return -ENODEV;
@@ -1147,14 +1146,14 @@ static int hpu_probe(struct platform_device *pdev)
 
 	priv->irq = platform_get_irq(pdev, 0);
 	if (priv->irq < 0) {
-		printk(KERN_ALERT MSG_PREFIX "Error getting irq\n");
+		dev_err(&priv->pdev->dev, "Error getting irq\n");
 		return -EPERM;
 	}
 	result =
 	    request_irq(priv->irq, hpu_irq_handler, IRQF_SHARED, "int_hpucore",
 			pdev);
 	if (result) {
-		printk(KERN_ALERT MSG_PREFIX "Error requesting irq: %i\n",
+		dev_err(&priv->pdev->dev, "Error requesting irq: %i\n",
 		       result);
 		return -EPERM;
 	}
@@ -1219,7 +1218,6 @@ static void __exit hpu_module_remove(void)
 	if (hpu_devt) {
 		unregister_chrdev_region(hpu_devt, HPU_MINOR_COUNT);
 	}
-	printk(KERN_DEBUG MSG_PREFIX "Removed\n");
 }
 
 static int __init hpu_module_init(void)
@@ -1228,21 +1226,21 @@ static int __init hpu_module_init(void)
 
 	ret = alloc_chrdev_region(&hpu_devt, 0, HPU_MINOR_COUNT, HPU_DEV_NAME);
 	if (ret < 0) {
-		printk(KERN_ALERT MSG_PREFIX
-		       "Error allocating space for device: %d\n", ret);
+		printk(KERN_ALERT "Error allocating chrdev region for driver "
+			HPU_DRIVER_NAME " \n");
 		return -ENOMEM;
 	}
 
 	hpu_class = class_create(THIS_MODULE, HPU_CLASS_NAME);
 	if (hpu_class == NULL) {
-		printk(KERN_ALERT MSG_PREFIX "Error creating device class\n");
+		printk(KERN_ALERT "Error creating class " HPU_CLASS_NAME " \n");
 		goto unreg_chrreg;
 	}
 
 	ret = platform_driver_register(&hpu_platform_driver);
 	if (ret) {
-		printk(KERN_ALERT MSG_PREFIX
-		       "Error registering platform drv\n");
+		printk(KERN_ALERT "Error registering driver "
+		       HPU_DRIVER_NAME " \n");
 		goto unreg_class;
 	}
 
