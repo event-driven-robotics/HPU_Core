@@ -662,15 +662,52 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	return _hpu_chardev_close(priv);
 }
 
+static void hpu_handle_err(struct hpu_priv *priv)
+{
+	uint32_t reg;
+	int i;
+	uint8_t num_channel = 0;
+	int is_aux = 0;
+
+	/* Detect which RX HSSAER channel is enabled */
+	reg = readl(priv->regs + HPU_RXCTRL_REG);
+	/* Check Left SAER */
+	if (reg & 0x1)
+		num_channel = num_channel | (reg & (0xF << 8)) >> 8;
+	/* Check Right SAER */
+	if (reg & 0x10000)
+		num_channel = num_channel | (reg & (0xF << 24)) >> 24;
+
+	/* Check Left Aux Saer */
+	reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
+	if (reg & 0x1) {
+		num_channel = num_channel | (reg & (0xF << 8)) >> 8;
+		is_aux = 1;
+	}
+
+	if (!is_aux)
+		printk(KERN_INFO MSG_PREFIX
+		       "HSSAER error in Left or Right Eyes\n");
+	else {
+		printk(KERN_INFO MSG_PREFIX
+		       "HSSAER error in Left or Right Eyes or Aux\n");
+		for (i = 0; i < 4; i++) {
+			if (num_channel & (1 << i))
+				printk(KERN_INFO MSG_PREFIX
+				       "Aux CNT %d 0x%08X\n", i,
+				       readl(priv->regs +
+					     (HPU_AUX_RX_ERR_CH0_REG + i * 4)));
+		}
+	}
+}
+
 /*************************************************************************************
   IRQ Handler
 **************************************************************************************/
-
 static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 {
 
 	u32 intr;
-	uint32_t reg;
 	uint32_t msk;
 	struct hpu_priv *priv = platform_get_drvdata(pdev);
 	irqreturn_t retval = 0;
@@ -710,167 +747,32 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	}
 
 	if (intr & HPU_MSK_INT_GLBLRXERR_KO) {
-		uint8_t num_channel = 0;
-		int i;
-		int is_aux = 0;
 		printk(KERN_INFO MSG_PREFIX "IRQ: RX KO Err\n");
-
-		/* Detect which RX HSSAER channel is enabled */
-		reg = readl(priv->regs + HPU_RXCTRL_REG);
-		/* Check Left SAER */
-		if (reg & 0x1)
-			num_channel = num_channel | (reg & (0xF << 8)) >> 8;
-		/* Check Right SAER */
-		if (reg & 0x10000)
-			num_channel = num_channel | (reg & (0xF << 24)) >> 24;
-
-		/* Check Left Aux Saer */
-		reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-		if (reg & 0x1) {
-			num_channel = num_channel | (reg & (0xF << 8)) >> 8;
-			is_aux = 1;
-		}
-
-		if (!is_aux)
-			printk(KERN_INFO MSG_PREFIX
-			       "HSSAER error in Left or Right Eyes\n");
-		else {
-			printk(KERN_INFO MSG_PREFIX
-			       "HSSAER error in Left or Right Eyes or Aux\n");
-			for (i = 0; i < 4; i++) {
-				if (num_channel & (1 << i))
-					printk(KERN_INFO MSG_PREFIX
-					       "Aux CNT %d 0x%08X\n", i,
-					       readl(priv->regs +
-						     (HPU_AUX_RX_ERR_CH0_REG +
-						      i * 4)));
-			}
-		}
-
+		hpu_handle_err(priv);
 		/* Clear the interrupt */
 		writel(HPU_MSK_INT_GLBLRXERR_KO, priv->regs + HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
 	if (intr & HPU_MSK_INT_GLBLRXERR_RX) {
-		uint8_t num_channel = 0;
-		int i;
-		int is_aux = 0;
-
 		printk(KERN_INFO MSG_PREFIX "IRQ: RX RX Err\n");
-
-		/* Detect which RX HSSAER channel is enabled */
-		reg = readl(priv->regs + HPU_RXCTRL_REG);
-		/* Check Left SAER */
-		if (reg & 0x1)
-			num_channel = num_channel | (reg & (0xF << 8)) >> 8;
-		/* Check Right SAER */
-		if (reg & 0x10000)
-			num_channel = num_channel | (reg & (0xF << 24)) >> 24;
-
-		/* Check Left Aux Saer */
-		reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-		if (reg & 0x1) {
-			num_channel = num_channel | (reg & (0xF << 8)) >> 8;
-			is_aux = 1;
-		}
-		if (!is_aux)
-			printk(KERN_INFO MSG_PREFIX
-			       "HSSAER error in Left or Right Eyes\n");
-		else {
-			printk(KERN_INFO MSG_PREFIX
-			       "HSSAER error in Left or Right Eyes or Aux\n");
-			for (i = 0; i < 4; i++) {
-				if (num_channel & (1 << i))
-					printk(KERN_INFO MSG_PREFIX
-					       "Aux CNT %d 0x%08X\n", i,
-					       readl(priv->regs +
-						     (HPU_AUX_RX_ERR_CH0_REG +
-						      i * 4)));
-			}
-		}
+		hpu_handle_err(priv);
 		/* Clear the interrupt */
 		writel(HPU_MSK_INT_GLBLRXERR_RX, priv->regs + HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
 	if (intr & HPU_MSK_INT_GLBLRXERR_TO) {
-		uint8_t num_channel = 0;
-		int i;
-		int is_aux = 0;
 		printk(KERN_INFO MSG_PREFIX "IRQ: RX TO Err\n");
-
-		/* Detect which RX HSSAER channel is enabled */
-		reg = readl(priv->regs + HPU_RXCTRL_REG);
-		/* Check Left SAER */
-		if (reg & 0x1)
-			num_channel = num_channel | (reg & (0xF << 8)) >> 8;
-		/* Check Right SAER */
-		if (reg & 0x10000)
-			num_channel = num_channel | (reg & (0xF << 24)) >> 24;
-
-		/* Check Left Aux Saer */
-		reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-		if (reg & 0x1) {
-			num_channel = num_channel | (reg & (0xF << 8)) >> 8;
-			is_aux = 1;
-		}
-		if (!is_aux)
-			printk(KERN_INFO MSG_PREFIX
-			       "HSSAER error in Left or Right Eyes\n");
-		else {
-			printk(KERN_INFO MSG_PREFIX
-			       "HSSAER error in Left or Right Eyes or Aux\n");
-			for (i = 0; i < 4; i++) {
-				if (num_channel & (1 << i))
-					printk(KERN_INFO MSG_PREFIX
-					       "Aux CNT %d 0x%08X\n", i,
-					       readl(priv->regs +
-						     (HPU_AUX_RX_ERR_CH0_REG +
-						      i * 4)));
-			}
-		}
+		hpu_handle_err(priv);
 		/* Clear the interrupt */
 		writel(HPU_MSK_INT_GLBLRXERR_TO, priv->regs + HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
 	if (intr & HPU_MSK_INT_GLBLRXERR_OF) {
-		uint8_t num_channel = 0;
-		int i;
-		int is_aux = 0;
 		printk(KERN_INFO MSG_PREFIX "IRQ: RX OF Err\n");
-
-		/* Detect which RX HSSAER channel is enabled */
-		reg = readl(priv->regs + HPU_RXCTRL_REG);
-		/* Check Left SAER */
-		if (reg & 0x1)
-			num_channel = num_channel | (reg & (0xF << 8)) >> 8;
-		/* Check Right SAER */
-		if (reg & 0x10000)
-			num_channel = num_channel | (reg & (0xF << 24)) >> 24;
-
-		/* Check Left Aux Saer */
-		reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-		if (reg & 0x1) {
-			num_channel = num_channel | (reg & (0xF << 8)) >> 8;
-			is_aux = 1;
-		}
-		if (!is_aux)
-			printk(KERN_INFO MSG_PREFIX
-			       "HSSAER error in Left or Right Eyes\n");
-		else {
-			printk(KERN_INFO MSG_PREFIX
-			       "HSSAER error in Left or Right Eyes or Aux\n");
-			for (i = 0; i < 4; i++) {
-				if (num_channel & (1 << i))
-					printk(KERN_INFO MSG_PREFIX
-					       "Aux CNT %d 0x%08X\n", i,
-					       readl(priv->regs +
-						     (HPU_AUX_RX_ERR_CH0_REG +
-						      i * 4)));
-			}
-		}
+		hpu_handle_err(priv);
 		/* Clear the interrupt */
 		writel(HPU_MSK_INT_GLBLRXERR_OF, priv->regs + HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
