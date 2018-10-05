@@ -210,6 +210,16 @@ struct hpu_buf {
 	struct hpu_priv *priv;
 };
 
+struct hpu_dma_pool {
+	spinlock_t ring_lock;
+	struct dma_pool *dma_pool;
+	struct hpu_buf *ring;
+	int buf_index;
+	int filled;
+	int ps;
+	int pn;
+};
+
 struct hpu_priv {
 	struct dentry *regset;
 	struct cdev cdev;
@@ -226,16 +236,12 @@ struct hpu_priv {
 	unsigned char *reading_done;
 
 	/* dma */
+	struct hpu_dma_pool dma_rx_pool;
 	struct dma_chan *dma_rx_chan;
 	struct dma_chan *dma_tx_chan;
-	struct dma_pool *rx_dma_pool;
-	struct hpu_buf *rx_dma_ring;
 	void *dma_tx_buf;
 	dma_addr_t dma_tx_buf_phys;
 	struct semaphore dma_tx_sem;
-	int buf_index;
-	int filled;
-	spinlock_t ring_lock;
 	unsigned char *tmp_buf;
 	unsigned int cnt_pktloss;
 };
@@ -246,7 +252,7 @@ static dev_t hpu_devt;
 static DEFINE_IDA(hpu_ida);
 
 static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
-static void hpu_rx_dma_free_pool(struct hpu_priv *priv);
+static void hpu_dma_free_pool(struct hpu_priv *priv, struct hpu_dma_pool *hpu_pool);
 static int _hpu_chardev_close(struct hpu_priv *priv);
 
 static void hpu_tx_dma_callback(void *arg)
@@ -261,24 +267,26 @@ static void hpu_rx_dma_callback(void *_buffer)
 	struct hpu_buf *buffer = _buffer;
 	struct hpu_priv *priv = buffer->priv;
 
-	spin_lock(&priv->ring_lock);
+	spin_lock(&priv->dma_rx_pool.ring_lock);
 	dev_dbg(&priv->pdev->dev, "DMA cb\n");
-	if (priv->filled == (rx_pn - 1)) {
-		hpu_rx_dma_submit_buffer(priv, &priv->rx_dma_ring[priv->buf_index]);
+	if (priv->dma_rx_pool.filled == (priv->dma_rx_pool.pn - 1)) {
+		hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index]);
 
 		/* forcefully advance index. 1pkt lost */
-		priv->buf_index = (priv->buf_index + 1) & (rx_pn - 1);
+		priv->dma_rx_pool.buf_index =
+			(priv->dma_rx_pool.buf_index + 1) &
+			(priv->dma_rx_pool.pn - 1);
 		priv->cnt_pktloss++;
 		dma_async_issue_pending(priv->dma_rx_chan);
 	} else {
-		if (priv->filled == 0) {
+		if (priv->dma_rx_pool.filled == 0) {
 			/* ring was empty. wake sleeping reader (if any) */
 			dev_dbg(&priv->pdev->dev, "complete completion\n");
 			complete(&priv->rx_cmp);
 		}
-		priv->filled++;
+		priv->dma_rx_pool.filled++;
 	}
-	spin_unlock(&priv->ring_lock);
+	spin_unlock(&priv->dma_rx_pool.ring_lock);
 }
 
 static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
@@ -295,12 +303,12 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 		 * Note that callbacks will always be invoked from the DMA
 		 * engines tasklet, never from interrupt context.
 		 */
-		spin_lock_bh(&priv->ring_lock);
+		spin_lock_bh(&priv->dma_rx_pool.ring_lock);
 
-		if (priv->filled > 0)
+		if (priv->dma_rx_pool.filled > 0)
 			break;
 
-		spin_unlock_bh(&priv->ring_lock);
+		spin_unlock_bh(&priv->dma_rx_pool.ring_lock);
 
 		dev_dbg(&priv->pdev->dev, "wait for dma\n");
 		time_left =
@@ -314,9 +322,9 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 	}
 
 	/* we got here with lock held */
-	item = &priv->rx_dma_ring[priv->buf_index];
+	item = &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index];
 	dev_dbg(&priv->pdev->dev, "reading dma descriptor %d\n",
-		priv->buf_index);
+		priv->dma_rx_pool.buf_index);
 
 	/*
 	 * Quoting  /Documentation/dmaengine/client.txt
@@ -334,7 +342,7 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 		goto exit;
 	}
 #endif
-	buf_count = rx_ps - item->read_index;
+	buf_count = priv->dma_rx_pool.ps - item->read_index;
 	length = min(maxlen, buf_count);
 
 	dev_dbg(&priv->pdev->dev, "going to read %d bytes from offset %d\n",
@@ -342,13 +350,14 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 
 	memcpy(priv->tmp_buf, item->virt + item->read_index, length);
 
-	if ((item->read_index + length) == rx_ps) {
+	if ((item->read_index + length) == priv->dma_rx_pool.ps) {
 		/* Buffer fully read. */
 		dev_dbg(&priv->pdev->dev, "fully consumed\n");
-		priv->filled--;
+		priv->dma_rx_pool.filled--;
 
-		hpu_rx_dma_submit_buffer(priv, &priv->rx_dma_ring[priv->buf_index]);
-		priv->buf_index = (priv->buf_index + 1) & (rx_pn - 1);
+		hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index]);
+		priv->dma_rx_pool.buf_index = (priv->dma_rx_pool.buf_index + 1)
+			& (priv->dma_rx_pool.pn - 1);
 
 		dma_async_issue_pending(priv->dma_rx_chan);
 
@@ -359,7 +368,7 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 			item->read_index);
 	}
 
-	spin_unlock_bh(&priv->ring_lock);
+	spin_unlock_bh(&priv->dma_rx_pool.ring_lock);
 
 	ret = copy_to_user(buf, priv->tmp_buf, length);
 	if (ret) {
@@ -482,52 +491,65 @@ static void hpu_dma_release(struct hpu_priv *priv)
 {
 	if (priv->dma_rx_chan) {
 		dma_release_channel(priv->dma_rx_chan);
-		hpu_rx_dma_free_pool(priv);
+		hpu_dma_free_pool(priv, &priv->dma_rx_pool);
 	}
 
 	if (priv->dma_tx_chan)
 		dma_release_channel(priv->dma_tx_chan);
 }
 
-static int hpu_rx_dma_alloc_pool(struct hpu_priv *priv)
+static int hpu_dma_alloc_pool(struct hpu_priv *priv,
+			      struct hpu_dma_pool *hpu_pool)
 {
 	int i;
 
-	priv->rx_dma_pool = dma_pool_create(HPU_DRIVER_NAME, &priv->pdev->dev,
-					 rx_ps, 4, 0);
+	hpu_pool->dma_pool = dma_pool_create(HPU_DRIVER_NAME, &priv->pdev->dev,
+					 hpu_pool->ps, 4, 0);
 
-	if (!priv->rx_dma_pool) {
+	if (!hpu_pool->dma_pool) {
 		dev_err(&priv->pdev->dev, "Error creating DMA pool\n");
 		return -ENOMEM;
 	}
 
-	for (i = 0; i < rx_pn; i++) {
-		priv->rx_dma_ring[i].virt =
-		    (unsigned char *)dma_pool_alloc(priv->rx_dma_pool, GFP_KERNEL,
-						    &priv->rx_dma_ring[i].phys);
-
-		if (!priv->rx_dma_ring[i].virt)
-			return -ENOMEM;
-
+	hpu_pool->ring = kmalloc(hpu_pool->pn * sizeof(struct hpu_buf), GFP_KERNEL);
+	if (!(hpu_pool->ring)) {
+		dev_err(&priv->pdev->dev, "Can't alloc mem for dma ring\n");
+		return -ENOMEM;
 	}
-	priv->buf_index = 0;
-	priv->filled = 0;
+
+	for (i = 0; i < hpu_pool->pn; i++) {
+	        hpu_pool->ring[i].virt =
+		    (unsigned char *)dma_pool_alloc(hpu_pool->dma_pool, GFP_KERNEL,
+						    &hpu_pool->ring[i].phys);
+
+		if (!hpu_pool->ring[i].virt)
+			return -ENOMEM;
+	}
+
+	for (i = 0; i < hpu_pool->pn; i++)
+		hpu_pool->ring[i].priv = priv;
+
+	hpu_pool->buf_index = 0;
+	hpu_pool->filled = 0;
 
 	return 0;
 }
 
-static void hpu_rx_dma_free_pool(struct hpu_priv *priv)
+static void hpu_dma_free_pool(struct hpu_priv *priv,
+			      struct hpu_dma_pool *hpu_pool)
 {
 	int i;
 
-	for (i = 0; i < rx_pn; i++) {
-		dma_pool_free(priv->rx_dma_pool,
-			      priv->rx_dma_ring[i].virt, priv->rx_dma_ring[i].phys);
-		priv->rx_dma_ring[i].virt = NULL;
+	for (i = 0; i < hpu_pool->pn; i++) {
+		dma_pool_free(hpu_pool->dma_pool,
+			      hpu_pool->ring[i].virt, hpu_pool->ring[i].phys);
+		hpu_pool->ring[i].virt = NULL;
 	}
 
-	dma_pool_destroy(priv->rx_dma_pool);
-	priv->rx_dma_pool = NULL;
+	dma_pool_destroy(hpu_pool->dma_pool);
+	hpu_pool->dma_pool = NULL;
+	kfree(hpu_pool->ring);
+	hpu_pool->ring = NULL;
 }
 
 static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
@@ -537,7 +559,7 @@ static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
 
 	dma_desc = dmaengine_prep_slave_single(priv->dma_rx_chan,
 					       buf->phys,
-					       rx_ps,
+					       priv->dma_rx_pool.ps,
 					       DMA_DEV_TO_MEM,
 					       DMA_CTRL_ACK |
 					       DMA_PREP_INTERRUPT);
@@ -558,8 +580,8 @@ static int hpu_rx_dma_submit_pool(struct hpu_priv *priv)
 	int i;
 	int ret;
 
-	for (i = 0; i < rx_pn; i++) {
-		ret = hpu_rx_dma_submit_buffer(priv, &priv->rx_dma_ring[i]);
+	for (i = 0; i < priv->dma_rx_pool.pn; i++) {
+		ret = hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[i]);
 
 		if (ret)
 			break;
@@ -590,7 +612,9 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		return ret;
 	}
 
-	ret = hpu_rx_dma_alloc_pool(priv);
+	priv->dma_rx_pool.ps = rx_ps;
+	priv->dma_rx_pool.pn = rx_pn;
+	ret = hpu_dma_alloc_pool(priv, &priv->dma_rx_pool);
 
 	/*
 	 * In case of error go to deallocation rollback path, since
@@ -873,7 +897,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_PS, unsigned int *):
-		ret = rx_ps;
+		ret = priv->dma_rx_pool.ps;
 		if (copy_to_user((unsigned int *)arg, &ret,
 				 sizeof(unsigned int)))
 			goto cfuser_err;
@@ -1082,7 +1106,6 @@ static int hpu_probe(struct platform_device *pdev)
 	struct resource *res;
 	struct debugfs_regset32 *regset;
 	unsigned int result;
-	int i;
 	u32 ver;
 	char buf[128];
 
@@ -1097,11 +1120,6 @@ static int hpu_probe(struct platform_device *pdev)
 	priv->hpu_is_opened = 0;
 	sema_init(&priv->dma_tx_sem, 1);
 
-	priv->rx_dma_ring = kmalloc(rx_pn * sizeof(struct hpu_buf), GFP_KERNEL);
-	if (!(priv->rx_dma_ring)) {
-		dev_err(&pdev->dev, "Can't alloc priv mem for rx_dma_ring\n");
-		return -ENOMEM;
-	}
 	priv->tmp_buf = kmalloc(rx_ps * sizeof(unsigned char), GFP_KERNEL);
 	if (!(priv->tmp_buf)) {
 		dev_err(&pdev->dev, "Can't alloc priv mem for tmp_buf\n");
@@ -1124,7 +1142,7 @@ static int hpu_probe(struct platform_device *pdev)
 	priv->reading_done = false;
 	priv->ctrl_reg = 0;
 
-	spin_lock_init(&priv->ring_lock);
+	spin_lock_init(&priv->dma_rx_pool.ring_lock);
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	priv->regs = devm_ioremap_resource(&pdev->dev, res);
@@ -1168,9 +1186,6 @@ static int hpu_probe(struct platform_device *pdev)
 		       priv->regs + HPU_DMA_REG);
 
 	init_completion(&priv->rx_cmp);
-
-	for (i = 0; i < rx_pn; i++)
-		priv->rx_dma_ring[i].priv = priv;
 
 	hpu_register_chardev(priv);
 
