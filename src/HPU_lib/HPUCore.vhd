@@ -80,7 +80,7 @@ entity HPUCore is
         C_RX_HSSAER_N_CHAN         : natural range 1 to 4    := 3;              -- HSSAER RX Channels:	          the number of RX HSSAER channels
         C_TX_HAS_HSSAER            : boolean                 := true;           -- HSSAER TX Interface:	          if true the TX HSSAER interface is exposed
         C_TX_HSSAER_N_CHAN         : natural range 1 to 4    := 3;              -- HSSAER TX Channels:	          the number of TX HSSAER channels
-        C_RX_HAS_GTP               : boolean                 := true;           -- GTP RX Interface:              if true the RX GTP interface is exposed
+        C_RX_HAS_GTP               : boolean                 := false;          -- GTP RX Interface:              if true the RX GTP interface is exposed
         C_TX_HAS_GTP               : boolean                 := false;          -- GTP TX Interface:	          if true the TX GTP interface is exposed
         C_RX_HAS_SPNNLNK           : boolean                 := true;           -- SpiNNlink RX Interface:        if true the RX SpiNNlink interface is exposed  
         C_TX_HAS_SPNNLNK           : boolean                 := true;           -- SpiNNlink TX Interface:	      if true the TX SpiNNlink interface is exposed

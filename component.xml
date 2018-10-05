@@ -309,7 +309,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>22a9176c</spirit:value>
+            <spirit:value>9992aa0f</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -328,7 +328,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>22a9176c</spirit:value>
+            <spirit:value>9992aa0f</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -343,7 +343,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>144c4e88</spirit:value>
+            <spirit:value>9c1ce219</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2869,7 +2869,7 @@
       <spirit:modelParameter spirit:dataType="boolean">
         <spirit:name>C_RX_HAS_GTP</spirit:name>
         <spirit:displayName>C Rx Has Gtp</spirit:displayName>
-        <spirit:value spirit:format="bool" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_HAS_GTP">true</spirit:value>
+        <spirit:value spirit:format="bool" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_HAS_GTP">false</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="boolean">
         <spirit:name>C_RX_HAS_SPNNLNK</spirit:name>
@@ -3284,7 +3284,7 @@
       <spirit:file>
         <spirit:name>src/HPU_lib/HPUCore.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_4ad9f320</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_8be0f100</spirit:userFileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
@@ -3731,7 +3731,7 @@
     <spirit:parameter>
       <spirit:name>C_RX_HAS_GTP</spirit:name>
       <spirit:displayName>GTP RX Interface</spirit:displayName>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_HAS_GTP">true</spirit:value>
+      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_HAS_GTP">false</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -3911,8 +3911,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>4</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2018-10-02T11:32:14Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>6</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2018-10-05T14:29:02Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
@@ -3926,10 +3926,10 @@
       <xilinx:xilinxVersion>2017.4.1</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="84870c4e"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="afb7fa17"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="f32ae2d6"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="b7c768f5"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="290e7862"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="1f808d7f"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="3e9083a8"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="0a05a117"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>
