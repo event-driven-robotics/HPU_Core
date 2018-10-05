@@ -149,8 +149,10 @@ LRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
 RRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
 AuxRxSpnnlnkStat_i             : in  t_RxSpnnlnkStat;
 
-Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);
-Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0); 
+Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+Spnn_tx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+Spnn_rx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
 
 DBG_CTRL_reg                   : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 DBG_ctrl_rd                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -281,7 +283,9 @@ architecture rtl of neuserial_axilite is
     signal  i_HSSAER_AUX_RX_ERR_CNT_reg : t_RxErrStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
     signal  i_HSSAER_AUX_RX_ERR_THR_reg : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_SPNN_START_KEY_reg  : std_logic_vector (31 downto 0);
-    signal  i_SPNN_STOP_KEY_reg   : std_logic_vector (31 downto 0);
+    signal  i_SPNN_STOP_KEY_reg   : std_logic_vector (31 downto 0);    
+    signal  i_SPNN_TX_MASK_reg    : std_logic_vector (31 downto 0);
+    signal  i_SPNN_RX_MASK_reg    : std_logic_vector (31 downto 0);
 
     signal  i_CTRL_rd             : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_LPBK_CNFG_rd        : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -315,6 +319,8 @@ architecture rtl of neuserial_axilite is
     signal  i_HSSAER_AUX_RX_ERR_THR_rd : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_SPNN_START_KEY_rd   : std_logic_vector (31 downto 0);
     signal  i_SPNN_STOP_KEY_rd    : std_logic_vector (31 downto 0);
+    signal  i_SPNN_TX_MASK_rd     : std_logic_vector (31 downto 0);
+    signal  i_SPNN_RX_MASK_rd     : std_logic_vector (31 downto 0);
 
 
     signal  i_rawHSSaerErr  : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -439,6 +445,8 @@ begin
     
     Spnn_cmd_start_key_o <= i_SPNN_START_KEY_reg;
     Spnn_cmd_stop_key_o  <= i_SPNN_STOP_KEY_reg;
+    Spnn_tx_mask_o       <= i_SPNN_TX_MASK_reg;
+    Spnn_rx_mask_o       <= i_SPNN_RX_MASK_reg;
 
     p_hssaer_rx_err : process (LRxSaerStat_i, RRxSaerStat_i)
     begin
@@ -623,6 +631,8 @@ begin
                 i_HSSAER_AUX_RX_ERR_THR_reg <= X"10_10_10_10";
                 i_SPNN_START_KEY_reg <= x"80000000";
                 i_SPNN_STOP_KEY_reg  <= x"40000000";
+                i_SPNN_TX_MASK_reg   <= x"00FFFFFF";
+                i_SPNN_RX_MASK_reg   <= x"00FFFFFF";
 
                 WriteTxBuffer_o <= '0';
                 i_cleanTimer  <= '0';
@@ -869,7 +879,22 @@ begin
                                   i_SPNN_STOP_KEY_reg(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
                                end if;
                           end loop;                 
-                       
+
+                       -- i_SPNN_TX_MASK_reg
+                       when 34 =>
+                           for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
+                               if (S_AXI_WSTRB(byte_index) = '1') then
+                                  i_SPNN_TX_MASK_reg(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
+                               end if;
+                           end loop;  
+                           
+                       -- i_SPNN_RX_MASK_reg
+                       when 35 =>
+                           for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
+                               if (S_AXI_WSTRB(byte_index) = '1') then
+                                  i_SPNN_RX_MASK_reg(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
+                               end if;
+                           end loop;  
 
                         when others => null;
 
@@ -986,7 +1011,7 @@ begin
                           i_IP_CONFIG_rd, i_FIFOTHRESH_rd, i_LPBK_CNFG_AUX_rd, i_ID_rd, i_AUX_CTRL_rd,
                           i_HSSAER_AUX_RX_ERR_rd, i_HSSAER_AUX_RX_MSK_rd,
                           i_readRxErrCnt, i_HSSAER_AUX_RX_ERR_THR_rd, i_HSSAER_AUX_RX_ERR_CNT_rd,
-                          i_SPNN_START_KEY_rd, i_SPNN_STOP_KEY_rd )
+                          i_SPNN_START_KEY_rd, i_SPNN_STOP_KEY_rd, i_SPNN_TX_MASK_rd, i_SPNN_RX_MASK_rd )
     begin
         if (S_AXI_ARESETN = '0') then
             regDataOut <= (others => '0');
@@ -1045,6 +1070,8 @@ begin
                            
                 when 32 => regDataOut  <= i_SPNN_START_KEY_rd;
                 when 33 => regDataOut  <= i_SPNN_STOP_KEY_rd;
+                when 34 => regDataOut  <= i_SPNN_TX_MASK_rd;
+                when 35 => regDataOut  <= i_SPNN_RX_MASK_rd;
 
                when others  => regDataOut  <= x"BAB0BAB0";
             end case;
@@ -1753,7 +1780,27 @@ begin
     -- i_SPNN_STOP_KEY_rd r/w
 
     i_SPNN_STOP_KEY_rd <= i_SPNN_STOP_KEY_reg;
+            
+    
+    -- ------------------------------------------------------------------------
+    -- SpiNNaker TX Data Mask Command
+    -- ------------------------------------------------------------------------
+    -- i_SPNN_TX_MASK_rd r/w
 
+    i_SPNN_TX_MASK_rd <= i_SPNN_TX_MASK_reg;  
+              
+    
+    -- ------------------------------------------------------------------------
+    -- SpiNNaker RX Data Mask Command
+    -- ------------------------------------------------------------------------
+    -- i_SPNN_RX_MASK_rd r/w
+
+    i_SPNN_RX_MASK_rd <= i_SPNN_RX_MASK_reg;
+
+
+    -- ------------------------------------------------------------------------
+    -- DEBUG Registers
+    -- ------------------------------------------------------------------------
 
     DBG_CTRL_reg <=  i_CTRL_reg;
     DBG_ctrl_rd  <=  i_CTRL_rd;
