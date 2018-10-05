@@ -1042,8 +1042,11 @@ begin
                            else
                               regDataOut  <= (others => '0');
                            end if;
+                           
+                when 32 => regDataOut  <= i_SPNN_START_KEY_rd;
+                when 33 => regDataOut  <= i_SPNN_STOP_KEY_rd;
 
-               when others  => regDataOut  <= (others => '0');
+               when others  => regDataOut  <= x"BAB0BAB0";
             end case;
         end if;
     end process p_read_mux;
