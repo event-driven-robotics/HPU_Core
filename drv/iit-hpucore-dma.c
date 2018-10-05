@@ -36,10 +36,10 @@
 /* max HPUs that can be handled */
 #define HPU_MINOR_COUNT 10
 
-/* DMA pool */
-#define HPU_POOL_SIZE 1024
-#define HPU_POOL_NUM 1024 /* must, must, must, must be a power of 2 */
-#define HPU_TO_MS 100000
+/* RX DMA pool */
+#define HPU_RX_POOL_SIZE 1024
+#define HPU_RX_POOL_NUM 1024 /* must, must, must, must be a power of 2 */
+#define HPU_RX_TO_MS 100000
 
 /* names */
 #define HPU_NAME "iit-hpu"
@@ -173,18 +173,18 @@ static struct debugfs_reg32 hpu_regs[] = {
 
 static short int test_dma = 0;
 static short int rx_fifo_full = 0;
-static int ps = HPU_POOL_SIZE;
-static int pn = HPU_POOL_NUM;
-static int to = HPU_TO_MS;
+static int rx_ps = HPU_RX_POOL_SIZE;
+static int rx_pn = HPU_RX_POOL_NUM;
+static int rx_to = HPU_RX_TO_MS;
 
 module_param(test_dma, short, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 MODULE_PARM_DESC(test_dma, "Set to 1 to test DMA");
-module_param(ps, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-MODULE_PARM_DESC(ps, "Pool size");
-module_param(pn, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-MODULE_PARM_DESC(pn, "Pool num");
-module_param(to, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-MODULE_PARM_DESC(to, "DMA TimeOut in ms");
+module_param(rx_ps, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+MODULE_PARM_DESC(rx_ps, "Pool size");
+module_param(rx_pn, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+MODULE_PARM_DESC(rx_pn, "Pool num");
+module_param(rx_to, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+MODULE_PARM_DESC(rx_to, "DMA TimeOut in ms");
 
 enum hssaersrc { left_eye = 0, right_eye, aux, spinn };
 
@@ -226,10 +226,10 @@ struct hpu_priv {
 	unsigned char *reading_done;
 
 	/* dma */
-	struct dma_chan *dma_chan;
+	struct dma_chan *dma_rx_chan;
 	struct dma_chan *dma_tx_chan;
-	struct dma_pool *dma_pool;
-	struct hpu_buf *dma_ring;
+	struct dma_pool *rx_dma_pool;
+	struct hpu_buf *rx_dma_ring;
 	void *dma_tx_buf;
 	dma_addr_t dma_tx_buf_phys;
 	struct semaphore dma_tx_sem;
@@ -245,8 +245,8 @@ static struct class *hpu_class = NULL;
 static dev_t hpu_devt;
 static DEFINE_IDA(hpu_ida);
 
-static int hpu_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
-static void hpu_dma_free_pool(struct hpu_priv *priv);
+static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
+static void hpu_rx_dma_free_pool(struct hpu_priv *priv);
 static int _hpu_chardev_close(struct hpu_priv *priv);
 
 static void hpu_tx_dma_callback(void *arg)
@@ -256,20 +256,20 @@ static void hpu_tx_dma_callback(void *arg)
 	up(&priv->dma_tx_sem);
 }
 
-static void hpu_dma_callback(void *_buffer)
+static void hpu_rx_dma_callback(void *_buffer)
 {
 	struct hpu_buf *buffer = _buffer;
 	struct hpu_priv *priv = buffer->priv;
 
 	spin_lock(&priv->ring_lock);
 	dev_dbg(&priv->pdev->dev, "DMA cb\n");
-	if (priv->filled == (pn - 1)) {
-		hpu_dma_submit_buffer(priv, &priv->dma_ring[priv->buf_index]);
+	if (priv->filled == (rx_pn - 1)) {
+		hpu_rx_dma_submit_buffer(priv, &priv->rx_dma_ring[priv->buf_index]);
 
 		/* forcefully advance index. 1pkt lost */
-		priv->buf_index = (priv->buf_index + 1) & (pn - 1);
+		priv->buf_index = (priv->buf_index + 1) & (rx_pn - 1);
 		priv->cnt_pktloss++;
-		dma_async_issue_pending(priv->dma_chan);
+		dma_async_issue_pending(priv->dma_rx_chan);
 	} else {
 		if (priv->filled == 0) {
 			/* ring was empty. wake sleeping reader (if any) */
@@ -305,7 +305,7 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 		dev_dbg(&priv->pdev->dev, "wait for dma\n");
 		time_left =
 		    wait_for_completion_timeout(&priv->rx_cmp,
-						msecs_to_jiffies(to));
+						msecs_to_jiffies(rx_to));
 
 		if (time_left == 0) {
 			dev_err(&priv->pdev->dev, "DMA timed out\n");
@@ -314,7 +314,7 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 	}
 
 	/* we got here with lock held */
-	item = &priv->dma_ring[priv->buf_index];
+	item = &priv->rx_dma_ring[priv->buf_index];
 	dev_dbg(&priv->pdev->dev, "reading dma descriptor %d\n",
 		priv->buf_index);
 
@@ -325,7 +325,7 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 	 */
 #if 0
 	status =
-	    dma_async_is_tx_complete(priv->dma_chan, item->cookie, NULL, NULL);
+	    dma_async_is_tx_complete(priv->dma_rx_chan, item->cookie, NULL, NULL);
 	if (status != DMA_COMPLETE) {
 		dev_err(&priv->pdev->dev,
 			"Was going to read descriptor with status \'%s\'\n",
@@ -334,7 +334,7 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 		goto exit;
 	}
 #endif
-	buf_count = ps - item->read_index;
+	buf_count = rx_ps - item->read_index;
 	length = min(maxlen, buf_count);
 
 	dev_dbg(&priv->pdev->dev, "going to read %d bytes from offset %d\n",
@@ -342,15 +342,15 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 
 	memcpy(priv->tmp_buf, item->virt + item->read_index, length);
 
-	if ((item->read_index + length) == ps) {
+	if ((item->read_index + length) == rx_ps) {
 		/* Buffer fully read. */
 		dev_dbg(&priv->pdev->dev, "fully consumed\n");
 		priv->filled--;
 
-		hpu_dma_submit_buffer(priv, &priv->dma_ring[priv->buf_index]);
-		priv->buf_index = (priv->buf_index + 1) & (pn - 1);
+		hpu_rx_dma_submit_buffer(priv, &priv->rx_dma_ring[priv->buf_index]);
+		priv->buf_index = (priv->buf_index + 1) & (rx_pn - 1);
 
-		dma_async_issue_pending(priv->dma_chan);
+		dma_async_issue_pending(priv->dma_rx_chan);
 
 	} else {
 		/* buffer partially consumed, advance in-buffer index */
@@ -458,18 +458,18 @@ error_rx_fifo_full:
 
 static int hpu_dma_init(struct hpu_priv *priv)
 {
-	priv->dma_chan = dma_request_slave_channel(&priv->pdev->dev, "rx");
+	priv->dma_rx_chan = dma_request_slave_channel(&priv->pdev->dev, "rx");
 
-	if (IS_ERR_OR_NULL(priv->dma_chan)) {
+	if (IS_ERR_OR_NULL(priv->dma_rx_chan)) {
 		dev_err(&priv->pdev->dev, "Can't bind RX DMA chan\n");
-		priv->dma_chan = NULL;
+		priv->dma_rx_chan = NULL;
 		return -ENODEV;
 	}
 
 	priv->dma_tx_chan = dma_request_slave_channel(&priv->pdev->dev, "tx");
 
 	if (IS_ERR_OR_NULL(priv->dma_tx_chan)) {
-		dma_release_channel(priv->dma_chan);
+		dma_release_channel(priv->dma_rx_chan);
 		priv->dma_tx_chan = NULL;
 		dev_err(&priv->pdev->dev, "Can't bind TX DMA chan\n");
 		return -ENODEV;
@@ -480,33 +480,33 @@ static int hpu_dma_init(struct hpu_priv *priv)
 
 static void hpu_dma_release(struct hpu_priv *priv)
 {
-	if (priv->dma_chan) {
-		dma_release_channel(priv->dma_chan);
-		hpu_dma_free_pool(priv);
+	if (priv->dma_rx_chan) {
+		dma_release_channel(priv->dma_rx_chan);
+		hpu_rx_dma_free_pool(priv);
 	}
 
 	if (priv->dma_tx_chan)
 		dma_release_channel(priv->dma_tx_chan);
 }
 
-static int hpu_dma_alloc_pool(struct hpu_priv *priv)
+static int hpu_rx_dma_alloc_pool(struct hpu_priv *priv)
 {
 	int i;
 
-	priv->dma_pool = dma_pool_create(HPU_DRIVER_NAME, &priv->pdev->dev,
-					 ps, 4, 0);
+	priv->rx_dma_pool = dma_pool_create(HPU_DRIVER_NAME, &priv->pdev->dev,
+					 rx_ps, 4, 0);
 
-	if (!priv->dma_pool) {
+	if (!priv->rx_dma_pool) {
 		dev_err(&priv->pdev->dev, "Error creating DMA pool\n");
 		return -ENOMEM;
 	}
 
-	for (i = 0; i < pn; i++) {
-		priv->dma_ring[i].virt =
-		    (unsigned char *)dma_pool_alloc(priv->dma_pool, GFP_KERNEL,
-						    &priv->dma_ring[i].phys);
+	for (i = 0; i < rx_pn; i++) {
+		priv->rx_dma_ring[i].virt =
+		    (unsigned char *)dma_pool_alloc(priv->rx_dma_pool, GFP_KERNEL,
+						    &priv->rx_dma_ring[i].phys);
 
-		if (!priv->dma_ring[i].virt)
+		if (!priv->rx_dma_ring[i].virt)
 			return -ENOMEM;
 
 	}
@@ -516,33 +516,33 @@ static int hpu_dma_alloc_pool(struct hpu_priv *priv)
 	return 0;
 }
 
-static void hpu_dma_free_pool(struct hpu_priv *priv)
+static void hpu_rx_dma_free_pool(struct hpu_priv *priv)
 {
 	int i;
 
-	for (i = 0; i < pn; i++) {
-		dma_pool_free(priv->dma_pool,
-			      priv->dma_ring[i].virt, priv->dma_ring[i].phys);
-		priv->dma_ring[i].virt = NULL;
+	for (i = 0; i < rx_pn; i++) {
+		dma_pool_free(priv->rx_dma_pool,
+			      priv->rx_dma_ring[i].virt, priv->rx_dma_ring[i].phys);
+		priv->rx_dma_ring[i].virt = NULL;
 	}
 
-	dma_pool_destroy(priv->dma_pool);
-	priv->dma_pool = NULL;
+	dma_pool_destroy(priv->rx_dma_pool);
+	priv->rx_dma_pool = NULL;
 }
 
-static int hpu_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
+static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
 {
 	struct dma_async_tx_descriptor *dma_desc;
 	dma_cookie_t cookie;
 
-	dma_desc = dmaengine_prep_slave_single(priv->dma_chan,
+	dma_desc = dmaengine_prep_slave_single(priv->dma_rx_chan,
 					       buf->phys,
-					       ps,
+					       rx_ps,
 					       DMA_DEV_TO_MEM,
 					       DMA_CTRL_ACK |
 					       DMA_PREP_INTERRUPT);
 
-	dma_desc->callback = hpu_dma_callback;
+	dma_desc->callback = hpu_rx_dma_callback;
 	dma_desc->callback_param = buf;
 
 	cookie = dmaengine_submit(dma_desc);
@@ -553,13 +553,13 @@ static int hpu_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
 	return dma_submit_error(cookie);
 }
 
-static int hpu_dma_submit_pool(struct hpu_priv *priv)
+static int hpu_rx_dma_submit_pool(struct hpu_priv *priv)
 {
 	int i;
 	int ret;
 
-	for (i = 0; i < pn; i++) {
-		ret = hpu_dma_submit_buffer(priv, &priv->dma_ring[i]);
+	for (i = 0; i < rx_pn; i++) {
+		ret = hpu_rx_dma_submit_buffer(priv, &priv->rx_dma_ring[i]);
 
 		if (ret)
 			break;
@@ -590,7 +590,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		return ret;
 	}
 
-	ret = hpu_dma_alloc_pool(priv);
+	ret = hpu_rx_dma_alloc_pool(priv);
 
 	/*
 	 * In case of error go to deallocation rollback path, since
@@ -602,13 +602,13 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		goto err_dealloc_dma;
 	}
 
-	ret = hpu_dma_submit_pool(priv);
+	ret = hpu_rx_dma_submit_pool(priv);
 	if (ret) {
 		dev_err(&priv->pdev->dev,
 			"Error in submitting RX DMA descriptor\n");
 		goto err_dealloc_dma;
 	}
-	dma_async_issue_pending(priv->dma_chan);
+	dma_async_issue_pending(priv->dma_rx_chan);
 
 	if (!test_dma) {
 		/* Unmask RXFIFOFULL interrupt */
@@ -873,7 +873,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_PS, unsigned int *):
-		ret = ps;
+		ret = rx_ps;
 		if (copy_to_user((unsigned int *)arg, &ret,
 				 sizeof(unsigned int)))
 			goto cfuser_err;
@@ -1097,12 +1097,12 @@ static int hpu_probe(struct platform_device *pdev)
 	priv->hpu_is_opened = 0;
 	sema_init(&priv->dma_tx_sem, 1);
 
-	priv->dma_ring = kmalloc(pn * sizeof(struct hpu_buf), GFP_KERNEL);
-	if (!(priv->dma_ring)) {
-		dev_err(&pdev->dev, "Can't alloc priv mem for dma_ring\n");
+	priv->rx_dma_ring = kmalloc(rx_pn * sizeof(struct hpu_buf), GFP_KERNEL);
+	if (!(priv->rx_dma_ring)) {
+		dev_err(&pdev->dev, "Can't alloc priv mem for rx_dma_ring\n");
 		return -ENOMEM;
 	}
-	priv->tmp_buf = kmalloc(ps * sizeof(unsigned char), GFP_KERNEL);
+	priv->tmp_buf = kmalloc(rx_ps * sizeof(unsigned char), GFP_KERNEL);
 	if (!(priv->tmp_buf)) {
 		dev_err(&pdev->dev, "Can't alloc priv mem for tmp_buf\n");
 		return -ENOMEM;
@@ -1161,16 +1161,16 @@ static int hpu_probe(struct platform_device *pdev)
 
 	/* Set Burst entity of DMA */
 	if (test_dma)
-		writel(((ps / 4 - 1) & HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,
+		writel(((rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,
 		       priv->regs + HPU_DMA_REG);
 	else
-		writel((ps / 4 - 1) & HPU_DMA_LENGTH_MASK,
+		writel((rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK,
 		       priv->regs + HPU_DMA_REG);
 
 	init_completion(&priv->rx_cmp);
 
-	for (i = 0; i < pn; i++)
-		priv->dma_ring[i].priv = priv;
+	for (i = 0; i < rx_pn; i++)
+		priv->rx_dma_ring[i].priv = priv;
 
 	hpu_register_chardev(priv);
 
