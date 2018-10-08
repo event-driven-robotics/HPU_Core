@@ -205,7 +205,7 @@ struct hpu_priv;
 struct hpu_buf {
 	dma_addr_t phys;
 	void *virt;
-	int read_index;
+	int fill_index;
 	dma_cookie_t cookie;
 	struct hpu_priv *priv;
 };
@@ -342,15 +342,15 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 		goto exit;
 	}
 #endif
-	buf_count = priv->dma_rx_pool.ps - item->read_index;
+	buf_count = priv->dma_rx_pool.ps - item->fill_index;
 	length = min(maxlen, buf_count);
 
 	dev_dbg(&priv->pdev->dev, "going to read %d bytes from offset %d\n",
-		length, item->read_index);
+		length, item->fill_index);
 
-	memcpy(priv->tmp_buf, item->virt + item->read_index, length);
+	memcpy(priv->tmp_buf, item->virt + item->fill_index, length);
 
-	if ((item->read_index + length) == priv->dma_rx_pool.ps) {
+	if ((item->fill_index + length) == priv->dma_rx_pool.ps) {
 		/* Buffer fully read. */
 		dev_dbg(&priv->pdev->dev, "fully consumed\n");
 		priv->dma_rx_pool.filled--;
@@ -363,9 +363,9 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 
 	} else {
 		/* buffer partially consumed, advance in-buffer index */
-		item->read_index += length;
+		item->fill_index += length;
 		dev_dbg(&priv->pdev->dev, "partially consumed, up to %d\n",
-			item->read_index);
+			item->fill_index);
 	}
 
 	spin_unlock_bh(&priv->dma_rx_pool.ring_lock);
@@ -374,7 +374,7 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 	if (ret) {
 		dev_dbg(&priv->pdev->dev,
 			"RET -EFAULT copied only %d while copying index %d, len %d. buffer %p\n",
-			ret, item->read_index, length, buf);
+			ret, item->fill_index, length, buf);
 		return -EFAULT;
 	}
 
@@ -570,7 +570,7 @@ static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
 	cookie = dmaengine_submit(dma_desc);
 	buf->cookie = cookie;
 	/* this buffer is new and has to be fully read */
-	buf->read_index = 0;
+	buf->fill_index = 0;
 
 	return dma_submit_error(cookie);
 }
