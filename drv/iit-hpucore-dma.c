@@ -212,6 +212,7 @@ struct hpu_buf {
 
 struct hpu_dma_pool {
 	spinlock_t ring_lock;
+	struct completion completion;
 	struct dma_pool *dma_pool;
 	struct hpu_buf *ring;
 	int buf_index;
@@ -231,7 +232,6 @@ struct hpu_priv {
 	unsigned int hpu_is_opened;
 	void __iomem *regs;
 	uint32_t ctrl_reg;
-	struct completion rx_cmp;
 	wait_queue_head_t wait;
 	unsigned char *reading_done;
 
@@ -282,7 +282,7 @@ static void hpu_rx_dma_callback(void *_buffer)
 		if (priv->dma_rx_pool.filled == 0) {
 			/* ring was empty. wake sleeping reader (if any) */
 			dev_dbg(&priv->pdev->dev, "complete completion\n");
-			complete(&priv->rx_cmp);
+			complete(&priv->dma_rx_pool.completion);
 		}
 		priv->dma_rx_pool.filled++;
 	}
@@ -312,7 +312,7 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 
 		dev_dbg(&priv->pdev->dev, "wait for dma\n");
 		time_left =
-		    wait_for_completion_timeout(&priv->rx_cmp,
+		    wait_for_completion_timeout(&priv->dma_rx_pool.completion,
 						msecs_to_jiffies(rx_to));
 
 		if (time_left == 0) {
@@ -1185,7 +1185,7 @@ static int hpu_probe(struct platform_device *pdev)
 		writel((rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK,
 		       priv->regs + HPU_DMA_REG);
 
-	init_completion(&priv->rx_cmp);
+	init_completion(&priv->dma_rx_pool.completion);
 
 	hpu_register_chardev(priv);
 
