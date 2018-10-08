@@ -41,6 +41,11 @@
 #define HPU_RX_POOL_NUM 1024 /* must, must, must, must be a power of 2 */
 #define HPU_RX_TO_MS 100000
 
+/* TX DMA pool */
+#define HPU_TX_POOL_SIZE 1024
+#define HPU_TX_POOL_NUM 128 /* must, must, must, must be a power of 2 */
+#define HPU_TX_TO_MS 100000
+
 /* names */
 #define HPU_NAME "iit-hpu"
 #define HPU_DRIVER_NAME HPU_NAME"-driver"
@@ -171,20 +176,35 @@ static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_AUX_RX_ERR_CH3_REG",	0x7C},
 };
 
-static short int test_dma = 0;
+
 static short int rx_fifo_full = 0;
+
+static short int test_dma = 0;
+module_param(test_dma, short, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+MODULE_PARM_DESC(test_dma, "Set to 1 to test DMA");
+
 static int rx_ps = HPU_RX_POOL_SIZE;
 static int rx_pn = HPU_RX_POOL_NUM;
 static int rx_to = HPU_RX_TO_MS;
 
-module_param(test_dma, short, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-MODULE_PARM_DESC(test_dma, "Set to 1 to test DMA");
 module_param(rx_ps, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-MODULE_PARM_DESC(rx_ps, "Pool size");
+MODULE_PARM_DESC(rx_ps, "RX Pool size");
 module_param(rx_pn, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-MODULE_PARM_DESC(rx_pn, "Pool num");
+MODULE_PARM_DESC(rx_pn, "RX Pool num");
 module_param(rx_to, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-MODULE_PARM_DESC(rx_to, "DMA TimeOut in ms");
+MODULE_PARM_DESC(rx_to, "RX DMA TimeOut in ms");
+
+static int tx_ps = HPU_TX_POOL_SIZE;
+static int tx_pn = HPU_TX_POOL_NUM;
+static int tx_to = HPU_TX_TO_MS;
+
+module_param(tx_ps, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+MODULE_PARM_DESC(tx_ps, "TX Pool size");
+module_param(tx_pn, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+MODULE_PARM_DESC(tx_pn, "TX Pool num");
+module_param(tx_to, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+MODULE_PARM_DESC(tx_to, "TX DMA TimeOut in ms");
+
 
 enum hssaersrc { left_eye = 0, right_eye, aux, spinn };
 
@@ -237,11 +257,9 @@ struct hpu_priv {
 
 	/* dma */
 	struct hpu_dma_pool dma_rx_pool;
+	struct hpu_dma_pool dma_tx_pool;
 	struct dma_chan *dma_rx_chan;
 	struct dma_chan *dma_tx_chan;
-	void *dma_tx_buf;
-	dma_addr_t dma_tx_buf_phys;
-	struct semaphore dma_tx_sem;
 	unsigned char *tmp_buf;
 	unsigned int cnt_pktloss;
 };
@@ -255,11 +273,16 @@ static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
 static void hpu_dma_free_pool(struct hpu_priv *priv, struct hpu_dma_pool *hpu_pool);
 static int _hpu_chardev_close(struct hpu_priv *priv);
 
-static void hpu_tx_dma_callback(void *arg)
+static void hpu_tx_dma_callback(void *_buffer)
 {
-	struct hpu_priv *priv = arg;
+	struct hpu_buf *buffer = _buffer;
+	struct hpu_priv *priv = buffer->priv;
 
-	up(&priv->dma_tx_sem);
+	/* mark as spare */
+	spin_lock(&priv->dma_tx_pool.ring_lock);
+	buffer->fill_index = 0;
+	complete(&priv->dma_tx_pool.completion);
+	spin_unlock(&priv->dma_tx_pool.ring_lock);
 }
 
 static void hpu_rx_dma_callback(void *_buffer)
@@ -384,43 +407,72 @@ static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
 static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 				 size_t lenght, loff_t *offset)
 {
-	int ret;
 	struct dma_async_tx_descriptor *dma_desc;
+	struct hpu_buf *dma_buf;
 	dma_cookie_t cookie;
+	size_t copy;
+	int time_left;
+	int i = 0;
+	int count = 0;
 	struct hpu_priv *priv = fp->private_data;
 
-	/* for now allow only one pair TS+VAL that is 4+4 bytes */
-	if (lenght != 8)
+	/* allow only pairs TS+VAL that is 4+4 bytes */
+	if (lenght % 8)
 		return -EINVAL;
 
-	if (copy_from_user(priv->dma_tx_buf, buf, lenght))
-		return -EINVAL;
+	while (i < lenght) {
+		copy = min_t(size_t, priv->dma_tx_pool.ps, lenght);
+		dma_buf = &priv->dma_tx_pool.ring[priv->dma_tx_pool.buf_index];
 
-	ret = down_timeout(&priv->dma_tx_sem, HZ);
+		spin_lock_bh(&priv->dma_tx_pool.ring_lock);
+		while (dma_buf->fill_index) {
+			dev_dbg(&priv->pdev->dev, "suspending TX\n");
+			spin_unlock_bh(&priv->dma_tx_pool.ring_lock);
+			time_left =
+				wait_for_completion_timeout(&priv->dma_tx_pool.completion,
+							    msecs_to_jiffies(tx_to));
+			if (time_left == 0) {
+				dev_err(&priv->pdev->dev, "TX DMA timed out\n");
+				return -ETIMEDOUT;
+			}
+			dev_dbg(&priv->pdev->dev, "resuming TX\n");
+			spin_lock_bh(&priv->dma_tx_pool.ring_lock);
+		}
 
-	if (ret < 0) {
-		dev_warn(&priv->pdev->dev, "TX DMA stuck?\n");
-		return ret;
+		spin_unlock_bh(&priv->dma_tx_pool.ring_lock);
+
+		if (copy_from_user(dma_buf->virt, buf, copy))
+			return -EINVAL;
+
+		dma_buf->fill_index = copy;
+
+		/* FIXME: shall we use sg ? */
+		dma_desc = dmaengine_prep_slave_single(priv->dma_tx_chan,
+						       dma_buf->phys,
+						       copy,
+						       DMA_MEM_TO_DEV,
+						       DMA_CTRL_ACK |
+						       DMA_PREP_INTERRUPT);
+		dma_desc->callback = hpu_tx_dma_callback;
+		dma_desc->callback_param = dma_buf;
+
+		cookie = dmaengine_submit(dma_desc);
+
+		i += copy;
+
+		if (count++ > (priv->dma_tx_pool.pn / 2)) {
+			count = 0;
+			dma_async_issue_pending(priv->dma_tx_chan);
+		}
+
+		priv->dma_tx_pool.buf_index = (priv->dma_tx_pool.buf_index + 1)
+			& (priv->dma_tx_pool.pn - 1);
 	}
-	dev_dbg(&priv->pdev->dev, "Firing TX DMA (%x)- stat: 0x%x, ctrl 0x%x\n",
-		((unsigned int *)priv->dma_tx_buf)[1],
-		readl(priv->regs + HPU_RAWSTAT_REG),
-		readl(priv->regs + HPU_CTRL_REG));
 
-	dma_desc = dmaengine_prep_slave_single(priv->dma_tx_chan,
-					       priv->dma_tx_buf_phys,
-					       lenght,
-					       DMA_MEM_TO_DEV,
-					       DMA_CTRL_ACK |
-					       DMA_PREP_INTERRUPT);
+	if (count)
+		dma_async_issue_pending(priv->dma_tx_chan);
 
-	dma_desc->callback = hpu_tx_dma_callback;
-	dma_desc->callback_param = priv;
-
-	cookie = dmaengine_submit(dma_desc);
-	dma_async_issue_pending(priv->dma_tx_chan);
-
-	return lenght;
+	return i;
 }
 
 static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
@@ -494,8 +546,10 @@ static void hpu_dma_release(struct hpu_priv *priv)
 		hpu_dma_free_pool(priv, &priv->dma_rx_pool);
 	}
 
-	if (priv->dma_tx_chan)
+	if (priv->dma_tx_chan) {
 		dma_release_channel(priv->dma_tx_chan);
+		hpu_dma_free_pool(priv, &priv->dma_tx_pool);
+	}
 }
 
 static int hpu_dma_alloc_pool(struct hpu_priv *priv,
@@ -526,8 +580,10 @@ static int hpu_dma_alloc_pool(struct hpu_priv *priv,
 			return -ENOMEM;
 	}
 
-	for (i = 0; i < hpu_pool->pn; i++)
+	for (i = 0; i < hpu_pool->pn; i++) {
 		hpu_pool->ring[i].priv = priv;
+		hpu_pool->ring[i].fill_index = 0;
+	}
 
 	hpu_pool->buf_index = 0;
 	hpu_pool->filled = 0;
@@ -610,6 +666,16 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	if (ret) {
 		mutex_unlock(&priv->access_lock);
 		return ret;
+	}
+
+	priv->dma_tx_pool.ps = tx_ps;
+	priv->dma_tx_pool.pn = tx_pn;
+	ret = hpu_dma_alloc_pool(priv, &priv->dma_tx_pool);
+
+	if (ret) {
+		dev_err(&priv->pdev->dev,
+			"Error allocating memory from TX DMA pool\n");
+		goto err_dealloc_dma;
 	}
 
 	priv->dma_rx_pool.ps = rx_ps;
@@ -1118,20 +1184,10 @@ static int hpu_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 	priv->hpu_is_opened = 0;
-	sema_init(&priv->dma_tx_sem, 1);
 
 	priv->tmp_buf = kmalloc(rx_ps * sizeof(unsigned char), GFP_KERNEL);
 	if (!(priv->tmp_buf)) {
 		dev_err(&pdev->dev, "Can't alloc priv mem for tmp_buf\n");
-		return -ENOMEM;
-	}
-
-	priv->dma_tx_buf = dma_alloc_coherent(&pdev->dev, 8,
-					      &priv->dma_tx_buf_phys,
-					      GFP_KERNEL);
-
-	if (!priv->dma_tx_buf) {
-		dev_err(&pdev->dev, "Can't alloc DMA mem for TX\n");
 		return -ENOMEM;
 	}
 
@@ -1143,6 +1199,7 @@ static int hpu_probe(struct platform_device *pdev)
 	priv->ctrl_reg = 0;
 
 	spin_lock_init(&priv->dma_rx_pool.ring_lock);
+	spin_lock_init(&priv->dma_tx_pool.ring_lock);
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	priv->regs = devm_ioremap_resource(&pdev->dev, res);
@@ -1186,6 +1243,7 @@ static int hpu_probe(struct platform_device *pdev)
 		       priv->regs + HPU_DMA_REG);
 
 	init_completion(&priv->dma_rx_pool.completion);
+	init_completion(&priv->dma_tx_pool.completion);
 
 	hpu_register_chardev(priv);
 
