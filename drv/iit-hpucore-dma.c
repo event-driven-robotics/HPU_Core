@@ -135,7 +135,7 @@
 /* 4 is not used anymore */
 #define HPU_IOCTL_SETTIMESTAMP		7
 /* 8 is not used anymore */
-#define HPU_IOCTL_GET_PS		9
+#define HPU_IOCTL_GET_RX_PS		9
 #define HPU_IOCTL_SET_AUX_THRS		10
 #define HPU_IOCTL_GET_AUX_THRS		11
 #define HPU_IOCTL_GET_AUX_CNT0		12
@@ -146,6 +146,7 @@
 #define HPU_IOCTL_SET_HSSAER_CH		17
 #define HPU_IOCTL_SET_LOOP_CFG		18
 #define HPU_IOCTL_SET_SPINN		19
+#define HPU_IOCTL_GET_TX_PS		20
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -937,8 +938,15 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 		break;
 
-	case _IOR(0x0, HPU_IOCTL_GET_PS, unsigned int *):
+	case _IOR(0x0, HPU_IOCTL_GET_RX_PS, unsigned int *):
 		ret = priv->dma_rx_pool.ps;
+		if (copy_to_user((unsigned int *)arg, &ret,
+				 sizeof(unsigned int)))
+			goto cfuser_err;
+		break;
+
+	case _IOR(0x0, HPU_IOCTL_GET_TX_PS, unsigned int *):
+		ret = priv->dma_tx_pool.ps;
 		if (copy_to_user((unsigned int *)arg, &ret,
 				 sizeof(unsigned int)))
 			goto cfuser_err;
