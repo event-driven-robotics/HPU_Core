@@ -42,7 +42,7 @@
 #define HPU_RX_TO_MS 100000
 
 /* TX DMA pool */
-#define HPU_TX_POOL_SIZE 1024
+#define HPU_TX_POOL_SIZE 4096
 #define HPU_TX_POOL_NUM 128 /* must, must, must, must be a power of 2 */
 #define HPU_TX_TO_MS 100000
 
