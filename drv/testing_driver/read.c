@@ -14,6 +14,7 @@
 #include <string.h>
 #include <signal.h>
 #include <termios.h>
+#include <time.h>
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -74,117 +75,153 @@
 #define DIFF_TIMESTAMP          80.0
 #define UNITY_TIMESTAMP         0.000000001
 
-typedef struct ip_regs {
-	unsigned int reg_offset;
-	char rw;
-	unsigned int data;
-} ip_regs_t;
-
 #define IOC_MAGIC_NUMBER        0
 #define IOC_READ_TS             _IOR(IOC_MAGIC_NUMBER, 1, unsigned int *)
 #define IOC_CLEAR_TS            _IOW(IOC_MAGIC_NUMBER, 2, unsigned int *)
 #define IOC_SET_TS_TYPE         _IOW(IOC_MAGIC_NUMBER, 7, unsigned int *)
-#define IOC_GEN_REG             _IOWR(IOC_MAGIC_NUMBER, 8, struct ip_regs *)
-#define IOC_GET_PS              _IOR(IOC_MAGIC_NUMBER, 9, unsigned int *)
-#define IOC_SET_SPINN           _IOW(IOC_MAGIC_NUMBER, 19, unsigned int *)
+#define IOC_GET_RX_PS           _IOR(IOC_MAGIC_NUMBER, 9, unsigned int *)
 #define IOC_SET_LOOP_CFG        _IOW(IOC_MAGIC_NUMBER, 18, unsigned int *)
+#define IOC_SET_SPINN           _IOW(IOC_MAGIC_NUMBER, 19, unsigned int *)
+#define IOC_GET_TX_PS           _IOR(IOC_MAGIC_NUMBER, 20, unsigned int *)
 
 
-void handle_kill(int sig) {
+unsigned int data[4096], wdata[4096];
+int iit_hpu;
 
-
+void handle_kill(int sig)
+{
         printf("\nProgram exited\n");
-
         exit(0);
+}
+
+void write_data(int chunk_size, int chunk_num)
+{
+	int i, j;
+	int ret;
+
+	for (i = 0; i < chunk_num; i++) {
+		for (j = 0; j < chunk_size; j++) {
+			wdata[j * 2] = 0;
+			wdata[j * 2 + 1] = (0xcafe << 16) |
+				((i * chunk_size + j) & 0xffff);
+		}
+		ret = write(iit_hpu, wdata, 8 * chunk_size);
+		if (ret != 8 * chunk_size)
+			fprintf(stderr, "Written only %d", ret);
+	}
+}
+
+void read_data(int chunk_size, int chunk_num)
+{
+	int i, j;
+	unsigned int tmp, tmp2;
+	int ret;
+
+	for (i = 0; i < chunk_num; i++) {
+		ret = read(iit_hpu, data,  8 * chunk_size);
+		if (ret != 8 * chunk_size)
+			printf("read returned %d\n", ret);
+		for (j = 0; j < chunk_size; j++) {
+			tmp = (0xcafe << 16) | ((i * chunk_size + j) & 0xffff);
+			tmp2 = data[j * 2 + 1];
+			if (tmp2 != tmp)
+				printf("error at %d,%d: %x %x\n", i, j,tmp2, tmp);
+		}
+	}
 }
 
 int main(int argc, char * argv[])
 {
-	int i2c_fd;
-	unsigned int *data;
 	int ret;
-	int numbdata=124;
-	int i,j;
-	int iit_hpu;
+	int i, j, k;
 	unsigned int timestamp = 0;
-	//unsigned int numtimes;
-	unsigned int wraptimes;
-	ip_regs_t gen_reg;
-	int a;
-	unsigned int value;
-	unsigned int ps;
-	unsigned int numtimes;
-	int polarity;
-	int address;
-	int dat;
-	int type;
-	float dt;
+	unsigned int rx_ps, tx_ps;
 	int val;
-	unsigned int tmp;
+	clock_t time;
+	double time_sec;
+
+	int iter_count = 1000;
+	int tx_size = 512;
+	int rx_size = 512;
+	int tx_n = 32;
+	int rx_n = 32;
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGTERM, handle_kill);
 	signal(SIGINT, handle_kill);
-
-	data=(unsigned int *) malloc (numbdata*sizeof(unsigned int));
 
 	iit_hpu = open("/dev/iit-hpu0",O_RDWR);
 	if(iit_hpu < 0) {
 		printf("Error in opening iit_hpu0 device!\n");
 		return 0;
 	}
-
-	// show DMA_REG value
-	//gen_reg.reg_offset=DMA_REG;
-	//gen_reg.rw=READ;
-	//ioctl(iit_hpu, IOC_GEN_REG, &gen_reg);
-	//printf ("DMA_REG: 0x%08X\n", gen_reg.data);
-
-	ret=ioctl(iit_hpu, IOC_GET_PS, &ps);
-	if (!(ret<0))
-		printf("Pool size=: %d\n", ps);
+	ret = ioctl(iit_hpu, IOC_GET_RX_PS, &rx_ps);
+	if (ret < 0)
+		printf("Unknown RX ps size\n");
 	else
-		printf("Unknown ps size\n");
+		printf("RX Pool size = %d\n", rx_ps);
 
-	ps = 120;
+	ret = ioctl(iit_hpu, IOC_GET_TX_PS, &tx_ps);
+	if (ret < 0)
+		printf("Unknown TX ps size\n");
+	else
+		printf("TX Pool size = %d\n", tx_ps);
 
 	val = 3;
 	ioctl(iit_hpu, IOC_SET_LOOP_CFG, &val);
 	val = 1;
 	ioctl(iit_hpu, IOC_SET_SPINN, &val);
+
 	// Set TimeStamp size
-	timestamp=1;
+	timestamp = 1;
 	ioctl(iit_hpu, IOC_SET_TS_TYPE, &timestamp);
-	//ioctl(iit_hpu, IOC_CLEAR_TS, 0);
-	unsigned int wdata[2];
 
-	for (i = 0; i < 10; i++) {
-		wdata[0] = 0;
-
-		fprintf(stderr, "Writing..\n");
-		for (j = 0; j < 1024; j++) {
-			wdata[1] = (0xcafe << 16) | (j & 0xffff);
-			ret = write(iit_hpu, wdata, 8);
-			if (ret != 8)
-				fprintf(stderr, "Written (%d)", ret);
-		}
-
-		fprintf(stderr, "Reading..\n");
-
-		for (j = 0; j < 1024; j++) {
-			read(iit_hpu, data,  8);
-			tmp = (0xcafe << 16) | (j & 0xffff);
-			if (data[1] != tmp)
-			    printf("error at %d,%d: %x %x\n", i, j, data[1], tmp);
-
-//			printf("data 0x%x 0x%x\n",
-//		       ((unsigned int *)data)[0],
-//			       ((unsigned int *)data)[1]);
-		}
+	/* check for correctness - write and read not overlappin*/
+	for (i = 0; i < iter_count; i++) {
+		write_data(tx_size, tx_n);
+		usleep(10000);
+		read_data(rx_size, rx_n);
 	}
+	printf("phase 1 OK\n");
 
-	close(iit_hpu);
+	/* check for correctness - overlapping write/read */
+	for (i = 0; i < iter_count; i++) {
+		write_data(tx_size, tx_n);
+		read_data(rx_size, rx_n);
+	}
+	printf("phase 2 OK\n");
 
+	/* tot RX desc = 100 * 32 * 1024 * 8  / 8192 = 3200 */
+	iter_count = 20;
+	rx_n = 4;
+	tx_n = 32;
+
+	tx_size = 1024;
+	rx_size = 8192;
+	int tot_data = iter_count * tx_size * tx_n * 8;
+
+	if (fork() == 0) {
+		for (i = 0; i < iter_count; i++) {
+			for (j = 0; j < rx_n; j++) {
+				read(iit_hpu, data, 8 * rx_size);
+			}
+		}
+
+		close(iit_hpu);
+	} else {
+		sleep(1);
+		time = clock();
+		for (i = 0; i < iter_count; i++) {
+			for (j = 0; j < tx_n; j++) {
+				write(iit_hpu, wdata, 8 * tx_size);
+			}
+		}
+
+		time = clock() - time;
+		time_sec = (double)time / CLOCKS_PER_SEC;
+		printf("RTX throughtput %f MBps\n",
+		       (double)tot_data / time_sec / 1024.0 / 1024.0);
+	}
 
 	return 0;
 }
