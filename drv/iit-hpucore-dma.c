@@ -132,7 +132,7 @@
 #define HPU_IOCTL_READTIMESTAMP		1
 #define HPU_IOCTL_CLEARTIMESTAMP	2
 #define HPU_IOCTL_READVERSION		3
-#define HPU_IOCTL_SETDMALENGTH		4
+/* 4 is not used anymore */
 #define HPU_IOCTL_SETTIMESTAMP		7
 /* 8 is not used anymore */
 #define HPU_IOCTL_GET_PS		9
@@ -894,7 +894,6 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 {
 	unsigned int ret;
 	unsigned int val = 0;
-	unsigned int ctrl_reg;
 	aux_cnt_t aux_cnt_reg;
 	ch_en_hssaer_t ch_en_hssaer;
 	unsigned int reg, reg2;
@@ -922,30 +921,6 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 				 sizeof(unsigned int)))
 			goto cfuser_err;
 		dev_info(&priv->pdev->dev, "Reading version %d\n", ret);
-		break;
-
-	case _IOW(0x0, HPU_IOCTL_SETDMALENGTH, unsigned int):
-		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
-			goto cfuser_err;
-
-		/* if dma is enabled then disable and also flush fifo */
-		priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
-		ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
-		if (priv->ctrl_reg & HPU_CTRL_ENDMA) {
-			priv->ctrl_reg &= !HPU_CTRL_ENDMA;
-			priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
-			writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-		}
-
-		if (test_dma)
-			writel((val & HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,
-			       priv->regs + HPU_DMA_REG);
-		else
-			writel(val & HPU_DMA_LENGTH_MASK,
-			       priv->regs + HPU_DMA_REG);
-		priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
-		priv->ctrl_reg |= HPU_CTRL_ENDMA;
-		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SETTIMESTAMP, unsigned int *):
