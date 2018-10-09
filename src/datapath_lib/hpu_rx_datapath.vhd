@@ -74,6 +74,7 @@ entity hpu_rx_datapath is
         Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);
         Spnn_cmd_start_o        : out std_logic;
         Spnn_cmd_stop_o         : out std_logic;
+        Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
                 
         -----------------------------
         -- Source Interfaces
@@ -414,6 +415,8 @@ DBG_FIFO_4 <= DBG_FIFO4;
            cmd_stop_key               => Spnn_cmd_stop_key_i,          -- in  std_logic_vector(31 downto 0);
            cmd_start                  => Spnn_cmd_start_o,             -- out std_logic;
            cmd_stop                   => Spnn_cmd_stop_o,              -- out std_logic;
+           tx_data_mask               => (others => '0'),              -- in  std_logic_vector(31 downto 0);
+           rx_data_mask               => Spnn_rx_mask_i,               -- in  std_logic_vector(31 downto 0);
            
            -- Controls
            dump_off                   => '0',                          -- in  std_logic;

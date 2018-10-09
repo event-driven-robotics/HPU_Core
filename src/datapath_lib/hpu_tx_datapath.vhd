@@ -83,7 +83,8 @@ entity hpu_tx_datapath is
         -----------------------------
         Spnn_Dump_on_i          : in  std_logic;
         Spnn_Dump_off_i         : in  std_logic;
-        
+        Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+     
         -----------------------------
         -- Destination interfaces
         -----------------------------
@@ -400,6 +401,8 @@ begin
             cmd_stop_key               => (others => '0'),  -- in  std_logic_vector(31 downto 0);
             cmd_start                  => open,             -- out std_logic;
             cmd_stop                   => open,             -- out std_logic;
+            tx_data_mask               => Spnn_tx_mask_i,   -- in  std_logic_vector(31 downto 0);
+            rx_data_mask               => (others => '0'),  -- in  std_logic_vector(31 downto 0);
         
         -- Controls
             dump_off                   => Spnn_Dump_off_i,  -- in  std_logic;

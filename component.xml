@@ -309,7 +309,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>636f284e</spirit:value>
+            <spirit:value>f31ef086</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -328,7 +328,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>636f284e</spirit:value>
+            <spirit:value>f31ef086</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -343,7 +343,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>7fe7074f</spirit:value>
+            <spirit:value>621c19a9</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -385,7 +385,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>647d34b4</spirit:value>
+            <spirit:value>4c943e1e</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -3284,7 +3284,7 @@
       <spirit:file>
         <spirit:name>src/HPU_lib/HPUCore.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_2f837ecd</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_6c7a9351</spirit:userFileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
@@ -3648,18 +3648,6 @@
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
-      <spirit:file>
-        <spirit:name>sim/AXI4LM_bfm.cmd</spirit:name>
-        <spirit:fileType>unknown</spirit:fileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>sim/Data_To_AUX.txt</spirit:name>
-        <spirit:userFileType>text</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>sim/Pll.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
-      </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
@@ -3685,7 +3673,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_productguide_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>doc/HPU Core 3.1 - User Guide - RevB.pdf</spirit:name>
+        <spirit:name>doc/HPU Core 3.1.4 - User Guide - RevC.pdf</spirit:name>
         <spirit:userFileType>pdf</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -3923,8 +3911,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>4</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2018-10-05T11:30:59Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>5</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2018-10-09T13:40:00Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
@@ -3939,7 +3927,7 @@
       <xilinx:xilinxVersion>2017.4.1</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="84870c4e"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="873b11e0"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="6b15d460"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="d8c0bfec"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="05152ba2"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="3ae2389b"/>

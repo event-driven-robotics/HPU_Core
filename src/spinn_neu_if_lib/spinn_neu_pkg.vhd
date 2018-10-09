@@ -48,6 +48,8 @@ component spinn_neu_if
         cmd_stop_key                : in  std_logic_vector(31 downto 0); 
         cmd_start                   : out std_logic;
         cmd_stop                    : out std_logic;
+        tx_data_mask                : in  std_logic_vector(31 downto 0);
+        rx_data_mask                : in  std_logic_vector(31 downto 0);
 
         -- Controls
         dump_off                    : in std_logic;

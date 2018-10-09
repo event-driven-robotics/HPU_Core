@@ -1,9 +1,10 @@
 
 // ------------------------------------------------------------------------------
 // 
-//  Revision 1.1:  07/24/2018
-//  - Parallel data parametrized
-//    (M. Casti - IIT)
+//  Changes:  
+//  - 07/24/2018 : Parallel data parametrized (M. Casti - IIT)
+//  - 08/24/2018 : START/STOP Command (M. Casti - IIT) 
+//  - 10/08/2018 : Data Mask (M. Casti - IIT) 
 //    
 // ------------------------------------------------------------------------------
 
@@ -22,7 +23,14 @@ module in_mapper #
 
         // status interface
         output reg         			dump_mode,
-
+        
+        // Commands
+        input wire                  dump_on,
+        input wire                  dump_off,
+        
+        // Controls
+        input  wire [31:0]          tx_data_mask,
+        
         // input AER device interface
         input  wire [AER_WIDTH-1:0] iaer_data,
         input  wire        			iaer_vld,
@@ -31,11 +39,7 @@ module in_mapper #
         // SpiNNaker packet interface
         output      [71:0] 			ipkt_data,
         output             			ipkt_vld,
-        input  wire        			ipkt_rdy,
-        
-        // Commands
-        input wire                  dump_on,
-        input wire                  dump_off
+        input  wire        			ipkt_rdy
     );
 
     //---------------------------------------------------------------
@@ -113,7 +117,7 @@ module in_mapper #
     wire [38:0]  pkt_bits;
     wire         parity;
 
-    assign pkt_bits = {{(32-AER_WIDTH){1'b0}}, iaer_data, 7'd0};
+    assign pkt_bits = {{(32-AER_WIDTH){1'b0}}, (iaer_data & tx_data_mask), 7'd0};
     assign parity   = ~(^pkt_bits);
 
     //---------------------------------------------------------------

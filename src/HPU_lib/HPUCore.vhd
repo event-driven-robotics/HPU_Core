@@ -423,9 +423,11 @@ architecture str of HPUCore is
     signal i_uP_LRxSpnnlnkStat       : t_RxSpnnlnkStat;
     signal i_uP_RRxSpnnlnkStat       : t_RxSpnnlnkStat;
     signal i_uP_AuxRxSpnnlnkStat     : t_RxSpnnlnkStat;
-    signal i_uP_Spnn_cmd_start_key   : std_logic_vector(31 downto 0); 
-    signal i_uP_Spnn_cmd_stop_key    : std_logic_vector(31 downto 0); 
-
+    signal i_uP_Spnn_cmd_start_key   : std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+    signal i_uP_Spnn_cmd_stop_key    : std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+    signal i_uP_Spnn_tx_mask         : std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+    signal i_uP_Spnn_rx_mask         : std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+    
     signal i_rawInterrupt            : std_logic_vector(15 downto 0);
     signal i_interrupt               : std_logic;
     
@@ -597,8 +599,11 @@ begin
                                RRxSpnnlnkStat_i               => i_uP_RRxSpnnlnkStat,          -- in  t_RxSpnnlnkStat;
                                AuxRxSpnnlnkStat_i             => i_uP_AuxRxSpnnlnkStat,        -- in  t_RxSpnnlnkStat;
                                
-                               Spnn_cmd_start_key_o           => i_uP_Spnn_cmd_start_key,      -- out std_logic_vector(31 downto 0); 
-                               Spnn_cmd_stop_key_o            => i_uP_Spnn_cmd_stop_key,       -- out std_logic_vector(31 downto 0);
+                               Spnn_cmd_start_key_o           => i_uP_Spnn_cmd_start_key,      -- out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+                               Spnn_cmd_stop_key_o            => i_uP_Spnn_cmd_stop_key,       -- out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+                               Spnn_tx_mask_o                 => i_uP_Spnn_tx_mask,            -- out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+                               Spnn_rx_mask_o                 => i_uP_Spnn_rx_mask,           -- out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+
                    
                                DBG_CTRL_reg                   => DBG_CTRG_reg,                 -- out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
                                DBG_ctrl_rd                    => DBG_ctrl_rd,                  -- out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -889,9 +894,11 @@ begin
             RRxSpnnlnkStat_o        => i_uP_RRxSpnnlnkStat,          -- out t_RxSpnnlnkStat;
             AuxRxSpnnlnkStat_o      => i_uP_AuxRxSpnnlnkStat,        -- out t_RxSpnnlnkStat;
         
-            Spnn_cmd_start_key_i    => i_uP_Spnn_cmd_start_key,      -- in  std_logic_vector(31 downto 0); 
-            Spnn_cmd_stop_key_i     => i_uP_Spnn_cmd_stop_key,       -- in  std_logic_vector(31 downto 0);
-            
+            Spnn_cmd_start_key_i    => i_uP_Spnn_cmd_start_key,      -- in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+            Spnn_cmd_stop_key_i     => i_uP_Spnn_cmd_stop_key,       -- in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+            Spnn_tx_mask_i          => i_uP_Spnn_tx_mask,            -- in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+            Spnn_rx_mask_i          => i_uP_Spnn_rx_mask,            -- in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+                        
             --
             -- LED drivers
             ---------------------

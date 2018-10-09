@@ -214,8 +214,10 @@ entity neuserial_core is
         RRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
         AuxRxSpnnlnkStat_o      : out t_RxSpnnlnkStat;
         
-        Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0); 
-        Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);
+        Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+        Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+        Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+        Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
         
         --
         -- LED drivers
@@ -403,8 +405,10 @@ architecture str of neuserial_core is
     signal  i_Tx_data_2of7_to_spinnaker   : std_logic_vector(6 downto 0);
     signal  i_TX_ack_from_spinnaker       : std_logic;
     
-    signal  i_Spnn_cmd_start              : std_logic;
-    signal  i_Spnn_cmd_stop               : std_logic;   
+    signal  i_Spnn_cmd_start              : std_logic;   -- SpiNNaker "START to send data" command 
+    signal  i_Spnn_cmd_stop               : std_logic;   -- SpiNNaker "STOP to send data" command  
+    signal  i_Spnn_tx_mask                : std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+    signal  i_Spnn_rx_mask                : std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
 
 
 --    for all : neuserial_loopback     use entity neuserial_lib.neuserial_loopback(beh);
@@ -596,7 +600,8 @@ begin
             -- SpiNNlink controls
             -----------------------------
             Spnn_Dump_on_i      => i_Spnn_cmd_stop,              -- in  std_logic;
-            Spnn_Dump_off_i     => i_Spnn_cmd_start,             -- in  std_logic;
+            Spnn_Dump_off_i     => i_Spnn_cmd_start,             -- in  std_logic;            
+            Spnn_tx_mask_i      => Spnn_tx_mask_i,               -- in  std_logic_vector(31 downto 0);
         
             -----------------------------
             -- Destination interfaces
@@ -692,6 +697,7 @@ begin
             Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0);
             Spnn_cmd_start_o     => open,                        -- out std_logic;
             Spnn_cmd_stop_o      => open,                        -- out std_logic;
+            Spnn_rx_mask_i       => Spnn_rx_mask_i,              -- in  std_logic_vector(31 downto 0);
             
             -----------------------------
             -- Source interfaces
@@ -808,6 +814,7 @@ begin
             Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0);
             Spnn_cmd_start_o     => open,                        -- out std_logic;
             Spnn_cmd_stop_o      => open,                        -- out std_logic;
+            Spnn_rx_mask_i       => Spnn_rx_mask_i,              -- in  std_logic_vector(31 downto 0);
             
             -----------------------------
             -- Source interfaces
@@ -919,10 +926,11 @@ begin
 
             -- SpiNNlink controls
             -----------------------------
-            Spnn_cmd_start_key_i => Spnn_cmd_start_key_i,        -- in  std_logic_vector(31 downto 0);
-            Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0);
+            Spnn_cmd_start_key_i => Spnn_cmd_start_key_i,        -- in  std_logic_vector(31 downto 0); -- SpiNNaker "START to send data" command 
+            Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0); -- SpiNNaker "STOP to send data" command  
             Spnn_cmd_start_o     => i_Spnn_cmd_start,            -- out std_logic;
             Spnn_cmd_stop_o      => i_Spnn_cmd_stop,             -- out std_logic;
+            Spnn_rx_mask_i       => Spnn_rx_mask_i,              -- in  std_logic_vector(31 downto 0);
 
             -----------------------------
             -- Source interfaces

@@ -19,9 +19,10 @@
 
 // ------------------------------------------------------------------------------
 // 
-//  Revision 1.1:  07/24/2018
-//  - Parallel data parametrized
-//    (M. Casti - IIT)
+//  Changes:  
+//  - 07/24/2018 : Parallel data parametrized (M. Casti - IIT)
+//  - 08/24/2018 : START/STOP Command (M. Casti - IIT) 
+//  - 10/08/2018 : Data Mask (M. Casti - IIT) 
 //    
 // ------------------------------------------------------------------------------
 
@@ -39,7 +40,16 @@ module out_mapper #
 
         // status interface
         output reg         			parity_err,
-
+        
+        // Command from SpiNNaker 
+        input  wire [31:0]          cmd_start_key,
+        input  wire [31:0]          cmd_stop_key, 
+        output reg                  cmd_start,
+        output reg                  cmd_stop,
+                        
+        // Controls
+        input  wire [31:0]          rx_data_mask,
+        
         // SpiNNaker packet interface
         input  wire [71:0] 			opkt_data,
         input  wire        			opkt_vld,
@@ -48,13 +58,8 @@ module out_mapper #
         // output AER device interface
         output      [AER_WIDTH-1:0] oaer_data,
         output             			oaer_vld,
-        input  wire        			oaer_rdy,
-        
-        // Command from SpiNNaker 
-        input  wire [31:0]          cmd_start_key,
-        input  wire [31:0]          cmd_stop_key, 
-        output reg                  cmd_start,
-        output reg                  cmd_stop
+        input  wire        			oaer_rdy
+
     );
 
     //---------------------------------------------------------------
@@ -162,14 +167,14 @@ module out_mapper #
                 2'b10 :
                     begin
                         fifo_len <= fifo_len + 1;
-                        data_fifo[fifo_len] <= opkt_data[39:8];
+                        data_fifo[fifo_len] <= (rx_data_mask & opkt_data[39:8]);
                     end
 
                 2'b11 :
                     begin
                         for (i=0; i<FIFO_DEPTH-1; i=i+1)
                             data_fifo[i] <= data_fifo[i+1];
-                        data_fifo[fifo_len-1] <= opkt_data[39:8];
+                        data_fifo[fifo_len-1] <= (rx_data_mask & opkt_data[39:8]);
                     end
             endcase
         end

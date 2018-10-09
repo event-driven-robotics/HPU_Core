@@ -39,13 +39,13 @@
 //  Description : Test Bench for "HPUcore" (SpiNNlink-AER)
 //     
 // ==============================================================================
-//  Revision history :
+//  Change history :
 // ==============================================================================
 // 
-//  Revision 1.0:  07/19/2018
-//  - Initial revision, based on tbench.vhd (F. Diotalevi)
-//  (M. Casti - IIT)
-// 
+//  - 08/24/2018 : START/STOP Command (M. Casti - IIT) 
+//  - 10/08/2018 : Data Mask (M. Casti - IIT) 
+//    
+// ------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------
 
 
@@ -88,6 +88,8 @@ module spinn_neu_if #
         input  wire [31:0] cmd_stop_key, 
         output wire        cmd_start,
         output wire        cmd_stop,
+        input  wire [31:0] tx_data_mask,
+        input  wire [31:0] rx_data_mask,
         
         // Controls
         input wire         dump_off,
@@ -262,21 +264,25 @@ module spinn_neu_if #
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //------------------------- out_mapper --------------------------
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    out_mapper om
+    out_mapper     #(
+        .AER_WIDTH     (C_PSPNNLNK_WIDTH)
+    ) om
     (
         .rst           (rst),
         .clk           (clk_mod),
-        .parity_err    (parity_err),
+        .parity_err    (parity_err),        
+        .cmd_start_key (cmd_start_key),
+        .cmd_stop_key  (cmd_stop_key),
+        .cmd_start     (i_cmd_start),
+        .cmd_stop      (i_cmd_stop),
+        .rx_data_mask  (rx_data_mask),
         .opkt_data     (i_opkt_data),
         .opkt_vld      (i_opkt_vld),
         .opkt_rdy      (i_opkt_rdy),
         .oaer_data     (i_oaer_addr),
         .oaer_vld      (i_oaer_vld),
-        .oaer_rdy      (i_oaer_rdy),
-        .cmd_start_key (cmd_start_key),
-        .cmd_stop_key  (cmd_stop_key),
-        .cmd_start     (i_cmd_start),
-        .cmd_stop      (i_cmd_stop)
+        .oaer_rdy      (i_oaer_rdy)
+
     );
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -284,19 +290,22 @@ module spinn_neu_if #
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //-------------------------- in_mapper --------------------------
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    in_mapper im
+    in_mapper     #(
+        .AER_WIDTH (C_PSPNNLNK_WIDTH)
+    ) im
     (
-        .rst       (rst),
-        .clk       (clk_mod),
-        .dump_mode (dump_mode),
-        .iaer_data (i_iaer_addr),
-        .iaer_vld  (i_iaer_vld),
-        .iaer_rdy  (i_iaer_rdy),
-        .ipkt_data (i_ipkt_data),
-        .ipkt_vld  (i_ipkt_vld),
-        .ipkt_rdy  (i_ipkt_rdy),
-        .dump_on   (i_dump_on),
-        .dump_off  (i_dump_off)
+        .rst          (rst),
+        .clk          (clk_mod),
+        .dump_mode    (dump_mode),
+        .dump_on      (i_dump_on),
+        .dump_off     (i_dump_off),  
+        .tx_data_mask (tx_data_mask), 
+        .iaer_data    (i_iaer_addr),
+        .iaer_vld     (i_iaer_vld),
+        .iaer_rdy     (i_iaer_rdy),
+        .ipkt_data    (i_ipkt_data),
+        .ipkt_vld     (i_ipkt_vld),
+        .ipkt_rdy     (i_ipkt_rdy)
     );
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -86,6 +86,7 @@ package NSComponents_pkg is
             Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);
             Spnn_cmd_start_o        : out std_logic;
             Spnn_cmd_stop_o         : out std_logic;
+            Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask
                     
             -----------------------------
             -- Source Interfaces
@@ -200,6 +201,7 @@ package NSComponents_pkg is
         -----------------------------
         Spnn_Dump_on_i          : in  std_logic;
         Spnn_Dump_off_i         : in  std_logic;
+        Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
             
         -----------------------------
         -- Destination interfaces

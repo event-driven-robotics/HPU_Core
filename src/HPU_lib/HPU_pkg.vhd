@@ -205,8 +205,10 @@ package HPUComponents_pkg is
             RRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
             AuxRxSpnnlnkStat_o      : out t_RxSpnnlnkStat;
         
-            Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0); 
-            Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);
+            Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+            Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+            Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+            Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
             
             --
             -- LED drivers
@@ -379,8 +381,10 @@ port (
     RRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
     AuxRxSpnnlnkStat_i             : in  t_RxSpnnlnkStat;
 
-    Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);
-    Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0); 
+    Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+    Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+    Spnn_tx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+    Spnn_rx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
 
     DBG_CTRL_reg                   : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     DBG_ctrl_rd                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
