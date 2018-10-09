@@ -421,6 +421,9 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 	if (lenght % 8)
 		return -EINVAL;
 
+	if (!access_ok(VERIFY_WRITE, buf, lenght))
+		return -EFAULT;
+
 	while (i < lenght) {
 		copy = min_t(size_t, priv->dma_tx_pool.ps, lenght);
 		dma_buf = &priv->dma_tx_pool.ring[priv->dma_tx_pool.buf_index];
@@ -442,7 +445,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 
 		spin_unlock_bh(&priv->dma_tx_pool.ring_lock);
 
-		if (copy_from_user(dma_buf->virt, buf, copy))
+		if (__copy_from_user(dma_buf->virt, buf, copy))
 			return -EINVAL;
 
 		dma_buf->fill_index = copy;
