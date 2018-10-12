@@ -324,6 +324,8 @@ wire        parity;
 reg        LoutAck_r;
 
 integer infile0; //file descriptors
+reg     infile_eof;
+reg [7:0]     dummy;
 
 assign parity = ~(^pkt_data);
 assign packet = {pkt_data, 7'b0000000, parity};
@@ -339,94 +341,116 @@ initial
 
 begin
   
-  if (HAS_ID == "true")  pkt_data  = {ID, 28'h0000000}; 
-  if (HAS_ID == "false") pkt_data  = {32'h00000000}; 
+dummy = 1;
   
-  if (HAS_TX == "true") infile0=$fopen(TX_FILE,"r");   //"r" means reading and "w" means writing
-
-  Lout = 0;
-
-  wait (rst);
-  wait (!rst);
-
-  forever 
-  begin
+if (HAS_ID == "true")  pkt_data  = {ID, 28'h0000000}; 
+if (HAS_ID == "false") pkt_data  = {32'h00000000}; 
   
-      //read the contents of the file as hexadecimal values into register "A".
-  if ((HAS_TX == "true") & (! $feof(infile0))) //read if "end of file" is not reached (and TX is enabled).
-      $fscanf(infile0,"%h\n",pkt_data);       //scan each line and get the value as an hexadecimal
+dummy = 2;
+  
+if (HAS_TX == "true") infile0=$fopen(TX_FILE,"r");   //"r" means reading and "w" means writing
 
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[3:0]});
+Lout = 0;
 
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
+wait (rst);
+wait (!rst);
 
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[7:4]});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[11:8]});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[15:12]});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[19:16]});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[23:20]});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[27:24]});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[31:28]});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[35:32]});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-    # SPL_HSDLY
-    Lout = Lout ^ encode_2of7 ({01'b0, packet[39:36]});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-    # SPL_HSDLY
-      Lout = Lout ^ encode_2of7 ({01'b1, 4'b0000});
-
-    LoutAck_r = LoutAck;
-    wait (LoutAck != LoutAck_r);
-
-//    if (HAS_ID == "true")  pkt_data[27:0] = pkt_data[27:0] + 1; 
-//    if (HAS_ID == "false") pkt_data = pkt_data + 32'h08000000;
+forever 
+    begin
+  
+    dummy = dummy + 1;
     
-
-  end
+    if (HAS_TX == "true") 
+        begin
+      
+        dummy = dummy + 1;
+      
+        infile_eof = $feof(infile0);
+      
+        if (! $feof(infile0)) //read if "end of file" is not reached (and TX is enabled).
+            begin
+            $fscanf(infile0,"%h\n",pkt_data);       //scan each line and get the value as an hexadecimal
+     
+        
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[3:0]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[7:4]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[11:8]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[15:12]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[19:16]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[23:20]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[27:24]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[31:28]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[35:32]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            Lout = Lout ^ encode_2of7 ({01'b0, packet[39:36]});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+              Lout = Lout ^ encode_2of7 ({01'b1, 4'b0000});
+            
+            LoutAck_r = LoutAck;
+            wait (LoutAck != LoutAck_r);
+            
+            //        if (HAS_ID == "true")  pkt_data[27:0] = pkt_data[27:0] + 1; 
+            //        if (HAS_ID == "false") pkt_data = pkt_data + 32'h08000000;
+            end
+        else
+            begin
+            # 10;
+            end
+        end
+    else
+        begin
+        # 10;
+        end
+    end
 end
 //--------------------------------------------------
 
@@ -449,45 +473,50 @@ assign rec_eop  = eop_nrz_2of7 (Lin, Lin_r);
 initial
 begin
 
-  //The $fopen function opens a file and returns a multi-channel descriptor 
-  //in the format of an unsized integer. 
-  if (HAS_RX == "true") outfile0=$fopen(RX_FILE,"w");   //"r" means reading and "w" means writing
+//The $fopen function opens a file and returns a multi-channel descriptor 
+//in the format of an unsized integer. 
+if (HAS_RX == "true") outfile0=$fopen(RX_FILE,"w");   //"r" means reading and "w" means writing
 
 
-  Lin_r = 0;
-  LinAck = 0;
+Lin_r = 0;
+LinAck = 0;
 
-  wait (rst);
-  wait (!rst);
+wait (rst);
+wait (!rst);
 
-  # SPL_HSDLY
-  LinAck = 1;
-  Lin_r = Lin;
+if (HAS_RX == "true") 
+    begin
 
-  forever begin
-    wait (complete_nrz_2of7 (Lin, Lin_r));
     # SPL_HSDLY
-    if (!rec_eop) rec_packet_sr = {rec_packet_sr[35:0],rec_data};
-    if (rec_eop) begin
-        header = {rec_packet_sr[35:32],
-                  rec_packet_sr[39:36]};
-        key    = {rec_packet_sr[3:0],
-                  rec_packet_sr[7:4],
-                  rec_packet_sr[11:8],
-                  rec_packet_sr[15:12],
-                  rec_packet_sr[19:16],
-                  rec_packet_sr[23:20],
-                  rec_packet_sr[27:24],
-                  rec_packet_sr[31:28]};
-                  
-        //Write the value into text files.
-        if (HAS_RX == "true") $fdisplay(outfile0,"%h",{header,key}); //write as hexadecimal
-        end;
-    LinAck = ~LinAck;
+    LinAck = 1;
     Lin_r = Lin;
-  end
-end
 
+    forever 
+        begin
+        wait (complete_nrz_2of7 (Lin, Lin_r));
+        # SPL_HSDLY
+        if (!rec_eop) rec_packet_sr = {rec_packet_sr[35:0],rec_data};
+        if (rec_eop) 
+            begin
+            header = {rec_packet_sr[35:32],
+                      rec_packet_sr[39:36]};
+            key    = {rec_packet_sr[3:0],
+                      rec_packet_sr[7:4],
+                      rec_packet_sr[11:8],
+                      rec_packet_sr[15:12],
+                      rec_packet_sr[19:16],
+                      rec_packet_sr[23:20],
+                      rec_packet_sr[27:24],
+                      rec_packet_sr[31:28]};
+                  
+            //Write the value into text files.
+            $fdisplay(outfile0,"%h",{header,key}); //write as hexadecimal
+            end;
+        LinAck = ~LinAck;
+        Lin_r = Lin;
+        end
+    end
+end
 //--------------------------------------------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
