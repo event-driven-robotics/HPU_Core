@@ -232,7 +232,8 @@ struct hpu_buf {
 };
 
 struct hpu_dma_pool {
-	spinlock_t ring_lock;
+	spinlock_t spin_lock;
+	struct mutex mutex_lock;
 	struct completion completion;
 	struct dma_pool *dma_pool;
 	struct hpu_buf *ring;
@@ -261,8 +262,12 @@ struct hpu_priv {
 	struct hpu_dma_pool dma_tx_pool;
 	struct dma_chan *dma_rx_chan;
 	struct dma_chan *dma_tx_chan;
-	unsigned char *tmp_buf;
+	struct work_struct rx_housekeeping_work;
 	unsigned int cnt_pktloss;
+	int pkt_txed;
+	unsigned long byte_txed;
+	int pkt_rxed;
+	unsigned long byte_rxed;
 };
 
 static struct dentry *hpu_debugfsdir = NULL;
@@ -280,10 +285,47 @@ static void hpu_tx_dma_callback(void *_buffer)
 	struct hpu_priv *priv = buffer->priv;
 
 	/* mark as spare */
-	spin_lock(&priv->dma_tx_pool.ring_lock);
+	spin_lock(&priv->dma_tx_pool.spin_lock);
 	buffer->fill_index = 0;
+	priv->dma_tx_pool.filled--;
 	complete(&priv->dma_tx_pool.completion);
-	spin_unlock(&priv->dma_tx_pool.ring_lock);
+	spin_unlock(&priv->dma_tx_pool.spin_lock);
+}
+
+static void hpu_rx_housekeeping(struct work_struct *work)
+{
+	struct hpu_priv *priv = container_of(work, struct hpu_priv,
+					     rx_housekeeping_work);
+
+	int ret;
+
+	dev_dbg(&priv->pdev->dev, "RX housekeeping ..\n");
+	mutex_lock(&priv->dma_rx_pool.mutex_lock);
+
+	spin_lock_bh(&priv->dma_rx_pool.spin_lock);
+	/* data has been already drained */
+	if (priv->dma_rx_pool.filled < (priv->dma_rx_pool.pn - 1)) {
+		spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+		mutex_unlock(&priv->dma_rx_pool.mutex_lock);
+		return;
+	}
+
+	priv->dma_rx_pool.filled--;
+	spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+
+	ret = hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index]);
+	if (ret)
+		dev_err(&priv->pdev->dev, "DMA RX submit error %d while housekeeping\n", ret);
+	/* forcefully advance index. 1pkt lost */
+	priv->dma_rx_pool.buf_index =
+		(priv->dma_rx_pool.buf_index + 1) &
+		(priv->dma_rx_pool.pn - 1);
+
+	BUG_ON(priv->dma_rx_pool.buf_index >= priv->dma_rx_pool.pn);
+
+	priv->cnt_pktloss++;
+	dma_async_issue_pending(priv->dma_rx_chan);
+	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 }
 
 static void hpu_rx_dma_callback(void *_buffer)
@@ -291,118 +333,23 @@ static void hpu_rx_dma_callback(void *_buffer)
 	struct hpu_buf *buffer = _buffer;
 	struct hpu_priv *priv = buffer->priv;
 
-	spin_lock(&priv->dma_rx_pool.ring_lock);
-	dev_dbg(&priv->pdev->dev, "DMA cb\n");
-	if (priv->dma_rx_pool.filled == (priv->dma_rx_pool.pn - 1)) {
-		hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index]);
+	dev_dbg(&priv->pdev->dev, "RX DMA cb\n");
+	priv->pkt_rxed++;
+	priv->byte_rxed += priv->dma_rx_pool.ps;
 
-		/* forcefully advance index. 1pkt lost */
-		priv->dma_rx_pool.buf_index =
-			(priv->dma_rx_pool.buf_index + 1) &
-			(priv->dma_rx_pool.pn - 1);
-		priv->cnt_pktloss++;
-		dma_async_issue_pending(priv->dma_rx_chan);
-	} else {
-		if (priv->dma_rx_pool.filled == 0) {
-			/* ring was empty. wake sleeping reader (if any) */
-			dev_dbg(&priv->pdev->dev, "complete completion\n");
-			complete(&priv->dma_rx_pool.completion);
-		}
-		priv->dma_rx_pool.filled++;
+	spin_lock(&priv->dma_rx_pool.spin_lock);
+	priv->dma_rx_pool.filled++;
+
+	if (priv->dma_rx_pool.filled == 1) {
+		dev_dbg(&priv->pdev->dev, "RX DMA waking up reader\n");
+		/* ring was empty. wake reader, if any.. */
+		complete(&priv->dma_rx_pool.completion);
+	} else if (priv->dma_rx_pool.filled == (priv->dma_rx_pool.pn - 1)) {
+		dev_dbg(&priv->pdev->dev, "RX DMA scheduling worker\n");
+		/* ring getting full, throw away old data to make room new one */
+		schedule_work(&priv->rx_housekeeping_work);
 	}
-	spin_unlock(&priv->dma_rx_pool.ring_lock);
-}
-
-static int hpu_read_chunk(struct hpu_priv *priv, int maxlen, void *__user buf)
-{
-	struct hpu_buf *item;
-	int time_left;
-	int length;
-	int buf_count;
-	int ret;
-
-	while (1) {
-		/*
-		 * Quoting Documentation/dmaengine/client.txt:
-		 * Note that callbacks will always be invoked from the DMA
-		 * engines tasklet, never from interrupt context.
-		 */
-		spin_lock_bh(&priv->dma_rx_pool.ring_lock);
-
-		if (priv->dma_rx_pool.filled > 0)
-			break;
-
-		spin_unlock_bh(&priv->dma_rx_pool.ring_lock);
-
-		dev_dbg(&priv->pdev->dev, "wait for dma\n");
-		time_left =
-		    wait_for_completion_timeout(&priv->dma_rx_pool.completion,
-						msecs_to_jiffies(rx_to));
-
-		if (time_left == 0) {
-			dev_err(&priv->pdev->dev, "DMA timed out\n");
-			return -ETIMEDOUT;
-		}
-	}
-
-	/* we got here with lock held */
-	item = &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index];
-	dev_dbg(&priv->pdev->dev, "reading dma descriptor %d\n",
-		priv->dma_rx_pool.buf_index);
-
-	/*
-	 * Quoting  /Documentation/dmaengine/client.txt
-	 * Not all DMA engine drivers can return reliable information for
-	 * a running DMA channel.
-	 */
-#if 0
-	status =
-	    dma_async_is_tx_complete(priv->dma_rx_chan, item->cookie, NULL, NULL);
-	if (status != DMA_COMPLETE) {
-		dev_err(&priv->pdev->dev,
-			"Was going to read descriptor with status \'%s\'\n",
-			status == DMA_ERROR ? "error" : "in progress");
-		ret = -ENODATA;
-		goto exit;
-	}
-#endif
-	buf_count = priv->dma_rx_pool.ps - item->fill_index;
-	length = min(maxlen, buf_count);
-
-	dev_dbg(&priv->pdev->dev, "going to read %d bytes from offset %d\n",
-		length, item->fill_index);
-
-	memcpy(priv->tmp_buf, item->virt + item->fill_index, length);
-
-	if ((item->fill_index + length) == priv->dma_rx_pool.ps) {
-		/* Buffer fully read. */
-		dev_dbg(&priv->pdev->dev, "fully consumed\n");
-		priv->dma_rx_pool.filled--;
-
-		hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index]);
-		priv->dma_rx_pool.buf_index = (priv->dma_rx_pool.buf_index + 1)
-			& (priv->dma_rx_pool.pn - 1);
-
-		dma_async_issue_pending(priv->dma_rx_chan);
-
-	} else {
-		/* buffer partially consumed, advance in-buffer index */
-		item->fill_index += length;
-		dev_dbg(&priv->pdev->dev, "partially consumed, up to %d\n",
-			item->fill_index);
-	}
-
-	spin_unlock_bh(&priv->dma_rx_pool.ring_lock);
-
-	ret = copy_to_user(buf, priv->tmp_buf, length);
-	if (ret) {
-		dev_dbg(&priv->pdev->dev,
-			"RET -EFAULT copied only %d while copying index %d, len %d. buffer %p\n",
-			ret, item->fill_index, length, buf);
-		return -EFAULT;
-	}
-
-	return length;
+	spin_unlock(&priv->dma_rx_pool.spin_lock);
 }
 
 static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
@@ -428,10 +375,10 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 		copy = min_t(size_t, priv->dma_tx_pool.ps, lenght);
 		dma_buf = &priv->dma_tx_pool.ring[priv->dma_tx_pool.buf_index];
 
-		spin_lock_bh(&priv->dma_tx_pool.ring_lock);
+		spin_lock_bh(&priv->dma_tx_pool.spin_lock);
 		while (dma_buf->fill_index) {
 			dev_dbg(&priv->pdev->dev, "suspending TX\n");
-			spin_unlock_bh(&priv->dma_tx_pool.ring_lock);
+			spin_unlock_bh(&priv->dma_tx_pool.spin_lock);
 			time_left =
 				wait_for_completion_timeout(&priv->dma_tx_pool.completion,
 							    msecs_to_jiffies(tx_to));
@@ -440,13 +387,17 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 				return -ETIMEDOUT;
 			}
 			dev_dbg(&priv->pdev->dev, "resuming TX\n");
-			spin_lock_bh(&priv->dma_tx_pool.ring_lock);
+			spin_lock_bh(&priv->dma_tx_pool.spin_lock);
 		}
 
-		spin_unlock_bh(&priv->dma_tx_pool.ring_lock);
+		priv->dma_tx_pool.filled++;
 
-		if (__copy_from_user(dma_buf->virt, buf, copy))
+		spin_unlock_bh(&priv->dma_tx_pool.spin_lock);
+
+		if (__copy_from_user(dma_buf->virt, buf, copy)) {
+			dev_err(&priv->pdev->dev, "failed copying from user\n");
 			return -EINVAL;
+		}
 
 		dma_buf->fill_index = copy;
 
@@ -461,6 +412,8 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 		dma_desc->callback_param = dma_buf;
 
 		cookie = dmaengine_submit(dma_desc);
+		priv->pkt_txed++;
+		priv->byte_txed += copy;
 
 		i += copy;
 
@@ -482,10 +435,18 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				loff_t *offset)
 {
-	int ret;
-	int read = 0;
+	int ret, ret2;
+	int copy;
 	u32 msk;
+	int index;
+	size_t buf_count;
+	struct hpu_buf *item;
+	int read = 0;
+
 	struct hpu_priv *priv = fp->private_data;
+
+	if (!access_ok(VERIFY_READ, buf, length))
+		return -EFAULT;
 
 	/* Unmask RXFIFOFULL interrupt */
 	msk = readl(priv->regs + HPU_IRQMASK_REG);
@@ -494,24 +455,115 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 	rx_fifo_full = 0;
 
 	dev_dbg(&priv->pdev->dev, "----tot to read %d\n", length);
+
+	mutex_lock(&priv->dma_rx_pool.mutex_lock);
+
 	while (length > 0) {
 		if (rx_fifo_full == 1)
 			goto error_rx_fifo_full;
 
-		ret = hpu_read_chunk(priv, length, buf + read);
-		dev_dbg(&priv->pdev->dev, "chunk ret: %d\n", ret);
-		if (ret < 0) {
-			dev_dbg(&priv->pdev->dev, "----END err\n");
-			return ret;
+		/*
+		 * Wait for some data to be available - this part must lock
+		 * against the DMA cb, in order to correctly handle filled count
+		 * and completion wakeup
+		 */
+		while (1) {
+			/*
+			 * Quoting Documentation/dmaengine/client.txt:
+			 * Note that callbacks will always be invoked from the DMA
+			 * engines tasklet, never from interrupt context.
+			 */
+			spin_lock_bh(&priv->dma_rx_pool.spin_lock);
+			if (priv->dma_rx_pool.filled > 0)
+				break;
+
+			/* drain away any completion leftover */
+			try_wait_for_completion(&priv->dma_rx_pool.completion);
+			spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+
+			dev_dbg(&priv->pdev->dev, "wait for dma\n");
+			if (wait_for_completion_timeout(&priv->dma_rx_pool.completion,
+							msecs_to_jiffies(rx_to)) == 0) {
+				dev_err(&priv->pdev->dev, "DMA timed out\n");
+				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
+				return -ETIMEDOUT;
+			}
 		}
-		read += ret;
-		length -= ret;
-		dev_dbg(&priv->pdev->dev, "tot %d, rem %d\n", read, length);
+
+		/* we got here with lock held */
+		spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+
+		index = priv->dma_rx_pool.buf_index;
+		item = &priv->dma_rx_pool.ring[index];
+		dev_dbg(&priv->pdev->dev, "reading dma descriptor %d\n", index);
+
+		BUG_ON(DMA_COMPLETE != dma_async_is_tx_complete(
+			       priv->dma_rx_chan,
+			       priv->dma_rx_pool.ring[index].cookie,
+			       NULL, NULL));
+
+		/* data still in buf */
+		buf_count = priv->dma_rx_pool.ps - item->fill_index;
+		copy = min(length, buf_count);
+
+		dev_dbg(&priv->pdev->dev, "going to read %d bytes from offset %d\n",
+			length, item->fill_index);
+
+		ret = __copy_to_user(buf + read,
+				     item->virt + item->fill_index, copy);
+		if (ret < 0) {
+			dev_warn(&priv->pdev->dev, "failed to copy from userspace");
+			break;
+		}
+		/* if ret > 0, then it is the number of _uncopied_ bytes */
+		copy -= ret;
+
+		BUG_ON((item->fill_index + copy) > priv->dma_rx_pool.ps);
+		if ((item->fill_index + copy) == priv->dma_rx_pool.ps) {
+			/* Buffer fully read. */
+			dev_dbg(&priv->pdev->dev, "fully consumed\n");
+
+			/* update filled count locking against DMA cb */
+			spin_lock_bh(&priv->dma_rx_pool.spin_lock);
+			priv->dma_rx_pool.filled--;
+			spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+
+			/* resubmit DMA buffer */
+			ret2 = hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[index]);
+			if (ret2)
+				dev_err(&priv->pdev->dev,
+					"DMA RX submit error %d while reading\n",
+					ret2);
+
+			priv->dma_rx_pool.buf_index = (priv->dma_rx_pool.buf_index + 1)
+				& (priv->dma_rx_pool.pn - 1);
+			BUG_ON(priv->dma_rx_pool.buf_index >= priv->dma_rx_pool.pn);
+			dma_async_issue_pending(priv->dma_rx_chan);
+		} else {
+			/* buffer partially consumed, advance in-buffer index */
+			item->fill_index += copy;
+			BUG_ON(item->fill_index >= priv->dma_rx_pool.ps);
+			dev_dbg(&priv->pdev->dev, "partially consumed, up to %d\n",
+				item->fill_index);
+		}
+
+		read += copy;
+		length -= copy;
+		BUG_ON(length < 0);
+		dev_dbg(&priv->pdev->dev, "read %d, rem %d\n", read, length);
+
+		/* partially copied */
+		if (ret)
+			break;
 	}
-	dev_dbg(&priv->pdev->dev, "----END ok\n");
+
+	dev_dbg(&priv->pdev->dev, "----END read\n");
+
+	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 	return read;
 
 error_rx_fifo_full:
+	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 
 	/*
 	 * AM: I kept the same behaviour here as before, but I'm not sure it
@@ -665,6 +717,11 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		return -EBUSY;
 	}
 
+	priv->pkt_txed = 0;
+	priv->byte_txed = 0;
+	priv->pkt_rxed = 0;
+	priv->byte_rxed = 0;
+
 	priv->hpu_is_opened = 1;
 	ret = hpu_dma_init(priv);
 	if (ret) {
@@ -755,6 +812,7 @@ static int _hpu_chardev_close(struct hpu_priv *priv)
 	/* TX reg to reset val */
 	writel(0x0, priv->regs + HPU_TXCTRL_REG);
 	mdelay(100);
+	cancel_work_sync(&priv->rx_housekeeping_work);
 
 	hpu_dma_release(priv);
 	priv->hpu_is_opened = 0;
@@ -846,11 +904,11 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 		/* Delete the interrupt */
 		writel(HPU_MSK_INT_RXFIFOFULL, priv->regs + HPU_IRQ_REG);
 		/* Deactivate RXFIFOFULL interrupt */
-		msk = readl(priv->regs + HPU_IRQMASK_REG);
-		msk &= (~HPU_MSK_INT_RXFIFOFULL);
-		writel(msk, priv->regs + HPU_IRQMASK_REG);
+//		msk = readl(priv->regs + HPU_IRQMASK_REG);
+//		msk &= (~HPU_MSK_INT_RXFIFOFULL);
+//		writel(msk, priv->regs + HPU_IRQMASK_REG);
 
-		rx_fifo_full = 1;
+//		rx_fifo_full = 1;
 		retval = IRQ_HANDLED;
 	}
 
@@ -1171,12 +1229,6 @@ static int hpu_probe(struct platform_device *pdev)
 	}
 	priv->hpu_is_opened = 0;
 
-	priv->tmp_buf = kmalloc(rx_ps * sizeof(unsigned char), GFP_KERNEL);
-	if (!(priv->tmp_buf)) {
-		dev_err(&pdev->dev, "Can't alloc priv mem for tmp_buf\n");
-		return -ENOMEM;
-	}
-
 	mutex_init(&priv->access_lock);
 
 	platform_set_drvdata(pdev, priv);
@@ -1184,8 +1236,12 @@ static int hpu_probe(struct platform_device *pdev)
 	priv->reading_done = false;
 	priv->ctrl_reg = 0;
 
-	spin_lock_init(&priv->dma_rx_pool.ring_lock);
-	spin_lock_init(&priv->dma_tx_pool.ring_lock);
+	INIT_WORK(&priv->rx_housekeeping_work, hpu_rx_housekeeping);
+
+	spin_lock_init(&priv->dma_rx_pool.spin_lock);
+	spin_lock_init(&priv->dma_tx_pool.spin_lock);
+
+	mutex_init(&priv->dma_rx_pool.mutex_lock);
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	priv->regs = devm_ioremap_resource(&pdev->dev, res);
