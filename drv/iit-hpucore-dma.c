@@ -1276,6 +1276,23 @@ static int hpu_probe(struct platform_device *pdev)
 
 	priv->cnt_pktloss = 0;
 
+	if ((rx_pn < 2) || (rx_pn != BIT(fls(rx_pn) - 1))) {
+		dev_warn(&priv->pdev->dev, "rx_pn invalid. using default\n");
+		rx_pn = HPU_RX_POOL_NUM;
+	}
+	if ((tx_pn < 2) || (tx_pn != BIT(fls(tx_pn) - 1))) {
+		dev_warn(&priv->pdev->dev, "tx_pn invalid. using default\n");
+		tx_pn = HPU_TX_POOL_NUM;
+	}
+	if (rx_ps < 8) {
+		dev_warn(&priv->pdev->dev, "rx_ps too small. using default\n");
+		rx_ps = HPU_RX_POOL_SIZE;
+	}
+	if (tx_ps < 8) {
+		dev_warn(&priv->pdev->dev, "tx_ps too small. using default\n");
+		tx_ps = HPU_TX_POOL_SIZE;
+	}
+
 	/* Set Burst entity of DMA */
 	if (test_dma)
 		writel(((rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,
