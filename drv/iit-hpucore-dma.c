@@ -676,6 +676,9 @@ static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
 					       DMA_CTRL_ACK |
 					       DMA_PREP_INTERRUPT);
 
+	if (!dma_desc)
+		return -ENOMEM;
+
 	dma_desc->callback = hpu_rx_dma_callback;
 	dma_desc->callback_param = buf;
 
@@ -694,7 +697,6 @@ static int hpu_rx_dma_submit_pool(struct hpu_priv *priv)
 
 	for (i = 0; i < priv->dma_rx_pool.pn; i++) {
 		ret = hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[i]);
-
 		if (ret)
 			break;
 	}
