@@ -1254,10 +1254,15 @@ static int hpu_probe(struct platform_device *pdev)
 	ver = readl(priv->regs + HPU_VER_REG);
 
 	if (ver != HPU_VER_MAGIC) {
-		dev_err(&pdev->dev, "HPU IP has wrong version: %x\n",
-		       ver);
-		kfree(priv);
-		return -ENODEV;
+		if ((ver >> 24) == 'B') {
+			dev_warn(&pdev->dev,
+				 "HPU IP is a _BETA_ version (0x%x)\n", ver);
+		} else {
+			dev_err(&pdev->dev,
+				"HPU IP has wrong version: 0x%x\n", ver);
+			kfree(priv);
+			return -ENODEV;
+		}
 	}
 
 	priv->irq = platform_get_irq(pdev, 0);
