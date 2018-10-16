@@ -255,7 +255,6 @@ struct hpu_priv {
 	void __iomem *regs;
 	uint32_t ctrl_reg;
 	wait_queue_head_t wait;
-	unsigned char *reading_done;
 
 	/* dma */
 	struct hpu_dma_pool dma_rx_pool;
@@ -1235,7 +1234,6 @@ static int hpu_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, priv);
 	priv->pdev = pdev;
-	priv->reading_done = false;
 	priv->ctrl_reg = 0;
 
 	INIT_WORK(&priv->rx_housekeeping_work, hpu_rx_housekeeping);
