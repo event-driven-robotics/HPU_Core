@@ -359,7 +359,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 	struct hpu_buf *dma_buf;
 	dma_cookie_t cookie;
 	size_t copy;
-	int time_left;
+	int ret;
 	int i = 0;
 	int count = 0;
 	struct hpu_priv *priv = fp->private_data;
@@ -379,12 +379,13 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 		while (dma_buf->fill_index) {
 			dev_dbg(&priv->pdev->dev, "suspending TX\n");
 			spin_unlock_bh(&priv->dma_tx_pool.spin_lock);
-			time_left =
-				wait_for_completion_timeout(&priv->dma_tx_pool.completion,
-							    msecs_to_jiffies(tx_to));
-			if (time_left == 0) {
+			ret = wait_for_completion_killable_timeout(&priv->dma_tx_pool.completion,
+								   msecs_to_jiffies(tx_to));
+			if (unlikely(ret == 0)) {
 				dev_err(&priv->pdev->dev, "TX DMA timed out\n");
 				return -ETIMEDOUT;
+			} else if (unlikely(ret < 0)) {
+				return ret;
 			}
 			dev_dbg(&priv->pdev->dev, "resuming TX\n");
 			spin_lock_bh(&priv->dma_tx_pool.spin_lock);
@@ -482,8 +483,12 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
 
 			dev_dbg(&priv->pdev->dev, "wait for dma\n");
-			if (wait_for_completion_timeout(&priv->dma_rx_pool.completion,
-							msecs_to_jiffies(rx_to)) == 0) {
+			ret = wait_for_completion_killable_timeout(&priv->dma_rx_pool.completion,
+									msecs_to_jiffies(rx_to));
+			if (unlikely(ret < 0)) {
+				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
+				return ret;
+			} else if (unlikely(ret == 0)) {
 				dev_err(&priv->pdev->dev, "DMA timed out\n");
 				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 				return -ETIMEDOUT;
