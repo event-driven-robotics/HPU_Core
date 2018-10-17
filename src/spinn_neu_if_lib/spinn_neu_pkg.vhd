@@ -15,8 +15,10 @@ package spinn_neu_pkg is
 
 component spinn_neu_if
 	generic (
-		C_PSPNNLNK_WIDTH			: natural range 1 to 32 := 32
-			);
+        C_PSPNNLNK_WIDTH              : natural range 1 to 32 := 32;
+        C_HAS_TX                      : string;
+        C_HAS_RX                      : string
+		);
 	port (
 		rst							: in  std_logic;
 		clk_32						: in  std_logic;
@@ -64,7 +66,7 @@ component spinn_neu_if
 		dbg_ipkt_rdy				: out std_logic;
 		dbg_opkt_vld				: out std_logic;
 		dbg_opkt_rdy				: out std_logic
-	); 
+        ); 
 end component;
 
 type SpnnCmd_type is record

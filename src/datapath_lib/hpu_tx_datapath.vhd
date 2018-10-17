@@ -364,7 +364,9 @@ begin
     
     u_tx_spinnlink_datapath : spinn_neu_if
         generic map (
-            C_PSPNNLNK_WIDTH             => C_PSPNNLNK_WIDTH
+            C_PSPNNLNK_WIDTH             => C_PSPNNLNK_WIDTH,
+            C_HAS_TX                     => "true",
+            C_HAS_RX                     => "false"
             )
         port map (
             rst                          => Rst,

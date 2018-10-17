@@ -378,7 +378,9 @@ DBG_FIFO_4 <= DBG_FIFO4;
        
        u_spinnlink_rx : spinn_neu_if
            generic map (
-               C_PSPNNLNK_WIDTH       => C_PSPNNLNK_WIDTH
+               C_PSPNNLNK_WIDTH       => C_PSPNNLNK_WIDTH,
+               C_HAS_TX               => "false",
+               C_HAS_RX               => "true"
                )
            port map (
            rst                        => Rst,
