@@ -244,6 +244,7 @@ struct hpu_dma_pool {
 };
 
 struct hpu_priv {
+	struct file_operations fops;
 	struct dentry *regset;
 	struct cdev cdev;
 	struct platform_device *pdev;
@@ -580,11 +581,11 @@ static int hpu_dma_init(struct hpu_priv *priv)
 	priv->dma_tx_chan = dma_request_slave_channel(&priv->pdev->dev, "tx");
 
 	if (IS_ERR_OR_NULL(priv->dma_tx_chan)) {
-		dma_release_channel(priv->dma_rx_chan);
 		priv->dma_tx_chan = NULL;
-		dev_err(&priv->pdev->dev, "Can't bind TX DMA chan\n");
-		return -ENODEV;
+		dev_notice(&priv->pdev->dev, "Can't bind TX DMA chan: write disabled\n");
 	}
+
+	priv->fops.write = priv->dma_tx_chan ? hpu_chardev_write : NULL;
 
 	return 0;
 }
@@ -725,14 +726,16 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		return ret;
 	}
 
-	priv->dma_tx_pool.ps = tx_ps;
-	priv->dma_tx_pool.pn = tx_pn;
-	ret = hpu_dma_alloc_pool(priv, &priv->dma_tx_pool);
+	if (priv->dma_tx_chan) {
+		priv->dma_tx_pool.ps = tx_ps;
+		priv->dma_tx_pool.pn = tx_pn;
+		ret = hpu_dma_alloc_pool(priv, &priv->dma_tx_pool);
 
-	if (ret) {
-		dev_err(&priv->pdev->dev,
-			"Error allocating memory from TX DMA pool\n");
-		goto err_dealloc_dma;
+		if (ret) {
+			dev_err(&priv->pdev->dev,
+				"Error allocating memory from TX DMA pool\n");
+			goto err_dealloc_dma;
+		}
 	}
 
 	priv->dma_rx_pool.ps = rx_ps;
@@ -1163,7 +1166,7 @@ static struct file_operations hpu_fops = {
 	.open = hpu_chardev_open,
 	.owner = THIS_MODULE,
 	.read = hpu_chardev_read,
-	.write = hpu_chardev_write,
+	.write= hpu_chardev_write,
 	.release = hpu_chardev_close,
 	.unlocked_ioctl = hpu_ioctl,
 };
@@ -1172,7 +1175,12 @@ static int hpu_register_chardev(struct hpu_priv *priv)
 {
 	int ret;
 
-	cdev_init(&priv->cdev, &hpu_fops);
+	/*
+	 * Copy default fops; write will be cleared/assigned for each instance
+	 * depending by whether it will be able to get the (optional) TX DMA ch
+	 */
+	priv->fops = hpu_fops;
+	cdev_init(&priv->cdev, &priv->fops);
 
 	priv->cdev.owner = THIS_MODULE;
 	priv->id = ida_simple_get(&hpu_ida, 0, 0, GFP_KERNEL);
