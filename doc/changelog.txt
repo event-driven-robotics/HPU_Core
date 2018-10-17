@@ -1,4 +1,15 @@
 ********************************************
+Version 3.1 Rev 7:  17th, October 2018
+- START/STOP command bypass feature
+- Unwanted reset of SpiNNlink section when disabled 
+  (M. Casti - IIT)
+
+********************************************
+Version 3.1 Rev 6:  9th, October 2018
+- *** Don't use that release ***
+  (M. Casti - IIT)
+
+********************************************
 Version 3.1 Rev 5:  9th, October 2018
 - Added the Data Mask feature to SpiNNlink
   (M. Casti - IIT)

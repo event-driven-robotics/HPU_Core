@@ -11,3 +11,6 @@ Vivado/*
 
 # ignore Local folder
 Local/*
+
+# Ignore zip files with DRAFT suffix
+*DRAFT.zip 
