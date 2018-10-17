@@ -263,6 +263,8 @@ struct hpu_priv {
 	struct dma_chan *dma_rx_chan;
 	struct dma_chan *dma_tx_chan;
 	struct work_struct rx_housekeeping_work;
+	size_t rx_blocking_threshold;
+	size_t tx_blocking_threshold;
 	unsigned int cnt_pktloss;
 	int pkt_txed;
 	unsigned long byte_txed;
@@ -286,7 +288,6 @@ static void hpu_tx_dma_callback(void *_buffer)
 
 	/* mark as spare */
 	spin_lock(&priv->dma_tx_pool.spin_lock);
-	buffer->fill_index = 0;
 	priv->dma_tx_pool.filled--;
 	complete(&priv->dma_tx_pool.completion);
 	spin_unlock(&priv->dma_tx_pool.spin_lock);
@@ -360,7 +361,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 	dma_cookie_t cookie;
 	size_t copy;
 	int ret;
-	int i = 0;
+	size_t i = 0;
 	int count = 0;
 	struct hpu_priv *priv = fp->private_data;
 
@@ -375,10 +376,27 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 		copy = min_t(size_t, priv->dma_tx_pool.ps, lenght);
 		dma_buf = &priv->dma_tx_pool.ring[priv->dma_tx_pool.buf_index];
 
-		spin_lock_bh(&priv->dma_tx_pool.spin_lock);
-		while (dma_buf->fill_index) {
-			dev_dbg(&priv->pdev->dev, "suspending TX\n");
+		while (1) {
+			spin_lock_bh(&priv->dma_tx_pool.spin_lock);
+
+			/* if the buffer is free, then we are OK */
+			if (priv->dma_tx_pool.filled < priv->dma_tx_pool.pn)
+				/* unlock in outer block */
+				break;
+			/*
+			 * If we've copied enough wrt blocking threshold, then
+			 * return now..
+			 */
+			if (i >= priv->tx_blocking_threshold) {
+				spin_unlock_bh(&priv->dma_tx_pool.spin_lock);
+				goto exit;
+			}
+
+			/* drain away any completion leftover */
+			try_wait_for_completion(&priv->dma_tx_pool.completion);
 			spin_unlock_bh(&priv->dma_tx_pool.spin_lock);
+
+			/* wait for more room */
 			ret = wait_for_completion_killable_timeout(&priv->dma_tx_pool.completion,
 								   msecs_to_jiffies(tx_to));
 			if (unlikely(ret == 0)) {
@@ -388,19 +406,15 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 				return ret;
 			}
 			dev_dbg(&priv->pdev->dev, "resuming TX\n");
-			spin_lock_bh(&priv->dma_tx_pool.spin_lock);
 		}
 
 		priv->dma_tx_pool.filled++;
-
 		spin_unlock_bh(&priv->dma_tx_pool.spin_lock);
 
 		if (__copy_from_user(dma_buf->virt, buf, copy)) {
 			dev_err(&priv->pdev->dev, "failed copying from user\n");
 			return -EINVAL;
 		}
-
-		dma_buf->fill_index = copy;
 
 		/* FIXME: shall we use sg ? */
 		dma_desc = dmaengine_prep_slave_single(priv->dma_tx_chan,
@@ -426,7 +440,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 		priv->dma_tx_pool.buf_index = (priv->dma_tx_pool.buf_index + 1)
 			& (priv->dma_tx_pool.pn - 1);
 	}
-
+exit:
 	if (count)
 		dma_async_issue_pending(priv->dma_tx_chan);
 
@@ -437,12 +451,12 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				loff_t *offset)
 {
 	int ret, ret2;
-	int copy;
+	size_t copy;
 	u32 msk;
 	int index;
 	size_t buf_count;
 	struct hpu_buf *item;
-	int read = 0;
+	size_t read = 0;
 
 	struct hpu_priv *priv = fp->private_data;
 
@@ -462,7 +476,6 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 	while (length > 0) {
 		if (rx_fifo_full == 1)
 			goto error_rx_fifo_full;
-
 		/*
 		 * Wait for some data to be available - this part must lock
 		 * against the DMA cb, in order to correctly handle filled count
@@ -475,8 +488,19 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			 * engines tasklet, never from interrupt context.
 			 */
 			spin_lock_bh(&priv->dma_rx_pool.spin_lock);
-			if (priv->dma_rx_pool.filled > 0)
+
+			/* if there is data, then do not wait .. */
+			if (priv->dma_rx_pool.filled > 0) {
+				spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
 				break;
+			}
+
+			/* if we have read enough not to block then return now */
+			if (read >= priv->rx_blocking_threshold) {
+				spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
+				return read;
+			}
 
 			/* drain away any completion leftover */
 			try_wait_for_completion(&priv->dma_rx_pool.completion);
@@ -494,9 +518,6 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				return -ETIMEDOUT;
 			}
 		}
-
-		/* we got here with lock held */
-		spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
 
 		index = priv->dma_rx_pool.buf_index;
 		item = &priv->dma_rx_pool.ring[index];
@@ -719,6 +740,8 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		return -EBUSY;
 	}
 
+	priv->rx_blocking_threshold = ~0;
+	priv->tx_blocking_threshold = ~0;
 	priv->pkt_txed = 0;
 	priv->byte_txed = 0;
 	priv->pkt_rxed = 0;
