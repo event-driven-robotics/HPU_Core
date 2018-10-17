@@ -374,19 +374,16 @@ DBG_FIFO_4 <= DBG_FIFO4;
 
     g_spinnlnk_true : if C_HAS_SPNNLNK = true generate
     
-    signal ii_spnnlnk_rst : std_logic;
-    
     begin
-    
-       ii_spnnlnk_rst <= not EnableSPNNLNK_i or not nRst;
        
        u_spinnlink_rx : spinn_neu_if
            generic map (
                C_PSPNNLNK_WIDTH       => C_PSPNNLNK_WIDTH
                )
            port map (
-           rst                        => ii_spnnlnk_rst,
+           rst                        => Rst,
            clk_32                     => Clk_core, -- 100 MHz Clock
+           enable                     => EnableSPNNLNK_i,
            
            dump_mode                  => open,    
            parity_err                 => RxSpnnlnkStat_o.parity_err,

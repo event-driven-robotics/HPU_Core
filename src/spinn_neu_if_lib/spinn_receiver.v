@@ -29,9 +29,10 @@ module spinn_receiver
 (
   input                         clk,
   input                         rst,
+  input                         enable,
 
   // status
-  output reg                     err,
+  output reg                    err,
 
   // SpiNNaker link asynchronous interface
   input                   [6:0] data_2of7,
@@ -56,6 +57,7 @@ module spinn_receiver
   localparam WTRD_ST    = TRAN_ST + 1;
   localparam ERR0_ST    = WTRD_ST + 1;
   localparam EOP0_ST    = ERR0_ST + 1;
+  localparam PARK_ST    = EOP0_ST + 1;             // "Parking" state, when interface is not enabled
 
 
   //---------------------------------------------------------------
@@ -123,76 +125,85 @@ module spinn_receiver
   always @(posedge clk or posedge rst)
     if (rst)
     begin
-      old_data_2of7 <= 7'd0;  // not really necessary!
-      ack           <= 1'b0;
+        old_data_2of7 <= 7'd0;  // not really necessary!
+        ack           <= 1'b0;
     end
     else
-      case (state)
-	REST_ST: begin
-                   old_data_2of7 <= data_2of7;  // remember 2of7 data
-	           ack           <= 1'b1;       // mimic SpiNNaker behaviour
-                 end
+        case (state)
+        
+            PARK_ST : 
+                begin
+                    old_data_2of7 <= old_data_2of7;  // no change!
+                    ack           <= ack;            // no change!
+                end
+        
+            REST_ST:    
+                begin
+                    old_data_2of7 <= data_2of7;  // remember 2of7 data
+	                ack           <= 1'b1;       // mimic SpiNNaker behaviour
+                end
 
-        IDLE_ST: if (nsb)  
-                 begin
-                   old_data_2of7 <= data_2of7;      // remember 2of7 data
-	           ack           <= ~ack;           // ack new symbol
-	         end
-                 else
-                 begin
-                   old_data_2of7 <= old_data_2of7;  // no change!
-                   ack           <= ack;            // no change!
-                 end
+            IDLE_ST: if (nsb)  
+                begin
+                    old_data_2of7 <= data_2of7;      // remember 2of7 data
+	                ack           <= ~ack;           // ack new symbol
+                end
+             else
+                begin
+                    old_data_2of7 <= old_data_2of7;  // no change!
+                    ack           <= ack;            // no change!
+                end
 
-	TRAN_ST: if (dat || bad)
-                 begin
-                   old_data_2of7 <= data_2of7;  // remember 2of7 data
-                   ack           <= ~ack;       // ack new symbol
-                 end
-                 else
-                 begin
-                   old_data_2of7 <= old_data_2of7;  // no change!
-                   ack           <= ack;            // no change!
-	         end
+            TRAN_ST: if (dat || bad)
+                begin
+                    old_data_2of7 <= data_2of7;  // remember 2of7 data
+                    ack           <= ~ack;       // ack new symbol
+                end
+             else
+                begin
+                    old_data_2of7 <= old_data_2of7;  // no change!
+                    ack           <= ack;            // no change!
+	            end
 
-	EOP0_ST: if (!busy)  
-                 begin
-                   old_data_2of7 <= data_2of7;      // remember 2of7 data
-	           ack           <= ~ack;           // ack new symbol
-	         end
-                 else
-                 begin
-                   old_data_2of7 <= old_data_2of7;  // no change!
-                   ack           <= ack;            // no change!
-                 end
+	       EOP0_ST: if (!busy)  
+                begin
+                    old_data_2of7 <= data_2of7;      // remember 2of7 data
+                    ack           <= ~ack;           // ack new symbol
+                end
+                else
+                begin
+                    old_data_2of7 <= old_data_2of7;  // no change!
+                    ack           <= ack;            // no change!
+                end
 
-        WTRD_ST: if (!busy)  
-                 begin
-                   old_data_2of7 <= data_2of7;      // remember 2of7 data
-	           ack           <= ~ack;           // ack new symbol
-	         end
-                 else
-                 begin
-                   old_data_2of7 <= old_data_2of7;  // no change!
-                   ack           <= ack;            // no change!
-                 end
+            WTRD_ST: if (!busy)  
+                begin
+                    old_data_2of7 <= data_2of7;      // remember 2of7 data
+                    ack           <= ~ack;           // ack new symbol
+                end
+                else
+                begin
+                    old_data_2of7 <= old_data_2of7;  // no change!
+                    ack           <= ack;            // no change!
+                end
 
-        ERR0_ST: if (nsb || (err_cnt == 0))  
-                 begin
-                   old_data_2of7 <= data_2of7;      // remember 2of7 data
-	           ack           <= ~ack;           // ack new symbol
-	         end
-                 else
-                 begin
-                   old_data_2of7 <= old_data_2of7;  // no change!
-                   ack           <= ack;            // no change!
-                 end
+            ERR0_ST: if (nsb || (err_cnt == 0))  
+                begin
+                    old_data_2of7 <= data_2of7;      // remember 2of7 data
+                    ack           <= ~ack;           // ack new symbol
+                end
+                else
+                begin
+                    old_data_2of7 <= old_data_2of7;  // no change!
+                    ack           <= ack;            // no change!
+                end
 
-        default: begin
-                   old_data_2of7 <= old_data_2of7;  // no change!
-                   ack           <= ack;            // no change!
-                 end
-      endcase 
+            default: 
+                begin
+                    old_data_2of7 <= old_data_2of7;  // no change!
+                    ack           <= ack;            // no change!
+                end
+        endcase 
   //---------------------------------------------------------------
   //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -489,8 +500,16 @@ module spinn_receiver
       state <= REST_ST;
     else
       case (state)
-	REST_ST: state <= IDLE_ST;
-
+	REST_ST: if (enable)
+	             state <= IDLE_ST;
+             else
+                 state <= PARK_ST;
+                 
+    PARK_ST : if (enable)
+                 state <= IDLE_ST;
+              else
+                 state <= PARK_ST;
+             
 	IDLE_ST: casex ({dat, bad})
                    2'b1x:   state <= TRAN_ST;  // first symbol in new packet
                    2'bx1:   state <= ERR0_ST;  // error, drop packet
@@ -498,10 +517,10 @@ module spinn_receiver
                  endcase
 
 	TRAN_ST: casex ({bad, eop})
-		   2'b1x:  // bad symbol: drop and go to error
+		           2'b1x:  // bad symbol: drop and go to error
                      state <= ERR0_ST;
 
-	           2'bx1:  // eop: check if correct packet and forward
+	               2'bx1:  // eop: check if correct packet and forward
                      state <= EOP0_ST;
 
                    default:  // data or no symbol arrived: keep going
@@ -509,27 +528,36 @@ module spinn_receiver
                  endcase
 
 	EOP0_ST: casex ({exp_eop, busy})
-		   2'b01:  // unexpected and busy: wait here
+		           2'b01:  // unexpected and busy: wait here
                      state <= EOP0_ST;
 
-	           2'b11:  // expected eop and busy: wait for ready
+	               2'b11:  // expected eop and busy: wait for ready
                      state <= WTRD_ST;
 
-		   //#2'b00,  // unexpected eop: drop
-	           //#2'b10,  // expected eop: forward packet
+		        //#2'b00,  // unexpected eop: drop
+	            //#2'b10,  // expected eop: forward packet
                    default:  // data or no symbol arrived: keep going
-                     state <= IDLE_ST;
+                     if (enable)
+                        state <= IDLE_ST;
+                     else
+                        state <= PARK_ST;
                  endcase
 
         WTRD_ST:  if (!busy)
-                   state <= IDLE_ST;  // forward packet and start again
+                      if (enable)
+                          state <= IDLE_ST;  // forward packet and start again
+                      else 
+                          state <= PARK_ST;
                  else
                    state <= WTRD_ST;  // no change!
 
         ERR0_ST:  if (eop)
-                   state <= IDLE_ST;
-                 else
-                   state <= ERR0_ST;  // no change!
+                      if (enable)
+                          state <= IDLE_ST;
+                      else 
+                          state <= PARK_ST;
+                  else
+                      state <= ERR0_ST;  // no change!
 
         default: state <= state;  // no change!
       endcase

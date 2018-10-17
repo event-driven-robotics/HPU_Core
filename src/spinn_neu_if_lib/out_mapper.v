@@ -35,8 +35,8 @@ module out_mapper #
 		parameter AER_WIDTH = 32
 	)
     (
-        input wire         			rst,
-        input wire         			clk,
+        input              			rst,
+        input           			clk,
 
         // status interface
         output reg         			parity_err,
@@ -134,15 +134,24 @@ module out_mapper #
     assign cmd_vld = cmd_flag & opkt_vld & mc_pkt & parity_chk;     
     
     always @(posedge clk or posedge rst) begin
-        if (rst) begin
+        if (rst) 
+            begin
             cmd_start <= 0;
             cmd_stop  <= 0;
             end 
-        else begin
-            cmd_start <= (opkt_data[39:8] == cmd_start_key) & cmd_vld;
-            cmd_stop  <= (opkt_data[39:8] == cmd_stop_key) & cmd_vld;
+        else 
+            if ({cmd_start_key, cmd_stop_key} == 0)
+                begin
+                cmd_start <= 1'b1;
+                cmd_stop <= 1'b0;
+                end
+            else
+                begin 
+                cmd_start <= (opkt_data[39:8] == cmd_start_key) & cmd_vld;
+                cmd_stop  <= (opkt_data[39:8] == cmd_stop_key) & cmd_vld;
+                end
             end
-        end    
+            
 
     //---------------------------------------------------------------
     // Data

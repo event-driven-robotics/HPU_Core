@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Product Version: Vivado v2017.4 (64-bit)              -->
+<!-- Product Version: Vivado v2017.4.1 (64-bit)              -->
 <!--                                                         -->
 <!-- Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="35" Path="C:/Progetti/Repository/HPU_Core/Vivado/HPU_core.xpr">
+<Project Version="7" Minor="35" Path="D:/Projects/Repository/HPU_Core/Vivado/HPU_core.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="19adf4512a9742cb84f24e9a5e44a5fa"/>
@@ -32,7 +32,7 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="740"/>
+    <Option Name="WTXSimLaunchSim" Val="761"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -421,7 +421,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../../../progetti/repository/hpu_core/component.xml">
+      <File Path="$PPRDIR/../component.xml">
         <FileInfo SFType="IPXACT"/>
       </File>
       <Config>

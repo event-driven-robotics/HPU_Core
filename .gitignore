@@ -8,3 +8,6 @@ mug
 Vivado/*
 # but NOT xpr file
 !Vivado/*.xpr
+
+# ignore Local folder
+Local/*

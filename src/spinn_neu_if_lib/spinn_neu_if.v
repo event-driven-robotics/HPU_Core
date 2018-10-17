@@ -60,6 +60,7 @@ module spinn_neu_if #
     (
         input wire         rst,
         input wire         clk_32,
+        input wire         enable,
 
         output wire        dump_mode,
         output wire        parity_err,
@@ -250,6 +251,7 @@ module spinn_neu_if #
     (
         .rst       (rst),
         .clk       (clk_mod),
+        .enable    (enable),
         .err       (rx_err),
         .data_2of7 (s_ispinn_data),
         .ack       (i_ispinn_ack),
@@ -296,6 +298,7 @@ module spinn_neu_if #
     (
         .rst          (rst),
         .clk          (clk_mod),
+        .enable       (enable),
         .dump_mode    (dump_mode),
         .dump_on      (i_dump_on),
         .dump_off     (i_dump_off),  

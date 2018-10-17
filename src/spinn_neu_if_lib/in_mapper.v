@@ -20,6 +20,7 @@ module in_mapper #
     (
         input  wire        			rst,
         input  wire        			clk,
+        input  wire                 enable,
 
         // status interface
         output reg         			dump_mode,
@@ -87,10 +88,10 @@ module in_mapper #
         if (rst) 
             cmd_dump <= 1'b1;
         else begin
-            if (dump_on) 
-                cmd_dump <= 1'b1;
-            else if (dump_off) 
+            if (dump_off) 
                 cmd_dump <= 1'b0;
+            else if (dump_on) 
+                cmd_dump <= 1'b1;
             end
         end
     //---------------------------------------------------------------   
@@ -134,7 +135,7 @@ module in_mapper #
     integer i;
 
 
-    assign write = ~fifo_full  & iaer_vld;
+    assign write = ~fifo_full  & iaer_vld & enable;
     assign read  = ~fifo_empty & ipkt_rdy;
 
     always @(posedge clk or posedge rst) begin
@@ -169,7 +170,7 @@ module in_mapper #
     assign fifo_empty = (fifo_len == 0);
 
 
-    assign iaer_rdy   = ~fifo_full | dump_mode;
+    assign iaer_rdy   = (~fifo_full | dump_mode) & enable;
 
     assign ipkt_vld   = ~fifo_empty & ~dump_mode;
     assign ipkt_data  = {32'h0, data_fifo[0]};

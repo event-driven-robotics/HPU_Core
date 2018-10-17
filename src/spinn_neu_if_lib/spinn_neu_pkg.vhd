@@ -20,6 +20,7 @@ component spinn_neu_if
 	port (
 		rst							: in  std_logic;
 		clk_32						: in  std_logic;
+		enable                      : in  std_logic;
 		
 		dump_mode					: out std_logic;
 		parity_err					: out std_logic;
