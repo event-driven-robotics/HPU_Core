@@ -147,6 +147,8 @@
 #define HPU_IOCTL_SET_LOOP_CFG		18
 #define HPU_IOCTL_SET_SPINN		19
 #define HPU_IOCTL_GET_TX_PS		20
+#define HPU_IOCTL_SET_BLK_TX_THR	21
+#define HPU_IOCTL_SET_BLK_RX_THR	22
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -1176,6 +1178,18 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		reg |= (val & 3) << 22;
 		writel(reg, priv->regs + HPU_CTRL_REG);
 		dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x", reg);
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_BLK_TX_THR, unsigned int*):
+		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
+			goto cfuser_err;
+		priv->tx_blocking_threshold = val;
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_BLK_RX_THR, unsigned int*):
+		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
+			goto cfuser_err;
+		priv->rx_blocking_threshold = val;
 		break;
 
 	default:
