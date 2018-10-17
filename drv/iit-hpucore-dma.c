@@ -496,11 +496,6 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 		item = &priv->dma_rx_pool.ring[index];
 		dev_dbg(&priv->pdev->dev, "reading dma descriptor %d\n", index);
 
-		BUG_ON(DMA_COMPLETE != dma_async_is_tx_complete(
-			       priv->dma_rx_chan,
-			       priv->dma_rx_pool.ring[index].cookie,
-			       NULL, NULL));
-
 		/* data still in buf */
 		buf_count = priv->dma_rx_pool.ps - item->fill_index;
 		copy = min(length, buf_count);
