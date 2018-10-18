@@ -419,7 +419,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 		priv->dma_tx_pool.filled++;
 		spin_unlock_bh(&priv->dma_tx_pool.spin_lock);
 
-		if (__copy_from_user(dma_buf->virt, buf, copy)) {
+		if (__copy_from_user(dma_buf->virt, buf + i, copy)) {
 			dev_err(&priv->pdev->dev, "failed copying from user\n");
 			return -EINVAL;
 		}
