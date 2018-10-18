@@ -30,6 +30,8 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_GET_TX_PS		|20| R |    unsigned int     |
 |HPU_IOCTL_SET_BLK_TX_THR	|21| W |    unsigned int     |
 |HPU_IOCTL_SET_BLK_RX_THR	|22| W |    unsigned int     |
+|HPU_IOCTL_SET_START_KEY	|23| W |    unsigned int     |
+|HPU_IOCTL_SET_STOP_KEY		|24| W |    unsigned int     |
 
 non-scalar types are defined as follows
 
