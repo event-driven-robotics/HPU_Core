@@ -80,6 +80,8 @@
 #define HPU_AUX_RX_ERR_CH1_REG	0x74
 #define HPU_AUX_RX_ERR_CH2_REG	0x78
 #define HPU_AUX_RX_ERR_CH3_REG	0x7C
+#define HPU_SPINN_START_KEY_REG	0x80
+#define HPU_SPINN_STOP_KEY_REG	0x84
 
 /* magic constants */
 #define HPU_VER_MAGIC			0x42303130
@@ -177,6 +179,8 @@ static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_AUX_RX_ERR_CH1_REG",	0x74},
 	{"HPU_AUX_RX_ERR_CH2_REG",	0x78},
 	{"HPU_AUX_RX_ERR_CH3_REG",	0x7C},
+	{"HPU_SPINN_START_KEY_REG",	0x80},
+	{"HPU_SPINN_STOP_KEY_REG",	0x84}
 };
 
 
