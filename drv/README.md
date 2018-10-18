@@ -57,3 +57,13 @@ Example of ioctl definition in userspace application:
 #define IOC_READ_TS			_IOR(IOC_MAGIC_NUMBER, 1, unsigned int *)
 #define IOC_CLEAR_TS		_IOW(IOC_MAGIC_NUMBER, 2, unsigned int *)
 ```
+
+Module parameters
+-----------------
+
+*rx_to:* set the timeout of RX operations in mS.
+*rx_pn:* set the number of DMA RX buffers in the ring. Must be a power of two.
+*rx_ps:* set the size of DMA RX buffers. This is the minumum transfer size for which the driver is acknowledged of.
+
+*tx_to* and *tx_pn:* as above, but on TX side.
+*tx_ps:* set the size of DMA TX buffers. Unlike RX, there is no minumum transfer size.
