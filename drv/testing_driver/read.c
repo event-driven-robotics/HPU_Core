@@ -83,9 +83,11 @@
 #define IOC_SET_LOOP_CFG        _IOW(IOC_MAGIC_NUMBER, 18, unsigned int *)
 #define IOC_SET_SPINN           _IOW(IOC_MAGIC_NUMBER, 19, unsigned int *)
 #define IOC_GET_TX_PS           _IOR(IOC_MAGIC_NUMBER, 20, unsigned int *)
+#define IOCTL_SET_BLK_TX_THR	_IOW(IOC_MAGIC_NUMBER, 21, unsigned int *)
+#define IOCTL_SET_BLK_RX_THR	_IOW(IOC_MAGIC_NUMBER, 22, unsigned int *)
 
 
-unsigned int data[4096], wdata[4096];
+unsigned int data[65536], wdata[65536];
 int iit_hpu;
 
 void handle_kill(int sig)
@@ -130,6 +132,38 @@ void read_data(int chunk_size, int chunk_num)
 	}
 }
 
+void read_thr_data(int chunk_size, int chunk_num)
+{
+	int i, j;
+	unsigned int tmp, tmp2;
+	int ret;
+	int chunk;
+	unsigned int size;
+
+	size = chunk_size;
+	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
+
+	for (i = 0; i < chunk_num; i++) {
+		chunk = 0;
+		while (chunk < chunk_size * 8) {
+			ret = read(iit_hpu, data + chunk,  (8 * chunk_size) - chunk);
+			if (ret < size)
+				printf("read returned %d\n", ret);
+			chunk += ret;
+		}
+
+		if (chunk != chunk_size * 8)
+			printf("read finished with %d\n", chunk);
+
+		for (j = 0; j < chunk_size; j++) {
+			tmp = (0xcafe << 16) | ((i * chunk_size + j) & 0xffff);
+			tmp2 = data[j * 2 + 1];
+			if (tmp2 != tmp)
+				printf("error at %d,%d: %x %x\n", i, j,tmp2, tmp);
+		}
+	}
+}
+
 int main(int argc, char * argv[])
 {
 	int ret;
@@ -140,6 +174,7 @@ int main(int argc, char * argv[])
 	clock_t time;
 	double time_sec;
 
+	unsigned int size;
 	int iter_count = 1000;
 	int tx_size = 512;
 	int rx_size = 512;
@@ -190,6 +225,26 @@ int main(int argc, char * argv[])
 		read_data(rx_size, rx_n);
 	}
 	printf("phase 2 OK\n");
+
+	/* check for correctness - overlapping write/read - RX threshold ioctl */
+	for (i = 0; i < iter_count; i++) {
+		write_data(tx_size, tx_n);
+		read_thr_data(rx_size, rx_n);
+	}
+	printf("phase 3 OK\n");
+
+	size = rx_ps;
+	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
+
+	/* check for correctness - overlapping write/read - RX threshold ioctl */
+	for (i = i; i <= 4; i++) {
+		write(iit_hpu, wdata, rx_ps * i);
+		usleep(10000);
+		ret = read(iit_hpu, data, rx_ps * 8);
+		if (ret != rx_ps * i)
+			printf("read %d instead of %d\n", ret, rx_ps * i);
+	}
+	printf("phase 4 OK\n");
 
 	/* tot RX desc = 100 * 32 * 1024 * 8  / 8192 = 3200 */
 	iter_count = 20;
