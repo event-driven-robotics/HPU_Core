@@ -260,6 +260,8 @@ begin
             Rst_xRBI       => Reset_xRBI,
             Clk_xCI        => CoreClk_xCI,
             Enable_xSI     => EnableSequencer_xS,
+            AbsMode        => '1',
+            --
             Timestamp_xDI  => Timestamp_xD,
             --
             InAddrEvt_xDI  => SeqInAddrEvt_xD,
