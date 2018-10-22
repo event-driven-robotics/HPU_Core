@@ -186,8 +186,6 @@ static struct debugfs_reg32 hpu_regs[] = {
 };
 
 
-static short int rx_fifo_full = 0;
-
 static short int test_dma = 0;
 module_param(test_dma, short, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 MODULE_PARM_DESC(test_dma, "Set to 1 to test DMA");
@@ -251,6 +249,14 @@ struct hpu_dma_pool {
 	int pn;
 };
 
+enum fifo_status {
+	FIFO_OK,
+	FIFO_DRAINED,
+	FIFO_OVERFLOW,
+	FIFO_OVERFLOW_NOTIFIED,
+	FIFO_STOPPED
+};
+
 struct hpu_priv {
 	struct file_operations fops;
 	struct dentry *regset;
@@ -263,6 +269,8 @@ struct hpu_priv {
 	unsigned int hpu_is_opened;
 	void __iomem *regs;
 	uint32_t ctrl_reg;
+	uint32_t rx_ctrl_reg;
+	uint32_t rx_aux_ctrl_reg;
 	wait_queue_head_t wait;
 
 	/* dma */
@@ -273,6 +281,7 @@ struct hpu_priv {
 	struct work_struct rx_housekeeping_work;
 	size_t rx_blocking_threshold;
 	size_t tx_blocking_threshold;
+	enum fifo_status rx_fifo_status;
 	unsigned int cnt_pktloss;
 	int pkt_txed;
 	unsigned long byte_txed;
@@ -287,7 +296,6 @@ static DEFINE_IDA(hpu_ida);
 
 static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
 static void hpu_dma_free_pool(struct hpu_priv *priv, struct hpu_dma_pool *hpu_pool);
-static int _hpu_chardev_close(struct hpu_priv *priv);
 
 static void hpu_tx_dma_callback(void *_buffer)
 {
@@ -301,39 +309,68 @@ static void hpu_tx_dma_callback(void *_buffer)
 	spin_unlock(&priv->dma_tx_pool.spin_lock);
 }
 
+/* called with RX lock held */
+static void hpu_flush_rx_fifo(struct hpu_priv *priv)
+{
+	int finished = 0;
+	int ret;
+
+	while (1) {
+		spin_lock_bh(&priv->dma_rx_pool.spin_lock);
+		finished = (priv->dma_rx_pool.filled == 0);
+		if (!finished)
+			priv->dma_rx_pool.filled--;
+		spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+		if (finished)
+			break;
+
+		ret = hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index]);
+		if (ret)
+			dev_err(&priv->pdev->dev, "DMA RX submit error %d while housekeeping\n", ret);
+		/* forcefully advance index. 1pkt lost */
+		priv->dma_rx_pool.buf_index =
+			(priv->dma_rx_pool.buf_index + 1) &
+		(priv->dma_rx_pool.pn - 1);
+
+		BUG_ON(priv->dma_rx_pool.buf_index >= priv->dma_rx_pool.pn);
+
+		priv->cnt_pktloss++;
+		dma_async_issue_pending(priv->dma_rx_chan);
+	}
+}
+
 static void hpu_rx_housekeeping(struct work_struct *work)
 {
 	struct hpu_priv *priv = container_of(work, struct hpu_priv,
 					     rx_housekeeping_work);
-
-	int ret;
+	enum fifo_status state;
 
 	dev_dbg(&priv->pdev->dev, "RX housekeeping ..\n");
 	mutex_lock(&priv->dma_rx_pool.mutex_lock);
 
-	spin_lock_bh(&priv->dma_rx_pool.spin_lock);
 	/* data has been already drained */
-	if (priv->dma_rx_pool.filled < (priv->dma_rx_pool.pn - 1)) {
-		spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+	state = READ_ONCE(priv->rx_fifo_status);
+	if (state == FIFO_OK || state == FIFO_DRAINED) {
 		mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 		return;
 	}
 
-	priv->dma_rx_pool.filled--;
-	spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+	hpu_flush_rx_fifo(priv);
 
-	ret = hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index]);
-	if (ret)
-		dev_err(&priv->pdev->dev, "DMA RX submit error %d while housekeeping\n", ret);
-	/* forcefully advance index. 1pkt lost */
-	priv->dma_rx_pool.buf_index =
-		(priv->dma_rx_pool.buf_index + 1) &
-		(priv->dma_rx_pool.pn - 1);
+	if (state == FIFO_OVERFLOW) {
+		WRITE_ONCE(priv->rx_fifo_status, FIFO_DRAINED);
+		/*
+		 * In theory the reader shouldn't be blocked waiting, because
+		 * if fifo was full, then DMA ring should be quite crowder,
+		 * but just in case... (make sure the read() can bail out
+		 * early reporting failure...
+		 */
+		complete(&priv->dma_rx_pool.completion);
 
-	BUG_ON(priv->dma_rx_pool.buf_index >= priv->dma_rx_pool.pn);
-
-	priv->cnt_pktloss++;
-	dma_async_issue_pending(priv->dma_rx_chan);
+	} else {
+		BUG_ON(state != FIFO_OVERFLOW_NOTIFIED);
+		WRITE_ONCE(priv->rx_fifo_status, FIFO_STOPPED);
+	}
 	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 }
 
@@ -355,10 +392,6 @@ static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *re
 		dev_dbg(&priv->pdev->dev, "RX DMA waking up reader\n");
 		/* ring was empty. wake reader, if any.. */
 		complete(&priv->dma_rx_pool.completion);
-	} else if (priv->dma_rx_pool.filled == (priv->dma_rx_pool.pn - 1)) {
-		dev_dbg(&priv->pdev->dev, "RX DMA scheduling worker\n");
-		/* ring getting full, throw away old data to make room new one */
-		schedule_work(&priv->rx_housekeeping_work);
 	}
 	spin_unlock(&priv->dma_rx_pool.spin_lock);
 }
@@ -462,30 +495,21 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 {
 	int ret, ret2;
 	size_t copy;
-	u32 msk;
 	int index;
 	size_t buf_count;
 	struct hpu_buf *item;
+	u32 msk;
 	size_t read = 0;
-
 	struct hpu_priv *priv = fp->private_data;
 
 	if (!access_ok(VERIFY_READ, buf, length))
 		return -EFAULT;
-
-	/* Unmask RXFIFOFULL interrupt */
-	msk = readl(priv->regs + HPU_IRQMASK_REG);
-	msk |= HPU_MSK_INT_RXFIFOFULL;
-	writel(msk, priv->regs + HPU_IRQMASK_REG);
-	rx_fifo_full = 0;
 
 	dev_dbg(&priv->pdev->dev, "----tot to read %d\n", length);
 
 	mutex_lock(&priv->dma_rx_pool.mutex_lock);
 
 	while (length > 0) {
-		if (rx_fifo_full == 1)
-			goto error_rx_fifo_full;
 		/*
 		 * Wait for some data to be available - this part must lock
 		 * against the DMA cb, in order to correctly handle filled count
@@ -498,6 +522,57 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			 * engines tasklet, never from interrupt context.
 			 */
 			spin_lock_bh(&priv->dma_rx_pool.spin_lock);
+
+			switch(READ_ONCE(priv->rx_fifo_status)) {
+			case FIFO_OK:
+				break;
+
+			case FIFO_OVERFLOW:
+				/*
+				 * FIFO-full, nobody cared yet. Bail out failing
+				 * and mark as 'notified'.
+				 */
+				WRITE_ONCE(priv->rx_fifo_status,
+					   FIFO_OVERFLOW_NOTIFIED);
+				goto error_rx_fifo_full;
+				break;
+
+			case FIFO_DRAINED:
+				/*
+				 * FIFO-full, already drained. Bail out failing
+				 * but next time we'll be OK.
+				 */
+				WRITE_ONCE(priv->rx_fifo_status, FIFO_STOPPED);
+				goto error_rx_fifo_full;
+				break;
+
+			case FIFO_OVERFLOW_NOTIFIED:
+				/*
+				 * FIFO-full, we had already notified this, but
+				 * no-one has drained the fifo yet. Do it now,
+				 * then we are OK and we can go on without fail.
+				 */
+				hpu_flush_rx_fifo(priv);
+
+				/* fall-through */
+			case FIFO_STOPPED:
+				/*
+				 * An overflow has been fixed. We have to
+				 * restart the RX machanism, then we can go on.
+				 */
+				writel(priv->rx_ctrl_reg,
+				       priv->regs + HPU_RXCTRL_REG);
+				writel(priv->rx_aux_ctrl_reg,
+				       priv->regs + HPU_AUX_RXCTRL_REG);
+
+				/* Re-enable RX FIFO full interrupt */
+				msk = readl(priv->regs + HPU_IRQMASK_REG);
+				msk |= HPU_MSK_INT_RXFIFOFULL;
+				writel(msk, priv->regs + HPU_IRQMASK_REG);
+
+				WRITE_ONCE(priv->rx_fifo_status, FIFO_OK);
+				break;
+			}
 
 			/* if there is data, then do not wait .. */
 			if (priv->dma_rx_pool.filled > 0) {
@@ -594,13 +669,9 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 	return read;
 
 error_rx_fifo_full:
+	spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
 	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 
-	/*
-	 * AM: I kept the same behaviour here as before, but I'm not sure it
-	 * is sane to force a close when a read fails.
-	 */
-	_hpu_chardev_close(priv);
 	return -ENOMEM;
 }
 
@@ -757,6 +828,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	priv->byte_txed = 0;
 	priv->pkt_rxed = 0;
 	priv->byte_rxed = 0;
+	priv->rx_fifo_status = FIFO_OK;
 
 	priv->hpu_is_opened = 1;
 	ret = hpu_dma_init(priv);
@@ -814,6 +886,9 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+
+	priv->rx_aux_ctrl_reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
+	priv->rx_ctrl_reg = readl(priv->regs + HPU_RXCTRL_REG);
 	mutex_unlock(&priv->access_lock);
 
 	return 0;
@@ -825,9 +900,10 @@ err_dealloc_dma:
 	return ret;
 }
 
-static int _hpu_chardev_close(struct hpu_priv *priv)
+static int hpu_chardev_close(struct inode *i, struct file *fp)
 {
 	uint32_t val;
+	struct hpu_priv *priv = fp->private_data;
 
 	mutex_lock(&priv->access_lock);
 
@@ -859,13 +935,6 @@ static int _hpu_chardev_close(struct hpu_priv *priv)
 	return 0;
 }
 
-static int hpu_chardev_close(struct inode *i, struct file *fp)
-{
-	struct hpu_priv *priv = fp->private_data;
-
-	return _hpu_chardev_close(priv);
-}
-
 static void hpu_handle_err(struct hpu_priv *priv)
 {
 	uint32_t reg;
@@ -874,7 +943,7 @@ static void hpu_handle_err(struct hpu_priv *priv)
 	int is_aux = 0;
 
 	/* Detect which RX HSSAER channel is enabled */
-	reg = readl(priv->regs + HPU_RXCTRL_REG);
+	reg = priv->rx_ctrl_reg;
 	/* Check Left SAER */
 	if (reg & 0x1)
 		num_channel = num_channel | (reg & (0xF << 8)) >> 8;
@@ -883,7 +952,7 @@ static void hpu_handle_err(struct hpu_priv *priv)
 		num_channel = num_channel | (reg & (0xF << 24)) >> 24;
 
 	/* Check Left Aux Saer */
-	reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
+	reg = priv->rx_aux_ctrl_reg;
 	if (reg & 0x1) {
 		num_channel = num_channel | (reg & (0xF << 8)) >> 8;
 		is_aux = 1;
@@ -912,7 +981,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 {
 
 	u32 intr;
-	uint32_t msk;
+	u32 msk;
 	struct hpu_priv *priv = platform_get_drvdata(pdev);
 	irqreturn_t retval = 0;
 
@@ -935,18 +1004,29 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 
 	if (intr & HPU_MSK_INT_RXFIFOFULL) {
 		dev_info(&priv->pdev->dev, "IRQ: RXFIFOFULL\n");
-		/* Flush the FIFO */
-		priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
-		priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
-		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-		/* Delete the interrupt */
-		writel(HPU_MSK_INT_RXFIFOFULL, priv->regs + HPU_IRQ_REG);
-		/* Deactivate RXFIFOFULL interrupt */
-//		msk = readl(priv->regs + HPU_IRQMASK_REG);
-//		msk &= (~HPU_MSK_INT_RXFIFOFULL);
-//		writel(msk, priv->regs + HPU_IRQMASK_REG);
 
-//		rx_fifo_full = 1;
+		/* Flush the FIFO */
+		/*
+		  priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
+		  priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
+		  writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+		*/
+
+		/* Stop feeding the fifos.. */
+		writel(0x00000000, priv->regs + HPU_RXCTRL_REG);
+		writel(0x00000000, priv->regs + HPU_AUX_RXCTRL_REG);
+
+		/* Mask fifo-full interrupt */
+		msk = readl(priv->regs + HPU_IRQMASK_REG);
+		msk &= ~HPU_MSK_INT_RXFIFOFULL;
+		writel(msk, priv->regs + HPU_IRQMASK_REG);
+
+		/* Clear fifo-full interrupt */
+		writel(HPU_MSK_INT_RXFIFOFULL, priv->regs + HPU_IRQ_REG);
+		WRITE_ONCE(priv->rx_fifo_status, FIFO_OVERFLOW);
+
+		/* Schedule the rx-purger thread */
+		schedule_work(&priv->rx_housekeeping_work);
 		retval = IRQ_HANDLED;
 	}
 
@@ -996,7 +1076,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 	unsigned int val = 0;
 	aux_cnt_t aux_cnt_reg;
 	ch_en_hssaer_t ch_en_hssaer;
-	unsigned int reg, reg2;
+	unsigned int reg;
 
 	struct hpu_priv *priv = fp->private_data;
 
@@ -1128,15 +1208,14 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 			return -EINVAL;
 		} else {
 			if (ch_en_hssaer.hssaer_src == aux) {
-				reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-				reg |= HPU_AUXCTRL_AUXRXHSSAER_EN |
+				priv->rx_aux_ctrl_reg |=
+					HPU_AUXCTRL_AUXRXHSSAER_EN |
 					((ch_en_hssaer.en_channels) << 8);
-				writel(reg, priv->regs + HPU_AUX_RXCTRL_REG);
+				writel(priv->rx_aux_ctrl_reg,
+				       priv->regs + HPU_AUX_RXCTRL_REG);
 			} else {
-				reg = readl(priv->regs + HPU_RXCTRL_REG);
-
 				/* don't overwrite spinn cfg, clear the rest */
-				reg &= HPU_RXCTRL_SPINNL_EN |
+				priv->rx_ctrl_reg &= HPU_RXCTRL_SPINNL_EN |
 					HPU_RXCTRL_SPINNR_EN;
 				if (ch_en_hssaer.hssaer_src == left_eye) {
 					reg |= HPU_RXCTRL_LRXHSSAER_EN |
@@ -1146,7 +1225,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 						(ch_en_hssaer.en_channels << 24);
 				}
 			}
-			writel(reg, priv->regs + HPU_RXCTRL_REG);
+			writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
 		}
 		break;
 
@@ -1154,27 +1233,25 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		if (copy_from_user(&val, (unsigned int *) arg, sizeof(val))) {
 			goto cfuser_err;
 		} else {
-			reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-			reg2 = readl(priv->regs + HPU_RXCTRL_REG);
 			if (val) {
-				reg |= HPU_AUXCTRL_AUXSPINN_EN;
-				reg2 |= HPU_RXCTRL_SPINNL_EN |
+				priv->rx_aux_ctrl_reg |= HPU_AUXCTRL_AUXSPINN_EN;
+				priv->rx_ctrl_reg |= HPU_RXCTRL_SPINNL_EN |
 					HPU_RXCTRL_SPINNR_EN;
 				/* magic from Maurizio */
 				writel(0x68, priv->regs + HPU_TXCTRL_REG);
 				dev_dbg(&priv->pdev->dev, "spinn enable\n");
 			} else {
-				reg &= ~HPU_AUXCTRL_AUXSPINN_EN;
-				reg2 &=	~(HPU_RXCTRL_SPINNL_EN |
-					  HPU_RXCTRL_SPINNR_EN);
+				priv->rx_aux_ctrl_reg &= ~HPU_AUXCTRL_AUXSPINN_EN;
+				priv->rx_ctrl_reg &= ~(HPU_RXCTRL_SPINNL_EN |
+						       HPU_RXCTRL_SPINNR_EN);
 				/* TX reg to reset val as per FD datasheet */
 				writel(0x0, priv->regs + HPU_TXCTRL_REG);
 				dev_dbg(&priv->pdev->dev, "spinn disable\n");
 			}
-			writel(reg2, priv->regs + HPU_RXCTRL_REG);
-			writel(reg, priv->regs + HPU_AUX_RXCTRL_REG);
+			writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
+			writel(priv->rx_aux_ctrl_reg, priv->regs + HPU_AUX_RXCTRL_REG);
 			dev_dbg(&priv->pdev->dev, "spinn - AUXRXCTRL reg 0x%x",
-				reg);
+				priv->rx_aux_ctrl_reg);
 		}
 		break;
 
@@ -1295,6 +1372,7 @@ static int hpu_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 	priv->hpu_is_opened = 0;
+	priv->rx_fifo_status = FIFO_OK;
 
 	mutex_init(&priv->access_lock);
 
