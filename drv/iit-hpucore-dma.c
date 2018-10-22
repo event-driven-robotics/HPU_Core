@@ -234,7 +234,7 @@ struct hpu_priv;
 struct hpu_buf {
 	dma_addr_t phys;
 	void *virt;
-	int fill_index;
+	int head_index, tail_index;
 	dma_cookie_t cookie;
 	struct hpu_priv *priv;
 };
@@ -337,17 +337,19 @@ static void hpu_rx_housekeeping(struct work_struct *work)
 	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 }
 
-static void hpu_rx_dma_callback(void *_buffer)
+static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *result)
 {
 	struct hpu_buf *buffer = _buffer;
 	struct hpu_priv *priv = buffer->priv;
+	int len = priv->dma_rx_pool.ps - result->residue;
 
 	dev_dbg(&priv->pdev->dev, "RX DMA cb\n");
 	priv->pkt_rxed++;
-	priv->byte_rxed += priv->dma_rx_pool.ps;
+	priv->byte_rxed += len;
 
 	spin_lock(&priv->dma_rx_pool.spin_lock);
 	priv->dma_rx_pool.filled++;
+	buffer->tail_index = len;
 
 	if (priv->dma_rx_pool.filled == 1) {
 		dev_dbg(&priv->pdev->dev, "RX DMA waking up reader\n");
@@ -532,14 +534,14 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 		dev_dbg(&priv->pdev->dev, "reading dma descriptor %d\n", index);
 
 		/* data still in buf */
-		buf_count = priv->dma_rx_pool.ps - item->fill_index;
+		buf_count = item->tail_index - item->head_index;
 		copy = min(length, buf_count);
 
 		dev_dbg(&priv->pdev->dev, "going to read %d bytes from offset %d\n",
-			length, item->fill_index);
+			length, item->head_index);
 
 		ret = __copy_to_user(buf + read,
-				     item->virt + item->fill_index, copy);
+				     item->virt + item->head_index, copy);
 		if (ret < 0) {
 			dev_warn(&priv->pdev->dev, "failed to copy from userspace");
 			break;
@@ -547,8 +549,8 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 		/* if ret > 0, then it is the number of _uncopied_ bytes */
 		copy -= ret;
 
-		BUG_ON((item->fill_index + copy) > priv->dma_rx_pool.ps);
-		if ((item->fill_index + copy) == priv->dma_rx_pool.ps) {
+		BUG_ON((item->head_index + copy) > item->tail_index);
+		if ((item->head_index + copy) == item->tail_index) {
 			/* Buffer fully read. */
 			dev_dbg(&priv->pdev->dev, "fully consumed\n");
 
@@ -570,10 +572,10 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			dma_async_issue_pending(priv->dma_rx_chan);
 		} else {
 			/* buffer partially consumed, advance in-buffer index */
-			item->fill_index += copy;
-			BUG_ON(item->fill_index >= priv->dma_rx_pool.ps);
+			item->head_index += copy;
+			BUG_ON(item->head_index >= item->tail_index);
 			dev_dbg(&priv->pdev->dev, "partially consumed, up to %d\n",
-				item->fill_index);
+				item->head_index);
 		}
 
 		read += copy;
@@ -667,7 +669,8 @@ static int hpu_dma_alloc_pool(struct hpu_priv *priv,
 
 	for (i = 0; i < hpu_pool->pn; i++) {
 		hpu_pool->ring[i].priv = priv;
-		hpu_pool->ring[i].fill_index = 0;
+		hpu_pool->ring[i].tail_index = 0;
+		hpu_pool->ring[i].head_index = 0;
 	}
 
 	hpu_pool->buf_index = 0;
@@ -708,13 +711,13 @@ static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
 	if (!dma_desc)
 		return -ENOMEM;
 
-	dma_desc->callback = hpu_rx_dma_callback;
+	dma_desc->callback_result = hpu_rx_dma_callback;
 	dma_desc->callback_param = buf;
 
 	cookie = dmaengine_submit(dma_desc);
 	buf->cookie = cookie;
 	/* this buffer is new and has to be fully read */
-	buf->fill_index = 0;
+	buf->head_index = 0;
 
 	return dma_submit_error(cookie);
 }
