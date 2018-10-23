@@ -69,3 +69,25 @@ Module parameters
 
 *tx_to* and *tx_pn:* as above, but on TX side.
 *tx_ps:* set the size of DMA TX buffers. Unlike RX, there is no minumum transfer size.
+
+Debugging stuff
+---------------
+
+You can enable driver debugging prints, provided that your kernel has been compiled with *dynamic printk* enabled (CONFIG_DYNAMIC_DEBUG=y), by loading the driver with the following command
+
+``` bash
+insmod iit-hpucore-dma.ko dyndbg==p
+```
+
+If your kernel supports *debug FS* (CONFIG_DEBUG_FS=y), you can snoop into the HPU registers by looking at */sys/kernel/debug/hpu/regdump.xxxxxxxx* (where 'xxxxxxxx' is the physical address of the HPU address space).
+
+Kernel requirements
+-------------------
+
+The DMA driver needs to be able to:
+- Enqueue new transfer requests while running
+- Support partial transfers (i.e. early-terminated transfers, providing residue information)
+
+EDL Zynq kernel (https://github.com/andreamerello/linux-zynq-stable) has been patched in order to accomplish to this requirements.
+
+Depending by [rx/tx]_[pn_ps] The HPU driver needs to allocate large portions of DMAable memory. Please make sure that CMA (Contiguous Memory Allocator) is enabled in kernel config (CONFIG_CMA=y) and that a reasonable amount of memory is reserved (e.g. append *CMA=32M* to your kernel arguments).
