@@ -882,11 +882,10 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	}
 
 	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
-	priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
 	priv->ctrl_reg |= HPU_CTRL_FULLTS;
-	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+	writel(priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
+	       priv->regs + HPU_CTRL_REG);
 
-	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 
@@ -905,23 +904,19 @@ err_dealloc_dma:
 
 static int hpu_chardev_close(struct inode *i, struct file *fp)
 {
-	uint32_t val;
 	struct hpu_priv *priv = fp->private_data;
 
 	mutex_lock(&priv->access_lock);
 
 	/* Read CTRL_Register and Disable The IP */
-	val = readl(priv->regs + HPU_CTRL_REG);
-	val = val & ~HPU_CTRL_ENDMA;
-	writel(val, priv->regs + HPU_CTRL_REG);
-
-	val = readl(priv->regs + HPU_CTRL_REG);
-	val = val | HPU_CTRL_RESETDMASTREAM;
-	writel(val, priv->regs + HPU_CTRL_REG);
-
-	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
-	priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
+        priv->ctrl_reg &= ~HPU_CTRL_ENDMA;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+
+	writel(priv->ctrl_reg | HPU_CTRL_RESETDMASTREAM,
+	       priv->regs + HPU_CTRL_REG);
+
+	writel(priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
+	       priv->regs + HPU_CTRL_REG);
 
 	writel(0x00000000, priv->regs + HPU_RXCTRL_REG);
 	writel(0x00000000, priv->regs + HPU_AUX_RXCTRL_REG);
@@ -988,7 +983,6 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	struct hpu_priv *priv = platform_get_drvdata(pdev);
 	irqreturn_t retval = 0;
 
-	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg &= ~HPU_CTRL_ENINT;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 
@@ -1065,7 +1059,6 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 		retval = IRQ_HANDLED;
 	}
 
-	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg |= HPU_CTRL_ENINT;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 
@@ -1111,7 +1104,6 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 			goto cfuser_err;
 
 		/* if dma is enabled then disable and also flush fifo */
-		priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
 		if (val)
 			priv->ctrl_reg |= HPU_CTRL_FULLTS;
 		else
@@ -1262,11 +1254,11 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
 			goto cfuser_err;
 
-		reg = readl(priv->regs + HPU_CTRL_REG);
-		reg &= ~(BIT(22) | BIT(23));
-		reg |= (val & 3) << 22;
-		writel(reg, priv->regs + HPU_CTRL_REG);
-		dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x", reg);
+		priv->ctrl_reg &= ~(BIT(22) | BIT(23));
+		priv->ctrl_reg |= (val & 3) << 22;
+		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+		dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
+			priv->ctrl_reg);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_BLK_TX_THR, unsigned int*):
@@ -1487,7 +1479,6 @@ static int hpu_remove(struct platform_device *pdev)
 
 	/* FIXME: resource release ! */
 	debugfs_remove_recursive(priv->debugfsdir);
-	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg &= ~HPU_CTRL_ENINT & ~HPU_CTRL_ENDMA;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 	free_irq(priv->irq, pdev);
