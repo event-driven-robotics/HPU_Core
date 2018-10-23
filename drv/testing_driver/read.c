@@ -19,29 +19,13 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <linux/i2c-dev.h>
-#include <linux/i2c.h>
-#include <linux/spi/spidev.h>
+#include <sys/wait.h>
+#include <sys/mman.h>
+
 
 /****************************************************************
  * Constants
  ****************************************************************/
-#define I2C_EYE_LEFT  0x10
-#define I2C_EYE_RIGHT 0x11
-#define AUTOINCR      0x80
-#define VSCTRL_VERSION	0x00005210
-
-#define INFO_REG        0x00
-#define SRCCNFG_REG		0x0C
-#define SRCDSTCTRL_REG	0x10
-#define DMA_REG         0x14
-#define HSSAERCNFG_REG	0x18
-#define BGCNFGCTRL_REG  0x20
-#define BGPRESCALER_REG 0x24
-#define BGTIMINGS_REG   0x28
-#define BGWRDATA_REG    0x30
-#define AUX_RX_CTRL_REG 0x60
-
 #define READ            0
 #define WRITE           1
 
@@ -76,15 +60,22 @@
 #define UNITY_TIMESTAMP         0.000000001
 
 #define IOC_MAGIC_NUMBER        0
-#define IOC_READ_TS             _IOR(IOC_MAGIC_NUMBER, 1, unsigned int *)
-#define IOC_CLEAR_TS            _IOW(IOC_MAGIC_NUMBER, 2, unsigned int *)
-#define IOC_SET_TS_TYPE         _IOW(IOC_MAGIC_NUMBER, 7, unsigned int *)
-#define IOC_GET_RX_PS           _IOR(IOC_MAGIC_NUMBER, 9, unsigned int *)
-#define IOC_SET_LOOP_CFG        _IOW(IOC_MAGIC_NUMBER, 18, unsigned int *)
-#define IOC_SET_SPINN           _IOW(IOC_MAGIC_NUMBER, 19, unsigned int *)
-#define IOC_GET_TX_PS           _IOR(IOC_MAGIC_NUMBER, 20, unsigned int *)
-#define IOCTL_SET_BLK_TX_THR	_IOW(IOC_MAGIC_NUMBER, 21, unsigned int *)
-#define IOCTL_SET_BLK_RX_THR	_IOW(IOC_MAGIC_NUMBER, 22, unsigned int *)
+#define IOC_READ_TS			_IOR(IOC_MAGIC_NUMBER, 1, unsigned int *)
+#define IOC_CLEAR_TS			_IOW(IOC_MAGIC_NUMBER, 2, unsigned int *)
+#define IOC_SET_TS_TYPE			_IOW(IOC_MAGIC_NUMBER, 7, unsigned int *)
+#define IOC_GET_RX_PS			_IOR(IOC_MAGIC_NUMBER, 9, unsigned int *)
+#define IOC_SET_LOOP_CFG		_IOW(IOC_MAGIC_NUMBER, 18, unsigned int *)
+#define IOC_SET_SPINN			_IOW(IOC_MAGIC_NUMBER, 19, unsigned int *)
+#define IOC_GET_TX_PS			_IOR(IOC_MAGIC_NUMBER, 20, unsigned int *)
+#define IOCTL_SET_BLK_TX_THR		_IOW(IOC_MAGIC_NUMBER, 21, unsigned int *)
+#define IOCTL_SET_BLK_RX_THR		_IOW(IOC_MAGIC_NUMBER, 22, unsigned int *)
+#define IOC_SET_SPINN_STARTSTOP		_IOW(IOC_MAGIC_NUMBER, 25, spinn_loop_t *)
+
+typedef enum {
+	LOOP_NONE,
+	LOOP_LNEAR,
+	LOOP_LSPINN,
+} spinn_loop_t;
 
 
 unsigned int data[65536], wdata[65536];
@@ -104,7 +95,7 @@ void write_data(int chunk_size, int chunk_num)
 	for (i = 0; i < chunk_num; i++) {
 		for (j = 0; j < chunk_size; j++) {
 			wdata[j * 2] = 0;
-			wdata[j * 2 + 1] = (0xcafe << 16) |
+			wdata[j * 2 + 1] = (0x5a << 16) |
 				((i * chunk_size + j) & 0xffff);
 		}
 		ret = write(iit_hpu, wdata, 8 * chunk_size);
@@ -124,7 +115,7 @@ void read_data(int chunk_size, int chunk_num)
 		if (ret != 8 * chunk_size)
 			printf("read returned %d\n", ret);
 		for (j = 0; j < chunk_size; j++) {
-			tmp = (0xcafe << 16) | ((i * chunk_size + j) & 0xffff);
+			tmp = (0x5a << 16) | ((i * chunk_size + j) & 0xffff);
 			tmp2 = data[j * 2 + 1];
 			if (tmp2 != tmp)
 				printf("error at %d,%d: %x %x\n", i, j,tmp2, tmp);
@@ -156,13 +147,15 @@ void read_thr_data(int chunk_size, int chunk_num)
 			printf("read finished with %d\n", chunk);
 
 		for (j = 0; j < chunk_size; j++) {
-			tmp = (0xcafe << 16) | ((i * chunk_size + j) & 0xffff);
+			tmp = (0x5a << 16) | ((i * chunk_size + j) & 0xffff);
 			tmp2 = data[j * 2 + 1];
 			if (tmp2 != tmp)
 				printf("error at %d,%d: %x %x\n", i, j,tmp2, tmp);
 		}
 	}
 }
+
+const int loop_near = 0;
 
 int main(int argc, char * argv[])
 {
@@ -171,9 +164,10 @@ int main(int argc, char * argv[])
 	unsigned int timestamp = 0;
 	unsigned int rx_ps, tx_ps;
 	int val;
+	spinn_loop_t loop;
 	clock_t time;
 	double time_sec;
-
+	pid_t pid;
 	unsigned int size;
 	int iter_count = 1000;
 	int tx_size = 512;
@@ -184,6 +178,10 @@ int main(int argc, char * argv[])
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGTERM, handle_kill);
 	signal(SIGINT, handle_kill);
+
+	mlockall(MCL_CURRENT|MCL_FUTURE);
+	memset(wdata, 0, sizeof(wdata) / sizeof(wdata[0]));
+	memset(data, 0, sizeof(data) / sizeof(data[0]));
 
 	iit_hpu = open("/dev/iit-hpu0",O_RDWR);
 	if(iit_hpu < 0) {
@@ -202,8 +200,15 @@ int main(int argc, char * argv[])
 	else
 		printf("TX Pool size = %d\n", tx_ps);
 
-	val = 3;
-	ioctl(iit_hpu, IOC_SET_LOOP_CFG, &val);
+	if (loop_near) {
+		loop = LOOP_LNEAR;
+		ioctl(iit_hpu, IOC_SET_LOOP_CFG, &loop);
+	} else {
+		loop = LOOP_LSPINN;
+		ioctl(iit_hpu, IOC_SET_LOOP_CFG, &loop);
+		val = 1;
+		ioctl(iit_hpu, IOC_SET_SPINN_STARTSTOP, &val);
+	}
 	val = 1;
 	ioctl(iit_hpu, IOC_SET_SPINN, &val);
 
@@ -246,19 +251,33 @@ int main(int argc, char * argv[])
 	}
 	printf("phase 4 OK\n");
 
-	/* tot RX desc = 100 * 32 * 1024 * 8  / 8192 = 3200 */
-	iter_count = 20;
-	rx_n = 4;
-	tx_n = 32;
+	size = 0x7fff0000;
+	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
 
-	tx_size = 1024;
+	/* tot RX desc = 100 * 32 * 1024 * 8  / 8192 = 3200 */
+	iter_count = 100;
+	rx_n = 4;
+	tx_n = 8;
+
+	tx_size = 4096;
 	rx_size = 8192;
 	int tot_data = iter_count * tx_size * tx_n * 8;
 
-	if (fork() == 0) {
+	for (i = 0; i < (65536 / 4); i++) {
+		/* halves throughtput */
+		((unsigned int*)wdata)[i] = i % 32 ? 0 : 1;//62;
+//		((unsigned int*)wdata)[i] = 0;//62;
+	}
+
+	pid = fork();
+	if (pid == 0) {
 		for (i = 0; i < iter_count; i++) {
 			for (j = 0; j < rx_n; j++) {
-				read(iit_hpu, data, 8 * rx_size);
+				ret = read(iit_hpu, data, 8 * rx_size);
+				if (ret != 8 * rx_size) {
+					printf("err RX %d - %d\n", ret, errno);
+					return -1;
+				}
 			}
 		}
 
@@ -268,7 +287,9 @@ int main(int argc, char * argv[])
 		time = clock();
 		for (i = 0; i < iter_count; i++) {
 			for (j = 0; j < tx_n; j++) {
-				write(iit_hpu, wdata, 8 * tx_size);
+				ret = write(iit_hpu, wdata, 8 * tx_size);
+				if (ret != 8 * tx_size)
+					printf("err TX %d\n", ret);
 			}
 		}
 
@@ -276,6 +297,7 @@ int main(int argc, char * argv[])
 		time_sec = (double)time / CLOCKS_PER_SEC;
 		printf("RTX throughtput %f MBps\n",
 		       (double)tot_data / time_sec / 1024.0 / 1024.0);
+		waitpid(pid, 0, 0);
 	}
 
 	return 0;
