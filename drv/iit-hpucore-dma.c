@@ -881,8 +881,8 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		writel(msk, priv->regs + HPU_IRQMASK_REG);
 	}
 
-	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
-	priv->ctrl_reg |= HPU_CTRL_FULLTS;
+	/* Initialize HPU with full TS, no loop */
+	priv->ctrl_reg = HPU_CTRL_FULLTS;
 	writel(priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
 	       priv->regs + HPU_CTRL_REG);
 
