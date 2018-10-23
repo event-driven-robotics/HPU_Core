@@ -32,6 +32,7 @@
 #include <linux/dma-mapping.h>
 #include <linux/dmapool.h>
 #include <linux/interrupt.h>
+#include <linux/stringify.h>
 
 /* max HPUs that can be handled */
 #define HPU_MINOR_COUNT 10
@@ -281,12 +282,15 @@ struct hpu_priv {
 	size_t rx_blocking_threshold;
 	size_t tx_blocking_threshold;
 	enum fifo_status rx_fifo_status;
-	unsigned int cnt_pktloss;
-	int pkt_txed;
+	unsigned long cnt_pktloss;
+	unsigned long pkt_txed;
 	unsigned long byte_txed;
-	int pkt_rxed;
+	unsigned long pkt_rxed;
 	unsigned long byte_rxed;
 };
+
+#define HPU_DEBUGFS_ULONG(priv, x) debugfs_create_ulong(__stringify(x), 0444, \
+				   priv->debugfsdir, &priv->x);
 
 static struct dentry *hpu_debugfsdir = NULL;
 static struct class *hpu_class = NULL;
@@ -1467,6 +1471,11 @@ static int hpu_probe(struct platform_device *pdev)
 		regset->nregs = ARRAY_SIZE(hpu_regs);
 		regset->base = priv->regs;
 		debugfs_create_regset32("regdump", 0444, priv->debugfsdir, regset);
+		HPU_DEBUGFS_ULONG(priv, cnt_pktloss);
+		HPU_DEBUGFS_ULONG(priv, pkt_txed);
+		HPU_DEBUGFS_ULONG(priv, pkt_rxed);
+		HPU_DEBUGFS_ULONG(priv, byte_txed);
+		HPU_DEBUGFS_ULONG(priv, byte_rxed);
 	}
 
 	return 0;
