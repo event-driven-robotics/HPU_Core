@@ -271,7 +271,6 @@ struct hpu_priv {
 	uint32_t ctrl_reg;
 	uint32_t rx_ctrl_reg;
 	uint32_t rx_aux_ctrl_reg;
-	wait_queue_head_t wait;
 
 	/* dma */
 	struct hpu_dma_pool dma_rx_pool;
