@@ -259,7 +259,6 @@ enum fifo_status {
 
 struct hpu_priv {
 	struct file_operations fops;
-	struct dentry *regset;
 	struct cdev cdev;
 	struct platform_device *pdev;
 	dev_t devt;
@@ -271,6 +270,7 @@ struct hpu_priv {
 	uint32_t ctrl_reg;
 	uint32_t rx_ctrl_reg;
 	uint32_t rx_aux_ctrl_reg;
+	struct dentry *debugfsdir;
 
 	/* dma */
 	struct hpu_dma_pool dma_rx_pool;
@@ -1454,16 +1454,19 @@ static int hpu_probe(struct platform_device *pdev)
 
 	hpu_register_chardev(priv);
 
-	sprintf(buf, "regdump.%x", res->start);
 	if (hpu_debugfsdir) {
+		sprintf(buf, "hpu.%x", res->start);
+		priv->debugfsdir = debugfs_create_dir(buf, hpu_debugfsdir);
+	}
+
+	if (priv->debugfsdir) {
 		regset = devm_kzalloc(&pdev->dev, sizeof(*regset), GFP_KERNEL);
 		if (!regset)
 			return 0;
 		regset->regs = hpu_regs;
 		regset->nregs = ARRAY_SIZE(hpu_regs);
 		regset->base = priv->regs;
-
-		priv->regset = debugfs_create_regset32(buf, 0444, hpu_debugfsdir, regset);
+		debugfs_create_regset32("regdump", 0444, priv->debugfsdir, regset);
 	}
 
 	return 0;
@@ -1474,7 +1477,7 @@ static int hpu_remove(struct platform_device *pdev)
 	struct hpu_priv *priv = platform_get_drvdata(pdev);
 
 	/* FIXME: resource release ! */
-	debugfs_remove(priv->regset);
+	debugfs_remove_recursive(priv->debugfsdir);
 	priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
 	priv->ctrl_reg &= ~HPU_CTRL_ENINT & ~HPU_CTRL_ENDMA;
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
