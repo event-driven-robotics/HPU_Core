@@ -859,16 +859,16 @@ HPUCORE_i : HPUCore
         -- ADD USER GENERICS BELOW THIS LINE ---------------
 
         C_PAER_DSIZE               	=> 24,				--	: natural range 1 to 29   := 24;
-        C_RX_HAS_PAER              	=> false,			--	: boolean                 := true;
+        C_RX_HAS_PAER              	=> true,			--	: boolean                 := true;
         C_RX_HAS_HSSAER            	=> false,			--	: boolean                 := true;
         C_RX_HSSAER_N_CHAN         	=> 3,				--	: natural range 1 to 4    := 3;
         C_RX_HAS_GTP               	=> false,			--	: boolean                 := true;
-        C_RX_HAS_SPNNLNK          	=> true,			--	: boolean                 := true;
+        C_RX_HAS_SPNNLNK          	=> false,			--	: boolean                 := true;
         C_TX_HAS_PAER              	=> false,			--	: boolean                 := true;
         C_TX_HAS_HSSAER            	=> false,			--	: boolean                 := true;
         C_TX_HSSAER_N_CHAN         	=> 2,				--	: natural range 1 to 4    := 2;
         C_TX_HAS_GTP               	=> false,			--	: boolean                 := true;
-        C_TX_HAS_SPNNLNK          	=> true,			--	: boolean                 := true;
+        C_TX_HAS_SPNNLNK          	=> false,			--	: boolean                 := true;
         C_DEBUG                    	=> false,			--	: boolean                 := false;
 
         -- ADD USER GENERICS ABOVE THIS LINE ---------------
@@ -1112,7 +1112,7 @@ Enable_AER_Proc : process
 		wait for 100 us;
 		AER_device_enable_L   <= '0';
 		AER_device_enable_R   <= '0';
-		AER_device_enable_Aux <= '0';
+		AER_device_enable_Aux <= '1';
 		AER_device_enable_Tx  <= '0';
 		wait;
 end process Enable_AER_Proc;
@@ -1125,12 +1125,12 @@ Enable_SPNN_Proc : process
 		SPNN_device_enable_Tx  <= '1';
 
 		wait for 100 us;
-		SPNN_device_enable_L   <= '0';
-		SPNN_device_enable_R   <= '0';
-		SPNN_device_enable_Tx  <= '0';
+		SPNN_device_enable_L   <= '1';
+		SPNN_device_enable_R   <= '1';
+		SPNN_device_enable_Tx  <= '1';
 		
 		wait for 348 us;
-	    SPNN_device_enable_Aux <= '0';
+	    SPNN_device_enable_Aux <= '1';
 		wait;
 end process Enable_SPNN_Proc;
 

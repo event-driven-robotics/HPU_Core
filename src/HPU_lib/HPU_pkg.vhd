@@ -131,7 +131,8 @@ package HPUComponents_pkg is
             ---------------------
             -- Control
             CleanTimer_i            : in  std_logic;
-            FlushFifos_i            : in  std_logic;
+            FlushRXFifos_i          : in  std_logic;
+            FlushTXFifos_i          : in  std_logic;        
             --TxEnable_i              : in  std_logic;
             --TxPaerFlushFifos_i      : in  std_logic;
             --LRxEnable_i             : in  std_logic;
@@ -309,7 +310,11 @@ port (
     fulltimestamp_o                : out std_logic;
 
     CleanTimer_o                   : out std_logic;
-    FlushFifos_o                   : out std_logic;
+    FlushRXFifos_o                 : out std_logic;
+    FlushTXFifos_o                 : out std_logic;
+    LatTlast_o                     : out std_logic;
+    TlastCnt_i                     : in  std_logic_vector(31 downto 0);
+    TlastTO_o                      : out std_logic_vector(31 downto 0);
     --TxEnable_o                     : out std_logic;
     --TxPaerFlushFifos_o             : out std_logic;
     --LRxEnable_o                    : out std_logic;
@@ -432,6 +437,9 @@ port (
             DMA_is_running_o       : out std_logic;
             DmaLength_i            : in  std_logic_vector(10 downto 0);
             ResetStream_i          : in  std_logic;
+            LatTlat_i              : in  std_logic;
+            TlastCnt_o             : out std_logic_vector(31 downto 0);
+            TlastTO_i              : in  std_logic_vector(31 downto 0);
             -- From Fifo to core/dma
             FifoCoreDat_i          : in  std_logic_vector(31 downto 0);
             FifoCoreRead_o         : out std_logic;

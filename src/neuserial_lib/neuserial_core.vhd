@@ -140,7 +140,8 @@ entity neuserial_core is
         ---------------------
         -- Control
         CleanTimer_i            : in  std_logic;
-        FlushFifos_i            : in  std_logic;
+        FlushRXFifos_i          : in  std_logic;
+        FlushTXFifos_i          : in  std_logic;        
         --TxEnable_i              : in  std_logic;
         --TxPaerFlushFifos_i      : in  std_logic;
         --LRxEnable_i             : in  std_logic;
@@ -1042,7 +1043,8 @@ begin
             Reset_xRBI              => nRst,                     -- in  std_logic;
             CoreClk_xCI             => Clk_core,                 -- in  std_logic;
             --
-            FlushFifos_xSI          => FlushFifos_i,             -- in  std_logic;
+            FlushRXFifos_xSI        => FlushRXFifos_i,           -- in  std_logic;
+            FlushTXFifos_xSI        => FlushTXFifos_i,           -- in  std_logic;
             --ChipType_xSI            => ChipType,                 -- in  std_logic;
             DmaLength_xDI           => DmaLength_i,              -- in  std_logic_vector(10 downto 0);
             --
