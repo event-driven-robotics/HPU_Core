@@ -220,7 +220,6 @@ MODULE_PARM_DESC(tx_pn, "TX Pool num");
 module_param(tx_to, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 MODULE_PARM_DESC(tx_to, "TX DMA TimeOut in ms");
 
-
 enum hssaersrc { left_eye = 0, right_eye, aux, spinn };
 
 typedef struct ch_en_hssaer {
