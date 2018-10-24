@@ -1171,6 +1171,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 	aux_cnt_t aux_cnt_reg;
 	ch_en_hssaer_t ch_en_hssaer;
 	spinn_keys_t spinn_keys;
+	spinn_loop_t loop;
 	unsigned int reg;
 	unsigned int val = 0;
 	int res = 0;
@@ -1352,11 +1353,11 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_LOOP_CFG, unsigned int *):
-		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
+		if (copy_from_user(&loop, (unsigned int *)arg, sizeof(spinn_loop_t)))
 			goto cfuser_err;
 
 		priv->ctrl_reg &= ~(HPU_CTRL_LOOP_LNEAR | HPU_CTRL_LOOP_SPINN);
-		switch (val) {
+		switch (loop) {
 		case LOOP_LSPINN:
 			priv->ctrl_reg |= HPU_CTRL_LOOP_SPINN;
 			break;
