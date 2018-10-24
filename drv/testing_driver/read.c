@@ -64,18 +64,36 @@
 #define IOC_CLEAR_TS			_IOW(IOC_MAGIC_NUMBER, 2, unsigned int *)
 #define IOC_SET_TS_TYPE			_IOW(IOC_MAGIC_NUMBER, 7, unsigned int *)
 #define IOC_GET_RX_PS			_IOR(IOC_MAGIC_NUMBER, 9, unsigned int *)
-#define IOC_SET_LOOP_CFG		_IOW(IOC_MAGIC_NUMBER, 18, unsigned int *)
-#define IOC_SET_SPINN			_IOW(IOC_MAGIC_NUMBER, 19, unsigned int *)
+#define IOC_SET_LOOP_CFG		_IOW(IOC_MAGIC_NUMBER, 18, spinn_loop_t *)
 #define IOC_GET_TX_PS			_IOR(IOC_MAGIC_NUMBER, 20, unsigned int *)
 #define IOCTL_SET_BLK_TX_THR		_IOW(IOC_MAGIC_NUMBER, 21, unsigned int *)
 #define IOCTL_SET_BLK_RX_THR		_IOW(IOC_MAGIC_NUMBER, 22, unsigned int *)
-#define IOC_SET_SPINN_STARTSTOP		_IOW(IOC_MAGIC_NUMBER, 25, spinn_loop_t *)
+#define IOC_SET_SPINN_STARTSTOP		_IOW(IOC_MAGIC_NUMBER, 25, unsigned int *)
+#define IOC_SET_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 26, hpu_interface_ioctl_t *)
 
 typedef enum {
 	LOOP_NONE,
 	LOOP_LNEAR,
 	LOOP_LSPINN,
 } spinn_loop_t;
+
+typedef enum {
+	INTERFACE_EYE_R,
+	INTERFACE_EYE_L,
+	INTERFACE_AUX
+} hpu_interface_t;
+
+typedef struct {
+	int hssaer[4];
+	int gtp;
+	int paer;
+	int spinn;
+} hpu_interface_cfg_t;
+
+typedef struct {
+	hpu_interface_t interface;
+	hpu_interface_cfg_t cfg;
+} hpu_interface_ioctl_t;
 
 
 unsigned int data[65536], wdata[65536];
@@ -174,6 +192,7 @@ int main(int argc, char * argv[])
 	int rx_size = 512;
 	int tx_n = 32;
 	int rx_n = 32;
+	hpu_interface_ioctl_t iface;
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGTERM, handle_kill);
@@ -206,12 +225,14 @@ int main(int argc, char * argv[])
 	} else {
 		loop = LOOP_LSPINN;
 		ioctl(iit_hpu, IOC_SET_LOOP_CFG, &loop);
+
+		memset((void*)&iface, 0, sizeof(iface));
+		iface.interface = INTERFACE_AUX;
+		iface.cfg.spinn = 1;
+		ioctl(iit_hpu, IOC_SET_INTERFACE, &iface);
 		val = 1;
 		ioctl(iit_hpu, IOC_SET_SPINN_STARTSTOP, &val);
 	}
-	val = 1;
-	ioctl(iit_hpu, IOC_SET_SPINN, &val);
-
 	// Set TimeStamp size
 	timestamp = 1;
 	ioctl(iit_hpu, IOC_SET_TS_TYPE, &timestamp);
