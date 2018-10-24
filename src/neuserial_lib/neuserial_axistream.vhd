@@ -111,9 +111,9 @@ begin
                     i_timeexpired <= '0';
                     if (i_M_AXIS_TVALID = '1' and M_AXIS_TREADY = '1') then
                         i_sentdata <= '1';
-                    else
-                        i_timeexpired <= '1';
                     end if;
+                else
+                    i_timeexpired <= '1';
                 end if;
             end if;
         end if;
@@ -174,6 +174,8 @@ begin
         end if;
     end process tlast_p;
     
+    M_AXIS_TLAST <= i_M_AXIS_TLAST;
+
     FifoCoreRead_o <= (M_AXIS_TREADY and i_M_AXIS_TVALID and not (FifoCoreEmpty_i)) when DMA_test_mode_i='0' else
                       '0';
 
