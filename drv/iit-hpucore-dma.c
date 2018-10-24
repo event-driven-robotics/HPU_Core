@@ -900,6 +900,131 @@ static int hpu_spinn_set_keys(struct hpu_priv *priv, u32 start, u32 stop)
 	return 0;
 }
 
+static int hpu_set_spinn(struct hpu_priv *priv, unsigned int val)
+{
+
+	if (val != !!val)
+		return -EINVAL;
+
+	if (val) {
+		priv->rx_aux_ctrl_reg |= HPU_AUXCTRL_AUXSPINN_EN;
+		priv->rx_ctrl_reg |= HPU_RXCTRL_SPINNL_EN |
+			HPU_RXCTRL_SPINNR_EN;
+		/* magic from Maurizio */
+		writel(0x68, priv->regs + HPU_TXCTRL_REG);
+		dev_dbg(&priv->pdev->dev, "spinn enable\n");
+	} else {
+		priv->rx_aux_ctrl_reg &= ~HPU_AUXCTRL_AUXSPINN_EN;
+		priv->rx_ctrl_reg &= ~(HPU_RXCTRL_SPINNL_EN |
+				       HPU_RXCTRL_SPINNR_EN);
+		/* TX reg to reset val as per FD datasheet */
+		writel(0x0, priv->regs + HPU_TXCTRL_REG);
+		dev_dbg(&priv->pdev->dev, "spinn disable\n");
+	}
+	writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
+	writel(priv->rx_aux_ctrl_reg, priv->regs + HPU_AUX_RXCTRL_REG);
+	dev_dbg(&priv->pdev->dev, "spinn - AUXRXCTRL reg 0x%x",
+		priv->rx_aux_ctrl_reg);
+
+	return 0;
+}
+
+static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
+{
+	priv->ctrl_reg &= ~(HPU_CTRL_LOOP_LNEAR | HPU_CTRL_LOOP_SPINN);
+	switch (loop) {
+	case LOOP_LSPINN:
+		priv->ctrl_reg |= HPU_CTRL_LOOP_SPINN;
+		break;
+
+	case LOOP_LNEAR:
+		priv->ctrl_reg |= HPU_CTRL_LOOP_LNEAR;
+		break;
+
+	case LOOP_NONE:
+		break;
+	default:
+		dev_notice(&priv->pdev->dev,
+			   "set loop - invalid arg %d\n", loop);
+		return -EINVAL;
+		break;
+	}
+
+	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+	dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
+		priv->ctrl_reg);
+
+	return 0;
+}
+
+static int hpu_set_hssaer_ch(struct hpu_priv *priv, ch_en_hssaer_t ch_en_hssaer)
+{
+	if (ch_en_hssaer.hssaer_src < left_eye ||
+	    ch_en_hssaer.hssaer_src > aux) {
+		dev_err(&priv->pdev->dev,
+			"Error in enabling channels\n");
+		return -EINVAL;
+	}
+
+	if (ch_en_hssaer.hssaer_src == aux) {
+		priv->rx_aux_ctrl_reg |=
+			HPU_AUXCTRL_AUXRXHSSAER_EN |
+			((ch_en_hssaer.en_channels) << 8);
+		writel(priv->rx_aux_ctrl_reg,
+		       priv->regs + HPU_AUX_RXCTRL_REG);
+	} else {
+		/* don't overwrite spinn cfg, clear the rest */
+		priv->rx_ctrl_reg &= HPU_RXCTRL_SPINNL_EN |
+			HPU_RXCTRL_SPINNR_EN;
+		if (ch_en_hssaer.hssaer_src == left_eye) {
+			priv->rx_ctrl_reg |= HPU_RXCTRL_LRXHSSAER_EN |
+				(ch_en_hssaer.en_channels << 8);
+		} else {	/* right */
+			priv->rx_ctrl_reg |= HPU_RXCTRL_RRXHSSAER_EN |
+				(ch_en_hssaer.en_channels << 24);
+		}
+	}
+	writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
+
+	return 0;
+}
+
+static void hpu_set_aux_thrs(struct hpu_priv *priv, aux_cnt_t aux_cnt_reg)
+{
+	unsigned int reg;
+
+	reg = readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+	/* Normalize to num of errors, avoiding not valid errors */
+	aux_cnt_reg.err = aux_cnt_reg.err % nomeaning_err;
+	/* Clear the relevant byte */
+	reg = reg & (~((0xFF) << (aux_cnt_reg.err * 8)));
+	/* Write the register */
+	writel((0xFF & aux_cnt_reg.cnt_val) <<
+	       (aux_cnt_reg.err * 8) | reg,
+		       priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+	/* Read and print the register */
+	reg = readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+
+	dev_dbg(&priv->pdev->dev,
+		"HPU_AUX_RX_ERR_THRS_REG 0x%08X\n", reg);
+}
+
+static int hpu_set_timestamp(struct hpu_priv *priv, unsigned int val)
+{
+	if (val != !!val)
+		return -EINVAL;
+
+	/* if dma is enabled then disable and also flush fifo */
+	if (val)
+		priv->ctrl_reg |= HPU_CTRL_FULLTS;
+	else
+		priv->ctrl_reg &= ~HPU_CTRL_FULLTS;
+
+	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+
+	return 0;
+}
+
 static int hpu_chardev_open(struct inode *i, struct file *f)
 {
 	int ret = 0;
@@ -1165,27 +1290,24 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	return retval;
 }
 
-static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
+static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 {
+	void *arg = (void*) _arg;
 	unsigned int ret;
 	aux_cnt_t aux_cnt_reg;
 	ch_en_hssaer_t ch_en_hssaer;
 	spinn_keys_t spinn_keys;
 	spinn_loop_t loop;
-	unsigned int reg;
 	unsigned int val = 0;
 	int res = 0;
-
 	struct hpu_priv *priv = fp->private_data;
 
 	dev_dbg(&priv->pdev->dev, "ioctl %x\n", cmd);
 
 	switch (cmd) {
-
 	case _IOR(0x0, HPU_IOCTL_READTIMESTAMP, unsigned int):
 		ret = readl(priv->regs + HPU_WRAP_REG);
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
@@ -1195,216 +1317,116 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 
 	case _IOR(0x0, HPU_IOCTL_READVERSION, unsigned int):
 		ret = readl(priv->regs + HPU_VER_REG);
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		dev_info(&priv->pdev->dev, "Reading version %d\n", ret);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SETTIMESTAMP, unsigned int *):
-		if (copy_from_user(&val, (unsigned int *) arg, sizeof(val)))
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
-
-		/* if dma is enabled then disable and also flush fifo */
-		if (val)
-			priv->ctrl_reg |= HPU_CTRL_FULLTS;
-		else
-			priv->ctrl_reg &= ~HPU_CTRL_FULLTS;
-
-		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+		res = hpu_set_timestamp(priv, val);
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_RX_PS, unsigned int *):
 		ret = priv->dma_rx_pool.ps;
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_TX_PS, unsigned int *):
 		ret = priv->dma_tx_pool.ps;
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_AUX_THRS, struct aux_cnt *):
-		if (copy_from_user(&aux_cnt_reg, (struct aux_cnt*)arg,
-				   sizeof(aux_cnt_reg)))
+		if (copy_from_user(&aux_cnt_reg, arg, sizeof(aux_cnt_reg)))
 			goto cfuser_err;
-
-		reg = readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
-		/* Normalize to num of errors, avoiding not valid errors */
-		aux_cnt_reg.err = aux_cnt_reg.err % nomeaning_err;
-		/* Clear the relevant byte */
-		reg = reg & (~((0xFF) << (aux_cnt_reg.err * 8)));
-		/* Write the register */
-		writel((0xFF & aux_cnt_reg.cnt_val) <<
-		       (aux_cnt_reg.err * 8) | reg,
-		       priv->regs + HPU_AUX_RX_ERR_THRS_REG);
-		/* Read and print the register */
-		reg = readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
-
-		dev_dbg(&priv->pdev->dev,
-			"HPU_AUX_RX_ERR_THRS_REG 0x%08X\n", reg);
-
+		hpu_set_aux_thrs(priv, aux_cnt_reg);
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_THRS, unsigned int *):
 		ret = readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT0, unsigned int *):
 		ret = readl(priv->regs + HPU_AUX_RX_ERR_CH0_REG);
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT1, unsigned int *):
 		ret = readl(priv->regs + HPU_AUX_RX_ERR_CH1_REG);
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT2, unsigned int *):
 		ret = readl(priv->regs + HPU_AUX_RX_ERR_CH2_REG);
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT3, unsigned int *):
 		ret = readl(priv->regs + HPU_AUX_RX_ERR_CH3_REG);
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_LOST_CNT, unsigned int *):
 		ret = priv->cnt_pktloss;
 		priv->cnt_pktloss = 0;
-		if (copy_to_user((unsigned int *)arg, &ret,
-				 sizeof(unsigned int)))
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_HSSAER_CH, struct ch_en_hssaer *):
-		if (copy_from_user(&ch_en_hssaer, (struct ch_en_hssaer *)arg,
-				   sizeof(ch_en_hssaer)))
+		if (copy_from_user(&ch_en_hssaer, arg, sizeof(ch_en_hssaer)))
 			goto cfuser_err;
-
-		if (ch_en_hssaer.hssaer_src < left_eye ||
-		    ch_en_hssaer.hssaer_src > aux) {
-			dev_err(&priv->pdev->dev,
-			       "Error in enabling channels\n");
-			return -EINVAL;
-		} else {
-			if (ch_en_hssaer.hssaer_src == aux) {
-				priv->rx_aux_ctrl_reg |=
-					HPU_AUXCTRL_AUXRXHSSAER_EN |
-					((ch_en_hssaer.en_channels) << 8);
-				writel(priv->rx_aux_ctrl_reg,
-				       priv->regs + HPU_AUX_RXCTRL_REG);
-			} else {
-				/* don't overwrite spinn cfg, clear the rest */
-				priv->rx_ctrl_reg &= HPU_RXCTRL_SPINNL_EN |
-					HPU_RXCTRL_SPINNR_EN;
-				if (ch_en_hssaer.hssaer_src == left_eye) {
-					reg |= HPU_RXCTRL_LRXHSSAER_EN |
-						(ch_en_hssaer.en_channels << 8);
-				} else {	/* right */
-					reg |= HPU_RXCTRL_RRXHSSAER_EN |
-						(ch_en_hssaer.en_channels << 24);
-				}
-			}
-			writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
-		}
+		res = hpu_set_hssaer_ch(priv, ch_en_hssaer);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_SPINN, unsigned int *):
-		if (copy_from_user(&val, (unsigned int *) arg, sizeof(val))) {
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
-		} else {
-			if (val) {
-				priv->rx_aux_ctrl_reg |= HPU_AUXCTRL_AUXSPINN_EN;
-				priv->rx_ctrl_reg |= HPU_RXCTRL_SPINNL_EN |
-					HPU_RXCTRL_SPINNR_EN;
-				/* magic from Maurizio */
-				writel(0x68, priv->regs + HPU_TXCTRL_REG);
-				dev_dbg(&priv->pdev->dev, "spinn enable\n");
-			} else {
-				priv->rx_aux_ctrl_reg &= ~HPU_AUXCTRL_AUXSPINN_EN;
-				priv->rx_ctrl_reg &= ~(HPU_RXCTRL_SPINNL_EN |
-						       HPU_RXCTRL_SPINNR_EN);
-				/* TX reg to reset val as per FD datasheet */
-				writel(0x0, priv->regs + HPU_TXCTRL_REG);
-				dev_dbg(&priv->pdev->dev, "spinn disable\n");
-			}
-			writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
-			writel(priv->rx_aux_ctrl_reg, priv->regs + HPU_AUX_RXCTRL_REG);
-			dev_dbg(&priv->pdev->dev, "spinn - AUXRXCTRL reg 0x%x",
-				priv->rx_aux_ctrl_reg);
-		}
+		res = hpu_set_spinn(priv, val);
 		break;
 
-	case _IOW(0x0, HPU_IOCTL_SET_LOOP_CFG, unsigned int *):
-		if (copy_from_user(&loop, (unsigned int *)arg, sizeof(spinn_loop_t)))
+	case _IOW(0x0, HPU_IOCTL_SET_LOOP_CFG, spinn_loop_t *):
+		if (copy_from_user(&loop, arg, sizeof(spinn_loop_t)))
 			goto cfuser_err;
-
-		priv->ctrl_reg &= ~(HPU_CTRL_LOOP_LNEAR | HPU_CTRL_LOOP_SPINN);
-		switch (loop) {
-		case LOOP_LSPINN:
-			priv->ctrl_reg |= HPU_CTRL_LOOP_SPINN;
-			break;
-
-		case LOOP_LNEAR:
-			priv->ctrl_reg |= HPU_CTRL_LOOP_LNEAR;
-			break;
-
-		case LOOP_NONE:
-			break;
-		default:
-			dev_notice(&priv->pdev->dev,
-				   "set loop - invalid arg %d\n", val);
-			res = -EINVAL;
-			goto exit;
-		}
-		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
-		dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
-			priv->ctrl_reg);
+		res = hpu_set_loop_cfg(priv, loop);
 		break;
 
-	case _IOW(0x0, HPU_IOCTL_SET_BLK_TX_THR, unsigned int*):
-		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
+	case _IOW(0x0, HPU_IOCTL_SET_BLK_TX_THR, unsigned int *):
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
 		priv->tx_blocking_threshold = val;
 		break;
 
-	case _IOW(0x0, HPU_IOCTL_SET_BLK_RX_THR, unsigned int*):
-		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
+	case _IOW(0x0, HPU_IOCTL_SET_BLK_RX_THR, unsigned int *):
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
 		priv->rx_blocking_threshold = val;
 		break;
 
-	case _IOW(0x0, HPU_IOCTL_SET_SPINN_KEYS, unsigned int*):
-		if (copy_from_user(&spinn_keys, (unsigned int *)arg, sizeof(spinn_keys_t)))
+	case _IOW(0x0, HPU_IOCTL_SET_SPINN_KEYS, spinn_keys_t *):
+		if (copy_from_user(&spinn_keys, arg, sizeof(spinn_keys_t)))
 			goto cfuser_err;
 		res = hpu_spinn_set_keys(priv, spinn_keys.start, spinn_keys.stop);
 		break;
 
-	case _IOW(0x0, HPU_IOCTL_SET_SPINN_KEYS_EN, unsigned int*):
-		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
+	case _IOW(0x0, HPU_IOCTL_SET_SPINN_KEYS_EN, unsigned int *):
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
 		res = hpu_spinn_keys_enable(priv, val);
 		break;
 
-	case _IOW(0x0, HPU_IOCTL_SET_SPINN_STARTSTOP, unsigned int*):
-		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
+	case _IOW(0x0, HPU_IOCTL_SET_SPINN_STARTSTOP, unsigned int *):
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
 		res = hpu_spinn_startstop(priv, val);
 		break;
@@ -1412,13 +1434,12 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 	default:
 		res = -EINVAL;
 	}
-exit:
+
 	return res;
 
 cfuser_err:
 	dev_err(&priv->pdev->dev, "Copy from user space failed\n");
 	return -EFAULT;
-
 }
 
 static struct file_operations hpu_fops = {
