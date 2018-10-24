@@ -103,23 +103,14 @@
 #define HPU_DMA_LENGTH_MASK		0x7FF
 #define HPU_DMA_TEST_ON			0x10000
 
-#define HPU_RXCTRL_LRXHSSAER_EN		0x00000001
-#define HPU_RXCTRL_LRXPAER_EN		0x00000002
-#define HPU_RXCTRL_LRXFTP_EN		0x00000004
-#define HPU_RXCTRL_SPINNL_EN		0x00000008
-#define HPU_RXCTRL_LRXHSSAERCH0_EN	0x00000100
-#define HPU_RXCTRL_LRXHSSAERCH1_EN	0x00000200
-#define HPU_RXCTRL_LRXHSSAERCH2_EN	0x00000400
-#define HPU_RXCTRL_LRXHSSAERCH3_EN	0x00000800
-
-#define HPU_RXCTRL_RRXHSSAER_EN		0x00010000
-#define HPU_RXCTRL_RRXPAER_EN		0x00020000
-#define HPU_RXCTRL_RRXFTP_EN		0x00040000
-#define HPU_RXCTRL_SPINNR_EN		0x00080000
-#define HPU_RXCTRL_RRXHSSAERCH0_EN	0x01000000
-#define HPU_RXCTRL_RRXHSSAERCH1_EN	0x02000000
-#define HPU_RXCTRL_RRXHSSAERCH2_EN	0x04000000
-#define HPU_RXCTRL_RRXHSSAERCH3_EN	0x08000000
+#define HPU_RXCTRL_RXHSSAER_EN		0x00000001
+#define HPU_RXCTRL_RXPAER_EN		0x00000002
+#define HPU_RXCTRL_RXGTP_EN		0x00000004
+#define HPU_RXCTRL_SPINN_EN		0x00000008
+#define HPU_RXCTRL_RXHSSAERCH0_EN	0x00000100
+#define HPU_RXCTRL_RXHSSAERCH1_EN	0x00000200
+#define HPU_RXCTRL_RXHSSAERCH2_EN	0x00000400
+#define HPU_RXCTRL_RXHSSAERCH3_EN	0x00000800
 
 #define HPU_MSK_INT_RXFIFOFULL		0x004
 #define HPU_MSK_INT_TSTAMPWRAPPED	0x080
@@ -128,15 +119,6 @@
 #define HPU_MSK_INT_GLBLRXERR_RX	0x00020000
 #define HPU_MSK_INT_GLBLRXERR_TO	0x00040000
 #define HPU_MSK_INT_GLBLRXERR_OF	0x00080000
-
-#define HPU_AUXCTRL_AUXRXHSSAER_EN	0x00000001
-#define HPU_AUXCTRL_AUXRXPAER_EN	0x00000002
-#define HPU_AUXCTRL_AUXRXFTP_EN		0x00000004
-#define HPU_AUXCTRL_AUXSPINN_EN		0x00000008
-#define HPU_AUXCTRL_AUXRXHSSAERCH0_EN	0x00000100
-#define HPU_AUXCTRL_AUXRXHSSAERCH1_EN	0x00000200
-#define HPU_AUXCTRL_AUXRXHSSAERCH2_EN	0x00000400
-#define HPU_AUXCTRL_AUXRXHSSAERCH3_EN	0x00000800
 
 #define HPU_IOCTL_READTIMESTAMP		1
 #define HPU_IOCTL_CLEARTIMESTAMP	2
@@ -152,15 +134,16 @@
 #define HPU_IOCTL_GET_AUX_CNT2		14
 #define HPU_IOCTL_GET_AUX_CNT3		15
 #define HPU_IOCTL_GET_LOST_CNT		16
-#define HPU_IOCTL_SET_HSSAER_CH		17
+/* 17 is not used anymore */
 #define HPU_IOCTL_SET_LOOP_CFG		18
-#define HPU_IOCTL_SET_SPINN		19
+/* 19 is not used anymore */
 #define HPU_IOCTL_GET_TX_PS		20
 #define HPU_IOCTL_SET_BLK_TX_THR	21
 #define HPU_IOCTL_SET_BLK_RX_THR	22
 #define HPU_IOCTL_SET_SPINN_KEYS	23
 #define HPU_IOCTL_SET_SPINN_KEYS_EN	24
 #define HPU_IOCTL_SET_SPINN_STARTSTOP	25
+#define HPU_IOCTL_SET_INTERFACE		26
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -220,12 +203,23 @@ MODULE_PARM_DESC(tx_pn, "TX Pool num");
 module_param(tx_to, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 MODULE_PARM_DESC(tx_to, "TX DMA TimeOut in ms");
 
-enum hssaersrc { left_eye = 0, right_eye, aux, spinn };
+typedef enum {
+	INTERFACE_EYE_R,
+	INTERFACE_EYE_L,
+	INTERFACE_AUX
+} hpu_interface_t;
 
-typedef struct ch_en_hssaer {
-	enum hssaersrc hssaer_src;
-	uint8_t en_channels;
-} ch_en_hssaer_t;
+typedef struct {
+	int hssaer[4];
+	int gtp;
+	int paer;
+	int spinn;
+} hpu_interface_cfg_t;
+
+typedef struct {
+	hpu_interface_t interface;
+	hpu_interface_cfg_t cfg;
+} hpu_interface_ioctl_t;
 
 enum rx_err { ko_err = 0, rx_err, to_err, of_err, nomeaning_err };
 
@@ -900,31 +894,52 @@ static int hpu_spinn_set_keys(struct hpu_priv *priv, u32 start, u32 stop)
 	return 0;
 }
 
-static int hpu_set_spinn(struct hpu_priv *priv, unsigned int val)
+static int hpu_set_interface(struct hpu_priv *priv,
+			     hpu_interface_t interf, hpu_interface_cfg_t cfg)
 {
+	u32 bitfield = 0;
+	u32 mask = 0xffff;
 
-	if (val != !!val)
-		return -EINVAL;
-
-	if (val) {
-		priv->rx_aux_ctrl_reg |= HPU_AUXCTRL_AUXSPINN_EN;
-		priv->rx_ctrl_reg |= HPU_RXCTRL_SPINNL_EN |
-			HPU_RXCTRL_SPINNR_EN;
+	if (cfg.hssaer[0])
+		bitfield = HPU_RXCTRL_RXHSSAER_EN | HPU_RXCTRL_RXHSSAERCH0_EN;
+	if (cfg.hssaer[1])
+		bitfield |= HPU_RXCTRL_RXHSSAER_EN | HPU_RXCTRL_RXHSSAERCH1_EN;
+	if (cfg.hssaer[2])
+		bitfield |= HPU_RXCTRL_RXHSSAER_EN | HPU_RXCTRL_RXHSSAERCH2_EN;
+	if (cfg.hssaer[3])
+		bitfield |= HPU_RXCTRL_RXHSSAER_EN | HPU_RXCTRL_RXHSSAERCH3_EN;
+	if (cfg.gtp)
+		bitfield |= HPU_RXCTRL_RXGTP_EN;
+	if (cfg.paer)
+		bitfield |= HPU_RXCTRL_RXPAER_EN;
+	if (cfg.spinn) {
+		bitfield |= HPU_RXCTRL_SPINN_EN;
 		/* magic from Maurizio */
 		writel(0x68, priv->regs + HPU_TXCTRL_REG);
-		dev_dbg(&priv->pdev->dev, "spinn enable\n");
 	} else {
-		priv->rx_aux_ctrl_reg &= ~HPU_AUXCTRL_AUXSPINN_EN;
-		priv->rx_ctrl_reg &= ~(HPU_RXCTRL_SPINNL_EN |
-				       HPU_RXCTRL_SPINNR_EN);
-		/* TX reg to reset val as per FD datasheet */
 		writel(0x0, priv->regs + HPU_TXCTRL_REG);
-		dev_dbg(&priv->pdev->dev, "spinn disable\n");
 	}
-	writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
-	writel(priv->rx_aux_ctrl_reg, priv->regs + HPU_AUX_RXCTRL_REG);
-	dev_dbg(&priv->pdev->dev, "spinn - AUXRXCTRL reg 0x%x",
-		priv->rx_aux_ctrl_reg);
+
+	switch (interf) {
+	case INTERFACE_EYE_R:
+		bitfield <<= 16;
+		mask <<= 16;
+		/* fall through */
+	case INTERFACE_EYE_L:
+		priv->rx_ctrl_reg &= ~mask;
+		priv->rx_ctrl_reg |= bitfield;
+		writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
+		dev_dbg(&priv->pdev->dev, "RXCTRL reg 0x%x\n", bitfield);
+		break;
+	case INTERFACE_AUX:
+		priv->rx_aux_ctrl_reg = bitfield;
+		writel(priv->rx_aux_ctrl_reg, priv->regs + HPU_AUX_RXCTRL_REG);
+		dev_dbg(&priv->pdev->dev, "AUXRXCTRL reg 0x%x\n", bitfield);
+		break;
+	default:
+		return -EINVAL;
+		break;
+	}
 
 	return 0;
 }
@@ -953,38 +968,6 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 	dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
 		priv->ctrl_reg);
-
-	return 0;
-}
-
-static int hpu_set_hssaer_ch(struct hpu_priv *priv, ch_en_hssaer_t ch_en_hssaer)
-{
-	if (ch_en_hssaer.hssaer_src < left_eye ||
-	    ch_en_hssaer.hssaer_src > aux) {
-		dev_err(&priv->pdev->dev,
-			"Error in enabling channels\n");
-		return -EINVAL;
-	}
-
-	if (ch_en_hssaer.hssaer_src == aux) {
-		priv->rx_aux_ctrl_reg |=
-			HPU_AUXCTRL_AUXRXHSSAER_EN |
-			((ch_en_hssaer.en_channels) << 8);
-		writel(priv->rx_aux_ctrl_reg,
-		       priv->regs + HPU_AUX_RXCTRL_REG);
-	} else {
-		/* don't overwrite spinn cfg, clear the rest */
-		priv->rx_ctrl_reg &= HPU_RXCTRL_SPINNL_EN |
-			HPU_RXCTRL_SPINNR_EN;
-		if (ch_en_hssaer.hssaer_src == left_eye) {
-			priv->rx_ctrl_reg |= HPU_RXCTRL_LRXHSSAER_EN |
-				(ch_en_hssaer.en_channels << 8);
-		} else {	/* right */
-			priv->rx_ctrl_reg |= HPU_RXCTRL_RRXHSSAER_EN |
-				(ch_en_hssaer.en_channels << 24);
-		}
-	}
-	writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
 
 	return 0;
 }
@@ -1295,9 +1278,9 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 	void *arg = (void*) _arg;
 	unsigned int ret;
 	aux_cnt_t aux_cnt_reg;
-	ch_en_hssaer_t ch_en_hssaer;
 	spinn_keys_t spinn_keys;
 	spinn_loop_t loop;
+	hpu_interface_ioctl_t iface;
 	unsigned int val = 0;
 	int res = 0;
 	struct hpu_priv *priv = fp->private_data;
@@ -1383,18 +1366,6 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 			goto cfuser_err;
 		break;
 
-	case _IOW(0x0, HPU_IOCTL_SET_HSSAER_CH, struct ch_en_hssaer *):
-		if (copy_from_user(&ch_en_hssaer, arg, sizeof(ch_en_hssaer)))
-			goto cfuser_err;
-		res = hpu_set_hssaer_ch(priv, ch_en_hssaer);
-		break;
-
-	case _IOW(0x0, HPU_IOCTL_SET_SPINN, unsigned int *):
-		if (copy_from_user(&val, arg, sizeof(unsigned int)))
-			goto cfuser_err;
-		res = hpu_set_spinn(priv, val);
-		break;
-
 	case _IOW(0x0, HPU_IOCTL_SET_LOOP_CFG, spinn_loop_t *):
 		if (copy_from_user(&loop, arg, sizeof(spinn_loop_t)))
 			goto cfuser_err;
@@ -1429,6 +1400,12 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
 		res = hpu_spinn_startstop(priv, val);
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_INTERFACE, hpu_interface_ioctl_t *):
+		if (copy_from_user(&iface, arg, sizeof(hpu_interface_ioctl_t)))
+			goto cfuser_err;
+		res = hpu_set_interface(priv, iface.interface, iface.cfg);
 		break;
 
 	default:
