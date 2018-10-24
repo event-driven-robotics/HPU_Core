@@ -93,6 +93,8 @@
 #define HPU_CTRL_FLUSHFIFOS		0x0010
 #define HPU_CTRL_RESETDMASTREAM 	0x1000
 #define HPU_CTRL_FULLTS			0x8000
+#define HPU_CTRL_LOOP_SPINN		(BIT(22) | BIT(23))
+#define HPU_CTRL_LOOP_LNEAR		BIT(25)
 
 #define HPU_DMA_LENGTH_MASK		0x7FF
 #define HPU_DMA_TEST_ON			0x10000
@@ -227,6 +229,12 @@ typedef struct aux_cnt {
 	enum rx_err err;
 	uint8_t cnt_val;
 } aux_cnt_t;
+
+typedef enum {
+	LOOP_NONE,
+	LOOP_LNEAR,
+	LOOP_LSPINN,
+} spinn_loop_t;
 
 struct hpu_priv;
 
@@ -1069,10 +1077,11 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 {
 	unsigned int ret;
-	unsigned int val = 0;
 	aux_cnt_t aux_cnt_reg;
 	ch_en_hssaer_t ch_en_hssaer;
 	unsigned int reg;
+	unsigned int val = 0;
+	int res = 0;
 
 	struct hpu_priv *priv = fp->private_data;
 
@@ -1254,8 +1263,24 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		if (copy_from_user(&val, (unsigned int *)arg, sizeof(val)))
 			goto cfuser_err;
 
-		priv->ctrl_reg &= ~(BIT(22) | BIT(23));
-		priv->ctrl_reg |= (val & 3) << 22;
+		priv->ctrl_reg &= ~(HPU_CTRL_LOOP_LNEAR | HPU_CTRL_LOOP_SPINN);
+		switch (val) {
+		case LOOP_LSPINN:
+			priv->ctrl_reg |= HPU_CTRL_LOOP_SPINN;
+			break;
+
+		case LOOP_LNEAR:
+			priv->ctrl_reg |= HPU_CTRL_LOOP_LNEAR;
+			break;
+
+		case LOOP_NONE:
+			break;
+		default:
+			dev_notice(&priv->pdev->dev,
+				   "set loop - invalid arg %d\n", val);
+			res = -EINVAL;
+			goto exit;
+		}
 		writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
 		dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
 			priv->ctrl_reg);
@@ -1286,10 +1311,10 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 		break;
 
 	default:
-		return -EINVAL;
+		res = -EINVAL;
 	}
-
-	return 0;
+exit:
+	return res;
 
 cfuser_err:
 	dev_err(&priv->pdev->dev, "Copy from user space failed\n");
