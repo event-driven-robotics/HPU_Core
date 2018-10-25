@@ -175,6 +175,7 @@ begin
                 EnableIp             => EnablePAER_i,           -- in  std_logic;
                 FlushFifo            => PaerFlushFifos_i,       -- in  std_logic;
                 IgnoreFifoFull_i     => PaerIgnoreFifoFull_i,   -- in  std_logic;
+                aux_channel          => Aux_Channel_i,          -- in  std_logic;
 
                 -- parallel AER
                 AerReqxAI            => PAER_Req_i,             -- in  std_logic;
