@@ -69,7 +69,8 @@
 #define IOCTL_SET_BLK_TX_THR		_IOW(IOC_MAGIC_NUMBER, 21, unsigned int *)
 #define IOCTL_SET_BLK_RX_THR		_IOW(IOC_MAGIC_NUMBER, 22, unsigned int *)
 #define IOC_SET_SPINN_STARTSTOP		_IOW(IOC_MAGIC_NUMBER, 25, unsigned int *)
-#define IOC_SET_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 26, hpu_interface_ioctl_t *)
+#define IOC_SET_RX_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 26, hpu_rx_interface_ioctl_t *)
+#define IOC_SET_TX_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 27, hpu_tx_interface_ioctl_t *)
 
 typedef enum {
 	LOOP_NONE,
@@ -93,7 +94,18 @@ typedef struct {
 typedef struct {
 	hpu_interface_t interface;
 	hpu_interface_cfg_t cfg;
-} hpu_interface_ioctl_t;
+} hpu_rx_interface_ioctl_t;
+
+typedef enum {
+	ROUTE_SINGLE,
+	ROUTE_AUTO,
+	ROUTE_ALL
+} hpu_tx_route_t;
+
+typedef struct {
+	hpu_interface_cfg_t cfg;
+	hpu_tx_route_t route;
+} hpu_tx_interface_ioctl_t;
 
 
 unsigned int data[65536], wdata[65536];
@@ -192,7 +204,8 @@ int main(int argc, char * argv[])
 	int rx_size = 512;
 	int tx_n = 32;
 	int rx_n = 32;
-	hpu_interface_ioctl_t iface;
+	hpu_rx_interface_ioctl_t rxiface;
+	hpu_tx_interface_ioctl_t txiface;
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGTERM, handle_kill);
@@ -226,10 +239,14 @@ int main(int argc, char * argv[])
 		loop = LOOP_LSPINN;
 		ioctl(iit_hpu, IOC_SET_LOOP_CFG, &loop);
 
-		memset((void*)&iface, 0, sizeof(iface));
-		iface.interface = INTERFACE_AUX;
-		iface.cfg.spinn = 1;
-		ioctl(iit_hpu, IOC_SET_INTERFACE, &iface);
+		memset((void*)&rxiface, 0, sizeof(rxiface));
+		memset((void*)&txiface, 0, sizeof(txiface));
+		rxiface.interface = INTERFACE_AUX;
+		rxiface.cfg.spinn = 1;
+		ioctl(iit_hpu, IOC_SET_RX_INTERFACE, &rxiface);
+		txiface.cfg.spinn = 1;
+		txiface.route = ROUTE_SINGLE;
+		ioctl(iit_hpu, IOC_SET_TX_INTERFACE, &txiface);
 		val = 1;
 		ioctl(iit_hpu, IOC_SET_SPINN_STARTSTOP, &val);
 	}
