@@ -15,7 +15,7 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_READVERSION         |3 | R |      unsigned int      |
 | *not supported anymore*      |4 |   |                        |
 |HPU_IOCTL_SETTIMESTAMP        |7 | W |      unsigned int      |
-| *not supported anymore*      |8 |   |                        |
+|HPU_IOCTL_GEN_REG             |8 |R/W|      ip_regs_t         |
 |HPU_IOCTL_GET_RX_PS           |9 | R |      unsigned int      |
 |HPU_IOCTL_SET_AUX_THRS        |10| W |     struct aux_cnt     |
 |HPU_IOCTL_GET_AUX_THRS        |11| R |      unsigned int      |
@@ -56,6 +56,22 @@ Example of ioctl definition in userspace application:
 Ioctls that expect an integer number as argument expect a pointer to an *unsigned int*.
 Ioclts that expect a logic boolean condition as argument want a pointer to an *unsigned int* that has to be either *1* or *0*.
 Other non-scalar arguments type are described below.
+
+### HPU_IOCTL_GEN_REG
+Provide a raw access (R/W) to the HW registers. It's here only for debugging purposes, while it's use in production is discouraged because it could cause weird side-effects.
+
+It wants a pointer to an instance of the follwing type as argument:
+
+```C
+typedef struct ip_regs {
+       u32 reg_offset;
+       char rw;
+       u32 data;
+} ip_regs_t;
+```
+
+The *reg_offset* member must be filled with the address of the register being written (when *rw* is 1) or read (when *rw* is 0).
+The *data* field does carry either the data to be written or that has been read.
 
 ### HPU_IOCTL_SET_BLK_TX_THR
 Sets the minimum amount of data, in bytes, that a *write()* syscall has to successfully submit to the HPU driver before returning (would block otherwise).
