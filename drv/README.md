@@ -117,7 +117,9 @@ You can enable driver debugging prints, provided that your kernel has been compi
 insmod iit-hpucore-dma.ko dyndbg==p
 ```
 
-If your kernel supports *debug FS* (CONFIG_DEBUG_FS=y), you can snoop into the HPU registers by looking at */sys/kernel/debug/hpu/regdump.xxxxxxxx* (where 'xxxxxxxx' is the physical address of the HPU address space).
+If your kernel supports *debug FS* (CONFIG_DEBUG_FS=y), you'll find some files in  */sys/kernel/debug/hpu/hpu.xxxxxxxx* (where 'xxxxxxxx' is the physical address of the HPU address space).
+
+Most notably you can snoop into the HPU registers by looking at the *regdump* file
 
 Kernel requirements
 -------------------
