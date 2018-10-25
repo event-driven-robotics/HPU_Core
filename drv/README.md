@@ -103,10 +103,9 @@ Module parameters
 
 *rx_to:* set the timeout of RX operations in mS.
 *rx_pn:* set the number of DMA RX buffers in the ring. Must be a power of two.
-*rx_ps:* set the size of DMA RX buffers. This is the minumum transfer size for which the driver is acknowledged of.
+*rx_ps:* set the size of DMA RX buffers.
 
-*tx_to* and *tx_pn:* as above, but on TX side.
-*tx_ps:* set the size of DMA TX buffers. Unlike RX, there is no minumum transfer size.
+*tx_to*, *tx_pn*, *tx_ps*: as above, but on TX side.
 
 Debugging stuff
 ---------------
