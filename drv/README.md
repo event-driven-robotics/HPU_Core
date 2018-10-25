@@ -8,41 +8,67 @@ IOCTLs
 
 Here there is a list of the currently supported IOCTLs.
 
-| Name                         |# |R/W| arg type            |
-|------------------------------|--|---|---------------------|
-|HPU_IOCTL_READTIMESTAMP       |1 | R |    unsigned int     |
-|HPU_IOCTL_CLEARTIMESTAMP      |2 | W |    unsigned int     |
-|HPU_IOCTL_READVERSION         |3 | R |    unsigned int     |
-| *not supported anymore*      |4 |   |                     |
-|HPU_IOCTL_SETTIMESTAMP        |7 | W |    unsigned int     |
-| *not supported anymore*      |8 |   |                     |
-|HPU_IOCTL_GET_RX_PS           |9 | R |    unsigned int     |
-|HPU_IOCTL_SET_AUX_THRS        |10| W |   struct aux_cnt    |
-|HPU_IOCTL_GET_AUX_THRS        |11| R |    unsigned int     |
-|HPU_IOCTL_GET_AUX_CNT0        |12| R |    unsigned int     |
-|HPU_IOCTL_GET_AUX_CNT1        |13| R |    unsigned int     |
-|HPU_IOCTL_GET_AUX_CNT2        |14| R |    unsigned int     |
-|HPU_IOCTL_GET_AUX_CNT3        |15| R |    unsigned int     |
-|HPU_IOCTL_GET_LOST_CNT        |16| R |    unsigned int     |
-|HPU_IOCTL_SET_HSSAER_CH       |17| W | struct ch_en_hssaer |
-|HPU_IOCTL_SET_LOOP_CFG        |18| W |    spinn_loop_t     |
-|HPU_IOCTL_SET_SPINN           |19| W |    unsigned int     |
-|HPU_IOCTL_GET_TX_PS           |20| R |    unsigned int     |
-|HPU_IOCTL_SET_BLK_TX_THR      |21| W |    unsigned int     |
-|HPU_IOCTL_SET_BLK_RX_THR      |22| W |    unsigned int     |
-|HPU_IOCTL_SET_SPINN_KEYS      |23| W |    spinn_keys_t     |
-|HPU_IOCTL_SET_SPINN_KEYS_EN   |24| W |    unsigned int     |
-|HPU_IOCTL_SET_SPINN_STARTSTOP |25| W |    unsigned int     |
+| Name                         |# |R/W| arg type               |
+|------------------------------|--|---|------------------------|
+|HPU_IOCTL_READTIMESTAMP       |1 | R |      unsigned int      |
+|HPU_IOCTL_CLEARTIMESTAMP      |2 | W |      unsigned int      |
+|HPU_IOCTL_READVERSION         |3 | R |      unsigned int      |
+| *not supported anymore*      |4 |   |                        |
+|HPU_IOCTL_SETTIMESTAMP        |7 | W |      unsigned int      |
+| *not supported anymore*      |8 |   |                        |
+|HPU_IOCTL_GET_RX_PS           |9 | R |      unsigned int      |
+|HPU_IOCTL_SET_AUX_THRS        |10| W |     struct aux_cnt     |
+|HPU_IOCTL_GET_AUX_THRS        |11| R |      unsigned int      |
+|HPU_IOCTL_GET_AUX_CNT0        |12| R |      unsigned int      |
+|HPU_IOCTL_GET_AUX_CNT1        |13| R |      unsigned int      |
+|HPU_IOCTL_GET_AUX_CNT2        |14| R |      unsigned int      |
+|HPU_IOCTL_GET_AUX_CNT3        |15| R |      unsigned int      |
+|HPU_IOCTL_GET_LOST_CNT        |16| R |      unsigned int      |
+| *not supported anymore*      |17|   |                        |
+|HPU_IOCTL_SET_LOOP_CFG        |18| W |      spinn_loop_t      |
+| *not supported anymore*      |19|   |                        |
+|HPU_IOCTL_GET_TX_PS           |20| R |      unsigned int      |
+|HPU_IOCTL_SET_BLK_TX_THR      |21| W |      unsigned int      |
+|HPU_IOCTL_SET_BLK_RX_THR      |22| W |      unsigned int      |
+|HPU_IOCTL_SET_SPINN_KEYS      |23| W |      spinn_keys_t      |
+|HPU_IOCTL_SET_SPINN_KEYS_EN   |24| W |      unsigned int      |
+|HPU_IOCTL_SET_SPINN_STARTSTOP |25| W |      unsigned int      |
+|HPU_IOCTL_SET_RX_INTERFACE    |26| W |hpu_rx_interface_ioctl_t|
+|HPU_IOCTL_SET_TX_INTERFACE    |27| W |hpu_tx_interface_ioctl_t|
 
 non-scalar types are defined as follows
 
-``` C
+```C
 enum hssaersrc { left_eye = 0, right_eye, aux, spinn };
 
-typedef struct ch_en_hssaer {
-	enum hssaersrc hssaer_src;
-	uint8_t en_channels;
-} ch_en_hssaer_t;
+typedef enum {
+	INTERFACE_EYE_R,
+	INTERFACE_EYE_L,
+	INTERFACE_AUX
+} hpu_interface_t;
+
+typedef struct {
+	int hssaer[4];
+	int gtp;
+	int paer;
+	int spinn;
+} hpu_interface_cfg_t;
+
+typedef struct {
+	hpu_interface_t interface;
+	hpu_interface_cfg_t cfg;
+} hpu_rx_interface_ioctl_t;
+
+typedef enum {
+	ROUTE_SINGLE,
+	ROUTE_AUTO,
+	ROUTE_ALL
+} hpu_tx_route_t;
+
+typedef struct {
+	hpu_interface_cfg_t cfg;
+	hpu_tx_route_t route;
+} hpu_tx_interface_ioctl_t;
 
 typedef struct aux_cnt {
 	enum rx_err err;
