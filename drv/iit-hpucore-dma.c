@@ -138,7 +138,7 @@
 #define HPU_IOCTL_READVERSION		3
 /* 4 is not used anymore */
 #define HPU_IOCTL_SETTIMESTAMP		7
-/* 8 is not used anymore */
+#define HPU_IOCTL_GEN_REG		8
 #define HPU_IOCTL_GET_RX_PS		9
 #define HPU_IOCTL_SET_AUX_THRS		10
 #define HPU_IOCTL_GET_AUX_THRS		11
@@ -216,6 +216,12 @@ module_param(tx_pn, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 MODULE_PARM_DESC(tx_pn, "TX Pool num");
 module_param(tx_to, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 MODULE_PARM_DESC(tx_to, "TX DMA TimeOut in ms");
+
+typedef struct ip_regs {
+       u32 reg_offset;
+       char rw;
+       u32 data;
+} ip_regs_t;
 
 typedef enum {
 	INTERFACE_EYE_R,
@@ -1366,6 +1372,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 	spinn_loop_t loop;
 	hpu_rx_interface_ioctl_t rxiface;
 	hpu_tx_interface_ioctl_t txiface;
+	ip_regs_t temp_reg;
 	unsigned int val = 0;
 	int res = 0;
 	struct hpu_priv *priv = fp->private_data;
@@ -1395,6 +1402,18 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 			goto cfuser_err;
 		res = hpu_set_timestamp(priv, val);
 		break;
+
+	case _IOWR(0x0, HPU_IOCTL_GEN_REG, struct ip_regs *):
+	       if (copy_from_user(&temp_reg, arg, sizeof(temp_reg)))
+		       goto cfuser_err;
+	       if (temp_reg.rw == 0) {
+		      temp_reg.data = readl(priv->regs + temp_reg.reg_offset);
+		       if (copy_to_user(arg, &temp_reg,	sizeof(temp_reg)))
+			       goto cfuser_err;
+	       } else {
+		       writel(temp_reg.data, priv->regs + temp_reg.reg_offset);
+	       }
+	       break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_RX_PS, unsigned int *):
 		ret = priv->dma_rx_pool.ps;
