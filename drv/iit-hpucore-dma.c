@@ -112,6 +112,19 @@
 #define HPU_RXCTRL_RXHSSAERCH2_EN	0x00000400
 #define HPU_RXCTRL_RXHSSAERCH3_EN	0x00000800
 
+#define HPU_TXCTRL_TXHSSAER_EN		0x00000001
+#define HPU_TXCTRL_TXPAER_EN		0x00000002
+#define HPU_TXCTRL_SPINN_EN		0x00000008
+#define HPU_TXCTRL_TXHSSAERCH0_EN	0x00000100
+#define HPU_TXCTRL_TXHSSAERCH1_EN	0x00000200
+#define HPU_TXCTRL_TXHSSAERCH2_EN	0x00000400
+#define HPU_TXCTRL_TXHSSAERCH3_EN	0x00000800
+#define HPU_TXCTRL_DEST_PAER		(0 << 4)
+#define HPU_TXCTRL_DEST_HSSAER		(1 << 4)
+#define HPU_TXCTRL_DEST_SPINN		(2 << 4)
+#define HPU_TXCTRL_DEST_ALL		(3 << 4)
+#define HPU_TXCTRL_ROUTE		BIT(6)
+
 #define HPU_MSK_INT_RXFIFOFULL		0x004
 #define HPU_MSK_INT_TSTAMPWRAPPED	0x080
 #define HPU_MSK_INT_RXBUFFREADY		0x100
@@ -143,7 +156,8 @@
 #define HPU_IOCTL_SET_SPINN_KEYS	23
 #define HPU_IOCTL_SET_SPINN_KEYS_EN	24
 #define HPU_IOCTL_SET_SPINN_STARTSTOP	25
-#define HPU_IOCTL_SET_INTERFACE		26
+#define HPU_IOCTL_SET_RX_INTERFACE	26
+#define HPU_IOCTL_SET_TX_INTERFACE	27
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -219,7 +233,18 @@ typedef struct {
 typedef struct {
 	hpu_interface_t interface;
 	hpu_interface_cfg_t cfg;
-} hpu_interface_ioctl_t;
+} hpu_rx_interface_ioctl_t;
+
+typedef enum {
+	ROUTE_SINGLE,
+	ROUTE_AUTO,
+	ROUTE_ALL
+} hpu_tx_route_t;
+
+typedef struct {
+	hpu_interface_cfg_t cfg;
+	hpu_tx_route_t route;
+} hpu_tx_interface_ioctl_t;
 
 enum rx_err { ko_err = 0, rx_err, to_err, of_err, nomeaning_err };
 
@@ -894,8 +919,8 @@ static int hpu_spinn_set_keys(struct hpu_priv *priv, u32 start, u32 stop)
 	return 0;
 }
 
-static int hpu_set_interface(struct hpu_priv *priv,
-			     hpu_interface_t interf, hpu_interface_cfg_t cfg)
+static int hpu_set_rx_interface(struct hpu_priv *priv,
+				hpu_interface_t interf, hpu_interface_cfg_t cfg)
 {
 	u32 bitfield = 0;
 	u32 mask = 0xffff;
@@ -914,10 +939,6 @@ static int hpu_set_interface(struct hpu_priv *priv,
 		bitfield |= HPU_RXCTRL_RXPAER_EN;
 	if (cfg.spinn) {
 		bitfield |= HPU_RXCTRL_SPINN_EN;
-		/* magic from Maurizio */
-		writel(0x68, priv->regs + HPU_TXCTRL_REG);
-	} else {
-		writel(0x0, priv->regs + HPU_TXCTRL_REG);
 	}
 
 	switch (interf) {
@@ -940,6 +961,69 @@ static int hpu_set_interface(struct hpu_priv *priv,
 		return -EINVAL;
 		break;
 	}
+
+	return 0;
+}
+
+static int hpu_set_tx_interface(struct hpu_priv *priv,
+				hpu_interface_cfg_t cfg, hpu_tx_route_t route)
+{
+	u32 static_route;
+	u32 reg = 0;
+	int count = 0;
+
+	/* GTP seems not supported: it has been replace by spinn in register */
+	if (cfg.gtp) {
+		dev_notice(&priv->pdev->dev, "gtp TX is not supported\n");
+		return -EINVAL;
+	}
+
+	if (cfg.hssaer[0])
+		reg = HPU_TXCTRL_TXHSSAERCH0_EN;
+	if (cfg.hssaer[1])
+		reg |= HPU_TXCTRL_TXHSSAERCH1_EN;
+	if (cfg.hssaer[2])
+		reg |= HPU_TXCTRL_TXHSSAERCH2_EN;
+	if (cfg.hssaer[3])
+		reg |= HPU_TXCTRL_TXHSSAERCH3_EN;
+
+	/* at least on SAER ch has been enabled -> SAER enabled */
+	if (reg) {
+		reg |= HPU_TXCTRL_TXHSSAER_EN;
+		static_route = HPU_TXCTRL_DEST_HSSAER;
+		count = 1;
+	}
+	if (cfg.paer) {
+		reg |= HPU_TXCTRL_TXPAER_EN;
+		static_route = HPU_TXCTRL_DEST_PAER;
+		count++;
+	}
+	if (cfg.spinn) {
+		reg |= HPU_TXCTRL_SPINN_EN;
+		static_route = HPU_TXCTRL_DEST_SPINN;
+		count++;
+	}
+
+	switch (route) {
+	case ROUTE_ALL:
+		reg |= HPU_TXCTRL_DEST_ALL;
+		break;
+	case ROUTE_SINGLE:
+		if (count != 1) {
+			dev_notice(&priv->pdev->dev,
+				   "Single TX destination requires one enabled interface\n");
+			return -EINVAL;
+		}
+		reg |= static_route | HPU_TXCTRL_ROUTE;
+		break;
+	case ROUTE_AUTO:
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	dev_dbg(&priv->pdev->dev, "writing TX CTRL REG: 0x%x\n", reg);
+	writel(reg, priv->regs + HPU_TXCTRL_REG);
 
 	return 0;
 }
@@ -1280,7 +1364,8 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 	aux_cnt_t aux_cnt_reg;
 	spinn_keys_t spinn_keys;
 	spinn_loop_t loop;
-	hpu_interface_ioctl_t iface;
+	hpu_rx_interface_ioctl_t rxiface;
+	hpu_tx_interface_ioctl_t txiface;
 	unsigned int val = 0;
 	int res = 0;
 	struct hpu_priv *priv = fp->private_data;
@@ -1402,12 +1487,17 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		res = hpu_spinn_startstop(priv, val);
 		break;
 
-	case _IOW(0x0, HPU_IOCTL_SET_INTERFACE, hpu_interface_ioctl_t *):
-		if (copy_from_user(&iface, arg, sizeof(hpu_interface_ioctl_t)))
+	case _IOW(0x0, HPU_IOCTL_SET_RX_INTERFACE, hpu_rx_interface_ioctl_t *):
+		if (copy_from_user(&rxiface, arg, sizeof(hpu_rx_interface_ioctl_t)))
 			goto cfuser_err;
-		res = hpu_set_interface(priv, iface.interface, iface.cfg);
+		res = hpu_set_rx_interface(priv, rxiface.interface, rxiface.cfg);
 		break;
 
+	case _IOW(0x0, HPU_IOCTL_SET_TX_INTERFACE, hpu_tx_interface_ioctl_t *):
+		if (copy_from_user(&txiface, arg, sizeof(hpu_tx_interface_ioctl_t)))
+			goto cfuser_err;
+		res = hpu_set_tx_interface(priv, txiface.cfg, txiface.route);
+		break;
 	default:
 		res = -EINVAL;
 	}
