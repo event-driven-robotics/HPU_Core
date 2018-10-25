@@ -371,6 +371,7 @@ architecture str of HPUCore is
     signal i_uP_RRxFlushFifos        : std_logic;
     signal i_uP_AuxRxPaerFlushFifos  : std_logic;
     signal i_up_TlastCnt             : std_logic_vector(31 downto 0);
+    signal i_up_TDataCnt             : std_logic_vector(31 downto 0);
     signal i_up_TlastTO              : std_logic_vector(31 downto 0);
     signal i_up_LatTlast             : std_logic;
 
@@ -439,6 +440,7 @@ architecture str of HPUCore is
     signal shreg_aux1                : std_logic_vector (3 downto 0);
     signal shreg_aux2                : std_logic_vector (3 downto 0);
 
+    signal i_FifoCoreLastData        : std_logic;
     
  --   for all : neuserial_axilite  use entity neuserial_lib.neuserial_axilite(rtl);
  --   for all : neuserial_axistream  use entity neuserial_lib.neuserial_axistream(rtl);
@@ -534,6 +536,7 @@ begin
                                FlushTXFifos_o                 => i_uP_flushTXFifos,            -- out std_logic;
                                LatTlast_o                     => i_up_LatTlast,                -- out std_logic;
                                TlastCnt_i                     => i_up_TlastCnt,                -- in  std_logic_vector(31 downto 0);
+                               TDataCnt_i                     => i_up_TDataCnt,                -- in  std_logic_vector(31 downto 0);
                                TlastTO_o                      => i_up_TlastTO,                 -- out std_logic_vector(31 downto 0);
                                --TxEnable_o                     => ,                             -- out std_logic;
                                --TxPaerFlushFifos_o             => ,                             -- out std_logic;
@@ -660,11 +663,13 @@ begin
             LatTlat_i                      => i_up_LatTlast,                    -- in  std_logic;
             TlastCnt_o                     => i_up_TlastCnt,                    -- out std_logic_vector(31 downto 0);
             TlastTO_i                      => i_up_TlastTO,                     -- in  std_logic_vector(31 downto 0);
+            TDataCnt_o                     => i_up_TDataCnt,                    -- out std_logic_vector(31 downto 0);
             -- From Fifo to core/dma
             FifoCoreDat_i                  => i_dma_rxDataBuffer,               -- in  std_logic_vector(31 downto 0);
             FifoCoreRead_o                 => i_dma_readRxBuffer,               -- out std_logic;
             FifoCoreEmpty_i                => i_dma_rxBufferEmpty,              -- in  std_logic;
             FifoCoreBurstReady_i           => i_dma_rxBufferReady,              -- in  std_logic;
+            FifoCoreLastData_i             => i_FifoCoreLastData,               -- in  std_logic;
             -- From core/dma to Fifo
             CoreFifoDat_o                  => i_dma_txDataBuffer,               -- out std_logic_vector(31 downto 0);
             CoreFifoWrite_o                => i_dma_writeTxBuffer,              -- out std_logic;
@@ -689,6 +694,7 @@ begin
 
         );
 
+    i_FifoCoreLastData <= '1' when i_fifoCoreNumData="00000000001" else '0';
 
     -- Muxing AXI-Lite and AXI-Stream Fifo interfaces --
     ----------------------------------------------------

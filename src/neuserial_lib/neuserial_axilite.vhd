@@ -81,6 +81,7 @@ FlushRXFifos_o                 : out std_logic;
 FlushTXFifos_o                 : out std_logic;
 LatTlast_o                     : out std_logic;
 TlastCnt_i                     : in  std_logic_vector(31 downto 0);
+TDataCnt_i                     : in  std_logic_vector(31 downto 0);
 TlastTO_o                      : out std_logic_vector(31 downto 0);
 --TxEnable_o                     : out std_logic;
 --TxPaerFlushFifos_o             : out std_logic;
@@ -326,6 +327,7 @@ architecture rtl of neuserial_axilite is
     signal  i_SPNN_TX_MASK_rd     : std_logic_vector (31 downto 0);
     signal  i_SPNN_RX_MASK_rd     : std_logic_vector (31 downto 0);
     signal  i_TlastCnt_rd         : std_logic_vector (31 downto 0);
+    signal  i_TDataCnt_rd         : std_logic_vector (31 downto 0);
     signal  i_TlastTO_rd          : std_logic_vector (31 downto 0);
 
 
@@ -919,6 +921,9 @@ begin
 
                         -- i_TlastCnt_reg Read Only Register
                         -- when 41 =>
+
+                        -- i_TDataCnt_reg Read Only Register
+                        -- when 42 =>
                         
                         when others => null;
 
@@ -1036,7 +1041,7 @@ begin
                           i_HSSAER_AUX_RX_ERR_rd, i_HSSAER_AUX_RX_MSK_rd,
                           i_readRxErrCnt, i_HSSAER_AUX_RX_ERR_THR_rd, i_HSSAER_AUX_RX_ERR_CNT_rd,
                           i_SPNN_START_KEY_rd, i_SPNN_STOP_KEY_rd, i_SPNN_TX_MASK_rd, i_SPNN_RX_MASK_rd,
-                          i_TlastCnt_rd, i_TlastTO_rd)
+                          i_TlastCnt_rd, i_TDataCnt_rd, i_TlastTO_rd)
     begin
         if (S_AXI_ARESETN = '0') then
             regDataOut <= (others => '0');
@@ -1100,6 +1105,7 @@ begin
                 
                 when 40 => regDataOut  <= i_TlastTO_rd;
                 when 41 => regDataOut  <= i_TlastCnt_rd;
+                when 42 => regDataOut  <= i_TDataCnt_rd;
 
                when others  => regDataOut  <= x"BAB0BAB0";
             end case;
@@ -1838,6 +1844,10 @@ begin
     -- ------------------------------------------------------------------------
     i_TlastCnt_rd <= TlastCnt_i;
 
+    -- ------------------------------------------------------------------------
+    -- TData Counter register
+    -- ------------------------------------------------------------------------
+    i_TDataCnt_rd <= TDataCnt_i;
 
     -- ------------------------------------------------------------------------
     -- DEBUG Registers

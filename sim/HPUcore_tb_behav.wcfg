@@ -19,15 +19,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="99984721440fs"></ZoomStartTime>
-      <ZoomEndTime time="100254156321fs"></ZoomEndTime>
-      <Cursor1Time time="100089948000fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="155000000001fs"></ZoomEndTime>
+      <Cursor1Time time="155000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="262"></NameColumnWidth>
-      <ValueColumnWidth column_width="142"></ValueColumnWidth>
+      <ValueColumnWidth column_width="134"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="16" />
+   <WVObjectSize size="19" />
    <wave_markers>
       <marker label="" time="1076829096000" />
       <marker label="" time="1396531164000" />
@@ -42,10 +42,6 @@
    <wvobject type="logic" fp_name="/HPUcore_tb/HSSAER_ClkHS_p">
       <obj_property name="ElementShortName">HSSAER_ClkHS_p</obj_property>
       <obj_property name="ObjectShortName">HSSAER_ClkHS_p</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/HPUcore_tb/i_clk">
-      <obj_property name="ElementShortName">i_clk</obj_property>
-      <obj_property name="ObjectShortName">i_clk</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/HPUcore_tb/i_resetn">
       <obj_property name="ElementShortName">i_resetn</obj_property>
@@ -589,21 +585,29 @@
       <obj_property name="label">AXI Stream</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TREADY">
-         <obj_property name="ElementShortName">S_AXIS_TREADY</obj_property>
-         <obj_property name="ObjectShortName">S_AXIS_TREADY</obj_property>
+      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_TlastTimer">
+         <obj_property name="ElementShortName">i_TlastTimer[31:0]</obj_property>
+         <obj_property name="ObjectShortName">i_TlastTimer[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TDATA">
-         <obj_property name="ElementShortName">S_AXIS_TDATA[31:0]</obj_property>
-         <obj_property name="ObjectShortName">S_AXIS_TDATA[31:0]</obj_property>
+      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_timeexpired">
+         <obj_property name="ElementShortName">i_timeexpired</obj_property>
+         <obj_property name="ObjectShortName">i_timeexpired</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TLAST">
-         <obj_property name="ElementShortName">S_AXIS_TLAST</obj_property>
-         <obj_property name="ObjectShortName">S_AXIS_TLAST</obj_property>
+      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/EnableAxistreamIf_i">
+         <obj_property name="ElementShortName">EnableAxistreamIf_i</obj_property>
+         <obj_property name="ObjectShortName">EnableAxistreamIf_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TVALID">
-         <obj_property name="ElementShortName">S_AXIS_TVALID</obj_property>
-         <obj_property name="ObjectShortName">S_AXIS_TVALID</obj_property>
+      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_enable_ip">
+         <obj_property name="ElementShortName">i_enable_ip</obj_property>
+         <obj_property name="ObjectShortName">i_enable_ip</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/FifoCoreRead_o">
+         <obj_property name="ElementShortName">FifoCoreRead_o</obj_property>
+         <obj_property name="ObjectShortName">FifoCoreRead_o</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/S_AXI_ACLK">
+         <obj_property name="ElementShortName">S_AXI_ACLK</obj_property>
+         <obj_property name="ObjectShortName">S_AXI_ACLK</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/M_AXIS_TDATA">
          <obj_property name="ElementShortName">M_AXIS_TDATA[31:0]</obj_property>
@@ -621,34 +625,54 @@
          <obj_property name="ElementShortName">M_AXIS_TREADY</obj_property>
          <obj_property name="ObjectShortName">M_AXIS_TREADY</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_TlastCnt">
-         <obj_property name="ElementShortName">i_TlastCnt[31:0]</obj_property>
-         <obj_property name="ObjectShortName">i_TlastCnt[31:0]</obj_property>
+      <wvobject type="other" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/state">
+         <obj_property name="ElementShortName">state</obj_property>
+         <obj_property name="ObjectShortName">state</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/DmaLength_i">
+         <obj_property name="ElementShortName">DmaLength_i[10:0]</obj_property>
+         <obj_property name="ObjectShortName">DmaLength_i[10:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/counterData">
+         <obj_property name="ElementShortName">counterData[10:0]</obj_property>
+         <obj_property name="ObjectShortName">counterData[10:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/FifoCoreLastData_i">
+         <obj_property name="ElementShortName">FifoCoreLastData_i</obj_property>
+         <obj_property name="ObjectShortName">FifoCoreLastData_i</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/TlastTO_i">
          <obj_property name="ElementShortName">TlastTO_i[31:0]</obj_property>
          <obj_property name="ObjectShortName">TlastTO_i[31:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_TlastTimer">
-         <obj_property name="ElementShortName">i_TlastTimer[31:0]</obj_property>
-         <obj_property name="ObjectShortName">i_TlastTimer[31:0]</obj_property>
+      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/FifoCoreEmpty_i">
+         <obj_property name="ElementShortName">FifoCoreEmpty_i</obj_property>
+         <obj_property name="ObjectShortName">FifoCoreEmpty_i</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/LatTlat_i">
          <obj_property name="ElementShortName">LatTlat_i</obj_property>
          <obj_property name="ObjectShortName">LatTlat_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_timeexpired">
-         <obj_property name="ElementShortName">i_timeexpired</obj_property>
-         <obj_property name="ObjectShortName">i_timeexpired</obj_property>
+      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/DmaLength_i">
+         <obj_property name="ElementShortName">DmaLength_i[10:0]</obj_property>
+         <obj_property name="ObjectShortName">DmaLength_i[10:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_sentdata">
-         <obj_property name="ElementShortName">i_sentdata</obj_property>
-         <obj_property name="ObjectShortName">i_sentdata</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_sendDummydata">
-         <obj_property name="ElementShortName">i_sendDummydata</obj_property>
-         <obj_property name="ObjectShortName">i_sendDummydata</obj_property>
-      </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TREADY">
+      <obj_property name="ElementShortName">S_AXIS_TREADY</obj_property>
+      <obj_property name="ObjectShortName">S_AXIS_TREADY</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TDATA">
+      <obj_property name="ElementShortName">S_AXIS_TDATA[31:0]</obj_property>
+      <obj_property name="ObjectShortName">S_AXIS_TDATA[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TVALID">
+      <obj_property name="ElementShortName">S_AXIS_TVALID</obj_property>
+      <obj_property name="ObjectShortName">S_AXIS_TVALID</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/EnableAxistreamIf_i">
+      <obj_property name="ElementShortName">EnableAxistreamIf_i</obj_property>
+      <obj_property name="ObjectShortName">EnableAxistreamIf_i</obj_property>
    </wvobject>
    <wvobject type="group" fp_name="group1548">
       <obj_property name="label">AUX RX datapath</obj_property>

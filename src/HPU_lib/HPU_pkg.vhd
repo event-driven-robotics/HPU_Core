@@ -314,6 +314,7 @@ port (
     FlushTXFifos_o                 : out std_logic;
     LatTlast_o                     : out std_logic;
     TlastCnt_i                     : in  std_logic_vector(31 downto 0);
+    TDataCnt_i                     : in  std_logic_vector(31 downto 0);
     TlastTO_o                      : out std_logic_vector(31 downto 0);
     --TxEnable_o                     : out std_logic;
     --TxPaerFlushFifos_o             : out std_logic;
@@ -440,11 +441,13 @@ port (
             LatTlat_i              : in  std_logic;
             TlastCnt_o             : out std_logic_vector(31 downto 0);
             TlastTO_i              : in  std_logic_vector(31 downto 0);
+            TDataCnt_o             : out std_logic_vector(31 downto 0);
             -- From Fifo to core/dma
             FifoCoreDat_i          : in  std_logic_vector(31 downto 0);
             FifoCoreRead_o         : out std_logic;
             FifoCoreEmpty_i        : in  std_logic;
             FifoCoreBurstReady_i   : in  std_logic;
+            FifoCoreLastData_i     : in  std_logic;
             -- From core/dma to Fifo
             CoreFifoDat_o          : out std_logic_vector(31 downto 0);
             CoreFifoWrite_o        : out std_logic;
