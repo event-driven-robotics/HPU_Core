@@ -36,57 +36,12 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_SET_RX_INTERFACE    |26| W |hpu_rx_interface_ioctl_t|
 |HPU_IOCTL_SET_TX_INTERFACE    |27| W |hpu_tx_interface_ioctl_t|
 
-non-scalar types are defined as follows
-
-```C
-enum hssaersrc { left_eye = 0, right_eye, aux, spinn };
-
-typedef enum {
-	INTERFACE_EYE_R,
-	INTERFACE_EYE_L,
-	INTERFACE_AUX
-} hpu_interface_t;
-
-typedef struct {
-	int hssaer[4];
-	int gtp;
-	int paer;
-	int spinn;
-} hpu_interface_cfg_t;
-
-typedef struct {
-	hpu_interface_t interface;
-	hpu_interface_cfg_t cfg;
-} hpu_rx_interface_ioctl_t;
-
-typedef enum {
-	ROUTE_SINGLE,
-	ROUTE_AUTO,
-	ROUTE_ALL
-} hpu_tx_route_t;
-
-typedef struct {
-	hpu_interface_cfg_t cfg;
-	hpu_tx_route_t route;
-} hpu_tx_interface_ioctl_t;
 
 typedef struct aux_cnt {
 	enum rx_err err;
 	uint8_t cnt_val;
 } aux_cnt_t;
 
-typedef struct {
-	u32 start;
-	u32 stop;
-} spinn_keys_t;
-
-typedef enum {
-	LOOP_NONE,
-	LOOP_LNEAR,
-	LOOP_LSPINN,
-} spinn_loop_t;
-
-```
 
 All ioctls have *zero* as magic number.
 
@@ -97,6 +52,133 @@ Example of ioctl definition in userspace application:
 #define IOC_READ_TS			_IOR(IOC_MAGIC_NUMBER, 1, unsigned int *)
 #define IOC_CLEAR_TS		_IOW(IOC_MAGIC_NUMBER, 2, unsigned int *)
 ```
+
+Ioctls that expect an integer number as argument expect a pointer to an *unsigned int*.
+Ioclts that expect a logic boolean condition as argument want a pointer to an *unsigned int* that has to be either *1* or *0*.
+Other non-scalar arguments type are described below.
+
+### HPU_IOCTL_SET_BLK_TX_THR
+Sets the minimum amount of data, in bytes, that a *write()* syscall has to successfully submit to the HPU driver before returning (would block otherwise).
+
+The caller should check for the *write()* return value to check how many bytes have been accepted by the driver.
+
+### HPU_IOCTL_SET_BLK_RX_THR
+Sets the minimum amount of data, in bytes, that a *read()* syscall has to put in the supplied buffer before returning (would block otherwise).
+
+The caller should check for the *read()* return value to check how many bytes have been put in the user buffer.
+
+### HPU_IOCTL_SET_SPINN_KEYS
+Sets both the *start* and *stop* keys to be recognized by the HPU on the SPINN bus.
+Note that the *HPU_IOCTL_SPINN_KEYS_EN* ioctl has to be used in order to *enable* or *disable* the keys
+recognization feature. The argument is a pointer to an instance of the following type
+
+```C
+typedef struct {
+	u32 start;
+	u32 stop;
+} spinn_keys_t;
+```
+
+### HPU_IOCTL_SPINN_KEYS_EN
+Disables/Enables the *start* and *stop* keys recognization on the SPINN bus.
+
+
+### HPU_IOCTL_SET_SPINN_STARTSTOP
+Forces a *start* (argument = 1) or *stop* (argument = 0) trigger for the SPINN interface. Start/stop keys settings will survive this IOCTL (i.e. if you have set and enabled start/stop keys and you force-start the bus, receiving a stop key will stop the bus).
+
+### HPU_IOCTL_SET_LOOP_CFG
+Allows to enable loopback mode (debug). It wants a pointer to an instance of the follwing type as argument
+
+``` C
+typedef enum {
+	LOOP_NONE,
+	LOOP_LNEAR,
+	LOOP_LSPINN,
+} spinn_loop_t;
+```
+
+- The LOOP_NONE mode just disables the loopback; the HW works in the regular way.
+- The LOOP_LNEAR mode ("local near") directly loops TX-ed packet onto the RX path
+- The LOOP_LSPINN mode ("local spinn") loops TX-ed pakets that are routed towards the SPINN BUS onto the SPINN bus of the RX AUX interface.
+
+
+### HPU_IOCTL_SET_RX_INTERFACE
+Configures the RX (data travelling to the CPU) interfaces. It wants a pointer to an instance of the follwing type as argument
+
+```C
+typedef struct {
+	hpu_interface_t interface;
+	hpu_interface_cfg_t cfg;
+} hpu_rx_interface_ioctl_t;
+```
+
+The *interface* member identify to which RX interface the configuration has to be applied; it's type is defined as follows:
+
+``` C
+typedef enum {
+	INTERFACE_EYE_R,
+	INTERFACE_EYE_L,
+	INTERFACE_AUX
+} hpu_interface_t;
+```
+The *cfg* member contains the configuration to be applied; it's type is defined as follows:
+
+``` C
+typedef struct {
+	int hssaer[4];
+	int gtp;
+	int paer;
+	int spinn;
+} hpu_interface_cfg_t;
+```
+Each member can be either *1* or *0* in order to enable or disable the corresponding bus.
+
+### HPU_IOCTL_SET_TX_INTERFACE
+Sets the TX (data sourced from the CPU and travelling to outside the CPU) inferface configuration.
+It wants a pointer to an instance of the follwing type as argument
+
+``` C
+typedef struct {
+	hpu_interface_cfg_t cfg;
+	hpu_tx_route_t route;
+} hpu_tx_interface_ioctl_t;
+```
+The *cfg* member contains the configuration to be applied; it's type is defined as follows:
+
+``` C
+typedef struct {
+	int hssaer[4];
+	int gtp;
+	int paer;
+	int spinn;
+} hpu_interface_cfg_t;
+```
+
+Each member can be either *1* or *0* in order to enable or disable the corresponding bus. NOTE: gtp is not currently supported.
+
+the *route* member type is defined as follows:
+
+``` C
+typedef enum {
+	ROUTE_SINGLE,
+	ROUTE_AUTO,
+	ROUTE_ALL
+} hpu_tx_route_t;
+```
+
+- When the *ROUTE_SINGLE* mode is selected, then the TX data is routed to the BUS selected by the *cfg* member. In this case only *one* BUS must be enabled in the *cfg* member.
+
+- When the *ROUTE_ALL* mode is selected, then the TX data is routed to *all* the BUSses selected by the *cfg* member
+
+- When the *ROUTE_AUTO* mode is selected, then the TX data is routed to one or more BUSes depending by the two MSBs of the message according to the following table, *and* depending by the enabled BUSes in *cfg* member:
+
+MSBs|  dest  |
+----|--------|
+ 00 | PAER   |
+ 01 | HSSAER |
+ 10 | SPINN  |
+ 11 | ALL    |
+
 
 Module parameters
 -----------------
