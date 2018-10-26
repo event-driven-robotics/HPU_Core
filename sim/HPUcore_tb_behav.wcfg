@@ -19,13 +19,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="155000000001fs"></ZoomEndTime>
-      <Cursor1Time time="155000000000fs"></Cursor1Time>
+      <ZoomStartTime time="445110090060fs"></ZoomStartTime>
+      <ZoomEndTime time="445220199589fs"></ZoomEndTime>
+      <Cursor1Time time="445201848000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="262"></NameColumnWidth>
-      <ValueColumnWidth column_width="134"></ValueColumnWidth>
+      <ValueColumnWidth column_width="126"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="19" />
    <wave_markers>
@@ -33,7 +33,7 @@
       <marker label="" time="1396531164000" />
       <marker label="" time="384616092000" />
       <marker label="" time="399879984000" />
-      <marker label="" time="396201456000" />
+      <marker label="" time="576065574000" />
    </wave_markers>
    <wvobject type="logic" fp_name="/HPUcore_tb/HSSAER_ClkLS_p">
       <obj_property name="ElementShortName">HSSAER_ClkLS_p</obj_property>
@@ -499,7 +499,6 @@
       <wvobject type="group" fp_name="group141">
          <obj_property name="label">PAER - RX Right</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="isExpanded"></obj_property>
          <wvobject type="array" fp_name="/HPUcore_tb/data_from_AER_R">
             <obj_property name="ElementShortName">data_from_AER_R[23:0]</obj_property>
             <obj_property name="ObjectShortName">data_from_AER_R[23:0]</obj_property>
@@ -546,9 +545,33 @@
             <obj_property name="ElementShortName">data_from_AER_Aux[23:0]</obj_property>
             <obj_property name="ObjectShortName">data_from_AER_Aux[23:0]</obj_property>
          </wvobject>
+         <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/g_paer_true/u_simplePAERInput/ClkxCI">
+            <obj_property name="ElementShortName">ClkxCI</obj_property>
+            <obj_property name="ObjectShortName">ClkxCI</obj_property>
+         </wvobject>
          <wvobject type="logic" fp_name="/HPUcore_tb/req_from_AER_Aux">
             <obj_property name="ElementShortName">req_from_AER_Aux</obj_property>
             <obj_property name="ObjectShortName">req_from_AER_Aux</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/g_paer_true/u_simplePAERInput/AerReqMetaxS">
+            <obj_property name="ElementShortName">AerReqMetaxS</obj_property>
+            <obj_property name="ObjectShortName">AerReqMetaxS</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/g_paer_true/u_simplePAERInput/AerReqStablexS">
+            <obj_property name="ElementShortName">AerReqStablexS</obj_property>
+            <obj_property name="ObjectShortName">AerReqStablexS</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/g_paer_true/u_simplePAERInput/counter">
+            <obj_property name="ElementShortName">counter[8:0]</obj_property>
+            <obj_property name="ObjectShortName">counter[8:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/g_paer_true/u_simplePAERInput/FifoInpWritexS">
+            <obj_property name="ElementShortName">FifoInpWritexS</obj_property>
+            <obj_property name="ObjectShortName">FifoInpWritexS</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/g_paer_true/u_simplePAERInput/AerAckxS">
+            <obj_property name="ElementShortName">AerAckxS</obj_property>
+            <obj_property name="ObjectShortName">AerAckxS</obj_property>
          </wvobject>
          <wvobject type="logic" fp_name="/HPUcore_tb/ack_to_AER_Aux">
             <obj_property name="ElementShortName">ack_to_AER_Aux</obj_property>
@@ -625,6 +648,22 @@
          <obj_property name="ElementShortName">M_AXIS_TREADY</obj_property>
          <obj_property name="ObjectShortName">M_AXIS_TREADY</obj_property>
       </wvobject>
+      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/DMA_test_mode_i">
+         <obj_property name="ElementShortName">DMA_test_mode_i</obj_property>
+         <obj_property name="ObjectShortName">DMA_test_mode_i</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_valid_lastread">
+         <obj_property name="ElementShortName">i_valid_lastread</obj_property>
+         <obj_property name="ObjectShortName">i_valid_lastread</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_TlastTimer">
+         <obj_property name="ElementShortName">i_TlastTimer[31:0]</obj_property>
+         <obj_property name="ObjectShortName">i_TlastTimer[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/counterTest">
+         <obj_property name="ElementShortName">counterTest[31:0]</obj_property>
+         <obj_property name="ObjectShortName">counterTest[31:0]</obj_property>
+      </wvobject>
       <wvobject type="other" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/state">
          <obj_property name="ElementShortName">state</obj_property>
          <obj_property name="ObjectShortName">state</obj_property>
@@ -656,6 +695,10 @@
       <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/DmaLength_i">
          <obj_property name="ElementShortName">DmaLength_i[10:0]</obj_property>
          <obj_property name="ObjectShortName">DmaLength_i[10:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axilite/i_CTRL_rd">
+         <obj_property name="ElementShortName">i_CTRL_rd[31:0]</obj_property>
+         <obj_property name="ObjectShortName">i_CTRL_rd[31:0]</obj_property>
       </wvobject>
    </wvobject>
    <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TREADY">
@@ -950,6 +993,7 @@
    <wvobject type="group" fp_name="group144">
       <obj_property name="label">AXI Lite</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/S_AXI_ACLK">
          <obj_property name="ElementShortName">S_AXI_ACLK</obj_property>
          <obj_property name="ObjectShortName">S_AXI_ACLK</obj_property>
