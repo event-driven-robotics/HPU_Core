@@ -633,7 +633,7 @@ begin
                 i_HSSAER_RX_MSK_reg   <= (others => '0');
                 i_RX_CTRL_reg       <= (others => '0');
                 i_TX_CTRL_reg       <= (others => '0');
-                i_RX_CNFG_reg       <= (others => '0');
+                i_RX_CNFG_reg       <= ( 25 => '1', 8 => '1',others => '0');
                 i_TX_CNFG_reg       <= (others => '0');
                 i_FIFOTHRESH_reg    <= (others => '0');
                 i_LPBK_CNFG_AUX_reg <= (others => '0');
