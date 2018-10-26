@@ -97,9 +97,8 @@ typedef struct {
 } hpu_rx_interface_ioctl_t;
 
 typedef enum {
-	ROUTE_SINGLE,
-	ROUTE_AUTO,
-	ROUTE_ALL
+	ROUTE_FIXED,
+	ROUTE_MSG,
 } hpu_tx_route_t;
 
 typedef struct {
@@ -245,7 +244,7 @@ int main(int argc, char * argv[])
 		rxiface.cfg.spinn = 1;
 		ioctl(iit_hpu, IOC_SET_RX_INTERFACE, &rxiface);
 		txiface.cfg.spinn = 1;
-		txiface.route = ROUTE_SINGLE;
+		txiface.route = ROUTE_FIXED;
 		ioctl(iit_hpu, IOC_SET_TX_INTERFACE, &txiface);
 		val = 1;
 		ioctl(iit_hpu, IOC_SET_SPINN_STARTSTOP, &val);
