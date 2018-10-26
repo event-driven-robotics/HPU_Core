@@ -460,16 +460,7 @@ port (
             M_AXIS_TVALID          : out std_logic;
             M_AXIS_TDATA           : out std_logic_vector(31 downto 0);
             M_AXIS_TLAST           : out std_logic;
-            M_AXIS_TREADY          : in  std_logic;
-
-            -- DBG
-            DBG_data_written       : out std_logic;
-            DBG_dma_burst_counter  : out std_logic_vector(10 downto 0);
-            DBG_dma_test_mode      : out std_logic;
-            DBG_dma_EnableDma      : out std_logic;
-            DBG_dma_is_running     : out std_logic;
-            DBG_dma_Length         : out std_logic_vector(10 downto 0);
-            DBG_dma_nedge_run      : out std_logic
+            M_AXIS_TREADY          : in  std_logic
 
         );
     end component neuserial_axistream;

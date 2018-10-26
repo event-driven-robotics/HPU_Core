@@ -682,17 +682,17 @@ begin
             M_AXIS_TVALID                  => M_AXIS_TVALID,                    -- out std_logic;
             M_AXIS_TDATA                   => M_AXIS_TDATA,                     -- out std_logic_vector(31 downto 0);
             M_AXIS_TLAST                   => M_AXIS_TLAST,                     -- out std_logic;
-            M_AXIS_TREADY                  => M_AXIS_TREADY,                    -- in  std_logic;
-            -- DBG
-            DBG_data_written               => DBG_data_written,                 -- out std_logic;
-            DBG_dma_burst_counter          => DBG_dma_burst_counter,            -- out std_logic_vector(10 downto 0)
-            DBG_dma_test_mode              => DBG_dma_test_mode,                -- out std_logic;
-            DBG_dma_EnableDma              => DBG_dma_EnableDma,                -- std_logic;
-            DBG_dma_is_running             => DBG_dma_is_running,               -- std_logic;
-            DBG_dma_Length                 => DBG_dma_Length,                   -- std_logic_vector(10 downto 0);
-            DBG_dma_nedge_run              => DBG_dma_nedge_run                 -- std_logic
-
+            M_AXIS_TREADY                  => M_AXIS_TREADY                      -- in  std_logic
         );
+
+    -- Removed DBG out port from AXIstream module
+    DBG_data_written      <= '0';
+    DBG_dma_burst_counter <= (others => '0');
+    DBG_dma_test_mode     <= '0';
+    DBG_dma_EnableDma     <= '0';
+    DBG_dma_is_running    <= '0';
+    DBG_dma_Length        <= (others => '0');
+    DBG_dma_nedge_run     <= '0';
 
     i_FifoCoreLastData <= '1' when i_fifoCoreNumData="00000000001" else '0';
 
