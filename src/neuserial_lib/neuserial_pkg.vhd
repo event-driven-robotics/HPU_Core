@@ -246,7 +246,7 @@ package NSComponents_pkg is
             FlushRXFifos_xSI    : in  std_logic;
             FlushTXFifos_xSI    : in  std_logic;
             --ChipType_xSI        : in  std_logic;
-            DmaLength_xDI       : in  std_logic_vector(10 downto 0);
+            DmaLength_xDI       : in  std_logic_vector(15 downto 0);
             --
             ---------------------------------------------------------------------------
             -- Input to Monitor

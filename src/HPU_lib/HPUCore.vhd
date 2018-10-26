@@ -343,7 +343,7 @@ architecture str of HPUCore is
     signal i_uP_DMAIsRunning         : std_logic;
     signal i_uP_enableDmaIf          : std_logic;
     signal i_uP_resetstream          : std_logic;
-    signal i_uP_dmaLength            : std_logic_vector(10 downto 0);
+    signal i_uP_dmaLength            : std_logic_vector(15 downto 0);
     signal i_uP_DMA_test_mode        : std_logic;
     signal i_uP_fulltimestamp        : std_logic;
 
@@ -658,7 +658,7 @@ begin
             DMA_test_mode_i                => i_uP_DMA_test_mode,               -- in  std_logic;
             EnableAxistreamIf_i            => i_uP_enableDmaIf,                 -- in  std_logic;
             DMA_is_running_o               => i_uP_DMAIsRunning,                -- out std_logic;
-            DmaLength_i                    => i_uP_dmaLength,                   -- in  std_logic_vector(10 downto 0);
+            DmaLength_i                    => i_uP_dmaLength,                   -- in  std_logic_vector(15 downto 0);
             ResetStream_i                  => i_uP_resetstream,                 -- in  std_logic;
             LatTlat_i                      => i_up_LatTlast,                    -- in  std_logic;
             TlastCnt_o                     => i_up_TlastCnt,                    -- out std_logic_vector(31 downto 0);
@@ -849,7 +849,7 @@ begin
 
 
             -- Configurations
-            DmaLength_i             => i_uP_dmaLength,               -- in  std_logic_vector(10 downto 0);
+            DmaLength_i             => i_uP_dmaLength,               -- in  std_logic_vector(15 downto 0);
             RemoteLoopback_i        => i_uP_RemoteLpbk,              -- in  std_logic;
             LocNearLoopback_i       => i_uP_LocalNearLpbk,           -- in  std_logic;
             LocFarLPaerLoopback_i   => i_uP_LocalFarLPaerLpbk,       -- in  std_logic;

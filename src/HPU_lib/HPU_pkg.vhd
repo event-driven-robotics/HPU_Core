@@ -143,7 +143,7 @@ package HPUComponents_pkg is
             FullTimestamp_i         : in  std_logic;
 
             -- Configurations
-            DmaLength_i             : in  std_logic_vector(10 downto 0);
+            DmaLength_i             : in  std_logic_vector(15 downto 0);
             RemoteLoopback_i        : in  std_logic;
             LocNearLoopback_i       : in  std_logic;
             LocFarLPaerLoopback_i   : in  std_logic;
@@ -305,7 +305,7 @@ port (
     DMA_is_running_i               : in  std_logic;
     EnableDMAIf_o                  : out std_logic;
     ResetStream_o                  : out std_logic;
-    DmaLength_o                    : out std_logic_vector(10 downto 0);
+    DmaLength_o                    : out std_logic_vector(15 downto 0);
     DMA_test_mode_o                : out std_logic;
     fulltimestamp_o                : out std_logic;
 
@@ -436,7 +436,7 @@ port (
             DMA_test_mode_i        : in  std_logic;
             EnableAxistreamIf_i    : in  std_logic;
             DMA_is_running_o       : out std_logic;
-            DmaLength_i            : in  std_logic_vector(10 downto 0);
+            DmaLength_i            : in  std_logic_vector(15 downto 0);
             ResetStream_i          : in  std_logic;
             LatTlat_i              : in  std_logic;
             TlastCnt_o             : out std_logic_vector(31 downto 0);

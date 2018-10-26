@@ -4,6 +4,8 @@
 
 library ieee;
     use ieee.std_logic_1164.all;
+    use ieee.std_logic_unsigned.all;
+    USE ieee.numeric_std.ALL;
 
 -- pragma synthesis_off
 -- the following are to write log file
@@ -38,7 +40,7 @@ entity CoreMonSeqRR is
         FlushRXFifos_xSI    : in  std_logic;
         FlushTXFifos_xSI    : in  std_logic;
         --ChipType_xSI        : in  std_logic;
-        DmaLength_xDI       : in  std_logic_vector(10 downto 0);
+        DmaLength_xDI       : in  std_logic_vector(15 downto 0);
         --
         ---------------------------------------------------------------------------
         -- Input to Monitor
@@ -410,7 +412,7 @@ begin
     FifoCoreNumData_o <= fifoWrDataCount_xD;
 
     -- It's DmaLength_xDI/2 because of the FIFO is 64 bit and the reading is 32 bit wide
-    FifoCoreBurstReady_xSO <= '1' when (fifoWrDataCount_xD >= ('0'&DmaLength_xDI(10 downto 1))) else '0';
+    FifoCoreBurstReady_xSO <= '1' when (to_integer(unsigned(fifoWrDataCount_xD)) >= to_integer(unsigned('0'&DmaLength_xDI(15 downto 1)))) else '0';
 
 
     p_ReadDataTimeSel : process (CoreClk_xCI) is

@@ -72,7 +72,7 @@ TxDataBuffer_o                 : out std_logic_vector(31 downto 0);
 DMA_is_running_i               : in  std_logic;
 EnableDMAIf_o                  : out std_logic;
 ResetStream_o                  : out std_logic;
-DmaLength_o                    : out std_logic_vector(10 downto 0);
+DmaLength_o                    : out std_logic_vector(15 downto 0);
 DMA_test_mode_o                : out std_logic;
 fulltimestamp_o                : out std_logic;
 
@@ -369,7 +369,7 @@ architecture rtl of neuserial_axilite is
     signal  i_TxDataBuffer         : std_logic_vector(31 downto 0);
 
 
-    signal  i_DmaLength            : std_logic_vector(10 downto 0);
+    signal  i_DmaLength            : std_logic_vector(15 downto 0);
 
 
     -- signal  i_LatchTime            : natural range 0 to 255;
@@ -1314,9 +1314,9 @@ begin
     -- DMA_reg - DMA Interface register R/W
     --
 
-    i_DmaLength <= i_DMA_reg(10 downto 0);
+    i_DmaLength <= i_DMA_reg(15 downto 0);
 
-    i_DMA_rd <= c_zero_vect(31 downto 17) & i_DMA_reg(16) & c_zero_vect(15 downto 11) &
+    i_DMA_rd <= c_zero_vect(31 downto 17) & i_DMA_reg(16) &
                 i_DmaLength;
 
     DmaLength_o <= i_DmaLength;

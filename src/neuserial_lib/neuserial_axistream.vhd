@@ -24,7 +24,7 @@ entity neuserial_axistream is
         DMA_test_mode_i        : in  std_logic;
         EnableAxistreamIf_i    : in  std_logic;
         DMA_is_running_o       : out std_logic;
-        DmaLength_i            : in  std_logic_vector(10 downto 0);
+        DmaLength_i            : in  std_logic_vector(15 downto 0);
         ResetStream_i          : in  std_logic;
         LatTlat_i              : in  std_logic;
         TlastCnt_o             : out std_logic_vector(31 downto 0);
@@ -34,7 +34,7 @@ entity neuserial_axistream is
         FifoCoreDat_i          : in  std_logic_vector(31 downto 0);
         FifoCoreRead_o         : out std_logic;
         FifoCoreEmpty_i        : in  std_logic;
-        FifoCoreBurstReady_i   : in  std_logic;
+        FifoCoreBurstReady_i   : in  std_logic; -- not used
         FifoCoreLastData_i     : in  std_logic;
         -- From core/dma to Fifo
         CoreFifoDat_o          : out std_logic_vector(31 downto 0);
@@ -61,7 +61,7 @@ architecture rtl of neuserial_axistream is
     
     signal i_M_AXIS_TVALID  : std_logic;
     signal i_M_AXIS_TLAST   : std_logic;  
-    signal counterData      : std_logic_vector(10 downto 0);
+    signal counterData      : std_logic_vector(15 downto 0);
     signal i_DMA_running    : std_logic;
     signal i_TlastCntRx     : std_logic_vector(15 downto 0);
     signal i_TlastCntTx     : std_logic_vector(15 downto 0);

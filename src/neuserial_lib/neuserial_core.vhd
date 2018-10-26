@@ -152,7 +152,7 @@ entity neuserial_core is
         FullTimestamp_i         : in  std_logic;
 
         -- Configurations
-        DmaLength_i             : in  std_logic_vector(10 downto 0);
+        DmaLength_i             : in  std_logic_vector(15 downto 0);
         RemoteLoopback_i        : in  std_logic;
         LocNearLoopback_i       : in  std_logic;
         LocFarLPaerLoopback_i   : in  std_logic;
@@ -1046,7 +1046,7 @@ begin
             FlushRXFifos_xSI        => FlushRXFifos_i,           -- in  std_logic;
             FlushTXFifos_xSI        => FlushTXFifos_i,           -- in  std_logic;
             --ChipType_xSI            => ChipType,                 -- in  std_logic;
-            DmaLength_xDI           => DmaLength_i,              -- in  std_logic_vector(10 downto 0);
+            DmaLength_xDI           => DmaLength_i,              -- in  std_logic_vector(15 downto 0);
             --
             MonInAddr_xDI           => i_monData,                -- in  std_logic_vector(31 downto 0);
             MonInSrcRdy_xSI         => i_monSrcRdy,              -- in  std_logic;
