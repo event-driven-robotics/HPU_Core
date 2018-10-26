@@ -1,4 +1,13 @@
 ********************************************
+Version 3.2 Rev 1:  17th, October 2018
+- Splitted FlushFifos in FlushRXFifo and FlushTXFifos. 
+- Modifications in axistream module to premature end a burst transfer. 
+- Added register that counts data in AXI stream bus. 
+- Modified reset value of RX PAER Configuration register (RX_PAER_CFNG_REG). 
+- Enlarged DMA length field to 16 bits.
+  (F. Diotalevi - IIT)
+
+********************************************
 Version 3.1 Rev 7:  17th, October 2018
 - START/STOP command bypass feature
 - Unwanted reset of SpiNNlink section when disabled 
