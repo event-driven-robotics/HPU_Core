@@ -48,16 +48,7 @@ entity neuserial_axistream is
         M_AXIS_TVALID          : out std_logic;
         M_AXIS_TDATA           : out std_logic_vector(31 downto 0);
         M_AXIS_TLAST           : out std_logic;
-        M_AXIS_TREADY          : in  std_logic;
-        
-        -- DBG
-        DBG_data_written       : out std_logic;
-        DBG_dma_burst_counter  : out std_logic_vector(10 downto 0);
-        DBG_dma_test_mode      : out std_logic;
-        DBG_dma_EnableDma      : out std_logic;
-        DBG_dma_is_running     : out std_logic;
-        DBG_dma_Length         : out std_logic_vector(10 downto 0);
-        DBG_dma_nedge_run      : out std_logic
+        M_AXIS_TREADY          : in  std_logic
     );
 end entity neuserial_axistream;
 
@@ -83,6 +74,7 @@ architecture rtl of neuserial_axistream is
     signal i_enable_ip      : std_logic;
     signal i_TlastTimer     : std_logic_vector(31 downto 0);   
     signal i_timeexpired    : std_logic; 
+    signal counterTest      : std_logic_vector(31 downto 0);
     
   begin 
     enable_p : process (Clk)
@@ -136,7 +128,7 @@ architecture rtl of neuserial_axistream is
    end process SYNC_PROC;
  
    NEXT_STATE_DECODE: process (state, i_enable_ip, FifoCoreEmpty_i, i_valid_read, EnableAxistreamIf_i,
-                               i_valid_lastread, FifoCoreLastData_i, i_timeexpired)
+                               i_valid_lastread, FifoCoreLastData_i, i_timeexpired, DMA_test_mode_i)
    begin
       case (state) is
       
@@ -148,7 +140,7 @@ architecture rtl of neuserial_axistream is
 			end if;
 			
         when waitfifo =>
-            if (FifoCoreEmpty_i = '1') then
+            if (FifoCoreEmpty_i = '1' and DMA_test_mode_i = '0') then
                 next_state <= waitfifo;
             else
                 next_state <= timeval;
@@ -162,11 +154,11 @@ architecture rtl of neuserial_axistream is
             end if;
             
         when dataval =>
-            if (EnableAxistreamIf_i = '0' and i_valid_lastread='1') then
+            if (EnableAxistreamIf_i = '0' and i_valid_lastread = '1') then
                 next_state <= idle;
             else
                 if (i_valid_read = '1') then
-                    if (FifoCoreLastData_i = '1') then
+                    if (FifoCoreLastData_i = '1' and DMA_test_mode_i = '0') then
                         next_state <= waitfifo;
                     elsif (i_timeexpired = '1' and i_valid_lastread='0') then
                         next_state <= premature_end;
@@ -200,11 +192,29 @@ architecture rtl of neuserial_axistream is
    i_valid_lastread <= i_valid_read and i_M_AXIS_TLAST;
    M_AXIS_TVALID  <= i_M_AXIS_TVALID ;
    M_AXIS_TLAST   <= i_M_AXIS_TLAST;
-   M_AXIS_TDATA   <= DUMMY_DATA when (state = premature_end) else FifoCoreDat_i;
+   M_AXIS_TDATA   <= DUMMY_DATA when (state = premature_end) else 
+                     FifoCoreDat_i when (DMA_test_mode_i = '0') else
+                     counterTest;
 
-   FifoCoreRead_o   <= '0' when (state = premature_end) else i_valid_read;
+   FifoCoreRead_o   <= '0' when (state = premature_end) else 
+                       i_valid_read when (i_enable_ip = '1' and DMA_test_mode_i = '0') else
+                       '0';
    DMA_is_running_o <= i_enable_ip;
    
+   -- Process counting data to be sent in test_mode
+   counterTest_p: process (Clk)
+   begin
+      if (Clk'event and Clk = '1') then
+         if (nRst = '0') then
+            counterTest <= (others => '0'); 
+         else
+            if (i_valid_read='1' and DMA_test_mode_i = '1' and state /= premature_end) then
+                counterTest <= counterTest + "01";
+            end if;
+         end if;        
+      end if;
+   end process counterTest_p;
+
    tlast_cnt_rx_p :  process (Clk)
      begin
         if (Clk'event and Clk = '1') then
@@ -270,28 +280,22 @@ architecture rtl of neuserial_axistream is
    begin
       
        if (Clk'event and Clk = '1') then
-        if (nRst = '0') then
-             i_TlastTimer <= (others => '0');
-             i_timeexpired <= '0';
-        elsif (Clk'event and Clk = '1') then
-           if (LatTlat_i='1') then
-               if (i_valid_lastread='1') then
-                   i_TlastTimer <= (others => '0');
-                   i_timeexpired <= '0';
-               elsif (i_TlastTimer/=TlastTO_i) then
-                   i_TlastTimer <= i_TlastTimer + "01";
-                   i_timeexpired <= '0';
-                   if (i_valid_read='1') then
-                   end if;
-               else
-                   i_timeexpired <= '1';
-               end if;
-           end if;
-         end if;
+        if (nRst = '0' or i_enable_ip='0' ) then
+            i_TlastTimer <= (others => '0');
+            i_timeexpired <= '0';
+        elsif (LatTlat_i='1') then
+            if (i_valid_lastread='1') then
+                i_TlastTimer <= (others => '0');
+                i_timeexpired <= '0';
+            elsif (i_TlastTimer/=TlastTO_i) then
+                i_TlastTimer <= i_TlastTimer + "01";
+                i_timeexpired <= '0';
+            else
+                i_timeexpired <= '1';
+            end if;
+        end if;
        end if;
    end process tlasttimer_p;
-
-   
    
 -- For TX FIFO
     i_S_AXIS_TREADY  <= not(CoreFifoFull_i) and i_enable_ip;
@@ -300,8 +304,6 @@ architecture rtl of neuserial_axistream is
     S_AXIS_TREADY    <= i_S_AXIS_TREADY;
 
 --    -- DEBUG
-    
---    DBG_data_written <= i_M_AXIS_TVALID and M_AXIS_TREADY;
 
 
 end architecture rtl;
