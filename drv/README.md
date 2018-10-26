@@ -176,17 +176,14 @@ the *route* member type is defined as follows:
 
 ``` C
 typedef enum {
-	ROUTE_SINGLE,
-	ROUTE_AUTO,
-	ROUTE_ALL
+	ROUTE_FIXED,
+	ROUTE_MSG,
 } hpu_tx_route_t;
 ```
 
-- When the *ROUTE_SINGLE* mode is selected, then the TX data is routed to the BUS selected by the *cfg* member. In this case only *one* BUS must be enabled in the *cfg* member.
+- When the *ROUTE_FIXED* mode is selected, then the TX data is routed to the BUS selected by the *cfg* member. Either only *one* BUS, ora *all* BUSses can be enabled in the *cfg* member, the HW does not support half-way configurations. NOTE: hssaer counts as "one".
 
-- When the *ROUTE_ALL* mode is selected, then the TX data is routed to *all* the BUSses selected by the *cfg* member
-
-- When the *ROUTE_AUTO* mode is selected, then the TX data is routed to one or more BUSes depending by the two MSBs of the message according to the following table, *and* depending by the enabled BUSes in *cfg* member:
+- When the *ROUTE_MSG* mode is selected, then the TX data is routed to one or more BUSes depending by the two MSBs of the message according to the following table, *and* depending by the enabled BUSes in *cfg* member:
 
 MSBs|  dest  |
 ----|--------|
