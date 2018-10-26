@@ -4,6 +4,8 @@
 
 library ieee;
     use ieee.std_logic_1164.all;
+    use ieee.std_logic_unsigned.all;
+    USE ieee.numeric_std.ALL;
 
 -- pragma synthesis_off
 -- the following are to write log file
@@ -35,9 +37,10 @@ entity CoreMonSeqRR is
         -- clock and reset
         Reset_xRBI          : in  std_logic;
         CoreClk_xCI         : in  std_logic;
-        FlushFifos_xSI      : in  std_logic;
+        FlushRXFifos_xSI    : in  std_logic;
+        FlushTXFifos_xSI    : in  std_logic;
         --ChipType_xSI        : in  std_logic;
-        DmaLength_xDI       : in  std_logic_vector(10 downto 0);
+        DmaLength_xDI       : in  std_logic_vector(15 downto 0);
         --
         ---------------------------------------------------------------------------
         -- Input to Monitor
@@ -154,7 +157,8 @@ architecture str of CoreMonSeqRR is
     signal SeqOutSrcRdy_xS, SeqOutDstRdy_xS : std_logic;
 
     -- Reset high signal for FIFOs
-    signal Reset_xR  : std_logic;
+    signal ResetRX_xR  : std_logic;
+    signal ResetTX_xR  : std_logic;
 
     --signal i_BGMonitorSel_xAS : std_logic;
     --signal i_BGAddrSel_xAS    : std_logic;
@@ -188,7 +192,8 @@ begin
     -----------------------------------------------------------------------------
     -- special reset for Fifo
     -----------------------------------------------------------------------------
-    Reset_xR <=  not(Reset_xRBI) or FlushFifos_xSI;
+    ResetRX_xR <=  not(Reset_xRBI) or FlushRXFifos_xSI;
+    ResetTX_xR <=  not(Reset_xRBI) or FlushTXFifos_xSI;
 
     -----------------------------------------------------------------------------
     -- CoreReady_xSI, EnableMonitor_xSI, EnableTimestampCounter_xS
@@ -353,7 +358,7 @@ begin
     --
     u_Outfifo_32_2048_64 : Outfifo_32_2048_64
         port map (
-            rst          => Reset_xR,    -- high-active reset
+            rst          => ResetTX_xR,    -- high-active reset
             wr_clk       => CoreClk_xCI,
             rd_clk       => CoreClk_xCI,
             din          => CoreFifoDat_xDI,
@@ -390,7 +395,7 @@ begin
     u_Infifo_64_1024_32 : Infifo_64_1024_32
         port map (
             clk          => CoreClk_xCI,
-            srst         => Reset_xR,    -- high-active reset
+            srst         => ResetRX_xR,    -- high-active reset
             din          => LiEnMonOutAddrEvt_xD,
             wr_en        => enableFifoWriting_xS,
             rd_en        => effectiveRdEn_xS,
@@ -407,7 +412,7 @@ begin
     FifoCoreNumData_o <= fifoWrDataCount_xD;
 
     -- It's DmaLength_xDI/2 because of the FIFO is 64 bit and the reading is 32 bit wide
-    FifoCoreBurstReady_xSO <= '1' when (fifoWrDataCount_xD >= ('0'&DmaLength_xDI(10 downto 1))) else '0';
+    FifoCoreBurstReady_xSO <= '1' when (to_integer(unsigned(fifoWrDataCount_xD)) >= to_integer(unsigned('0'&DmaLength_xDI(15 downto 1)))) else '0';
 
 
     p_ReadDataTimeSel : process (CoreClk_xCI) is
@@ -494,7 +499,7 @@ DBG_Timestamp_xD   <= Timestamp_xD;
 DBG_MonInAddr_xD   <= MonInAddr_xD;
 DBG_MonInSrcRdy_xS <= MonInSrcRdy_xS;
 DBG_MonInDstRdy_xS <= MonInDstRdy_xS;
-DBG_RESETFIFO      <= Reset_xR;
+DBG_RESETFIFO      <= ResetRX_xR;
 
 
 end architecture str;

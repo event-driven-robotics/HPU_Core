@@ -40,7 +40,10 @@ use IEEE.std_logic_arith.all;
 -- use IEEE.numeric_std.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.STD_LOGIC_TEXTIO.ALL;
--- use IEEE.math_real.all;
+use IEEE.math_real.all;
+
+library std;
+use std.textio.all;
 
 --  LIBRARY dut_lib;
 --  use  dut_lib.all;
@@ -596,6 +599,8 @@ signal i_vdclink_clk_sd         : std_logic;
 -- 
 signal M_Axis_TREADY_HPU        : std_logic;
 
+file logfile_ptr      : text open WRITE_MODE is "RX_FIFO.csv";
+
 begin 
 
 -- ************************************************************************************************************************
@@ -859,16 +864,16 @@ HPUCORE_i : HPUCore
         -- ADD USER GENERICS BELOW THIS LINE ---------------
 
         C_PAER_DSIZE               	=> 24,				--	: natural range 1 to 29   := 24;
-        C_RX_HAS_PAER              	=> false,			--	: boolean                 := true;
+        C_RX_HAS_PAER              	=> true,			--	: boolean                 := true;
         C_RX_HAS_HSSAER            	=> false,			--	: boolean                 := true;
         C_RX_HSSAER_N_CHAN         	=> 3,				--	: natural range 1 to 4    := 3;
         C_RX_HAS_GTP               	=> false,			--	: boolean                 := true;
-        C_RX_HAS_SPNNLNK          	=> true,			--	: boolean                 := true;
+        C_RX_HAS_SPNNLNK          	=> false,			--	: boolean                 := true;
         C_TX_HAS_PAER              	=> false,			--	: boolean                 := true;
         C_TX_HAS_HSSAER            	=> false,			--	: boolean                 := true;
         C_TX_HSSAER_N_CHAN         	=> 2,				--	: natural range 1 to 4    := 2;
         C_TX_HAS_GTP               	=> false,			--	: boolean                 := true;
-        C_TX_HAS_SPNNLNK          	=> true,			--	: boolean                 := true;
+        C_TX_HAS_SPNNLNK          	=> false,			--	: boolean                 := true;
         C_DEBUG                    	=> false,			--	: boolean                 := false;
 
         -- ADD USER GENERICS ABOVE THIS LINE ---------------
@@ -1112,7 +1117,7 @@ Enable_AER_Proc : process
 		wait for 100 us;
 		AER_device_enable_L   <= '0';
 		AER_device_enable_R   <= '0';
-		AER_device_enable_Aux <= '0';
+		AER_device_enable_Aux <= '1';
 		AER_device_enable_Tx  <= '0';
 		wait;
 end process Enable_AER_Proc;
@@ -1125,23 +1130,64 @@ Enable_SPNN_Proc : process
 		SPNN_device_enable_Tx  <= '1';
 
 		wait for 100 us;
-		SPNN_device_enable_L   <= '0';
-		SPNN_device_enable_R   <= '0';
-		SPNN_device_enable_Tx  <= '0';
+		SPNN_device_enable_L   <= '1';
+		SPNN_device_enable_R   <= '1';
+		SPNN_device_enable_Tx  <= '1';
 		
 		wait for 348 us;
-	    SPNN_device_enable_Aux <= '0';
+	    SPNN_device_enable_Aux <= '1';
 		wait;
 end process Enable_SPNN_Proc;
 
 Axis_HPU_proc : process
-	begin
-		M_Axis_TREADY_HPU   <= '1';
+	variable seed1, seed2 : positive;
+    variable rand:real;
+    variable int_rand: integer;
 
+	begin
+    l1: loop
+        M_Axis_TREADY_HPU   <= '1';
+        uniform(seed1, seed2, rand);
+        int_rand:= 3*integer(trunc(rand*15.0));
+
+    	if (int_rand>0) then
+            for i in 0 to int_rand loop
+                wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+            end loop;
+        end if;
+        wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+
+		M_Axis_TREADY_HPU   <= '0';
+        uniform(seed1, seed2, rand);
+        int_rand:= 4*integer(trunc(rand*15.0));
+
+        if (int_rand>0) then
+            for i in 0 to int_rand loop
+                wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+            end loop;
+        end if;
+        wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+    end loop;
 --		wait for 2000 us;
 --		M_Axis_TREADY_HPU   <= '0';
 		wait;
 end process Axis_HPU_proc;
+
+log_file_writing : process
+   variable v_buf_out: line;
+begin
+    loop
+        wait until HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1';
+        if (M_Axis_TREADY_HPU='1' and m_axis_tvalid='1') then
+            write (v_buf_out, now);write (v_buf_out, string'(", "));
+            hwrite (v_buf_out, m_axis_tdata);
+            if (m_axis_tlast='1') then
+                write (v_buf_out, string'(" TLAST"));
+            end if;
+            writeline (logfile_ptr, v_buf_out);
+        end if;
+    end loop;
+end process log_file_writing;
 
 LS_Clock_Proc : process
 	begin
