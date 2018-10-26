@@ -242,9 +242,8 @@ typedef struct {
 } hpu_rx_interface_ioctl_t;
 
 typedef enum {
-	ROUTE_SINGLE,
-	ROUTE_AUTO,
-	ROUTE_ALL
+	ROUTE_FIXED,
+	ROUTE_MSG,
 } hpu_tx_route_t;
 
 typedef struct {
@@ -1010,22 +1009,22 @@ static int hpu_set_tx_interface(struct hpu_priv *priv,
 		count++;
 	}
 
-	switch (route) {
-	case ROUTE_ALL:
-		reg |= HPU_TXCTRL_DEST_ALL;
-		break;
-	case ROUTE_SINGLE:
-		if (count != 1) {
+	if (route == ROUTE_FIXED) {
+		switch (count) {
+		case 0:
+			break;
+		case 1:
+			reg |= static_route | HPU_TXCTRL_ROUTE;
+			break;
+		case 2:
 			dev_notice(&priv->pdev->dev,
-				   "Single TX destination requires one enabled interface\n");
+				   "Either one or all destination can be selected\n");
 			return -EINVAL;
+			break;
+		case 3:
+			reg |= HPU_TXCTRL_DEST_ALL;
+			break;
 		}
-		reg |= static_route | HPU_TXCTRL_ROUTE;
-		break;
-	case ROUTE_AUTO:
-		break;
-	default:
-		return -EINVAL;
 	}
 
 	dev_dbg(&priv->pdev->dev, "writing TX CTRL REG: 0x%x\n", reg);
