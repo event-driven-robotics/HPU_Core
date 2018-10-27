@@ -33,7 +33,7 @@ entity AEXSsequencerRR is
         Rst_xRBI       : in  std_logic;
         Clk_xCI        : in  std_logic;
         Enable_xSI     : in  std_logic;
-        AbsMode        : in  std_logic;
+        TSMode         : in  std_logic_vector(1 downto 0);
         --
         Timestamp_xDI  : in  std_logic_vector(31 downto 0);
         --
@@ -124,7 +124,7 @@ begin
                         NetxTime_xDN <= unsigned(InAddrEvt_xDI(63 downto 32));
                         LastTime_xDN <= NetxTime_xDP;
 
-                        if (AbsMode = '0') then  -- Old Mode (Delta Time)
+                        if (TSMode = "00") then  -- Old Mode (Delta Time)
                             -- if we have a zero ISI or TestEnableSequencerNoWait
                             -- we go to the stWaitDelta state, otherwise we send now...
                             if (Delta_xDN /= 0 and not TestEnableSequencerNoWait) then
@@ -137,8 +137,12 @@ begin
                                 --    State_xDN <= stConfigReq;
                                 --end if;
                             end if;
+                         
+                         elsif (TSMode = "01") then  -- (Send immediatly)
+                             
+                             State_xDN <= stSend;
                             
-                         else                    -- New Mode (Absolute Time)
+                         else                        -- (Absolute Time)
                          
                              if (combo = 0 or combo = 6 or combo = 5) then
                                  State_xDN <= stWaitDelta;
@@ -159,7 +163,7 @@ begin
             when stWaitDelta =>
 
                 if (Enable_xSI = '1') then
-                    if (AbsMode = '0') then  -- Old Mode (Delta Time)
+                    if (TSMode = "00") then  -- Old Mode (Delta Time)
                         -- already zero? transmit or keep counting
                         if (Delta_xDP = 0) then
                             -- address or config..?
@@ -173,6 +177,11 @@ begin
                                 Delta_xDN <= Delta_xDP - 1;
                             end if;
                         end if;
+                    
+                    elsif (TSMode = "01") then  
+                    
+                        State_xDN <= stIdle;
+                    
                     else
                         if (unsigned(Timestamp_xDI) = NetxTime_xDN) then
                             State_xDN <= stSend;
