@@ -94,7 +94,7 @@ begin
     p_next : process (Address_xDP, Delta_xDN, Delta_xDP,
                       Enable_xSI, InAddrEvt_xDI, InEmpty_xSI, OutDstRdy_xSI,
                       State_xDP, TimestampPrev_xD, Timestamp_xDI,
-                      NetxTime_xDP, NetxTime_xDN, combo, LastTime_xDP, AbsMode 
+                      NetxTime_xDP, NetxTime_xDN, combo, LastTime_xDP
                       )
     begin
 
