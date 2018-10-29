@@ -17,6 +17,7 @@
 #include <linux/iopoll.h>
 #include <linux/cdev.h>
 #include <linux/idr.h>
+#include <linux/clk.h>
 #include <linux/debugfs.h>
 #include <linux/device.h>
 #include <linux/fs.h>
@@ -318,6 +319,7 @@ struct hpu_priv {
 	uint32_t rx_ctrl_reg;
 	uint32_t rx_aux_ctrl_reg;
 	struct dentry *debugfsdir;
+	struct clk *clk;
 
 	/* spinn-related */
 	int spinn_start;
@@ -1137,6 +1139,9 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		return -EBUSY;
 	}
 
+	if (!IS_ERR(priv->clk))
+		clk_prepare_enable(priv->clk);
+
 	priv->rx_blocking_threshold = ~0;
 	priv->tx_blocking_threshold = ~0;
 	priv->pkt_txed = 0;
@@ -1249,6 +1254,8 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 
 	hpu_dma_release(priv);
 	priv->hpu_is_opened = 0;
+	if (!IS_ERR(priv->clk))
+	    clk_disable_unprepare(priv->clk);
 	mutex_unlock(&priv->access_lock);
 
 	return 0;
@@ -1702,6 +1709,8 @@ static int hpu_probe(struct platform_device *pdev)
 
 	init_completion(&priv->dma_rx_pool.completion);
 	init_completion(&priv->dma_tx_pool.completion);
+
+	priv->clk = devm_clk_get(&pdev->dev, "s_axi_aclk");
 
 	hpu_register_chardev(priv);
 
