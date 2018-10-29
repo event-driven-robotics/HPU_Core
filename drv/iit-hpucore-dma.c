@@ -313,7 +313,7 @@ struct hpu_priv {
 	unsigned int irq;
 	struct mutex access_lock;
 	unsigned int hpu_is_opened;
-	void __iomem *regs;
+	void __iomem *reg_base;
 	uint32_t ctrl_reg;
 	uint32_t rx_ctrl_reg;
 	uint32_t rx_aux_ctrl_reg;
@@ -341,6 +341,8 @@ struct hpu_priv {
 	unsigned long byte_rxed;
 };
 
+#define HPU_REG_LOG 0
+
 #define HPU_DEBUGFS_ULONG(priv, x) debugfs_create_ulong(__stringify(x), 0444, \
 				   priv->debugfsdir, &priv->x);
 
@@ -351,6 +353,24 @@ static DEFINE_IDA(hpu_ida);
 
 static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
 static void hpu_dma_free_pool(struct hpu_priv *priv, struct hpu_dma_pool *hpu_pool);
+
+static void hpu_reg_write(struct hpu_priv *priv, u32 val, int offs)
+{
+	writel(val, priv->reg_base + offs);
+#if HPU_REG_LOG
+	printk(KERN_INFO "W32 0x%x = 0x%x\n", offs, val);
+#endif
+}
+
+static u32 hpu_reg_read(struct hpu_priv *priv, int offs)
+{
+	u32 val;
+	val = readl(priv->reg_base + offs);
+#if HPU_REG_LOG
+	printk(KERN_INFO "R32 0x%x == 0x%x\n", offs, val);
+#endif
+	return val;
+}
 
 static void hpu_tx_dma_callback(void *_buffer)
 {
@@ -615,15 +635,15 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				 * An overflow has been fixed. We have to
 				 * restart the RX machanism, then we can go on.
 				 */
-				writel(priv->rx_ctrl_reg,
-				       priv->regs + HPU_RXCTRL_REG);
-				writel(priv->rx_aux_ctrl_reg,
-				       priv->regs + HPU_AUX_RXCTRL_REG);
+				hpu_reg_write(priv, priv->rx_ctrl_reg,
+					      HPU_RXCTRL_REG);
+				hpu_reg_write(priv, priv->rx_aux_ctrl_reg,
+					      HPU_AUX_RXCTRL_REG);
 
 				/* Re-enable RX FIFO full interrupt */
-				msk = readl(priv->regs + HPU_IRQMASK_REG);
+				msk = hpu_reg_read(priv, HPU_IRQMASK_REG);
 				msk |= HPU_MSK_INT_RXFIFOFULL;
-				writel(msk, priv->regs + HPU_IRQMASK_REG);
+				hpu_reg_write(priv, msk, HPU_IRQMASK_REG);
 
 				WRITE_ONCE(priv->rx_fifo_status, FIFO_OK);
 				break;
@@ -864,8 +884,8 @@ static int hpu_rx_dma_submit_pool(struct hpu_priv *priv)
 
 static void hpu_spinn_do_set_keys(struct hpu_priv *priv)
 {
-	writel(priv->spinn_start_key, priv->regs + HPU_SPINN_START_KEY_REG);
-	writel(priv->spinn_stop_key, priv->regs + HPU_SPINN_STOP_KEY_REG);
+	hpu_reg_write(priv, priv->spinn_start_key, HPU_SPINN_START_KEY_REG);
+	hpu_reg_write(priv, priv->spinn_stop_key, HPU_SPINN_STOP_KEY_REG);
 	dev_dbg(&priv->pdev->dev, "Enabling keys START:0x%x STOP:0x%x\n",
 		priv->spinn_start_key, priv->spinn_stop_key);
 }
@@ -874,12 +894,12 @@ static void hpu_spinn_do_startstop(struct hpu_priv *priv)
 {
 	if (priv->spinn_start) {
 		dev_dbg(&priv->pdev->dev, "Forcing SPINN start\n");
-		writel(0x0, priv->regs + HPU_SPINN_START_KEY_REG);
-		writel(0x0, priv->regs + HPU_SPINN_STOP_KEY_REG);
+		hpu_reg_write(priv, 0x0, HPU_SPINN_START_KEY_REG);
+		hpu_reg_write(priv, 0x0, HPU_SPINN_STOP_KEY_REG);
 	} else {
 		dev_dbg(&priv->pdev->dev, "Forcing SPINN stop\n");
-		writel(0xFFFFFFFF, priv->regs + HPU_SPINN_START_KEY_REG);
-		writel(0xFFFFFFFF, priv->regs + HPU_SPINN_STOP_KEY_REG);
+		hpu_reg_write(priv, 0xFFFFFFFF, HPU_SPINN_START_KEY_REG);
+		hpu_reg_write(priv, 0xFFFFFFFF, HPU_SPINN_STOP_KEY_REG);
 	}
 }
 
@@ -959,12 +979,12 @@ static int hpu_set_rx_interface(struct hpu_priv *priv,
 	case INTERFACE_EYE_L:
 		priv->rx_ctrl_reg &= ~mask;
 		priv->rx_ctrl_reg |= bitfield;
-		writel(priv->rx_ctrl_reg, priv->regs + HPU_RXCTRL_REG);
+		hpu_reg_write(priv, priv->rx_ctrl_reg, HPU_RXCTRL_REG);
 		dev_dbg(&priv->pdev->dev, "RXCTRL reg 0x%x\n", bitfield);
 		break;
 	case INTERFACE_AUX:
 		priv->rx_aux_ctrl_reg = bitfield;
-		writel(priv->rx_aux_ctrl_reg, priv->regs + HPU_AUX_RXCTRL_REG);
+		hpu_reg_write(priv, priv->rx_aux_ctrl_reg, HPU_AUX_RXCTRL_REG);
 		dev_dbg(&priv->pdev->dev, "AUXRXCTRL reg 0x%x\n", bitfield);
 		break;
 	default:
@@ -1033,7 +1053,7 @@ static int hpu_set_tx_interface(struct hpu_priv *priv,
 	}
 
 	dev_dbg(&priv->pdev->dev, "writing TX CTRL REG: 0x%x\n", reg);
-	writel(reg, priv->regs + HPU_TXCTRL_REG);
+	hpu_reg_write(priv, reg, HPU_TXCTRL_REG);
 
 	return 0;
 }
@@ -1059,7 +1079,7 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 		break;
 	}
 
-	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 	dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
 		priv->ctrl_reg);
 
@@ -1070,17 +1090,17 @@ static void hpu_set_aux_thrs(struct hpu_priv *priv, aux_cnt_t aux_cnt_reg)
 {
 	unsigned int reg;
 
-	reg = readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+	reg = hpu_reg_read(priv, HPU_AUX_RX_ERR_THRS_REG);
 	/* Normalize to num of errors, avoiding not valid errors */
 	aux_cnt_reg.err = aux_cnt_reg.err % nomeaning_err;
 	/* Clear the relevant byte */
 	reg = reg & (~((0xFF) << (aux_cnt_reg.err * 8)));
 	/* Write the register */
-	writel((0xFF & aux_cnt_reg.cnt_val) <<
+	hpu_reg_write(priv, (0xFF & aux_cnt_reg.cnt_val) <<
 	       (aux_cnt_reg.err * 8) | reg,
-		       priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+		        HPU_AUX_RX_ERR_THRS_REG);
 	/* Read and print the register */
-	reg = readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+	reg = hpu_reg_read(priv, HPU_AUX_RX_ERR_THRS_REG);
 
 	dev_dbg(&priv->pdev->dev,
 		"HPU_AUX_RX_ERR_THRS_REG 0x%08X\n", reg);
@@ -1097,7 +1117,7 @@ static int hpu_set_timestamp(struct hpu_priv *priv, unsigned int val)
 	else
 		priv->ctrl_reg &= ~HPU_CTRL_FULLTS;
 
-	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
 	return 0;
 }
@@ -1168,9 +1188,9 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 
 	if (!test_dma) {
 		/* Unmask RXFIFOFULL interrupt */
-		msk = readl(priv->regs + HPU_IRQMASK_REG);
+		msk = hpu_reg_read(priv, HPU_IRQMASK_REG);
 		msk |= HPU_MSK_INT_RXFIFOFULL;
-		writel(msk, priv->regs + HPU_IRQMASK_REG);
+		hpu_reg_write(priv, msk, HPU_IRQMASK_REG);
 	}
 
 	priv->spinn_start_key = HPU_DEFAULT_START_KEY;
@@ -1182,14 +1202,14 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 
 	/* Initialize HPU with full TS, no loop */
 	priv->ctrl_reg = HPU_CTRL_FULLTS;
-	writel(priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
-	       priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
+	        HPU_CTRL_REG);
 
 	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA;
-	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
-	priv->rx_aux_ctrl_reg = readl(priv->regs + HPU_AUX_RXCTRL_REG);
-	priv->rx_ctrl_reg = readl(priv->regs + HPU_RXCTRL_REG);
+	priv->rx_aux_ctrl_reg = hpu_reg_read(priv, HPU_AUX_RXCTRL_REG);
+	priv->rx_ctrl_reg = hpu_reg_read(priv, HPU_RXCTRL_REG);
 	mutex_unlock(&priv->access_lock);
 
 	return 0;
@@ -1209,20 +1229,20 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 
 	/* Read CTRL_Register and Disable The IP */
         priv->ctrl_reg &= ~HPU_CTRL_ENDMA;
-	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
-	writel(0x0, priv->regs + HPU_RXCTRL_REG);
-	writel(0x0, priv->regs + HPU_AUX_RXCTRL_REG);
+	hpu_reg_write(priv, 0x0, HPU_RXCTRL_REG);
+	hpu_reg_write(priv, 0x0, HPU_AUX_RXCTRL_REG);
 	/* TX reg to reset val */
-	writel(0x0, priv->regs + HPU_TXCTRL_REG);
+	hpu_reg_write(priv, 0x0, HPU_TXCTRL_REG);
 	priv->spinn_start = 0;
 	hpu_spinn_do_startstop(priv);
 
-	writel(priv->ctrl_reg | HPU_CTRL_RESETDMASTREAM,
-	       priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_RESETDMASTREAM,
+	        HPU_CTRL_REG);
 
-	writel(priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
-	       priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
+	        HPU_CTRL_REG);
 
 	mdelay(100);
 	cancel_work_sync(&priv->rx_housekeeping_work);
@@ -1267,7 +1287,7 @@ static void hpu_handle_err(struct hpu_priv *priv)
 			if (num_channel & (1 << i))
 				dev_info(&priv->pdev->dev,
 					 "Aux CNT %d 0x%08X\n", i,
-					 readl(priv->regs +
+					 hpu_reg_read(priv,
 					       (HPU_AUX_RX_ERR_CH0_REG + i * 4)));
 		}
 	}
@@ -1285,18 +1305,18 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	irqreturn_t retval = 0;
 
 	priv->ctrl_reg &= ~HPU_CTRL_ENINT;
-	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
-	intr = readl(priv->regs + HPU_IRQ_REG);
+	intr = hpu_reg_read(priv, HPU_IRQ_REG);
 
 	if (intr & HPU_MSK_INT_TSTAMPWRAPPED) {
-		writel(HPU_MSK_INT_TSTAMPWRAPPED, priv->regs + HPU_IRQ_REG);
+		hpu_reg_write(priv, HPU_MSK_INT_TSTAMPWRAPPED, HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
 	if (intr & HPU_MSK_INT_RXBUFFREADY) {
 		dev_info(&priv->pdev->dev, "IRQ: RXBUFFREADY\n");
-		writel(HPU_MSK_INT_RXBUFFREADY, priv->regs + HPU_IRQ_REG);
+		hpu_reg_write(priv, HPU_MSK_INT_RXBUFFREADY, HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
@@ -1305,22 +1325,22 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 
 		/* Flush the FIFO */
 		/*
-		  priv->ctrl_reg = readl(priv->regs + HPU_CTRL_REG);
+		  priv->ctrl_reg = hpu_reg_read(priv, HPU_CTRL_REG);
 		  priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
-		  writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+		  hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 		*/
 
 		/* Stop feeding the fifos.. */
-		writel(0x00000000, priv->regs + HPU_RXCTRL_REG);
-		writel(0x00000000, priv->regs + HPU_AUX_RXCTRL_REG);
+		hpu_reg_write(priv, 0x00000000, HPU_RXCTRL_REG);
+		hpu_reg_write(priv, 0x00000000, HPU_AUX_RXCTRL_REG);
 
 		/* Mask fifo-full interrupt */
-		msk = readl(priv->regs + HPU_IRQMASK_REG);
+		msk = hpu_reg_read(priv, HPU_IRQMASK_REG);
 		msk &= ~HPU_MSK_INT_RXFIFOFULL;
-		writel(msk, priv->regs + HPU_IRQMASK_REG);
+		hpu_reg_write(priv, msk, HPU_IRQMASK_REG);
 
 		/* Clear fifo-full interrupt */
-		writel(HPU_MSK_INT_RXFIFOFULL, priv->regs + HPU_IRQ_REG);
+		hpu_reg_write(priv, HPU_MSK_INT_RXFIFOFULL, HPU_IRQ_REG);
 		WRITE_ONCE(priv->rx_fifo_status, FIFO_OVERFLOW);
 
 		/* Schedule the rx-purger thread */
@@ -1332,7 +1352,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 		dev_info(&priv->pdev->dev, "IRQ: RX KO Err\n");
 		hpu_handle_err(priv);
 		/* Clear the interrupt */
-		writel(HPU_MSK_INT_GLBLRXERR_KO, priv->regs + HPU_IRQ_REG);
+		hpu_reg_write(priv, HPU_MSK_INT_GLBLRXERR_KO, HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
@@ -1340,7 +1360,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 		dev_info(&priv->pdev->dev, "IRQ: RX RX Err\n");
 		hpu_handle_err(priv);
 		/* Clear the interrupt */
-		writel(HPU_MSK_INT_GLBLRXERR_RX, priv->regs + HPU_IRQ_REG);
+		hpu_reg_write(priv, HPU_MSK_INT_GLBLRXERR_RX, HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
@@ -1348,7 +1368,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 		dev_info(&priv->pdev->dev, "IRQ: RX TO Err\n");
 		hpu_handle_err(priv);
 		/* Clear the interrupt */
-		writel(HPU_MSK_INT_GLBLRXERR_TO, priv->regs + HPU_IRQ_REG);
+		hpu_reg_write(priv, HPU_MSK_INT_GLBLRXERR_TO, HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
@@ -1356,12 +1376,12 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 		dev_info(&priv->pdev->dev, "IRQ: RX OF Err\n");
 		hpu_handle_err(priv);
 		/* Clear the interrupt */
-		writel(HPU_MSK_INT_GLBLRXERR_OF, priv->regs + HPU_IRQ_REG);
+		hpu_reg_write(priv, HPU_MSK_INT_GLBLRXERR_OF, HPU_IRQ_REG);
 		retval = IRQ_HANDLED;
 	}
 
 	priv->ctrl_reg |= HPU_CTRL_ENINT;
-	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
 	retval = IRQ_HANDLED;
 	return retval;
@@ -1385,17 +1405,17 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 
 	switch (cmd) {
 	case _IOR(0x0, HPU_IOCTL_READTIMESTAMP, unsigned int):
-		ret = readl(priv->regs + HPU_WRAP_REG);
+		ret = hpu_reg_read(priv, HPU_WRAP_REG);
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_CLEARTIMESTAMP, unsigned int):
-		writel(0, priv->regs + HPU_WRAP_REG);
+		hpu_reg_write(priv, 0, HPU_WRAP_REG);
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_READVERSION, unsigned int):
-		ret = readl(priv->regs + HPU_VER_REG);
+		ret = hpu_reg_read(priv, HPU_VER_REG);
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		dev_info(&priv->pdev->dev, "Reading version %d\n", ret);
@@ -1411,11 +1431,11 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 	       if (copy_from_user(&temp_reg, arg, sizeof(temp_reg)))
 		       goto cfuser_err;
 	       if (temp_reg.rw == 0) {
-		      temp_reg.data = readl(priv->regs + temp_reg.reg_offset);
+		      temp_reg.data = hpu_reg_read(priv, temp_reg.reg_offset);
 		       if (copy_to_user(arg, &temp_reg,	sizeof(temp_reg)))
 			       goto cfuser_err;
 	       } else {
-		       writel(temp_reg.data, priv->regs + temp_reg.reg_offset);
+		       hpu_reg_write(priv, temp_reg.data, temp_reg.reg_offset);
 	       }
 	       break;
 
@@ -1438,31 +1458,31 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_THRS, unsigned int *):
-		ret = readl(priv->regs + HPU_AUX_RX_ERR_THRS_REG);
+		ret = hpu_reg_read(priv, HPU_AUX_RX_ERR_THRS_REG);
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT0, unsigned int *):
-		ret = readl(priv->regs + HPU_AUX_RX_ERR_CH0_REG);
+		ret = hpu_reg_read(priv, HPU_AUX_RX_ERR_CH0_REG);
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT1, unsigned int *):
-		ret = readl(priv->regs + HPU_AUX_RX_ERR_CH1_REG);
+		ret = hpu_reg_read(priv, HPU_AUX_RX_ERR_CH1_REG);
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT2, unsigned int *):
-		ret = readl(priv->regs + HPU_AUX_RX_ERR_CH2_REG);
+		ret = hpu_reg_read(priv, HPU_AUX_RX_ERR_CH2_REG);
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
 
 	case _IOR(0x0, HPU_IOCTL_GET_AUX_CNT3, unsigned int *):
-		ret = readl(priv->regs + HPU_AUX_RX_ERR_CH3_REG);
+		ret = hpu_reg_read(priv, HPU_AUX_RX_ERR_CH3_REG);
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
 		break;
@@ -1618,14 +1638,14 @@ static int hpu_probe(struct platform_device *pdev)
 	mutex_init(&priv->dma_rx_pool.mutex_lock);
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-	priv->regs = devm_ioremap_resource(&pdev->dev, res);
-	if (IS_ERR(priv->regs)) {
+	priv->reg_base = devm_ioremap_resource(&pdev->dev, res);
+	if (IS_ERR(priv->reg_base)) {
 		dev_err(&pdev->dev, "HPU has no regs in DT\n");
 		kfree(priv);
-		return PTR_ERR(priv->regs);
+		return PTR_ERR(priv->reg_base);
 	}
 
-	ver = readl(priv->regs + HPU_VER_REG);
+	ver = hpu_reg_read(priv, HPU_VER_REG);
 
 	if (ver != HPU_VER_MAGIC) {
 		if ((ver >> 24) == 'B') {
@@ -1674,11 +1694,11 @@ static int hpu_probe(struct platform_device *pdev)
 
 	/* Set Burst entity of DMA */
 	if (test_dma)
-		writel(((rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,
-		       priv->regs + HPU_DMA_REG);
+		hpu_reg_write(priv, ((rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,
+		        HPU_DMA_REG);
 	else
-		writel((rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK,
-		       priv->regs + HPU_DMA_REG);
+		hpu_reg_write(priv, (rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK,
+		        HPU_DMA_REG);
 
 	init_completion(&priv->dma_rx_pool.completion);
 	init_completion(&priv->dma_tx_pool.completion);
@@ -1696,7 +1716,7 @@ static int hpu_probe(struct platform_device *pdev)
 			return 0;
 		regset->regs = hpu_regs;
 		regset->nregs = ARRAY_SIZE(hpu_regs);
-		regset->base = priv->regs;
+		regset->base = priv->reg_base;
 		debugfs_create_regset32("regdump", 0444, priv->debugfsdir, regset);
 		HPU_DEBUGFS_ULONG(priv, cnt_pktloss);
 		HPU_DEBUGFS_ULONG(priv, pkt_txed);
@@ -1715,7 +1735,7 @@ static int hpu_remove(struct platform_device *pdev)
 	/* FIXME: resource release ! */
 	debugfs_remove_recursive(priv->debugfsdir);
 	priv->ctrl_reg &= ~HPU_CTRL_ENINT & ~HPU_CTRL_ENDMA;
-	writel(priv->ctrl_reg, priv->regs + HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 	free_irq(priv->irq, pdev);
 
 	hpu_unregister_chardev(priv);
