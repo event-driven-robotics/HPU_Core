@@ -1694,10 +1694,10 @@ static int hpu_probe(struct platform_device *pdev)
 
 	/* Set Burst entity of DMA */
 	if (test_dma)
-		hpu_reg_write(priv, ((rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,
+		hpu_reg_write(priv, ((rx_ps / 4) & HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,
 		        HPU_DMA_REG);
 	else
-		hpu_reg_write(priv, (rx_ps / 4 - 1) & HPU_DMA_LENGTH_MASK,
+		hpu_reg_write(priv, (rx_ps / 4) & HPU_DMA_LENGTH_MASK,
 		        HPU_DMA_REG);
 
 	init_completion(&priv->dma_rx_pool.completion);
