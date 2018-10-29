@@ -87,6 +87,7 @@
 #define HPU_AUX_RX_ERR_CH3_REG	0x7C
 #define HPU_SPINN_START_KEY_REG	0x80
 #define HPU_SPINN_STOP_KEY_REG	0x84
+#define HPU_TLAST_TIMEOUT	0xA0
 
 /* magic constants */
 #define HPU_VER_MAGIC			0x42303130
@@ -95,6 +96,7 @@
 #define HPU_CTRL_ENDMA			0x0002
 #define HPU_CTRL_ENINT			0x0004
 #define HPU_CTRL_FLUSHFIFOS		0x0010
+#define HPU_CTRL_AXIS_LAT		BIT(9)
 #define HPU_CTRL_RESETDMASTREAM 	0x1000
 #define HPU_CTRL_FULLTS			0x8000
 #define HPU_CTRL_LOOP_SPINN		(BIT(22) | BIT(23))
@@ -187,7 +189,10 @@ static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_AUX_RX_ERR_CH2_REG",	0x78},
 	{"HPU_AUX_RX_ERR_CH3_REG",	0x7C},
 	{"HPU_SPINN_START_KEY_REG",	0x80},
-	{"HPU_SPINN_STOP_KEY_REG",	0x84}
+	{"HPU_SPINN_STOP_KEY_REG",	0x84},
+	{"HPU_TLAST_TIMEOUT",		0xa0},
+	{"HPU_TLAST_COUNT",		0xa4},
+	{"HPU_DATA_COUNT",		0xa8}
 };
 
 
