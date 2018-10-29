@@ -158,10 +158,10 @@ architecture rtl of neuserial_axistream is
                 next_state <= idle;
             else
                 if (i_valid_read = '1') then
-                    if (FifoCoreLastData_i = '1' and DMA_test_mode_i = '0') then
-                        next_state <= waitfifo;
-                    elsif (i_timeexpired = '1' and i_valid_lastread='0') then
+                    if (i_timeexpired = '1' and i_valid_lastread='0') then
                         next_state <= premature_end;
+                    elsif (FifoCoreLastData_i = '1' and DMA_test_mode_i = '0') then
+                        next_state <= waitfifo;
                     else
                         next_state <= timeval;
                     end if;               
