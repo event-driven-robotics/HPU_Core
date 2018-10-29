@@ -1169,7 +1169,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	}
 
 	priv->spinn_start_key = HPU_DEFAULT_START_KEY;
-	priv->spinn_start_key = HPU_DEFAULT_STOP_KEY;
+	priv->spinn_stop_key = HPU_DEFAULT_STOP_KEY;
 	priv->spinn_start = 0;
 	priv->spinn_keys_enable = 1;
 	hpu_spinn_do_startstop(priv);
