@@ -341,6 +341,7 @@ struct hpu_priv {
 	unsigned long byte_txed;
 	unsigned long pkt_rxed;
 	unsigned long byte_rxed;
+	int axis_lat;
 };
 
 #define HPU_REG_LOG 0
@@ -459,6 +460,12 @@ static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *re
 
 	dev_dbg(&priv->pdev->dev, "RX DMA cb\n");
 	priv->pkt_rxed++;
+	/*
+	 * when HPU prodive odd number of data it means that it has produced
+	 * an early TLAST sending also a dummy data, so we need to discard it
+	 */
+	if (len & 1)
+		len--;
 	priv->byte_rxed += len;
 
 	spin_lock(&priv->dma_rx_pool.spin_lock);
@@ -1088,6 +1095,18 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 	return 0;
 }
 
+static void hpu_do_set_axis_lat(struct hpu_priv *priv)
+{
+	u32 lat;
+	unsigned long rate;
+
+
+	rate = clk_get_rate(priv->clk);
+	lat = rate / 1000 * priv->axis_lat;
+	printk("CLK rate %lu; lat %u\n", rate, lat);
+	hpu_reg_write(priv, lat, HPU_TLAST_TIMEOUT);
+}
+
 static void hpu_set_aux_thrs(struct hpu_priv *priv, aux_cnt_t aux_cnt_reg)
 {
 	unsigned int reg;
@@ -1210,7 +1229,12 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
 	        HPU_CTRL_REG);
 
+	priv->axis_lat = 1; /* mS */
 	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA;
+	if (!IS_ERR(priv->clk)) {
+		priv->ctrl_reg |= HPU_CTRL_AXIS_LAT;
+		hpu_do_set_axis_lat(priv);
+	}
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
 	priv->rx_aux_ctrl_reg = hpu_reg_read(priv, HPU_AUX_RXCTRL_REG);
@@ -1711,6 +1735,8 @@ static int hpu_probe(struct platform_device *pdev)
 	init_completion(&priv->dma_tx_pool.completion);
 
 	priv->clk = devm_clk_get(&pdev->dev, "s_axi_aclk");
+	if (IS_ERR(priv->clk))
+		dev_warn(&priv->pdev->dev, "cannot get clock: s_axi_aclk; disabling AXIS latency timeout\n");
 
 	hpu_register_chardev(priv);
 
