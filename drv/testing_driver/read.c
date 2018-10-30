@@ -71,6 +71,7 @@
 #define IOC_SET_SPINN_STARTSTOP		_IOW(IOC_MAGIC_NUMBER, 25, unsigned int *)
 #define IOC_SET_RX_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 26, hpu_rx_interface_ioctl_t *)
 #define IOC_SET_TX_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 27, hpu_tx_interface_ioctl_t *)
+#define IOC_SET_AXIS_LATENCY		_IOW(IOC_MAGIC_NUMBER, 28, unsigned int *)
 
 typedef enum {
 	LOOP_NONE,
@@ -184,7 +185,7 @@ void read_thr_data(int chunk_size, int chunk_num)
 	}
 }
 
-const int loop_near = 0;
+const int loop_near = 1;
 
 int main(int argc, char * argv[])
 {
@@ -253,6 +254,10 @@ int main(int argc, char * argv[])
 	timestamp = 1;
 	ioctl(iit_hpu, IOC_SET_TS_TYPE, &timestamp);
 
+	val = 500;
+	ioctl(iit_hpu, IOC_SET_AXIS_LATENCY, &val);
+
+
 	/* check for correctness - write and read not overlappin*/
 	for (i = 0; i < iter_count; i++) {
 		write_data(tx_size, tx_n);
@@ -287,6 +292,13 @@ int main(int argc, char * argv[])
 			printf("read %d instead of %d\n", ret, rx_ps * i);
 	}
 	printf("phase 4 OK\n");
+
+	val = 10;
+	ioctl(iit_hpu, IOC_SET_AXIS_LATENCY, &val);
+	/* check for early-tlast mechanism to be OK */
+	write_data(rx_ps / 8 / 2, 1);
+	read_data(rx_ps / 8 / 2, 1);
+	printf("phase 5 OK\n");
 
 	size = 0x7fff0000;
 	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
