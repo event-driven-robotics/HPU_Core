@@ -341,6 +341,7 @@ struct hpu_priv {
 	unsigned long byte_txed;
 	unsigned long pkt_rxed;
 	unsigned long byte_rxed;
+	unsigned long early_tlast;
 	int axis_lat;
 };
 
@@ -454,18 +455,25 @@ static void hpu_rx_housekeeping(struct work_struct *work)
 
 static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *result)
 {
+	u32 word;
 	struct hpu_buf *buffer = _buffer;
 	struct hpu_priv *priv = buffer->priv;
 	int len = priv->dma_rx_pool.ps - result->residue;
 
 	dev_dbg(&priv->pdev->dev, "RX DMA cb\n");
 	priv->pkt_rxed++;
+
 	/*
 	 * when HPU prodive odd number of data it means that it has produced
 	 * an early TLAST sending also a dummy data, so we need to discard it
 	 */
-	if (len & 1)
-		len--;
+	if ((len / 4) & 1) {
+		priv->early_tlast++;
+		len -= 4;
+		word = ((u32*)buffer->virt)[len / 4];
+		if (unlikely(word != 0xf0cacc1a))
+			dev_err(&priv->pdev->dev, "Got early TLAST, but no magic word\n");
+	}
 	priv->byte_rxed += len;
 
 	spin_lock(&priv->dma_rx_pool.spin_lock);
@@ -1103,7 +1111,7 @@ static void hpu_do_set_axis_lat(struct hpu_priv *priv)
 
 	rate = clk_get_rate(priv->clk);
 	lat = rate / 1000 * priv->axis_lat;
-	printk("CLK rate %lu; lat %u\n", rate, lat);
+
 	hpu_reg_write(priv, lat, HPU_TLAST_TIMEOUT);
 }
 
@@ -1167,6 +1175,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	priv->byte_txed = 0;
 	priv->pkt_rxed = 0;
 	priv->byte_rxed = 0;
+	priv->early_tlast = 0;
 	priv->rx_fifo_status = FIFO_OK;
 
 	priv->hpu_is_opened = 1;
@@ -1229,7 +1238,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
 	        HPU_CTRL_REG);
 
-	priv->axis_lat = 1; /* mS */
+	priv->axis_lat = 10; /* mS */
 	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA;
 	if (!IS_ERR(priv->clk)) {
 		priv->ctrl_reg |= HPU_CTRL_AXIS_LAT;
@@ -1758,6 +1767,7 @@ static int hpu_probe(struct platform_device *pdev)
 		HPU_DEBUGFS_ULONG(priv, pkt_rxed);
 		HPU_DEBUGFS_ULONG(priv, byte_txed);
 		HPU_DEBUGFS_ULONG(priv, byte_rxed);
+		HPU_DEBUGFS_ULONG(priv, early_tlast);
 	}
 
 	return 0;
