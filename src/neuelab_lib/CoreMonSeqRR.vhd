@@ -127,6 +127,7 @@ architecture str of CoreMonSeqRR is
     signal EnableTimestampCounter_xS  : std_logic;
     signal EnableTimestampCounter_xSB : std_logic;
     signal Timestamp_xD               : std_logic_vector(31 downto 0);
+    signal ShortTimestamp_xD          : std_logic_vector(31 downto 0);
 
     -- Monitor -> Core
     signal MonOutAddrEvt_xD     : std_logic_vector(63 downto 0);
@@ -252,6 +253,9 @@ begin
             OutFull_xSI    => MonOutFull_xS
         );
 
+ShortTimestamp_xD <= x"0000" & "000" & Timestamp_xD(12 downto 0);
+
+
     u_AEXSsequencerRR : AEXSsequencerRR
         generic map (
             TestEnableSequencerNoWait => TestEnableSequencerNoWait
@@ -260,7 +264,9 @@ begin
             Rst_xRBI       => Reset_xRBI,
             Clk_xCI        => CoreClk_xCI,
             Enable_xSI     => EnableSequencer_xS,
-            Timestamp_xDI  => Timestamp_xD,
+            TSMode         => "01",
+            --
+            Timestamp_xDI  => ShortTimestamp_xD, --Timestamp_xD,
             --
             InAddrEvt_xDI  => SeqInAddrEvt_xD,
             InRead_xSO     => SeqInRead_xS,

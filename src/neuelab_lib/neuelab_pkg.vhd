@@ -100,6 +100,7 @@ package NEComponents_pkg is
             Rst_xRBI       : in  std_logic;
             Clk_xCI        : in  std_logic;
             Enable_xSI     : in  std_logic;
+            TSMode         : in  std_logic_vector(1 downto 0);
             --
             Timestamp_xDI  : in  std_logic_vector(31 downto 0);
             --
