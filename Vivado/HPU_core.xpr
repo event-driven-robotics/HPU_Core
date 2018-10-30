@@ -21,6 +21,7 @@
     <Option Name="ActiveSimSet" Val="sim_1"/>
     <Option Name="DefaultLib" Val="work"/>
     <Option Name="ProjectType" Val="Default"/>
+    <Option Name="IPRepoPath" Val="$PPRDIR/../../HPU_Core"/>
     <Option Name="IPRepoPath" Val="$PPRDIR/../../../../projects/repository/hpu_core"/>
     <Option Name="IPOutputRepo" Val="$PPRDIR/../../HPU_Core_Git/Vivado/HPU_core.cache/ip"/>
     <Option Name="IPCachePermission" Val="read"/>

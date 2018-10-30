@@ -3,7 +3,7 @@
   <spirit:vendor>IIT</spirit:vendor>
   <spirit:library>IIT_lib</spirit:library>
   <spirit:name>HPU_Core</spirit:name>
-  <spirit:version>3.2</spirit:version>
+  <spirit:version>3.3</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
       <spirit:name>M_AXIS</spirit:name>
@@ -271,7 +271,7 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>ASSOCIATED_BUSIF</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.S_AXI_ACLK.ASSOCIATED_BUSIF">S_AXI:S_AXIS:M_AXIS</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.S_AXI_ACLK.ASSOCIATED_BUSIF">S_AXI</spirit:value>
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>ASSOCIATED_RESET</spirit:name>
@@ -309,7 +309,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>fa6d612d</spirit:value>
+            <spirit:value>1e49a149</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -328,7 +328,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>fa6d612d</spirit:value>
+            <spirit:value>1e49a149</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -343,7 +343,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>cb06a455</spirit:value>
+            <spirit:value>1409b480</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -357,7 +357,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>817aec71</spirit:value>
+            <spirit:value>5ef221d4</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -371,7 +371,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>9ebb2967</spirit:value>
+            <spirit:value>38b97564</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -3281,7 +3281,7 @@
       <spirit:file>
         <spirit:name>src/HPU_lib/HPUCore.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_2d5534c8</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_cbe600ad</spirit:userFileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
@@ -3649,9 +3649,9 @@
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/HPU_Core_v3_2.tcl</spirit:name>
+        <spirit:name>xgui/HPU_Core_v3_3.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_817aec71</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_5ef221d4</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -3862,7 +3862,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">HPU_Core_v3_2</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">HPU_Core_v3_3</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -3901,8 +3901,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>1</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2018-10-26T13:51:59Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>3</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2018-10-30T14:50:48Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
@@ -3911,17 +3911,18 @@
         <xilinx:tag xilinx:name="IIT:IIT_lib:HPU Core:3.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPU_Core/__IP_Export__/Vivado</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.0_ARCHIVE_LOCATION">d:/projects/repository/hpu_core</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.1_ARCHIVE_LOCATION">d:/Projects/Repository/HPU_Core</xilinx:tag>
-        <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.2_ARCHIVE_LOCATION">d:/Projects/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.2_ARCHIVE_LOCATION">/mnt/design/WORK/GIT/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.3_ARCHIVE_LOCATION">/mnt/design/WORK/GIT/HPU_Core</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2017.4.1</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="ec2d16a4"/>
+      <xilinx:xilinxVersion>2017.4</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="151a7657"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="68cb75ed"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="ca0045ef"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="d8c0bfec"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="05152ba2"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="f3d62396"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="b4c5d56d"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>
