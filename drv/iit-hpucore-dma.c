@@ -161,6 +161,7 @@
 #define HPU_IOCTL_SET_SPINN_STARTSTOP	25
 #define HPU_IOCTL_SET_RX_INTERFACE	26
 #define HPU_IOCTL_SET_TX_INTERFACE	27
+#define HPU_IOCTL_SET_AXIS_LATENCY	28
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -1581,6 +1582,14 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 			goto cfuser_err;
 		res = hpu_set_tx_interface(priv, txiface.cfg, txiface.route);
 		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_AXIS_LATENCY, unsigned int *):
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
+			goto cfuser_err;
+		priv->axis_lat = val;
+		hpu_do_set_axis_lat(priv);
+		break;
+
 	default:
 		res = -EINVAL;
 	}
