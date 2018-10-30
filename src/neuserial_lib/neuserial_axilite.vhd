@@ -1314,10 +1314,11 @@ begin
     -- DMA_reg - DMA Interface register R/W
     --
 
-    i_DmaLength <= i_DMA_reg(15 downto 0);
+    -- The bit 0 is always zero, this means that only even number of data are
+    i_DmaLength <= i_DMA_reg(15 downto 1)&'0';
 
     i_DMA_rd <= c_zero_vect(31 downto 17) & i_DMA_reg(16) &
-                i_DmaLength;
+                i_DmaLength(15 downto 1)&'0';
 
     DmaLength_o <= i_DmaLength;
 

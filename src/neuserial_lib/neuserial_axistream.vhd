@@ -75,6 +75,7 @@ architecture rtl of neuserial_axistream is
     signal i_TlastTimer     : std_logic_vector(31 downto 0);   
     signal i_timeexpired    : std_logic; 
     signal counterTest      : std_logic_vector(31 downto 0);
+    signal i_sent_a_couple  : std_logic;
     
   begin 
     enable_p : process (Clk)
@@ -113,6 +114,8 @@ architecture rtl of neuserial_axistream is
       end if;
    end process CountData_p;
 
+-- At least a data couple has been sent when counterData>1
+i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counterData'length)) else '0';
    
 -- ASM that manages the timing of the Shared Multiplier
 
@@ -128,7 +131,7 @@ architecture rtl of neuserial_axistream is
    end process SYNC_PROC;
  
    NEXT_STATE_DECODE: process (state, i_enable_ip, FifoCoreEmpty_i, i_valid_read, EnableAxistreamIf_i,
-                               i_valid_lastread, FifoCoreLastData_i, i_timeexpired, DMA_test_mode_i)
+                               i_valid_lastread, FifoCoreLastData_i, i_timeexpired, DMA_test_mode_i, i_sent_a_couple)
    begin
       case (state) is
       
@@ -140,7 +143,9 @@ architecture rtl of neuserial_axistream is
 			end if;
 			
         when waitfifo =>
-            if (FifoCoreEmpty_i = '1' and DMA_test_mode_i = '0') then
+            if (i_timeexpired = '1' and i_sent_a_couple='1') then
+                next_state <= premature_end;
+            elsif (FifoCoreEmpty_i = '1' and DMA_test_mode_i = '0') then
                 next_state <= waitfifo;
             else
                 next_state <= timeval;
@@ -149,6 +154,8 @@ architecture rtl of neuserial_axistream is
         when timeval =>
             if (i_valid_read = '1') then
                 next_state <= dataval;
+            elsif (i_timeexpired = '1' and i_sent_a_couple='1') then
+                next_state <= premature_end;
             else 
                 next_state <= timeval;
             end if;

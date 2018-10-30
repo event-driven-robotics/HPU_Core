@@ -19,15 +19,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="854251278213fs"></ZoomStartTime>
-      <ZoomEndTime time="854712040936fs"></ZoomEndTime>
-      <Cursor1Time time="854468076000fs"></Cursor1Time>
+      <ZoomStartTime time="99709872000fs"></ZoomStartTime>
+      <ZoomEndTime time="101311872001fs"></ZoomEndTime>
+      <Cursor1Time time="100279872000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="294"></NameColumnWidth>
-      <ValueColumnWidth column_width="76"></ValueColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="22" />
+   <WVObjectSize size="24" />
    <wave_markers>
       <marker label="" time="394944536000" />
       <marker label="" time="399700209000" />
@@ -692,9 +692,17 @@
       <obj_property name="ElementShortName">state</obj_property>
       <obj_property name="ObjectShortName">state</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/counterData">
+      <obj_property name="ElementShortName">counterData[15:0]</obj_property>
+      <obj_property name="ObjectShortName">counterData[15:0]</obj_property>
+   </wvobject>
    <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_timeexpired">
       <obj_property name="ElementShortName">i_timeexpired</obj_property>
       <obj_property name="ObjectShortName">i_timeexpired</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_sent_a_couple">
+      <obj_property name="ElementShortName">i_sent_a_couple</obj_property>
+      <obj_property name="ObjectShortName">i_sent_a_couple</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_valid_read">
       <obj_property name="ElementShortName">i_valid_read</obj_property>
