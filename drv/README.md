@@ -35,6 +35,7 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_SET_SPINN_STARTSTOP |25| W |      unsigned int      |
 |HPU_IOCTL_SET_RX_INTERFACE    |26| W |hpu_rx_interface_ioctl_t|
 |HPU_IOCTL_SET_TX_INTERFACE    |27| W |hpu_tx_interface_ioctl_t|
+|HPU_IOCTL_SET_AXIS_LATENCY    |28| W |      unsigned int      |
 
 
 typedef struct aux_cnt {
@@ -192,6 +193,10 @@ MSBs|  dest  |
  10 | SPINN  |
  11 | ALL    |
 
+### HPU_IOCTL_SET_AXIS_LATENCY
+Set the maximum time (in mS) after which a data transfer is forced to happen, even if it would contain less data than expected.
+
+This affects only the RX channel, and it allows to limit the latency when few data is received, while still keeping large buffers to be able to handle also high-load situations.
 
 Module parameters
 -----------------
