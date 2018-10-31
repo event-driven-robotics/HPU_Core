@@ -1283,17 +1283,44 @@ err_dealloc_dma:
 static int hpu_chardev_close(struct inode *i, struct file *fp)
 {
 	struct hpu_priv *priv = fp->private_data;
+	ktime_t time;
 
 	mutex_lock(&priv->access_lock);
 
-	/* Read CTRL_Register and Disable The IP */
+	/* Disable RX */
+	hpu_reg_write(priv, 0x0, HPU_RXCTRL_REG);
+	hpu_reg_write(priv, 0x0, HPU_AUX_RXCTRL_REG);
+	/* Disable TX */
+	hpu_reg_write(priv, 0x0, HPU_TXCTRL_REG);
+
+	/* Disable interrupts */
+	hpu_reg_write(priv, 0x0, HPU_IRQMASK_REG);
+
+	/*
+	 * Ease fifo flushing - in order for DMA to be disabled the stream must
+	 * end with a TLAST
+	 */
+	hpu_reg_write(priv, 1, HPU_TLAST_TIMEOUT);
+
+	/* Disable DMA */
         priv->ctrl_reg &= ~HPU_CTRL_ENDMA;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
-	hpu_reg_write(priv, 0x0, HPU_RXCTRL_REG);
-	hpu_reg_write(priv, 0x0, HPU_AUX_RXCTRL_REG);
-	/* TX reg to reset val */
-	hpu_reg_write(priv, 0x0, HPU_TXCTRL_REG);
+	/*
+	 * Keep on draining RX DMA descriptor to make sure the IP is
+	 * allowed to end up with a TLAST, otherwise it would not
+	 * stop properly - wait for the IP to really stop.
+	 */
+	time = ktime_add_us(ktime_get(), 2000000); /* timeout 2 Sec */
+	while (hpu_reg_read(priv, HPU_CTRL_REG) & HPU_CTRL_DMA_RUNNING) {
+		if (ktime_compare(ktime_get(), time) > 0) {
+			dev_err(&priv->pdev->dev, "Cannot stop IP (DMA running)\n");
+			break;
+		}
+		hpu_flush_rx_fifo(priv);
+		msleep(5);
+	}
+
 	priv->spinn_start = 0;
 	hpu_spinn_do_startstop(priv);
 
