@@ -1167,7 +1167,7 @@ static int hpu_set_timestamp(struct hpu_priv *priv, unsigned int val)
 static int hpu_chardev_open(struct inode *i, struct file *f)
 {
 	int ret = 0;
-	u32 msk;
+	u32 reg;
 	struct hpu_priv *priv = container_of(i->i_cdev,
 					     struct hpu_priv, cdev);
 
@@ -1233,9 +1233,9 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 
 	if (!test_dma) {
 		/* Unmask RXFIFOFULL interrupt */
-		msk = hpu_reg_read(priv, HPU_IRQMASK_REG);
-		msk |= HPU_MSK_INT_RXFIFOFULL;
-		hpu_reg_write(priv, msk, HPU_IRQMASK_REG);
+		reg = hpu_reg_read(priv, HPU_IRQMASK_REG);
+		reg |= HPU_MSK_INT_RXFIFOFULL;
+		hpu_reg_write(priv, reg, HPU_IRQMASK_REG);
 	}
 
 	priv->spinn_start_key = HPU_DEFAULT_START_KEY;
