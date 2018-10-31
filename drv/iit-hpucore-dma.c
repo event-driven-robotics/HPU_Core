@@ -96,7 +96,8 @@
 #define HPU_CTRL_DMA_RUNNING		0x0001
 #define HPU_CTRL_ENDMA			0x0002
 #define HPU_CTRL_ENINT			0x0004
-#define HPU_CTRL_FLUSHFIFOS		0x0010
+#define HPU_CTRL_FLUSH_RX_FIFO		BIT(4)
+#define HPU_CTRL_FLUSH_TX_FIFO		BIT(8)
 #define HPU_CTRL_AXIS_LAT		BIT(9)
 #define HPU_CTRL_RESETDMASTREAM 	0x1000
 #define HPU_CTRL_FULLTS			0x8000
@@ -1247,8 +1248,9 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 
 	/* Initialize HPU with full TS, no loop */
 	priv->ctrl_reg = HPU_CTRL_FULLTS;
-	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
-	        HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg |
+		      HPU_CTRL_FLUSH_TX_FIFO | HPU_CTRL_FLUSH_RX_FIFO,
+		      HPU_CTRL_REG);
 
 	/* Set RX DMA max pkt len (data count before TLAST) */
 	reg = priv->dma_rx_pool.ps / 4;
@@ -1297,8 +1299,9 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_RESETDMASTREAM,
 	        HPU_CTRL_REG);
 
-	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
-	        HPU_CTRL_REG);
+	hpu_reg_write(priv, priv->ctrl_reg |
+		      HPU_CTRL_FLUSH_TX_FIFO | HPU_CTRL_FLUSH_RX_FIFO,
+		      HPU_CTRL_REG);
 
 	mdelay(100);
 	cancel_work_sync(&priv->rx_housekeeping_work);
