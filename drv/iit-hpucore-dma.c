@@ -1708,9 +1708,9 @@ static int hpu_probe(struct platform_device *pdev)
 	if (IS_ERR(priv->clk))
 		dev_warn(&priv->pdev->dev, "cannot get clock: s_axi_aclk; disabling AXIS latency timeout\n");
 
-	hpu_clk_enable();
+	hpu_clk_enable(priv);
 	ver = hpu_reg_read(priv, HPU_VER_REG);
-	hpu_clk_disable();
+	hpu_clk_disable(priv);
 
 	if (ver != HPU_VER_MAGIC) {
 		if ((ver >> 24) == 'B') {
