@@ -1250,6 +1250,12 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_FLUSHFIFOS,
 	        HPU_CTRL_REG);
 
+	/* Set RX DMA max pkt len (data count before TLAST) */
+	reg = priv->dma_rx_pool.ps / 4;
+	if (test_dma)
+		reg |= HPU_DMA_TEST_ON;
+	hpu_reg_write(priv, reg , HPU_DMA_REG);
+
 	priv->axis_lat = 10; /* mS */
 	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA;
 	if (!IS_ERR(priv->clk)) {
@@ -1760,12 +1766,6 @@ static int hpu_probe(struct platform_device *pdev)
 		dev_warn(&priv->pdev->dev, "tx_ps too small. using default\n");
 		tx_ps = HPU_TX_POOL_SIZE;
 	}
-
-	/* Set Burst entity of DMA */
-	if (test_dma)
-		hpu_reg_write(priv, (rx_ps / 4) | HPU_DMA_TEST_ON, HPU_DMA_REG);
-	else
-		hpu_reg_write(priv, (rx_ps / 4), HPU_DMA_REG);
 
 	init_completion(&priv->dma_rx_pool.completion);
 	init_completion(&priv->dma_tx_pool.completion);
