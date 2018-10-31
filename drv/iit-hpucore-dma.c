@@ -1383,16 +1383,14 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	if (intr & HPU_MSK_INT_RXFIFOFULL) {
 		dev_info(&priv->pdev->dev, "IRQ: RXFIFOFULL\n");
 
-		/* Flush the FIFO */
-		/*
-		  priv->ctrl_reg = hpu_reg_read(priv, HPU_CTRL_REG);
-		  priv->ctrl_reg |= HPU_CTRL_FLUSHFIFOS;
-		  hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
-		*/
-
 		/* Stop feeding the fifos.. */
 		hpu_reg_write(priv, 0x00000000, HPU_RXCTRL_REG);
 		hpu_reg_write(priv, 0x00000000, HPU_AUX_RXCTRL_REG);
+
+		/* Flush the RX FIFO */
+		hpu_reg_write(priv,
+			      priv->ctrl_reg | HPU_CTRL_FLUSH_RX_FIFO,
+			      HPU_CTRL_REG);
 
 		/* Mask fifo-full interrupt */
 		msk = hpu_reg_read(priv, HPU_IRQMASK_REG);
