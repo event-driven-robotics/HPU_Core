@@ -521,7 +521,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 	if (!access_ok(VERIFY_WRITE, buf, lenght))
 		return -EFAULT;
 
-	while (i < lenght) {
+	while (lenght) {
 		copy = min_t(size_t, priv->dma_tx_pool.ps, lenght);
 		dma_buf = &priv->dma_tx_pool.ring[priv->dma_tx_pool.buf_index];
 
@@ -580,6 +580,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 		priv->byte_txed += copy;
 
 		i += copy;
+		lenght -= copy;
 
 		if (count++ > (priv->dma_tx_pool.pn / 2)) {
 			count = 0;
