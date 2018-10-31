@@ -377,6 +377,18 @@ static u32 hpu_reg_read(struct hpu_priv *priv, int offs)
 	return val;
 }
 
+static void hpu_clk_enable(struct hpu_priv *priv)
+{
+	if (!IS_ERR(priv->clk))
+		clk_prepare_enable(priv->clk);
+}
+
+static void hpu_clk_disable(struct hpu_priv *priv)
+{
+	if (!IS_ERR(priv->clk))
+		clk_disable_unprepare(priv->clk);
+}
+
 static void hpu_tx_dma_callback(void *_buffer)
 {
 	struct hpu_buf *buffer = _buffer;
@@ -1167,8 +1179,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		return -EBUSY;
 	}
 
-	if (!IS_ERR(priv->clk))
-		clk_prepare_enable(priv->clk);
+	hpu_clk_enable(priv);
 
 	priv->rx_blocking_threshold = ~0;
 	priv->tx_blocking_threshold = ~0;
@@ -1288,8 +1299,7 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 
 	hpu_dma_release(priv);
 	priv->hpu_is_opened = 0;
-	if (!IS_ERR(priv->clk))
-	    clk_disable_unprepare(priv->clk);
+	hpu_clk_disable(priv);
 	mutex_unlock(&priv->access_lock);
 
 	return 0;
