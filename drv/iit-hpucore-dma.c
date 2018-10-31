@@ -1736,6 +1736,10 @@ static int hpu_probe(struct platform_device *pdev)
 		dev_warn(&priv->pdev->dev, "rx_ps too small. using default\n");
 		rx_ps = HPU_RX_POOL_SIZE;
 	}
+	if ((rx_ps / 4) > HPU_DMA_LENGTH_MASK) {
+		dev_warn(&priv->pdev->dev, "rx_ps too big. using default\n");
+		rx_ps = HPU_RX_POOL_SIZE;
+	}
 	if (tx_ps < 8) {
 		dev_warn(&priv->pdev->dev, "tx_ps too small. using default\n");
 		tx_ps = HPU_TX_POOL_SIZE;
@@ -1743,11 +1747,9 @@ static int hpu_probe(struct platform_device *pdev)
 
 	/* Set Burst entity of DMA */
 	if (test_dma)
-		hpu_reg_write(priv, ((rx_ps / 4) & HPU_DMA_LENGTH_MASK) | HPU_DMA_TEST_ON,
-		        HPU_DMA_REG);
+		hpu_reg_write(priv, (rx_ps / 4) | HPU_DMA_TEST_ON, HPU_DMA_REG);
 	else
-		hpu_reg_write(priv, (rx_ps / 4) & HPU_DMA_LENGTH_MASK,
-		        HPU_DMA_REG);
+		hpu_reg_write(priv, (rx_ps / 4), HPU_DMA_REG);
 
 	init_completion(&priv->dma_rx_pool.completion);
 	init_completion(&priv->dma_tx_pool.completion);
