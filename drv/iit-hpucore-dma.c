@@ -1256,6 +1256,11 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	hpu_spinn_do_startstop(priv);
 	hpu_spinn_do_set_keys(priv);
 
+	priv->rx_aux_ctrl_reg = 0;
+	priv->rx_ctrl_reg = 0;
+	hpu_reg_write(priv, priv->rx_aux_ctrl_reg, HPU_AUX_RXCTRL_REG);
+	hpu_reg_write(priv, priv->rx_ctrl_reg, HPU_RXCTRL_REG);
+
 	/* Initialize HPU with full TS, no loop */
 	priv->ctrl_reg = HPU_CTRL_FULLTS;
 	hpu_reg_write(priv, priv->ctrl_reg |
@@ -1276,10 +1281,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	}
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
-	priv->rx_aux_ctrl_reg = hpu_reg_read(priv, HPU_AUX_RXCTRL_REG);
-	priv->rx_ctrl_reg = hpu_reg_read(priv, HPU_RXCTRL_REG);
 	mutex_unlock(&priv->access_lock);
-
 	return 0;
 
 err_dealloc_dma:
