@@ -87,6 +87,8 @@ architecture rtl of neuserial_axistream is
             else
                 if (ResetStream_i='1') then
                     i_enable_ip <= '0';
+                elsif (EnableAxistreamIf_i='0' and i_sent_a_couple='0') then
+                    i_enable_ip <= '0';
                 else
                     if EnableAxistreamIf_i = '1' then
                         i_enable_ip <= '1';
@@ -124,6 +126,8 @@ i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counte
    begin
       if (Clk'event and Clk = '1') then
          if (nRst = '0') then
+            state <= idle;
+         elsif (EnableAxistreamIf_i='0' and i_sent_a_couple='0') then
             state <= idle;
          else
             state <= next_state;
