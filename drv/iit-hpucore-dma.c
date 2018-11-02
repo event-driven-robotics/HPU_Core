@@ -1241,14 +1241,6 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	}
 	dma_async_issue_pending(priv->dma_rx_chan);
 
-	if (test_dma)
-		priv->irq_msk = 0;
-	else
-		/* Unmask RXFIFOFULL interrupt */
-		priv->irq_msk = HPU_MSK_INT_RXFIFOFULL;
-
-	hpu_reg_write(priv, priv->irq_msk, HPU_IRQMASK_REG);
-
 	priv->spinn_start_key = HPU_DEFAULT_START_KEY;
 	priv->spinn_stop_key = HPU_DEFAULT_STOP_KEY;
 	priv->spinn_start = 0;
@@ -1274,6 +1266,16 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	hpu_reg_write(priv, reg , HPU_DMA_REG);
 
 	priv->axis_lat = 10; /* mS */
+	if (test_dma)
+		priv->irq_msk = 0;
+	else
+		/* Unmask RXFIFOFULL interrupt */
+		priv->irq_msk = HPU_MSK_INT_RXFIFOFULL;
+
+	hpu_reg_write(priv, priv->irq_msk, HPU_IRQMASK_REG);
+	/* clear all INTs */
+	hpu_reg_write(priv, 0xffffffff, HPU_IRQ_REG);
+
 	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA;
 	if (!IS_ERR(priv->clk)) {
 		priv->ctrl_reg |= HPU_CTRL_AXIS_LAT;
