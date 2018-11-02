@@ -89,6 +89,8 @@
 #define HPU_SPINN_START_KEY_REG	0x80
 #define HPU_SPINN_STOP_KEY_REG	0x84
 #define HPU_TLAST_TIMEOUT	0xA0
+#define HPU_TLAST_COUNT		0xA4
+#define HPU_DATA_COUNT		0xA8
 
 /* magic constants */
 #define HPU_VER_MAGIC			0x42303130
@@ -345,8 +347,11 @@ struct hpu_priv {
 	unsigned long byte_txed;
 	unsigned long pkt_rxed;
 	unsigned long byte_rxed;
+	unsigned long rawbyte_rxed;
 	unsigned long early_tlast;
 	int axis_lat;
+	int rx_initial_tlast;
+	int rx_initial_byte;
 };
 
 #define HPU_REG_LOG 0
@@ -361,6 +366,7 @@ static DEFINE_IDA(hpu_ida);
 
 static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
 static void hpu_dma_free_pool(struct hpu_priv *priv, struct hpu_dma_pool *hpu_pool);
+static void hpu_do_set_axis_lat(struct hpu_priv *priv);
 
 static void hpu_reg_write(struct hpu_priv *priv, u32 val, int offs)
 {
@@ -404,8 +410,11 @@ static void hpu_tx_dma_callback(void *_buffer)
 	spin_unlock(&priv->dma_tx_pool.spin_lock);
 }
 
-/* called with RX lock held */
-static void hpu_flush_rx_fifo(struct hpu_priv *priv)
+/*
+ * Drain data from RX DMA descriptors that has been already completed.
+ * Must be called with RX lock held.
+ */
+static void hpu_drain_rx_dma(struct hpu_priv *priv)
 {
 	int finished = 0;
 	int ret;
@@ -434,6 +443,59 @@ static void hpu_flush_rx_fifo(struct hpu_priv *priv)
 	}
 }
 
+/*
+ * Perform a full RX-path flush by draining all data. This could leave some
+ * leftovers if the HPU internal fifo is not emply (the caller shall ensure it).
+ * Must be called with RX lock held
+ */
+static void hpu_flush_rx(struct hpu_priv *priv)
+{
+	u16 rx_IP_tlast_count, rx_SW_tlast_count;
+	u16 rx_IP_byte_count, rx_SW_byte_count;
+	int ret;
+
+	/*
+	 * We assume to get here with empty RX fifos, so we just want to get
+	 * TLAST on any transfer that might be pending; we don't worry about
+	 * stuff in RXFIFO that would be tranferred to DMA in small chunks
+	 */
+	hpu_reg_write(priv, 1, HPU_TLAST_TIMEOUT);
+
+	while (1) {
+		hpu_drain_rx_dma(priv);
+
+		rx_IP_tlast_count = hpu_reg_read(priv, HPU_TLAST_COUNT) >> 16;
+		rx_IP_byte_count = (hpu_reg_read(priv, HPU_DATA_COUNT) >> 16) * 4;
+
+		spin_lock_bh(&priv->dma_rx_pool.spin_lock);
+		rx_SW_tlast_count = (priv->rx_initial_tlast + priv->pkt_rxed) & 0xffff;
+		rx_SW_byte_count = (priv->rx_initial_byte + priv->rawbyte_rxed) & 0x3ffff;
+		spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
+
+		/*
+		 * We check for both TLAST and DATA count:
+		 * TLAST count is not enough because if there is any data that
+		 * has been already sent on AXI bus, but not yet TLASTed, we
+		 * wouldn't see it. DATA couter alone could be enough but it
+		 * wraps around by far more often...
+		 */
+		if ((rx_IP_tlast_count == rx_SW_tlast_count) &&
+		    (rx_IP_byte_count == rx_SW_byte_count))
+			break;
+
+		ret = wait_for_completion_timeout(&priv->dma_rx_pool.completion,
+									msecs_to_jiffies(500));
+		if (unlikely(ret == 0)) {
+			dev_err(&priv->pdev->dev, "RX DMA timed out while flushing(%d %d %d %d)\n",
+				rx_IP_tlast_count, rx_SW_tlast_count,
+				rx_IP_byte_count, rx_SW_byte_count);
+			break;
+		}
+	}
+	/* restore AXI latency setting */
+	hpu_do_set_axis_lat(priv);
+}
+
 static void hpu_rx_housekeeping(struct work_struct *work)
 {
 	struct hpu_priv *priv = container_of(work, struct hpu_priv,
@@ -450,7 +512,7 @@ static void hpu_rx_housekeeping(struct work_struct *work)
 		return;
 	}
 
-	hpu_flush_rx_fifo(priv);
+	hpu_flush_rx(priv);
 
 	if (state == FIFO_OVERFLOW) {
 		WRITE_ONCE(priv->rx_fifo_status, FIFO_DRAINED);
@@ -474,15 +536,15 @@ static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *re
 	u32 word;
 	struct hpu_buf *buffer = _buffer;
 	struct hpu_priv *priv = buffer->priv;
-	int len = priv->dma_rx_pool.ps - result->residue;
+	int len, rawlen = priv->dma_rx_pool.ps - result->residue;
 
 	dev_dbg(&priv->pdev->dev, "RX DMA cb\n");
-	priv->pkt_rxed++;
 
 	/*
 	 * when HPU prodive odd number of data it means that it has produced
 	 * an early TLAST sending also a dummy data, so we need to discard it
 	 */
+	len = rawlen;
 	if ((len / 4) & 1) {
 		priv->early_tlast++;
 		len -= 4;
@@ -491,8 +553,13 @@ static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *re
 			dev_err(&priv->pdev->dev, "Got early TLAST, but no magic word\n");
 	}
 	priv->byte_rxed += len;
-
 	spin_lock(&priv->dma_rx_pool.spin_lock);
+	/*
+	 * pkt_rxed is not only a stat, it is used to fully drain fifo, so
+	 * We really want to avoid races
+	 */
+	priv->pkt_rxed++;
+	priv->rawbyte_rxed += rawlen;
 	priv->dma_rx_pool.filled++;
 	buffer->tail_index = len;
 
@@ -666,7 +733,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				 * no-one has drained the fifo yet. Do it now,
 				 * then we are OK and we can go on without fail.
 				 */
-				hpu_flush_rx_fifo(priv);
+				hpu_flush_rx(priv);
 
 				/* fall-through */
 			case FIFO_STOPPED:
@@ -1197,6 +1264,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	priv->byte_txed = 0;
 	priv->pkt_rxed = 0;
 	priv->byte_rxed = 0;
+	priv->rawbyte_rxed = 0;
 	priv->early_tlast = 0;
 	priv->rx_fifo_status = FIFO_OK;
 
@@ -1258,6 +1326,14 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	hpu_reg_write(priv, priv->ctrl_reg |
 		      HPU_CTRL_FLUSH_TX_FIFO | HPU_CTRL_FLUSH_RX_FIFO,
 		      HPU_CTRL_REG);
+
+	/*
+	 * Sample initial value for IP RX TLAST and DATA counters; they are used
+	 * to get a clue about how many bytes have been transferred in the
+	 * current session, in order to fully flush RX-path when required
+	 */
+	priv->rx_initial_tlast = hpu_reg_read(priv, HPU_TLAST_COUNT) >> 16;
+	priv->rx_initial_byte = (hpu_reg_read(priv, HPU_DATA_COUNT) >> 16) * 4;
 
 	/* Set RX DMA max pkt len (data count before TLAST) */
 	reg = priv->dma_rx_pool.ps / 4;
@@ -1336,7 +1412,7 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 			dev_err(&priv->pdev->dev, "Cannot stop IP (DMA running)\n");
 			break;
 		}
-		hpu_flush_rx_fifo(priv);
+		hpu_drain_rx_dma(priv);
 		msleep(5);
 	}
 
@@ -1650,8 +1726,10 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 	case _IOW(0x0, HPU_IOCTL_SET_AXIS_LATENCY, unsigned int *):
 		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
+		mutex_lock(&priv->dma_rx_pool.mutex_lock);
 		priv->axis_lat = val;
 		hpu_do_set_axis_lat(priv);
+		mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 		break;
 
 	default:
@@ -1745,7 +1823,6 @@ static int hpu_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, priv);
 	priv->pdev = pdev;
 	priv->ctrl_reg = 0;
-
 	INIT_WORK(&priv->rx_housekeeping_work, hpu_rx_housekeeping);
 
 	spin_lock_init(&priv->dma_rx_pool.spin_lock);
