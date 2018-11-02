@@ -19,15 +19,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="99709872000fs"></ZoomStartTime>
-      <ZoomEndTime time="101311872001fs"></ZoomEndTime>
-      <Cursor1Time time="100279872000fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="3235000000001fs"></ZoomEndTime>
+      <Cursor1Time time="640003896000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="294"></NameColumnWidth>
-      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+      <ValueColumnWidth column_width="86"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="24" />
+   <WVObjectSize size="28" />
    <wave_markers>
       <marker label="" time="394944536000" />
       <marker label="" time="399700209000" />
@@ -680,6 +680,14 @@
       <obj_property name="ElementShortName">TlastTO_i[31:0]</obj_property>
       <obj_property name="ObjectShortName">TlastTO_i[31:0]</obj_property>
    </wvobject>
+   <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_TlastTimer">
+      <obj_property name="ElementShortName">i_TlastTimer[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TlastTimer[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/TlastTOwritten_i">
+      <obj_property name="ElementShortName">TlastTOwritten_i</obj_property>
+      <obj_property name="ObjectShortName">TlastTOwritten_i</obj_property>
+   </wvobject>
    <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/TDataCnt_o">
       <obj_property name="ElementShortName">TDataCnt_o[31:0]</obj_property>
       <obj_property name="ObjectShortName">TDataCnt_o[31:0]</obj_property>
@@ -720,9 +728,17 @@
       <obj_property name="ElementShortName">DMA_test_mode_i</obj_property>
       <obj_property name="ObjectShortName">DMA_test_mode_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/i_TlastTimer">
-      <obj_property name="ElementShortName">i_TlastTimer[31:0]</obj_property>
-      <obj_property name="ObjectShortName">i_TlastTimer[31:0]</obj_property>
+   <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/EnableAxistreamIf_i">
+      <obj_property name="ElementShortName">EnableAxistreamIf_i</obj_property>
+      <obj_property name="ObjectShortName">EnableAxistreamIf_i</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/DMA_is_running_o">
+      <obj_property name="ElementShortName">DMA_is_running_o</obj_property>
+      <obj_property name="ObjectShortName">DMA_is_running_o</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_axistream/ResetStream_i">
+      <obj_property name="ElementShortName">ResetStream_i</obj_property>
+      <obj_property name="ObjectShortName">ResetStream_i</obj_property>
    </wvobject>
    <wvobject type="group" fp_name="group144">
       <obj_property name="label">AXI Lite</obj_property>

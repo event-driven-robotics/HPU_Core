@@ -83,6 +83,8 @@ LatTlast_o                     : out std_logic;
 TlastCnt_i                     : in  std_logic_vector(31 downto 0);
 TDataCnt_i                     : in  std_logic_vector(31 downto 0);
 TlastTO_o                      : out std_logic_vector(31 downto 0);
+TlastTOwritten_o               : out std_logic;
+
 --TxEnable_o                     : out std_logic;
 --TxPaerFlushFifos_o             : out std_logic;
 --LRxEnable_o                    : out std_logic;
@@ -433,6 +435,7 @@ architecture rtl of neuserial_axilite is
     signal  i_SpnnLnk_err      : std_logic_vector(26 downto 20);
 
     signal  i_TlastTO          : std_logic_vector(31 downto 0);
+    signal  i_TlastTowritten   : std_logic;
 
 begin
 
@@ -650,6 +653,7 @@ begin
                 i_cleanTimer  <= '0';
                 
                 i_TlastTO <= X"00010000";
+                i_TlastTowritten <= '0';
 
             else
                 WriteTxBuffer_o <= '0';
@@ -668,7 +672,10 @@ begin
                 i_CTRL_reg( 7) <= '0';   -- AuxRxPaerFlushFifos_o   (WO: monostable)
                 i_CTRL_reg( 8) <= '0';   -- FlushTXFifos_o          (WO: monostable)
                 i_CTRL_reg(12) <= '0';   -- ResetStream_o           (WO: monostable)
-
+                
+                -- TlastTO register
+                i_TlastTowritten <= '0';
+                
                 -- IRQ Register
                 -- Update the value of the IRQ
                 v_IRQ_reg := i_IRQ_reg;
@@ -916,6 +923,7 @@ begin
                            for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
                                if (S_AXI_WSTRB(byte_index) = '1') then
                                   i_TlastTO(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
+                                  i_TlastTowritten <= '1';
                                end if;
                            end loop;  
 
@@ -1839,6 +1847,7 @@ begin
     -- ------------------------------------------------------------------------
     i_TlastTO_rd <= i_TlastTO;
     TlastTO_o <= i_TlastTO;
+    TlastTOwritten_o <= i_TlastTowritten;
 
     -- ------------------------------------------------------------------------
     -- Tlast Counter register
