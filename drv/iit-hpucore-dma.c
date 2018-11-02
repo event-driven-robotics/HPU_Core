@@ -325,6 +325,7 @@ struct hpu_priv {
 	uint32_t irq_msk;
 	struct dentry *debugfsdir;
 	struct clk *clk;
+	unsigned long clk_rate;
 	spinlock_t irq_lock;
 
 	/* spinn-related */
@@ -1196,12 +1197,8 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 static void hpu_do_set_axis_lat(struct hpu_priv *priv)
 {
 	u32 lat;
-	unsigned long rate;
 
-
-	rate = clk_get_rate(priv->clk);
-	lat = rate / 1000 * priv->axis_lat;
-
+	lat = priv->clk_rate / 1000 * priv->axis_lat;
 	hpu_reg_write(priv, lat, HPU_TLAST_TIMEOUT);
 }
 
@@ -1267,6 +1264,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	priv->rawbyte_rxed = 0;
 	priv->early_tlast = 0;
 	priv->rx_fifo_status = FIFO_OK;
+	priv->axis_lat = 10; /* mS */
 
 	priv->hpu_is_opened = 1;
 	ret = hpu_dma_init(priv);
@@ -1341,7 +1339,6 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		reg |= HPU_DMA_TEST_ON;
 	hpu_reg_write(priv, reg , HPU_DMA_REG);
 
-	priv->axis_lat = 10; /* mS */
 	if (test_dma)
 		priv->irq_msk = 0;
 	else
@@ -1352,11 +1349,9 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	/* clear all INTs */
 	hpu_reg_write(priv, 0xffffffff, HPU_IRQ_REG);
 
-	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA;
-	if (!IS_ERR(priv->clk)) {
-		priv->ctrl_reg |= HPU_CTRL_AXIS_LAT;
-		hpu_do_set_axis_lat(priv);
-	}
+	hpu_do_set_axis_lat(priv);
+
+	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA | HPU_CTRL_AXIS_LAT;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
 	mutex_unlock(&priv->access_lock);
@@ -1840,8 +1835,12 @@ static int hpu_probe(struct platform_device *pdev)
 	}
 
 	priv->clk = devm_clk_get(&pdev->dev, "s_axi_aclk");
-	if (IS_ERR(priv->clk))
-		dev_warn(&priv->pdev->dev, "cannot get clock: s_axi_aclk; disabling AXIS latency timeout\n");
+	if (IS_ERR(priv->clk)) {
+		dev_warn(&priv->pdev->dev, "cannot get clock: s_axi_aclk; using default 100MHz\n");
+		priv->clk_rate = 100000000;
+	} else {
+		priv->clk_rate = clk_get_rate(priv->clk);
+	}
 
 	hpu_clk_enable(priv);
 	ver = hpu_reg_read(priv, HPU_VER_REG);
