@@ -1343,9 +1343,6 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	priv->spinn_start = 0;
 	hpu_spinn_do_startstop(priv);
 
-	hpu_reg_write(priv, priv->ctrl_reg | HPU_CTRL_RESETDMASTREAM,
-	        HPU_CTRL_REG);
-
 	hpu_reg_write(priv, priv->ctrl_reg |
 		      HPU_CTRL_FLUSH_TX_FIFO | HPU_CTRL_FLUSH_RX_FIFO,
 		      HPU_CTRL_REG);
