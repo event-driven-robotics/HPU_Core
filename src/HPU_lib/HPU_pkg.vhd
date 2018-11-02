@@ -316,6 +316,8 @@ port (
     TlastCnt_i                     : in  std_logic_vector(31 downto 0);
     TDataCnt_i                     : in  std_logic_vector(31 downto 0);
     TlastTO_o                      : out std_logic_vector(31 downto 0);
+    TlastTOwritten_o               : out std_logic;
+
     --TxEnable_o                     : out std_logic;
     --TxPaerFlushFifos_o             : out std_logic;
     --LRxEnable_o                    : out std_logic;
@@ -441,6 +443,7 @@ port (
             LatTlat_i              : in  std_logic;
             TlastCnt_o             : out std_logic_vector(31 downto 0);
             TlastTO_i              : in  std_logic_vector(31 downto 0);
+            TlastTOwritten_i       : in  std_logic;
             TDataCnt_o             : out std_logic_vector(31 downto 0);
             -- From Fifo to core/dma
             FifoCoreDat_i          : in  std_logic_vector(31 downto 0);

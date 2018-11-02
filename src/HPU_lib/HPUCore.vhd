@@ -373,6 +373,7 @@ architecture str of HPUCore is
     signal i_up_TlastCnt             : std_logic_vector(31 downto 0);
     signal i_up_TDataCnt             : std_logic_vector(31 downto 0);
     signal i_up_TlastTO              : std_logic_vector(31 downto 0);
+    signal i_up_TlastTOwritten       : std_logic;
     signal i_up_LatTlast             : std_logic;
 
     signal i_uP_RemoteLpbk           : std_logic;
@@ -538,6 +539,7 @@ begin
                                TlastCnt_i                     => i_up_TlastCnt,                -- in  std_logic_vector(31 downto 0);
                                TDataCnt_i                     => i_up_TDataCnt,                -- in  std_logic_vector(31 downto 0);
                                TlastTO_o                      => i_up_TlastTO,                 -- out std_logic_vector(31 downto 0);
+                               TlastTOwritten_o               => i_up_TlastTOwritten,          -- out std_logic;
                                --TxEnable_o                     => ,                             -- out std_logic;
                                --TxPaerFlushFifos_o             => ,                             -- out std_logic;
                                --LRxEnable_o                    => ,                             -- out std_logic;
@@ -663,6 +665,7 @@ begin
             LatTlat_i                      => i_up_LatTlast,                    -- in  std_logic;
             TlastCnt_o                     => i_up_TlastCnt,                    -- out std_logic_vector(31 downto 0);
             TlastTO_i                      => i_up_TlastTO,                     -- in  std_logic_vector(31 downto 0);
+            TlastTOwritten_i               => i_up_TlastTOwritten,              -- in  std_logic;
             TDataCnt_o                     => i_up_TDataCnt,                    -- out std_logic_vector(31 downto 0);
             -- From Fifo to core/dma
             FifoCoreDat_i                  => i_dma_rxDataBuffer,               -- in  std_logic_vector(31 downto 0);

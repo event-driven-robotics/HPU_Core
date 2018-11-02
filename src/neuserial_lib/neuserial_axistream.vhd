@@ -29,6 +29,7 @@ entity neuserial_axistream is
         LatTlat_i              : in  std_logic;
         TlastCnt_o             : out std_logic_vector(31 downto 0);
         TlastTO_i              : in  std_logic_vector(31 downto 0);
+        TlastTOwritten_i       : in  std_logic;
         TDataCnt_o             : out std_logic_vector(31 downto 0);
         -- From Fifo to core/dma
         FifoCoreDat_i          : in  std_logic_vector(31 downto 0);
@@ -287,7 +288,7 @@ i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counte
    begin
       
        if (Clk'event and Clk = '1') then
-        if (nRst = '0' or i_enable_ip='0' ) then
+        if (nRst = '0' or i_enable_ip='0' or TlastTOwritten_i='1') then
             i_TlastTimer <= (others => '0');
             i_timeexpired <= '0';
         elsif (LatTlat_i='1') then
