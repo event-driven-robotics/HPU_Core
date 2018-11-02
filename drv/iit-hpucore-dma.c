@@ -320,6 +320,7 @@ struct hpu_priv {
 	uint32_t ctrl_reg;
 	uint32_t rx_ctrl_reg;
 	uint32_t rx_aux_ctrl_reg;
+	uint32_t irq_msk;
 	struct dentry *debugfsdir;
 	struct clk *clk;
 
@@ -610,7 +611,6 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 	int index;
 	size_t buf_count;
 	struct hpu_buf *item;
-	u32 msk;
 	size_t read = 0;
 	struct hpu_priv *priv = fp->private_data;
 
@@ -678,9 +678,8 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 					      HPU_AUX_RXCTRL_REG);
 
 				/* Re-enable RX FIFO full interrupt */
-				msk = hpu_reg_read(priv, HPU_IRQMASK_REG);
-				msk |= HPU_MSK_INT_RXFIFOFULL;
-				hpu_reg_write(priv, msk, HPU_IRQMASK_REG);
+				priv->irq_msk |= HPU_MSK_INT_RXFIFOFULL;
+				hpu_reg_write(priv, priv->irq_msk, HPU_IRQMASK_REG);
 
 				WRITE_ONCE(priv->rx_fifo_status, FIFO_OK);
 				break;
@@ -1238,12 +1237,13 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	}
 	dma_async_issue_pending(priv->dma_rx_chan);
 
-	if (!test_dma) {
+	if (test_dma)
+		priv->irq_msk = 0;
+	else
 		/* Unmask RXFIFOFULL interrupt */
-		reg = hpu_reg_read(priv, HPU_IRQMASK_REG);
-		reg |= HPU_MSK_INT_RXFIFOFULL;
-		hpu_reg_write(priv, reg, HPU_IRQMASK_REG);
-	}
+		priv->irq_msk = HPU_MSK_INT_RXFIFOFULL;
+
+	hpu_reg_write(priv, priv->irq_msk, HPU_IRQMASK_REG);
 
 	priv->spinn_start_key = HPU_DEFAULT_START_KEY;
 	priv->spinn_stop_key = HPU_DEFAULT_STOP_KEY;
@@ -1398,7 +1398,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 {
 
 	u32 intr;
-	u32 msk;
+
 	struct hpu_priv *priv = platform_get_drvdata(pdev);
 	irqreturn_t retval = 0;
 
@@ -1431,9 +1431,8 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 			      HPU_CTRL_REG);
 
 		/* Mask fifo-full interrupt */
-		msk = hpu_reg_read(priv, HPU_IRQMASK_REG);
-		msk &= ~HPU_MSK_INT_RXFIFOFULL;
-		hpu_reg_write(priv, msk, HPU_IRQMASK_REG);
+		priv->irq_msk &= ~HPU_MSK_INT_RXFIFOFULL;
+		hpu_reg_write(priv, priv->irq_msk, HPU_IRQMASK_REG);
 
 		/* Clear fifo-full interrupt */
 		hpu_reg_write(priv, HPU_MSK_INT_RXFIFOFULL, HPU_IRQ_REG);
