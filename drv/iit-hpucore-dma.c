@@ -323,6 +323,7 @@ struct hpu_priv {
 	uint32_t irq_msk;
 	struct dentry *debugfsdir;
 	struct clk *clk;
+	spinlock_t irq_lock;
 
 	/* spinn-related */
 	int spinn_start;
@@ -611,6 +612,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 	int index;
 	size_t buf_count;
 	struct hpu_buf *item;
+	unsigned long flags;
 	size_t read = 0;
 	struct hpu_priv *priv = fp->private_data;
 
@@ -672,6 +674,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				 * An overflow has been fixed. We have to
 				 * restart the RX machanism, then we can go on.
 				 */
+				spin_lock_irqsave(&priv->irq_lock, flags);
 				hpu_reg_write(priv, priv->rx_ctrl_reg,
 					      HPU_RXCTRL_REG);
 				hpu_reg_write(priv, priv->rx_aux_ctrl_reg,
@@ -682,6 +685,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				hpu_reg_write(priv, priv->irq_msk, HPU_IRQMASK_REG);
 
 				WRITE_ONCE(priv->rx_fifo_status, FIFO_OK);
+				spin_unlock_irqrestore(&priv->irq_lock, flags);
 				break;
 			}
 
@@ -1288,20 +1292,24 @@ err_dealloc_dma:
 static int hpu_chardev_close(struct inode *i, struct file *fp)
 {
 	struct hpu_priv *priv = fp->private_data;
+	unsigned long flags;
 	ktime_t time;
 
 	mutex_lock(&priv->access_lock);
 	mutex_lock(&priv->dma_rx_pool.mutex_lock);
 	mutex_lock(&priv->dma_tx_pool.mutex_lock);
 
+	spin_lock_irqsave(&priv->irq_lock, flags);
 	/* Disable RX */
 	hpu_reg_write(priv, 0x0, HPU_RXCTRL_REG);
 	hpu_reg_write(priv, 0x0, HPU_AUX_RXCTRL_REG);
 	/* Disable TX */
 	hpu_reg_write(priv, 0x0, HPU_TXCTRL_REG);
 
-	/* Disable interrupts */
-	hpu_reg_write(priv, 0x0, HPU_IRQMASK_REG);
+	/* Mask interrupts - this ensure that pending IRQ are ignored by ISR */
+	priv->irq_msk = 0;
+	hpu_reg_write(priv, priv->irq_msk, HPU_IRQMASK_REG);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
 	/*
 	 * Ease fifo flushing - in order for DMA to be disabled the stream must
@@ -1309,8 +1317,8 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	 */
 	hpu_reg_write(priv, 1, HPU_TLAST_TIMEOUT);
 
-	/* Disable DMA */
-        priv->ctrl_reg &= ~HPU_CTRL_ENDMA;
+	/* Disable DMA and interrupts */
+        priv->ctrl_reg &= ~(HPU_CTRL_ENDMA | HPU_CTRL_ENINT);
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
 	/*
@@ -1402,10 +1410,8 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 	struct hpu_priv *priv = platform_get_drvdata(pdev);
 	irqreturn_t retval = 0;
 
-	priv->ctrl_reg &= ~HPU_CTRL_ENINT;
-	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
-
-	intr = hpu_reg_read(priv, HPU_IRQ_REG);
+	spin_lock(&priv->irq_lock);
+	intr = hpu_reg_read(priv, HPU_IRQ_REG) & priv->irq_msk;
 
 	if (intr & HPU_MSK_INT_TSTAMPWRAPPED) {
 		hpu_reg_write(priv, HPU_MSK_INT_TSTAMPWRAPPED, HPU_IRQ_REG);
@@ -1475,9 +1481,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 		retval = IRQ_HANDLED;
 	}
 
-	priv->ctrl_reg |= HPU_CTRL_ENINT;
-	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
-
+	spin_unlock(&priv->irq_lock);
 	retval = IRQ_HANDLED;
 	return retval;
 }
@@ -1735,6 +1739,7 @@ static int hpu_probe(struct platform_device *pdev)
 	priv->rx_fifo_status = FIFO_OK;
 
 	mutex_init(&priv->access_lock);
+	spin_lock_init(&priv->irq_lock);
 
 	platform_set_drvdata(pdev, priv);
 	priv->pdev = pdev;
@@ -1848,8 +1853,6 @@ static int hpu_remove(struct platform_device *pdev)
 
 	/* FIXME: resource release ! */
 	debugfs_remove_recursive(priv->debugfsdir);
-	priv->ctrl_reg &= ~HPU_CTRL_ENINT & ~HPU_CTRL_ENDMA;
-	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 	free_irq(priv->irq, pdev);
 
 	hpu_unregister_chardev(priv);
