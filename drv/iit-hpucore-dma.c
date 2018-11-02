@@ -521,6 +521,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 	if (!access_ok(VERIFY_WRITE, buf, lenght))
 		return -EFAULT;
 
+	mutex_lock(&priv->dma_tx_pool.mutex_lock);
 	while (lenght) {
 		copy = min_t(size_t, priv->dma_tx_pool.ps, lenght);
 		dma_buf = &priv->dma_tx_pool.ring[priv->dma_tx_pool.buf_index];
@@ -550,8 +551,10 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 								   msecs_to_jiffies(tx_to));
 			if (unlikely(ret == 0)) {
 				dev_err(&priv->pdev->dev, "TX DMA timed out\n");
+				mutex_unlock(&priv->dma_tx_pool.mutex_lock);
 				return -ETIMEDOUT;
 			} else if (unlikely(ret < 0)) {
+				mutex_unlock(&priv->dma_tx_pool.mutex_lock);
 				return ret;
 			}
 			dev_dbg(&priv->pdev->dev, "resuming TX\n");
@@ -562,6 +565,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 
 		if (__copy_from_user(dma_buf->virt, buf + i, copy)) {
 			dev_err(&priv->pdev->dev, "failed copying from user\n");
+			mutex_unlock(&priv->dma_tx_pool.mutex_lock);
 			return -EINVAL;
 		}
 
@@ -591,6 +595,7 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 			& (priv->dma_tx_pool.pn - 1);
 	}
 exit:
+	mutex_unlock(&priv->dma_tx_pool.mutex_lock);
 	if (count)
 		dma_async_issue_pending(priv->dma_tx_chan);
 
@@ -1286,6 +1291,8 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	ktime_t time;
 
 	mutex_lock(&priv->access_lock);
+	mutex_lock(&priv->dma_rx_pool.mutex_lock);
+	mutex_lock(&priv->dma_tx_pool.mutex_lock);
 
 	/* Disable RX */
 	hpu_reg_write(priv, 0x0, HPU_RXCTRL_REG);
@@ -1337,6 +1344,9 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	hpu_dma_release(priv);
 	priv->hpu_is_opened = 0;
 	hpu_clk_disable(priv);
+
+	mutex_unlock(&priv->dma_tx_pool.mutex_lock);
+	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 	mutex_unlock(&priv->access_lock);
 
 	return 0;
@@ -1489,6 +1499,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 
 	dev_dbg(&priv->pdev->dev, "ioctl %x\n", cmd);
 
+	mutex_lock(&priv->access_lock);
 	switch (cmd) {
 	case _IOR(0x0, HPU_IOCTL_READTIMESTAMP, unsigned int):
 		ret = hpu_reg_read(priv, HPU_WRAP_REG);
@@ -1589,13 +1600,17 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 	case _IOW(0x0, HPU_IOCTL_SET_BLK_TX_THR, unsigned int *):
 		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
+		mutex_lock(&priv->dma_tx_pool.mutex_lock);
 		priv->tx_blocking_threshold = val;
+		mutex_unlock(&priv->dma_tx_pool.mutex_lock);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_BLK_RX_THR, unsigned int *):
 		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			goto cfuser_err;
+		mutex_lock(&priv->dma_rx_pool.mutex_lock);
 		priv->rx_blocking_threshold = val;
+		mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_SPINN_KEYS, spinn_keys_t *):
@@ -1639,10 +1654,12 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		res = -EINVAL;
 	}
 
+	mutex_unlock(&priv->access_lock);
 	return res;
 
 cfuser_err:
 	dev_err(&priv->pdev->dev, "Copy from user space failed\n");
+	mutex_unlock(&priv->access_lock);
 	return -EFAULT;
 }
 
@@ -1730,6 +1747,7 @@ static int hpu_probe(struct platform_device *pdev)
 	spin_lock_init(&priv->dma_tx_pool.spin_lock);
 
 	mutex_init(&priv->dma_rx_pool.mutex_lock);
+	mutex_init(&priv->dma_tx_pool.mutex_lock);
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	priv->reg_base = devm_ioremap_resource(&pdev->dev, res);
