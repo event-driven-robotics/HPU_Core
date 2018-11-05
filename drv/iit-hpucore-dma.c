@@ -320,6 +320,7 @@ struct hpu_priv {
 	unsigned int hpu_is_opened;
 	void __iomem *reg_base;
 	uint32_t ctrl_reg;
+	uint32_t loop_bits;
 	uint32_t rx_ctrl_reg;
 	uint32_t rx_aux_ctrl_reg;
 	uint32_t irq_msk;
@@ -748,6 +749,8 @@ static void hpu_rx_suspend(struct hpu_priv *priv)
 	priv->rx_suspended = 1;
 	hpu_reg_write(priv, 0, HPU_RXCTRL_REG);
 	hpu_reg_write(priv, 0, HPU_AUX_RXCTRL_REG);
+	priv->ctrl_reg &= ~HPU_CTRL_LOOP_LNEAR;
+	hpu_reg_write(priv, priv->ctrl_reg , HPU_CTRL_REG);
 }
 
 static void hpu_rx_resume(struct hpu_priv *priv)
@@ -755,6 +758,8 @@ static void hpu_rx_resume(struct hpu_priv *priv)
 	priv->rx_suspended = 0;
 	hpu_reg_write(priv, priv->rx_ctrl_reg, HPU_RXCTRL_REG);
 	hpu_reg_write(priv, priv->rx_aux_ctrl_reg, HPU_AUX_RXCTRL_REG);
+	priv->ctrl_reg |= priv->loop_bits;
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 }
 
 static int hpu_rx_is_suspended(struct hpu_priv *priv)
@@ -1262,35 +1267,39 @@ static int hpu_set_tx_interface(struct hpu_priv *priv,
 static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 {
 	unsigned long flags;
-	int ret = 0;
 
 	spin_lock_irqsave(&priv->irq_lock, flags);
-	priv->ctrl_reg &= ~(HPU_CTRL_LOOP_LNEAR | HPU_CTRL_LOOP_SPINN);
 	switch (loop) {
 	case LOOP_LSPINN:
-		priv->ctrl_reg |= HPU_CTRL_LOOP_SPINN;
+		priv->loop_bits = HPU_CTRL_LOOP_SPINN;
 		break;
 
 	case LOOP_LNEAR:
-		priv->ctrl_reg |= HPU_CTRL_LOOP_LNEAR;
+		priv->loop_bits = HPU_CTRL_LOOP_LNEAR;
 		break;
 
 	case LOOP_NONE:
+		priv->loop_bits = 0;
 		break;
 	default:
+		spin_unlock_irqrestore(&priv->irq_lock, flags);
 		dev_notice(&priv->pdev->dev,
 			   "set loop - invalid arg %d\n", loop);
-		ret = -EINVAL;
+		return -EINVAL;
 		break;
 	}
 
-	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+	if (!hpu_rx_is_suspended(priv)) {
+		priv->ctrl_reg &= ~(HPU_CTRL_LOOP_LNEAR | HPU_CTRL_LOOP_SPINN);
+		priv->ctrl_reg |= priv->loop_bits;
+		hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+	}
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
 	dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
 		priv->ctrl_reg);
 
-	return ret;
+	return 0;
 }
 
 /* called with IRQ lock held */
@@ -1441,6 +1450,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 
 	/* Initialize HPU with full TS, no loop */
 	priv->ctrl_reg = HPU_CTRL_FULLTS;
+	priv->loop_bits = 0;
 	hpu_reg_write(priv, priv->ctrl_reg |
 		      HPU_CTRL_FLUSH_TX_FIFO | HPU_CTRL_FLUSH_RX_FIFO,
 		      HPU_CTRL_REG);
