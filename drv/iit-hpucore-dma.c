@@ -327,6 +327,7 @@ struct hpu_priv {
 	struct clk *clk;
 	unsigned long clk_rate;
 	spinlock_t irq_lock;
+	int rx_suspended;
 
 	/* spinn-related */
 	int spinn_start;
@@ -738,6 +739,26 @@ exit:
 	return i;
 }
 
+/* those three func are called with irq lock held */
+static void hpu_rx_suspend(struct hpu_priv *priv)
+{
+	priv->rx_suspended = 1;
+	hpu_reg_write(priv, 0, HPU_RXCTRL_REG);
+	hpu_reg_write(priv, 0, HPU_AUX_RXCTRL_REG);
+}
+
+static void hpu_rx_resume(struct hpu_priv *priv)
+{
+	priv->rx_suspended = 0;
+	hpu_reg_write(priv, priv->rx_ctrl_reg, HPU_RXCTRL_REG);
+	hpu_reg_write(priv, priv->rx_aux_ctrl_reg, HPU_AUX_RXCTRL_REG);
+}
+
+static int hpu_rx_is_suspended(struct hpu_priv *priv)
+{
+	return priv->rx_suspended;
+}
+
 static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				loff_t *offset)
 {
@@ -809,10 +830,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				 * restart the RX machanism, then we can go on.
 				 */
 				spin_lock_irqsave(&priv->irq_lock, flags);
-				hpu_reg_write(priv, priv->rx_ctrl_reg,
-					      HPU_RXCTRL_REG);
-				hpu_reg_write(priv, priv->rx_aux_ctrl_reg,
-					      HPU_AUX_RXCTRL_REG);
+				hpu_rx_resume(priv);
 
 				/* Re-enable RX FIFO full interrupt */
 				priv->irq_msk |= HPU_MSK_INT_RXFIFOFULL;
@@ -1126,6 +1144,8 @@ static int hpu_spinn_set_keys(struct hpu_priv *priv, u32 start, u32 stop)
 static int hpu_set_rx_interface(struct hpu_priv *priv,
 				hpu_interface_t interf, hpu_interface_cfg_t cfg)
 {
+	unsigned long flags;
+	int ret = 0;
 	u32 bitfield = 0;
 	u32 mask = 0xffff;
 
@@ -1145,6 +1165,7 @@ static int hpu_set_rx_interface(struct hpu_priv *priv,
 		bitfield |= HPU_RXCTRL_SPINN_EN;
 	}
 
+	spin_lock_irqsave(&priv->irq_lock, flags);
 	switch (interf) {
 	case INTERFACE_EYE_R:
 		bitfield <<= 16;
@@ -1153,20 +1174,23 @@ static int hpu_set_rx_interface(struct hpu_priv *priv,
 	case INTERFACE_EYE_L:
 		priv->rx_ctrl_reg &= ~mask;
 		priv->rx_ctrl_reg |= bitfield;
-		hpu_reg_write(priv, priv->rx_ctrl_reg, HPU_RXCTRL_REG);
+		if (!hpu_rx_is_suspended(priv))
+			hpu_reg_write(priv, priv->rx_ctrl_reg, HPU_RXCTRL_REG);
 		dev_dbg(&priv->pdev->dev, "RXCTRL reg 0x%x\n", bitfield);
 		break;
 	case INTERFACE_AUX:
 		priv->rx_aux_ctrl_reg = bitfield;
-		hpu_reg_write(priv, priv->rx_aux_ctrl_reg, HPU_AUX_RXCTRL_REG);
+		if (!hpu_rx_is_suspended(priv))
+			hpu_reg_write(priv, priv->rx_aux_ctrl_reg, HPU_AUX_RXCTRL_REG);
 		dev_dbg(&priv->pdev->dev, "AUXRXCTRL reg 0x%x\n", bitfield);
 		break;
 	default:
-		return -EINVAL;
+		ret = -EINVAL;
 		break;
 	}
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
-	return 0;
+	return ret;
 }
 
 static int hpu_set_tx_interface(struct hpu_priv *priv,
@@ -1400,8 +1424,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 
 	priv->rx_aux_ctrl_reg = 0;
 	priv->rx_ctrl_reg = 0;
-	hpu_reg_write(priv, priv->rx_aux_ctrl_reg, HPU_AUX_RXCTRL_REG);
-	hpu_reg_write(priv, priv->rx_ctrl_reg, HPU_RXCTRL_REG);
+	hpu_rx_resume(priv);
 
 	/* Initialize HPU with full TS, no loop */
 	priv->ctrl_reg = HPU_CTRL_FULLTS;
@@ -1460,8 +1483,7 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 
 	spin_lock_irqsave(&priv->irq_lock, flags);
 	/* Disable RX */
-	hpu_reg_write(priv, 0x0, HPU_RXCTRL_REG);
-	hpu_reg_write(priv, 0x0, HPU_AUX_RXCTRL_REG);
+	hpu_rx_suspend(priv);
 	/* Disable TX */
 	hpu_reg_write(priv, 0x0, HPU_TXCTRL_REG);
 
@@ -1564,9 +1586,8 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 		dev_info(&priv->pdev->dev, "IRQ: RXFIFOFULL\n");
 
 		/* Stop feeding the fifos.. */
-		hpu_reg_write(priv, 0x00000000, HPU_RXCTRL_REG);
-		hpu_reg_write(priv, 0x00000000, HPU_AUX_RXCTRL_REG);
-
+		hpu_rx_suspend(priv);
+		hpu_rx_resume(priv);
 		/*
 		 * Initiate DMA stop procedure ASAP. We'll wait for the DMA to
 		 * be really stopped in the bottom half
