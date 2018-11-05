@@ -294,7 +294,7 @@ int main(int argc, char * argv[])
 	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
 
 	/* check for correctness - overlapping write/read - RX threshold ioctl */
-	for (i = i; i <= 4; i++) {
+	for (i = 1; i <= 4; i++) {
 		write(iit_hpu, wdata, rx_ps * i);
 		usleep(10000);
 		ret = read(iit_hpu, data, rx_ps * 8);
