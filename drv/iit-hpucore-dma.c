@@ -518,14 +518,17 @@ static void hpu_flush_rx(struct hpu_priv *priv)
 	u16 rx_IP_tlast_count, rx_SW_tlast_count;
 	u16 rx_IP_byte_count, rx_SW_byte_count;
 	int ret;
+	unsigned long flags;
 
 	/*
 	 * It doesn't matter if the upper half (_hpu_stop_dma_uh) has been
 	 * already called or not.. This way it's always OK.
 	 */
 	hpu_stop_dma(priv);
+	spin_lock_irqsave(&priv->irq_lock, flags);
 	hpu_reg_write(priv,
 		      priv->ctrl_reg | HPU_CTRL_FLUSH_RX_FIFO, HPU_CTRL_REG);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
 	/*
 	 * We have flushed RX FIFO, so enabling DMA does not cause any effect on
 	 * RX side. But we want to enable it not to block TX for too much time
@@ -1258,6 +1261,10 @@ static int hpu_set_tx_interface(struct hpu_priv *priv,
 
 static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 {
+	unsigned long flags;
+	int ret = 0;
+
+	spin_lock_irqsave(&priv->irq_lock, flags);
 	priv->ctrl_reg &= ~(HPU_CTRL_LOOP_LNEAR | HPU_CTRL_LOOP_SPINN);
 	switch (loop) {
 	case LOOP_LSPINN:
@@ -1273,17 +1280,20 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 	default:
 		dev_notice(&priv->pdev->dev,
 			   "set loop - invalid arg %d\n", loop);
-		return -EINVAL;
+		ret = -EINVAL;
 		break;
 	}
 
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
+
 	dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
 		priv->ctrl_reg);
 
-	return 0;
+	return ret;
 }
 
+/* called with IRQ lock held */
 static void _hpu_do_set_axis_lat(struct hpu_priv *priv)
 {
 	u32 lat;
@@ -1332,9 +1342,12 @@ static void hpu_set_aux_thrs(struct hpu_priv *priv, aux_cnt_t aux_cnt_reg)
 
 static int hpu_set_timestamp(struct hpu_priv *priv, unsigned int val)
 {
+	unsigned long flags;
+
 	if (val != !!val)
 		return -EINVAL;
 
+	spin_lock_irqsave(&priv->irq_lock, flags);
 	/* if dma is enabled then disable and also flush fifo */
 	if (val)
 		priv->ctrl_reg |= HPU_CTRL_FULLTS;
@@ -1342,7 +1355,7 @@ static int hpu_set_timestamp(struct hpu_priv *priv, unsigned int val)
 		priv->ctrl_reg &= ~HPU_CTRL_FULLTS;
 
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
-
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
 	return 0;
 }
 
