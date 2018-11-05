@@ -1587,7 +1587,7 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 
 		/* Stop feeding the fifos.. */
 		hpu_rx_suspend(priv);
-		hpu_rx_resume(priv);
+
 		/*
 		 * Initiate DMA stop procedure ASAP. We'll wait for the DMA to
 		 * be really stopped in the bottom half
