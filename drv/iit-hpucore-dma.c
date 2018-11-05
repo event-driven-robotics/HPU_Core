@@ -368,6 +368,7 @@ static DEFINE_IDA(hpu_ida);
 static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
 static void hpu_dma_free_pool(struct hpu_priv *priv, struct hpu_dma_pool *hpu_pool);
 static void hpu_do_set_axis_lat(struct hpu_priv *priv);
+static void _hpu_do_set_axis_lat(struct hpu_priv *priv);
 
 static void hpu_reg_write(struct hpu_priv *priv, u32 val, int offs)
 {
@@ -444,10 +445,72 @@ static void hpu_drain_rx_dma(struct hpu_priv *priv)
 	}
 }
 
+static void _hpu_stop_dma_uh(struct hpu_priv *priv)
+{
+	/* Make the DMA stop ASAP */
+	hpu_reg_write(priv, 1, HPU_TLAST_TIMEOUT);
+
+	priv->ctrl_reg &= ~HPU_CTRL_ENDMA;
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+}
+
+/* must be called with RX lock held */
+static void _hpu_stop_dma_bh(struct hpu_priv *priv)
+{
+	ktime_t time;
+
+	BUG_ON(priv->ctrl_reg & HPU_CTRL_ENDMA);
+
+	/*
+	 * Keep on draining RX DMA descriptor to make sure the IP is
+	 * allowed to end up with a TLAST, otherwise it would not
+	 * stop properly - wait for the IP to really stop.
+	 */
+	time = ktime_add_us(ktime_get(), 2000000); /* timeout 2 Sec */
+	while (hpu_reg_read(priv, HPU_CTRL_REG) & HPU_CTRL_DMA_RUNNING) {
+		if (ktime_compare(ktime_get(), time) > 0) {
+			dev_err(&priv->pdev->dev, "Cannot stop IP (DMA running)\n");
+			break;
+		}
+		hpu_drain_rx_dma(priv);
+		msleep(5);
+	}
+}
+
+static void hpu_start_dma(struct hpu_priv *priv)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->irq_lock, flags);
+	priv->ctrl_reg |= HPU_CTRL_ENDMA;
+
+	/*
+	 * Restore AXI latency setting. Note that hpu_do_set_axis_lat()
+	 * does not apply the requested latency until the DMAEN bit is set,
+	 * so we set it above.
+	 */
+	_hpu_do_set_axis_lat(priv);
+
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
+}
+
+
+/* must be called with RX lock held */
+static void hpu_stop_dma(struct hpu_priv *priv)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->irq_lock, flags);
+	_hpu_stop_dma_uh(priv);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
+
+	_hpu_stop_dma_bh(priv);
+}
+
 /*
- * Perform a full RX-path flush by draining all data. This could leave some
- * leftovers if the HPU internal fifo is not emply (the caller shall ensure it).
- * Must be called with RX lock held
+ * Perform a full RX-path flush by draining all data
+ * Must be called with RX lock held.
  */
 static void hpu_flush_rx(struct hpu_priv *priv)
 {
@@ -456,11 +519,17 @@ static void hpu_flush_rx(struct hpu_priv *priv)
 	int ret;
 
 	/*
-	 * We assume to get here with empty RX fifos, so we just want to get
-	 * TLAST on any transfer that might be pending; we don't worry about
-	 * stuff in RXFIFO that would be tranferred to DMA in small chunks
+	 * It doesn't matter if the upper half (_hpu_stop_dma_uh) has been
+	 * already called or not.. This way it's always OK.
 	 */
-	hpu_reg_write(priv, 1, HPU_TLAST_TIMEOUT);
+	hpu_stop_dma(priv);
+	hpu_reg_write(priv,
+		      priv->ctrl_reg | HPU_CTRL_FLUSH_RX_FIFO, HPU_CTRL_REG);
+	/*
+	 * We have flushed RX FIFO, so enabling DMA does not cause any effect on
+	 * RX side. But we want to enable it not to block TX for too much time
+	 */
+	hpu_start_dma(priv);
 
 	while (1) {
 		hpu_drain_rx_dma(priv);
@@ -493,8 +562,6 @@ static void hpu_flush_rx(struct hpu_priv *priv)
 			break;
 		}
 	}
-	/* restore AXI latency setting */
-	hpu_do_set_axis_lat(priv);
 }
 
 static void hpu_rx_housekeeping(struct work_struct *work)
@@ -1194,12 +1261,30 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 	return 0;
 }
 
-static void hpu_do_set_axis_lat(struct hpu_priv *priv)
+static void _hpu_do_set_axis_lat(struct hpu_priv *priv)
 {
 	u32 lat;
 
+	/*
+	 * If the DMA is not enabled, then do not touch the actual register:
+	 * it is set to 1 when the DMA is terminating, and when the DMA is
+	 * restarted this function will be called again to apply the user
+	 * setting
+	 */
+	if (!(priv->ctrl_reg & HPU_CTRL_ENDMA))
+		return;
+
 	lat = priv->clk_rate / 1000 * priv->axis_lat;
 	hpu_reg_write(priv, lat, HPU_TLAST_TIMEOUT);
+}
+
+static void hpu_do_set_axis_lat(struct hpu_priv *priv)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->irq_lock, flags);
+	_hpu_do_set_axis_lat(priv);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
 }
 
 static void hpu_set_aux_thrs(struct hpu_priv *priv, aux_cnt_t aux_cnt_reg)
@@ -1349,10 +1434,11 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	/* clear all INTs */
 	hpu_reg_write(priv, 0xffffffff, HPU_IRQ_REG);
 
-	hpu_do_set_axis_lat(priv);
-
-	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_ENDMA | HPU_CTRL_AXIS_LAT;
+	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_AXIS_LAT;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+
+	/* this will also set TLAST timeout */
+	hpu_start_dma(priv);
 
 	mutex_unlock(&priv->access_lock);
 	return 0;
@@ -1368,7 +1454,6 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 {
 	struct hpu_priv *priv = fp->private_data;
 	unsigned long flags;
-	ktime_t time;
 
 	mutex_lock(&priv->access_lock);
 	mutex_lock(&priv->dma_rx_pool.mutex_lock);
@@ -1386,31 +1471,11 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	hpu_reg_write(priv, priv->irq_msk, HPU_IRQMASK_REG);
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
-	/*
-	 * Ease fifo flushing - in order for DMA to be disabled the stream must
-	 * end with a TLAST
-	 */
-	hpu_reg_write(priv, 1, HPU_TLAST_TIMEOUT);
-
-	/* Disable DMA and interrupts */
-        priv->ctrl_reg &= ~(HPU_CTRL_ENDMA | HPU_CTRL_ENINT);
+	/* Disable interrupts */
+        priv->ctrl_reg &= HPU_CTRL_ENINT;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
-	/*
-	 * Keep on draining RX DMA descriptor to make sure the IP is
-	 * allowed to end up with a TLAST, otherwise it would not
-	 * stop properly - wait for the IP to really stop.
-	 */
-	time = ktime_add_us(ktime_get(), 2000000); /* timeout 2 Sec */
-	while (hpu_reg_read(priv, HPU_CTRL_REG) & HPU_CTRL_DMA_RUNNING) {
-		if (ktime_compare(ktime_get(), time) > 0) {
-			dev_err(&priv->pdev->dev, "Cannot stop IP (DMA running)\n");
-			break;
-		}
-		hpu_drain_rx_dma(priv);
-		msleep(5);
-	}
-
+	hpu_stop_dma(priv);
 	priv->spinn_start = 0;
 	hpu_spinn_do_startstop(priv);
 
@@ -1503,10 +1568,11 @@ static irqreturn_t hpu_irq_handler(int irq, void *pdev)
 		hpu_reg_write(priv, 0x00000000, HPU_RXCTRL_REG);
 		hpu_reg_write(priv, 0x00000000, HPU_AUX_RXCTRL_REG);
 
-		/* Flush the RX FIFO */
-		hpu_reg_write(priv,
-			      priv->ctrl_reg | HPU_CTRL_FLUSH_RX_FIFO,
-			      HPU_CTRL_REG);
+		/*
+		 * Initiate DMA stop procedure ASAP. We'll wait for the DMA to
+		 * be really stopped in the bottom half
+		 */
+		_hpu_stop_dma_uh(priv);
 
 		/* Mask fifo-full interrupt */
 		priv->irq_msk &= ~HPU_MSK_INT_RXFIFOFULL;
