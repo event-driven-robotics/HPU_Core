@@ -350,11 +350,10 @@ struct hpu_priv {
 	unsigned long byte_txed;
 	unsigned long pkt_rxed;
 	unsigned long byte_rxed;
-	unsigned long rawbyte_rxed;
 	unsigned long early_tlast;
 	int axis_lat;
-	int rx_initial_tlast;
-	int rx_initial_byte;
+	unsigned int rx_tlast_count;
+	unsigned int rx_data_count;
 };
 
 #define HPU_REG_LOG 0
@@ -517,7 +516,7 @@ static void hpu_stop_dma(struct hpu_priv *priv)
 static void hpu_flush_rx(struct hpu_priv *priv)
 {
 	u16 rx_IP_tlast_count, rx_SW_tlast_count;
-	u16 rx_IP_byte_count, rx_SW_byte_count;
+	u16 rx_IP_data_count, rx_SW_data_count;
 	int ret;
 	unsigned long flags;
 
@@ -540,11 +539,11 @@ static void hpu_flush_rx(struct hpu_priv *priv)
 		hpu_drain_rx_dma(priv);
 
 		rx_IP_tlast_count = hpu_reg_read(priv, HPU_TLAST_COUNT) >> 16;
-		rx_IP_byte_count = (hpu_reg_read(priv, HPU_DATA_COUNT) >> 16) * 4;
+		rx_IP_data_count = hpu_reg_read(priv, HPU_DATA_COUNT) >> 16;
 
 		spin_lock_bh(&priv->dma_rx_pool.spin_lock);
-		rx_SW_tlast_count = (priv->rx_initial_tlast + priv->pkt_rxed) & 0xffff;
-		rx_SW_byte_count = (priv->rx_initial_byte + priv->rawbyte_rxed) & 0x3ffff;
+		rx_SW_tlast_count = priv->rx_tlast_count;
+		rx_SW_data_count = priv->rx_data_count;
 		spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
 
 		/*
@@ -553,7 +552,10 @@ static void hpu_flush_rx(struct hpu_priv *priv)
 		 * the HW guarantees that the last tranfer has been TLASTed
 		 */
 		if (rx_IP_tlast_count == rx_SW_tlast_count) {
-			BUG_ON(rx_IP_byte_count != rx_SW_byte_count);
+			if (rx_IP_data_count != rx_SW_data_count)
+				dev_err(&priv->pdev->dev, "Flush error (%d %d %d %d)\n",
+					rx_IP_tlast_count, rx_SW_tlast_count,
+					rx_IP_data_count, rx_SW_data_count);
 			break;
 		}
 
@@ -562,7 +564,7 @@ static void hpu_flush_rx(struct hpu_priv *priv)
 		if (unlikely(ret == 0)) {
 			dev_err(&priv->pdev->dev, "RX DMA timed out while flushing(%d %d %d %d)\n",
 				rx_IP_tlast_count, rx_SW_tlast_count,
-				rx_IP_byte_count, rx_SW_byte_count);
+				rx_IP_data_count, rx_SW_data_count);
 			break;
 		}
 	}
@@ -625,13 +627,11 @@ static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *re
 			dev_err(&priv->pdev->dev, "Got early TLAST, but no magic word\n");
 	}
 	priv->byte_rxed += len;
-	spin_lock(&priv->dma_rx_pool.spin_lock);
-	/*
-	 * pkt_rxed is not only a stat, it is used to fully drain fifo, so
-	 * We really want to avoid races
-	 */
 	priv->pkt_rxed++;
-	priv->rawbyte_rxed += rawlen;
+
+	spin_lock(&priv->dma_rx_pool.spin_lock);
+	priv->rx_tlast_count = (priv->rx_tlast_count + 1) & 0xffff;
+	priv->rx_data_count = (priv->rx_data_count + rawlen / 4) & 0xffff;
 	priv->dma_rx_pool.filled++;
 	buffer->tail_index = len;
 
@@ -1391,7 +1391,6 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	priv->byte_txed = 0;
 	priv->pkt_rxed = 0;
 	priv->byte_rxed = 0;
-	priv->rawbyte_rxed = 0;
 	priv->early_tlast = 0;
 	priv->rx_fifo_status = FIFO_OK;
 	priv->axis_lat = 10; /* mS */
@@ -1460,8 +1459,8 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	 * to get a clue about how many bytes have been transferred in the
 	 * current session, in order to fully flush RX-path when required
 	 */
-	priv->rx_initial_tlast = hpu_reg_read(priv, HPU_TLAST_COUNT) >> 16;
-	priv->rx_initial_byte = (hpu_reg_read(priv, HPU_DATA_COUNT) >> 16) * 4;
+	priv->rx_tlast_count = hpu_reg_read(priv, HPU_TLAST_COUNT) >> 16;
+	priv->rx_data_count = hpu_reg_read(priv, HPU_DATA_COUNT) >> 16;
 
 	/* Set RX DMA max pkt len (data count before TLAST) */
 	reg = priv->dma_rx_pool.ps / 4;
