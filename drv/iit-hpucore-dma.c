@@ -544,14 +544,13 @@ static void hpu_flush_rx(struct hpu_priv *priv)
 
 		/*
 		 * We check for both TLAST and DATA count:
-		 * TLAST count is not enough because if there is any data that
-		 * has been already sent on AXI bus, but not yet TLASTed, we
-		 * wouldn't see it. DATA couter alone could be enough but it
-		 * wraps around by far more often...
+		 * Checking TLAST should be enough because the IP is stopped and
+		 * the HW guarantees that the last tranfer has been TLASTed
 		 */
-		if ((rx_IP_tlast_count == rx_SW_tlast_count) &&
-		    (rx_IP_byte_count == rx_SW_byte_count))
+		if (rx_IP_tlast_count == rx_SW_tlast_count) {
+			BUG_ON(rx_IP_byte_count != rx_SW_byte_count);
 			break;
+		}
 
 		ret = wait_for_completion_timeout(&priv->dma_rx_pool.completion,
 									msecs_to_jiffies(500));
