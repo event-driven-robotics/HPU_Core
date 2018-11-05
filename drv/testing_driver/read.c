@@ -117,7 +117,7 @@ void handle_kill(int sig)
         exit(0);
 }
 
-void write_data(int chunk_size, int chunk_num)
+void _write_data(int chunk_size, int chunk_num, int magic)
 {
 	int i, j;
 	int ret;
@@ -125,16 +125,16 @@ void write_data(int chunk_size, int chunk_num)
 	for (i = 0; i < chunk_num; i++) {
 		for (j = 0; j < chunk_size; j++) {
 			wdata[j * 2] = 0;
-			wdata[j * 2 + 1] = (0x5a << 16) |
+			wdata[j * 2 + 1] = (magic << 16) |
 				((i * chunk_size + j) & 0xffff);
 		}
 		ret = write(iit_hpu, wdata, 8 * chunk_size);
 		if (ret != 8 * chunk_size)
-			fprintf(stderr, "Written only %d", ret);
+			fprintf(stderr, "Written only %d insted of %d\n", ret, 8 * chunk_size);
 	}
 }
 
-void read_data(int chunk_size, int chunk_num)
+void _read_data(int chunk_size, int chunk_num, int magic)
 {
 	int i, j;
 	unsigned int tmp, tmp2;
@@ -145,12 +145,22 @@ void read_data(int chunk_size, int chunk_num)
 		if (ret != 8 * chunk_size)
 			printf("read returned %d\n", ret);
 		for (j = 0; j < chunk_size; j++) {
-			tmp = (0x5a << 16) | ((i * chunk_size + j) & 0xffff);
+			tmp = (magic << 16) | ((i * chunk_size + j) & 0xffff);
 			tmp2 = data[j * 2 + 1];
 			if (tmp2 != tmp)
 				printf("error at %d,%d: %x %x\n", i, j,tmp2, tmp);
 		}
 	}
+}
+
+void write_data(int chunk_size, int chunk_num)
+{
+	_write_data(chunk_size, chunk_num, 0x5a);
+}
+
+void read_data(int chunk_size, int chunk_num)
+{
+	_read_data(chunk_size, chunk_num, 0x5a);
 }
 
 void read_thr_data(int chunk_size, int chunk_num)
@@ -300,6 +310,35 @@ int main(int argc, char * argv[])
 	read_data(rx_ps / 8 / 2, 1);
 	printf("phase 5 OK\n");
 
+
+	/* cause a fifo full: fill-up the RX ring and the RF FIFO, plus an extra data */
+	for (i = 0; i < 1024; i++) {
+		write_data(rx_ps / 8, /*rx_pn*/ 1);
+		usleep(100);
+	}
+	for (i = 0; i < 8; i++) {
+		write_data(1024 / 8, /*rx_pn*/ 1);
+		usleep(100);
+	}
+	write_data(4, /*rx_pn*/ 1);
+
+	/* rx fifo depth can stand at 8192 data, that is 32Kbytes */
+	//write_data(32 * 1024 / 8 - 1, /*rx_pn*/ 1);
+	//write_data(1, /*rx_pn*/ 1);
+	printf("fifo filled..\n");
+	usleep(100000);
+	ret = read(iit_hpu, data, 8);
+
+	printf("fifo full %s\n", (ret < 0) ? "OK" : "not detected");
+
+	/* check for fifo-full recover */
+	for (i = 0; i < iter_count; i++) {
+		_write_data(tx_size, tx_n, 0x55);
+		_read_data(rx_size, rx_n, 0x55);
+	}
+	printf("phase 6 OK\n");
+
+
 	size = 0x7fff0000;
 	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
 
@@ -349,5 +388,4 @@ int main(int argc, char * argv[])
 		waitpid(pid, 0, 0);
 	}
 
-	return 0;
 }
