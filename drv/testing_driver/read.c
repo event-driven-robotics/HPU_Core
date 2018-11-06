@@ -338,6 +338,9 @@ int main(int argc, char * argv[])
 
 	printf("fifo full %s\n", (ret < 0) ? "OK" : "not detected");
 
+	size = 0x7fff0000;
+	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
+
 	/* check for fifo-full recover */
 	for (i = 0; i < iter_count; i++) {
 		_write_data(tx_size, tx_n, 0x55);
@@ -345,9 +348,6 @@ int main(int argc, char * argv[])
 	}
 	printf("phase 6 OK\n");
 
-
-	size = 0x7fff0000;
-	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
 
 	/* tot RX desc = 100 * 32 * 1024 * 8  / 8192 = 3200 */
 	iter_count = 100;
