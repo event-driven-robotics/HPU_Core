@@ -794,13 +794,6 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 		 * and completion wakeup
 		 */
 		while (1) {
-			/*
-			 * Quoting Documentation/dmaengine/client.txt:
-			 * Note that callbacks will always be invoked from the DMA
-			 * engines tasklet, never from interrupt context.
-			 */
-			spin_lock_bh(&priv->dma_rx_pool.spin_lock);
-
 			switch(READ_ONCE(priv->rx_fifo_status)) {
 			case FIFO_OK:
 				break;
@@ -849,6 +842,13 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				spin_unlock_irqrestore(&priv->irq_lock, flags);
 				break;
 			}
+			/*
+			 * Quoting Documentation/dmaengine/client.txt:
+			 * Note that callbacks will always be invoked from the DMA
+			 * engines tasklet, never from interrupt context.
+			 */
+			spin_lock_bh(&priv->dma_rx_pool.spin_lock);
+
 
 			/* if there is data, then do not wait .. */
 			if (priv->dma_rx_pool.filled > 0) {
@@ -945,7 +945,6 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 	return read;
 
 error_rx_fifo_full:
-	spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
 	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 
 	return -ENOMEM;
@@ -1528,14 +1527,15 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 		      HPU_CTRL_REG);
 
 	mdelay(100);
+	mutex_unlock(&priv->dma_tx_pool.mutex_lock);
+	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
+
 	cancel_work_sync(&priv->rx_housekeeping_work);
 
 	hpu_dma_release(priv);
 	priv->hpu_is_opened = 0;
 	hpu_clk_disable(priv);
 
-	mutex_unlock(&priv->dma_tx_pool.mutex_lock);
-	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 	mutex_unlock(&priv->access_lock);
 
 	return 0;
