@@ -1466,7 +1466,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	reg = priv->dma_rx_pool.ps / 4;
 	if (test_dma)
 		reg |= HPU_DMA_TEST_ON;
-	hpu_reg_write(priv, reg , HPU_DMA_REG);
+	hpu_reg_write(priv, reg, HPU_DMA_REG);
 
 	if (test_dma)
 		priv->irq_msk = 0;
