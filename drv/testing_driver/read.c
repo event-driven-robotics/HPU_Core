@@ -197,6 +197,14 @@ void read_thr_data(int chunk_size, int chunk_num)
 }
 
 const int loop_near = 1;
+double time_diff(struct timespec *start, struct timespec *stop)
+{
+	double ret;
+	ret = (double)(stop->tv_nsec - start->tv_nsec) / 1000.0 / 1000.0 / 1000.0;
+	ret +=  stop->tv_sec - start->tv_sec;
+
+	return ret;
+}
 
 int main(int argc, char * argv[])
 {
@@ -206,7 +214,7 @@ int main(int argc, char * argv[])
 	unsigned int rx_ps, tx_ps, rx_pn;
 	int val;
 	spinn_loop_t loop;
-	clock_t time;
+	struct timespec ts1, ts2;
 	double time_sec;
 	pid_t pid;
 	unsigned int size;
@@ -313,10 +321,13 @@ int main(int argc, char * argv[])
 	val = 10;
 	ioctl(iit_hpu, IOC_SET_AXIS_LATENCY, &val);
 	/* check for early-tlast mechanism to be OK */
+	clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
 	write_data(rx_ps / 8 / 2, 1);
 	read_data(rx_ps / 8 / 2, 1);
-	printf("phase 5 OK\n");
+	clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
+	time_sec = time_diff(&ts1, &ts2);
 
+	printf("phase 5 OK (%f)\n", time_sec);
 
 	/* cause a fifo full: fill-up the RX ring and the RF FIFO, plus an extra data */
 	for (i = 0; i < rx_pn; i++) {
@@ -379,7 +390,7 @@ int main(int argc, char * argv[])
 		close(iit_hpu);
 	} else {
 		sleep(1);
-		time = clock();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
 		for (i = 0; i < iter_count; i++) {
 			for (j = 0; j < tx_n; j++) {
 				ret = write(iit_hpu, wdata, 8 * tx_size);
@@ -387,9 +398,8 @@ int main(int argc, char * argv[])
 					printf("err TX %d\n", ret);
 			}
 		}
-
-		time = clock() - time;
-		time_sec = (double)time / CLOCKS_PER_SEC;
+		clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
+		time_sec = time_diff(&ts1, &ts2);
 		printf("RTX throughtput %f MBps\n",
 		       (double)tot_data / time_sec / 1024.0 / 1024.0);
 		waitpid(pid, 0, 0);
