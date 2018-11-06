@@ -72,6 +72,7 @@
 #define IOC_SET_RX_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 26, hpu_rx_interface_ioctl_t *)
 #define IOC_SET_TX_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 27, hpu_tx_interface_ioctl_t *)
 #define IOC_SET_AXIS_LATENCY		_IOW(IOC_MAGIC_NUMBER, 28, unsigned int *)
+#define IOC_GET_RX_PN			_IOR(IOC_MAGIC_NUMBER, 29, unsigned int *)
 
 typedef enum {
 	LOOP_NONE,
@@ -202,7 +203,7 @@ int main(int argc, char * argv[])
 	int ret;
 	int i, j, k;
 	unsigned int timestamp = 0;
-	unsigned int rx_ps, tx_ps;
+	unsigned int rx_ps, tx_ps, rx_pn;
 	int val;
 	spinn_loop_t loop;
 	clock_t time;
@@ -235,6 +236,12 @@ int main(int argc, char * argv[])
 		printf("Unknown RX ps size\n");
 	else
 		printf("RX Pool size = %d\n", rx_ps);
+
+		ret = ioctl(iit_hpu, IOC_GET_RX_PN, &rx_pn);
+	if (ret < 0)
+		printf("Unknown RX pn\n");
+	else
+		printf("RX Pool number = %d\n", rx_pn);
 
 	ret = ioctl(iit_hpu, IOC_GET_TX_PS, &tx_ps);
 	if (ret < 0)
@@ -312,7 +319,7 @@ int main(int argc, char * argv[])
 
 
 	/* cause a fifo full: fill-up the RX ring and the RF FIFO, plus an extra data */
-	for (i = 0; i < 1024; i++) {
+	for (i = 0; i < rx_pn; i++) {
 		write_data(rx_ps / 8, /*rx_pn*/ 1);
 		usleep(100);
 	}
