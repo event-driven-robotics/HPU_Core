@@ -582,7 +582,7 @@ static void hpu_rx_housekeeping(struct work_struct *work)
 
 	/* data has been already drained */
 	state = READ_ONCE(priv->rx_fifo_status);
-	if (state == FIFO_OK || state == FIFO_DRAINED) {
+	if (state == FIFO_OK || state == FIFO_DRAINED || state == FIFO_STOPPED) {
 		mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 		return;
 	}
