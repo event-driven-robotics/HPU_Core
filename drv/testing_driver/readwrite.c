@@ -112,6 +112,7 @@ typedef struct {
 unsigned int data[65536], wdata[65536];
 int iit_hpu;
 
+
 void handle_kill(int sig)
 {
         printf("\nProgram exited\n");
@@ -209,18 +210,17 @@ double time_diff(struct timespec *start, struct timespec *stop)
 int main(int argc, char * argv[])
 {
 	int ret;
-	int i, j, k;
+	int i;
 	unsigned int timestamp = 0;
 	unsigned int rx_ps, tx_ps, rx_pn;
 	int val;
 	spinn_loop_t loop;
 	struct timespec ts1, ts2;
-	double time_sec;
-	pid_t pid;
+	double time_sec = 0;
 	unsigned int size;
 	int iter_count = 1000;
-	int tx_size = 512;
 	int rx_size = 512;
+	int tx_size = 512;
 	int tx_n = 32;
 	int rx_n = 32;
 	hpu_rx_interface_ioctl_t rxiface;
@@ -231,8 +231,8 @@ int main(int argc, char * argv[])
 	signal(SIGINT, handle_kill);
 
 	mlockall(MCL_CURRENT|MCL_FUTURE);
-	memset(wdata, 0, sizeof(wdata) / sizeof(wdata[0]));
-	memset(data, 0, sizeof(data) / sizeof(data[0]));
+	memset(wdata, 0, sizeof(wdata));
+	memset(data, 0, sizeof(data));
 
 	iit_hpu = open("/dev/iit-hpu0",O_RDWR);
 	if(iit_hpu < 0) {
@@ -245,7 +245,7 @@ int main(int argc, char * argv[])
 	else
 		printf("RX Pool size = %d\n", rx_ps);
 
-		ret = ioctl(iit_hpu, IOC_GET_RX_PN, &rx_pn);
+	ret = ioctl(iit_hpu, IOC_GET_RX_PN, &rx_pn);
 	if (ret < 0)
 		printf("Unknown RX pn\n");
 	else
@@ -310,7 +310,7 @@ int main(int argc, char * argv[])
 
 	/* check for correctness - overlapping write/read - RX threshold ioctl */
 	for (i = 1; i <= 4; i++) {
-		write(iit_hpu, wdata, rx_ps * i);
+		ret = write(iit_hpu, wdata, rx_ps * i);
 		usleep(10000);
 		ret = read(iit_hpu, data, rx_ps * 8);
 		if (ret != rx_ps * i)
@@ -318,7 +318,7 @@ int main(int argc, char * argv[])
 	}
 	printf("phase 4 OK\n");
 
-	val = 10;
+	val = 50;
 	ioctl(iit_hpu, IOC_SET_AXIS_LATENCY, &val);
 	/* check for early-tlast mechanism to be OK */
 	clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
@@ -339,7 +339,6 @@ int main(int argc, char * argv[])
 		usleep(100);
 	}
 	write_data(4, /*rx_pn*/ 1);
-
 	/* rx fifo depth can stand at 8192 data, that is 32Kbytes */
 	//write_data(32 * 1024 / 8 - 1, /*rx_pn*/ 1);
 	//write_data(1, /*rx_pn*/ 1);
@@ -359,50 +358,5 @@ int main(int argc, char * argv[])
 	}
 	printf("phase 6 OK\n");
 
-
-	/* tot RX desc = 100 * 32 * 1024 * 8  / 8192 = 3200 */
-	iter_count = 100;
-	rx_n = 4;
-	tx_n = 8;
-
-	tx_size = 4096;
-	rx_size = 8192;
-	int tot_data = iter_count * tx_size * tx_n * 8;
-
-	for (i = 0; i < (65536 / 4); i++) {
-		/* halves throughtput */
-		((unsigned int*)wdata)[i] = i % 32 ? 0 : 1;//62;
-//		((unsigned int*)wdata)[i] = 0;//62;
-	}
-
-	pid = fork();
-	if (pid == 0) {
-		for (i = 0; i < iter_count; i++) {
-			for (j = 0; j < rx_n; j++) {
-				ret = read(iit_hpu, data, 8 * rx_size);
-				if (ret != 8 * rx_size) {
-					printf("err RX %d - %d\n", ret, errno);
-					return -1;
-				}
-			}
-		}
-
-		close(iit_hpu);
-	} else {
-		sleep(1);
-		clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
-		for (i = 0; i < iter_count; i++) {
-			for (j = 0; j < tx_n; j++) {
-				ret = write(iit_hpu, wdata, 8 * tx_size);
-				if (ret != 8 * tx_size)
-					printf("err TX %d\n", ret);
-			}
-		}
-		clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
-		time_sec = time_diff(&ts1, &ts2);
-		printf("RTX throughtput %f MBps\n",
-		       (double)tot_data / time_sec / 1024.0 / 1024.0);
-		waitpid(pid, 0, 0);
-	}
-
+	return 0;
 }
