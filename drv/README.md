@@ -37,13 +37,6 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_SET_TX_INTERFACE    |27| W |hpu_tx_interface_ioctl_t|
 |HPU_IOCTL_SET_AXIS_LATENCY    |28| W |      unsigned int      |
 
-
-typedef struct aux_cnt {
-	enum rx_err err;
-	uint8_t cnt_val;
-} aux_cnt_t;
-
-
 All ioctls have *zero* as magic number.
 
 Example of ioctl definition in userspace application:
@@ -73,6 +66,35 @@ typedef struct ip_regs {
 
 The *reg_offset* member must be filled with the address of the register being written (when *rw* is 1) or read (when *rw* is 0).
 The *data* field does carry either the data to be written or that has been read.
+
+### HPU_IOCTL_SET_AUX_THRS
+Sets the threshold of the AUX RX counter error.
+It wants a pointer to an instance of the following type as argument:
+
+```C
+enum rx_err { ko_err = 0, rx_err, to_err, of_err, nomeaning_err };
+
+typedef struct aux_cnt {
+	enum rx_err err;
+	uint8_t cnt_val;
+} aux_cnt_t;
+
+```
+
+### HPU_IOCTL_GET_AUX_THRS
+It gives the values of the AUX RX Error Threshold register
+
+### HPU_IOCTL_GET_AUX_CNT0
+It gives the value of the errors occured in the AUX RX Channel 0
+
+### HPU_IOCTL_GET_AUX_CNT1
+It gives the value of the errors occured in the AUX RX Channel 1
+
+### HPU_IOCTL_GET_AUX_CNT2
+It gives the value of the errors occured in the AUX RX Channel 2
+
+### HPU_IOCTL_GET_AUX_CNT3
+It gives the value of the errors occured in the AUX RX Channel 3
 
 ### HPU_IOCTL_SET_BLK_TX_THR
 Sets the minimum amount of data, in bytes, that a *write()* syscall has to successfully submit to the HPU driver before returning (would block otherwise).
