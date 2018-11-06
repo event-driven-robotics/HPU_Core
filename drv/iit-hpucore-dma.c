@@ -165,6 +165,7 @@
 #define HPU_IOCTL_SET_RX_INTERFACE	26
 #define HPU_IOCTL_SET_TX_INTERFACE	27
 #define HPU_IOCTL_SET_AXIS_LATENCY	28
+#define HPU_IOCTL_GET_RX_PN		29
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -1833,6 +1834,12 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		priv->axis_lat = val;
 		hpu_do_set_axis_lat(priv);
 		mutex_unlock(&priv->dma_rx_pool.mutex_lock);
+		break;
+
+	case _IOR(0x0, HPU_IOCTL_GET_RX_PN, unsigned int *):
+		ret = priv->dma_rx_pool.pn;
+		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
+			goto cfuser_err;
 		break;
 
 	default:
