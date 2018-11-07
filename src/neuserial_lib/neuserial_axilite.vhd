@@ -207,7 +207,7 @@ end entity neuserial_axilite;
 
 architecture rtl of neuserial_axilite is
 
-    constant cVer   : string(3 downto 1) := "B01";
+    constant cVer   : string(3 downto 1) := "B05";
     constant cMAJOR : std_logic_vector(3 downto 0) :="0011";
     constant cMINOR : std_logic_vector(3 downto 0) :="0011";
 
