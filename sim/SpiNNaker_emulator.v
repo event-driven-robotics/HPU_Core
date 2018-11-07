@@ -350,7 +350,7 @@ dummy = 2;
   
 if (HAS_TX == "true") infile0=$fopen(TX_FILE,"r");   //"r" means reading and "w" means writing
 
-Lout = 0;
+Lout = 7'b1111111;
 
 wait (rst);
 wait (!rst);

@@ -32,7 +32,7 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="806"/>
+    <Option Name="WTXSimLaunchSim" Val="828"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -230,16 +230,16 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/neuelab_lib/CoreMonSeqRR.vhd">
+      <File Path="$PPRDIR/../src/HPU_lib/HPU_pkg.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="neuelab_lib"/>
+          <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/HPU_pkg.vhd">
+      <File Path="$PPRDIR/../src/neuelab_lib/CoreMonSeqRR.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="HPU_lib"/>
+          <Attr Name="Library" Val="neuelab_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -398,6 +398,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/HPU_lib/time_machine.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="HPU_lib"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/HPU_lib/timestamp.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
@@ -465,6 +472,13 @@
       </File>
       <File Path="$PPRDIR/../sim/HPUcore_tb.vhd">
         <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../sim/Time_Machine_tb.vhd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>

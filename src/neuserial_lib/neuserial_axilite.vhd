@@ -1130,16 +1130,20 @@ begin
     i_LocNearLoopback      <= i_CTRL_reg(25);
     i_RemoteLoopback       <= i_CTRL_reg(24);
     i_LocFarSpnnLnkLoopbackSel <= i_CTRL_reg(23 downto 22) when C_RX_HAS_SPNNLNK and C_TX_HAS_SPNNLNK else "00";
-    
-
+ --                        <= i_CTRL_reg(21);                               -- Available        
+ --                        <= i_CTRL_reg(20);                               -- Available     
+ --                        <= i_CTRL_reg(19);                               -- Available     
+ --                        <= i_CTRL_reg(18);                               -- Available     
+ --                        <= i_CTRL_reg(17);                               -- Available     
  -- i_ChipType             <= i_CTRL_reg(16);                               -- Reserved for back compatibility with neuelab
     i_fulltimestamp        <= i_CTRL_reg(15);
+ --                        <= i_CTRL_reg(14);                               -- Available     
+ --                        <= i_CTRL_reg(13);                               -- Available     
     i_ResetStream          <= i_CTRL_reg(12);
  -- i_TxEnable             <= i_CTRL_reg(11) when C_TX_HAS_PAER else '0';   -- Reserved for future use
  -- i_RRxEnable            <= i_CTRL_reg(10) when C_RX_HAS_PAER else '0';   -- Reserved for future use
  -- i_LRxEnable            <= i_CTRL_reg(9)  when C_RX_HAS_PAER else '0';   -- Reserved for future use
  -- i_BG_PowerDown         <= i_CTRL_reg(8);                                -- Reserved for back compatibility with neuelab
-
     i_AuxRxPaerFlushFifos  <= i_CTRL_reg(7)  when C_RX_HAS_PAER else '0';
     i_RRxPaerFlushFifos    <= i_CTRL_reg(6)  when C_RX_HAS_PAER else '0';
     i_LRxPaerFlushFifos    <= i_CTRL_reg(5)  when C_RX_HAS_PAER else '0';
@@ -1163,7 +1167,7 @@ begin
                     i_fulltimestamp            &
                     c_zero_vect(14 downto 13)  &
                     i_ResetStream              &
-                    c_zero_vect(11 downto 10)  &                    
+                    c_zero_vect(11 downto 10)  &   -- Reserved for future use                 
                     c_zero_vect(9)             &   -- Reserved for future use
                     c_zero_vect(8)             &   -- Reserved for back compatibility with neuelab
                     i_AuxRxPaerFlushFifos      &
@@ -1533,7 +1537,9 @@ begin
     -- ------------------------------------------------------------------------
     -- TX_CTRL_reg - R/W
 
+--                  <= i_TX_CTRL_reg(31 downto 12);    -- Available   
     i_TxSaerChanEn  <= i_TX_CTRL_reg(11 downto  8)   when C_TX_HAS_HSSAER  else (others => '0');
+--                  <= i_TX_CTRL_reg(7);               -- Available   
     i_TxDestSwitch  <= i_TX_CTRL_reg(6 downto 4)     when (C_TX_HAS_HSSAER or C_TX_HAS_SPNNLNK or C_TX_HAS_GTP or C_TX_HAS_PAER) else "000";
     i_TxSpnnLnkEn   <= i_TX_CTRL_reg(3)              when C_TX_HAS_SPNNLNK else '0';
     i_TxGtpEn       <= i_TX_CTRL_reg(2)              when C_TX_HAS_GTP     else '0';

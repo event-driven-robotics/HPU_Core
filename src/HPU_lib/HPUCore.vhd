@@ -434,6 +434,13 @@ architecture str of HPUCore is
     signal shreg_aux0                : std_logic_vector (3 downto 0);
     signal shreg_aux1                : std_logic_vector (3 downto 0);
     signal shreg_aux2                : std_logic_vector (3 downto 0);
+    
+-- Signals for TimeMachine
+    signal clear_n                   : std_logic;
+    signal resync_clear_n            : std_logic;  
+    signal init_reset                : std_logic; 
+    signal init_reset_n              : std_logic; 
+    signal timing                    : time_tick;	    
 
     
  --   for all : neuserial_axilite  use entity neuserial_lib.neuserial_axilite(rtl);
@@ -455,6 +462,32 @@ begin
     -- Reset generation --
     ----------------------
     nRst    <= S_AXI_ARESETN and nSyncReset;
+
+
+u_time_machine : time_machine 
+generic map( 
+  SIM_TIME_COMPRESSION_g => TRUE,  -- Se "TRUE", la simulazione viene "compressa": i clock enable non seguono le tempistiche reali
+  INIT_DELAY             => 32     -- Ritardo dal rilascio del reset all'impulso di "init"
+  )
+port map(
+  -- Clock in port
+  CLK_100M_i           => S_AXI_ACLK,        -- Ingresso 100 MHz
+  -- Enable ports
+  EN100NS_100_o        => timing.en100ns, 	 -- Clock enable a 100 ns
+  EN1US_100_o          => timing.en1us,	     -- Clock enable a 1 us
+  EN10US_100_o         => timing.en10us,	 -- Clock enable a 10 us
+  EN100US_100_o        => timing.en100us,	 -- Clock enable a 100 us
+  EN1MS_100_o          => timing.en1ms,	     -- Clock enable a 1 ms
+  EN10MS_100_o         => timing.en10ms,	 -- Clock enable a 10 ms
+  EN100MS_100_o        => timing.en100ms,	 -- Clock enable a 100 ms
+  EN1S_100_o           => timing.en1s,	     -- Clock enable a 1 s
+  -- Reset output port 
+  RESYNC_CLEAR_N_o     => resync_clear_n,	 -- Clear resincronizzato
+  INIT_RESET_100_o     => init_reset,	 	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica positiva)
+  INIT_RESET_N_100_o   => init_reset_n,	 	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica negativa)
+  -- Status and control signals
+  CLEAR_N_i            => nRst           -- Clear asincrono che reinizializza le macchine di timing
+  );
 
 
     ------------------------------------------------------
@@ -739,7 +772,12 @@ begin
             ClkLS_n                 => HSSAER_ClkLS_n,               -- in  std_logic;
             ClkHS_p                 => HSSAER_ClkHS_p,               -- in  std_logic;
             ClkHS_n                 => HSSAER_ClkHS_n,               -- in  std_logic;
-
+            
+            --
+            -- Enable per timing
+            ---------------------
+            Timing_i                => timing,
+            
             --
             -- TX DATA PATH
             ---------------------

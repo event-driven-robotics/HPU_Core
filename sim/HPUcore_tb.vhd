@@ -1134,7 +1134,14 @@ Enable_SPNN_Proc : process
 		SPNN_device_enable_R   <= '1';
 		SPNN_device_enable_Tx  <= '0';
 	    SPNN_device_enable_Aux <= '1';
-		
+
+
+		wait for 990 us;
+		SPNN_device_enable_L   <= '1';
+		SPNN_device_enable_R   <= '1';
+		SPNN_device_enable_Tx  <= '1';
+	    SPNN_device_enable_Aux <= '1';
+	    		
 		wait;
 end process Enable_SPNN_Proc;
 

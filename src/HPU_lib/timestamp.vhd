@@ -17,6 +17,8 @@ entity Timestamp is
         Clk_xCI        : in  std_logic;
         Zero_xSI       : in  std_logic;
         CleanTimer_xSI : in  std_logic;
+        LoadTimer_xSI  : in  std_logic;
+        LoadValue_xSI  : in std_logic_vector(31 downto 0);
         Timestamp_xDO  : out std_logic_vector(31 downto 0)
     );
 end entity Timestamp;

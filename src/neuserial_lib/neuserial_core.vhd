@@ -16,6 +16,7 @@ library ieee;
 
 library HPU_lib;
     use HPU_lib.aer_pkg.all;
+    use HPU_lib.HPUComponents_pkg.all;
 
 library neuserial_lib;
     use neuserial_lib.NSComponents_pkg.all;
@@ -59,10 +60,14 @@ entity neuserial_core is
         ClkLS_n           : in  std_logic;
         ClkHS_p           : in  std_logic;
         ClkHS_n           : in  std_logic;
-
+            
+        --
+        -- Enable per timing
+        ---------------------
+        timing_i          : in  time_tick;
+        
         --
         -- TX DATA PATH
-        ---------------------
         -- Parallel AER
         Tx_PAER_Addr_o    : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
         Tx_PAER_Req_o     : out std_logic;
@@ -1045,6 +1050,8 @@ begin
             FlushFifos_xSI          => FlushFifos_i,             -- in  std_logic;
             --ChipType_xSI            => ChipType,                 -- in  std_logic;
             DmaLength_xDI           => DmaLength_i,              -- in  std_logic_vector(10 downto 0);
+            --
+            Timing_xSI              => timing_i,                 -- in  time_tick;
             --
             MonInAddr_xDI           => i_monData,                -- in  std_logic_vector(31 downto 0);
             MonInSrcRdy_xSI         => i_monSrcRdy,              -- in  std_logic;

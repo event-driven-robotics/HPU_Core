@@ -17,7 +17,7 @@ library neuelab_lib;
 
 library HPU_lib;
     use HPU_lib.aer_pkg.all;
-
+    use HPU_lib.HPUComponents_pkg.all;
 
 --****************************
 --   PORT DECLARATION
@@ -38,6 +38,10 @@ entity CoreMonSeqRR is
         FlushFifos_xSI      : in  std_logic;
         --ChipType_xSI        : in  std_logic;
         DmaLength_xDI       : in  std_logic_vector(10 downto 0);
+        --
+        ---------------------------------------------------------------------------
+        -- Enable per timing
+        Timing_xSI          : in  time_tick;
         --
         ---------------------------------------------------------------------------
         -- Input to Monitor
@@ -128,6 +132,8 @@ architecture str of CoreMonSeqRR is
     signal EnableTimestampCounter_xSB : std_logic;
     signal Timestamp_xD               : std_logic_vector(31 downto 0);
     signal ShortTimestamp_xD          : std_logic_vector(31 downto 0);
+    signal LoadTimer_xS               : std_logic;
+    signal LoadValue_xS               : std_logic_vector(31 downto 0);
 
     -- Monitor -> Core
     signal MonOutAddrEvt_xD     : std_logic_vector(63 downto 0);
@@ -216,16 +222,30 @@ begin
   -- Timestamp, Monitor, Sequencer
   -----------------------------------------------------------------------------
 
-    u_Timestamp : Timestamp
+
+    u_Timestamp_TX : Timestamp
+        port map (
+            Rst_xRBI       => Reset_xRBI,
+            Clk_xCI        => CoreClk_xCI,
+            Zero_xSI       => '0',
+            LoadTimer_xSI  => LoadTimer_xS,
+            LoadValue_xSI  => LoadValue_xS,
+            CleanTimer_xSI => CleanTimer_xSI,
+            Timestamp_xDO  => Timestamp_xD
+        );
+        
+    u_Timestamp_RX : Timestamp
         port map (
             Rst_xRBI       => Reset_xRBI,
             Clk_xCI        => CoreClk_xCI,
             Zero_xSI       => EnableTimestampCounter_xSB,
+            LoadTimer_xSI  => '0',
+            LoadValue_xSI  => (others => '0'),
             CleanTimer_xSI => CleanTimer_xSI,
             Timestamp_xDO  => Timestamp_xD
         );
 
-    u_TimestampWrapDetector: TimestampWrapDetector
+    u_TimestampWrapDetector_RX: TimestampWrapDetector
         port map (
             Resetn         => Reset_xRBI,
             Clk            => CoreClk_xCI,
@@ -264,9 +284,14 @@ ShortTimestamp_xD <= x"0000" & "000" & Timestamp_xD(12 downto 0);
             Rst_xRBI       => Reset_xRBI,
             Clk_xCI        => CoreClk_xCI,
             Enable_xSI     => EnableSequencer_xS,
-            TSMode         => "01",
+            --
+            En1ms_xSI      => Timing_xSI.en1ms,
+            --
+            TSMode         => "00",
             --
             Timestamp_xDI  => ShortTimestamp_xD, --Timestamp_xD,
+            LoadTimer_xSO  => LoadTimer_xS, -- std_logic;
+            LoadValue_xSO  => LoadValue_xS, -- std_logic_vector(31 downto 0);
             --
             InAddrEvt_xDI  => SeqInAddrEvt_xD,
             InRead_xSO     => SeqInRead_xS,

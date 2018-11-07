@@ -10,7 +10,6 @@
 library ieee;
     use ieee.std_logic_1164.all;
 
-
 package NEComponents_pkg is
 
     component Infifo_64_1024_32 is
@@ -57,6 +56,8 @@ package NEComponents_pkg is
             Clk_xCI        : in  std_logic;
             Zero_xSI       : in  std_logic;
             CleanTimer_xSI : in  std_logic;
+            LoadTimer_xSI  : in  std_logic;
+            LoadValue_xSI  : in std_logic_vector(31 downto 0);
             Timestamp_xDO  : out std_logic_vector(31 downto 0)
         );
     end component Timestamp;
@@ -100,9 +101,15 @@ package NEComponents_pkg is
             Rst_xRBI       : in  std_logic;
             Clk_xCI        : in  std_logic;
             Enable_xSI     : in  std_logic;
+            --
+            En1ms_xSI      : in  std_logic;
+            --
             TSMode         : in  std_logic_vector(1 downto 0);
+            TSTimeout
             --
             Timestamp_xDI  : in  std_logic_vector(31 downto 0);
+            LoadTimer_xSO  : out std_logic;
+            LoadValue_xSO  : out std_logic_vector(31 downto 0);
             --
             InAddrEvt_xDI  : in  std_logic_vector(63 downto 0);
             InRead_xSO     : out std_logic;

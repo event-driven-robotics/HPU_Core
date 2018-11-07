@@ -20,6 +20,7 @@ library ieee;
     use ieee.std_logic_1164.all;
 
 library HPU_lib;
+    use HPU_lib.HPUComponents_pkg.all;
     use HPU_lib.aer_pkg.all;
     use HPU_lib.aer_pkg.C_INTERNAL_DSIZE;
 
@@ -246,6 +247,10 @@ package NSComponents_pkg is
             FlushFifos_xSI      : in  std_logic;
             --ChipType_xSI        : in  std_logic;
             DmaLength_xDI       : in  std_logic_vector(10 downto 0);
+            --
+            ---------------------------------------------------------------------------
+            -- Enable per timing
+            Timing_xSI          : in  time_tick;
             --
             ---------------------------------------------------------------------------
             -- Input to Monitor

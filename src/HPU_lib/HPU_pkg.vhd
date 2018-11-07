@@ -26,6 +26,17 @@ library HPU_lib;
 
 package HPUComponents_pkg is
 
+type time_tick is record
+    en100ns               : std_logic;
+    en1us                 : std_logic;
+    en10us                : std_logic;
+    en100us               : std_logic;
+    en1ms                 : std_logic;
+    en10ms                : std_logic;
+    en100ms               : std_logic;
+    en1s                  : std_logic;
+    end record time_tick;
+
     component neuserial_core is
         generic (
             C_PAER_DSIZE            : natural range 1 to 29;
@@ -51,7 +62,12 @@ package HPUComponents_pkg is
             ClkLS_n           : in  std_logic;
             ClkHS_p           : in  std_logic;
             ClkHS_n           : in  std_logic;
-
+            
+            --
+            -- Enable per timing
+            ---------------------
+            Timing_i          : in  time_tick;
+            
             --
             -- TX DATA PATH
             ---------------------
@@ -463,5 +479,31 @@ port (
         );
     end component neuserial_axistream;
 
-
+    component time_machine is
+       generic ( 
+            SIM_TIME_COMPRESSION_g : boolean := FALSE; -- Se "TRUE", la simulazione viene "compressa": i clock enable non seguono le tempistiche reali
+            INIT_DELAY             : natural := 32     -- Ritardo dal rilascio del reset all'impulso di "init"
+            );
+       port (
+            -- Clock in port
+            CLK_100M_i           : in  std_logic;  -- Ingresso 100 MHz
+            -- Enable ports
+            EN100NS_100_o        : out std_logic;	-- Clock enable a 100 ns
+            EN1US_100_o          : out std_logic;	-- Clock enable a 1 us
+            EN10US_100_o         : out std_logic;	-- Clock enable a 10 us
+            EN100US_100_o        : out std_logic;	-- Clock enable a 100 us
+            EN1MS_100_o          : out std_logic;	-- Clock enable a 1 ms
+            EN10MS_100_o         : out std_logic;	-- Clock enable a 10 ms
+            EN100MS_100_o        : out std_logic;	-- Clock enable a 100 ms
+            EN1S_100_o           : out std_logic;	-- Clock enable a 1 s
+            -- Reset output port 
+            RESYNC_CLEAR_N_o     : out std_logic; -- Clear resincronizzato
+            INIT_RESET_100_o     : out std_logic;	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica positiva)
+            INIT_RESET_N_100_o   : out std_logic;	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica negativa)
+            -- Status and control signals
+            CLEAR_N_i            : in  std_logic   -- Clear asincrono che reinizializza le macchine di timing
+            );
+       end component;
+       
+       
 end package HPUComponents_pkg;
