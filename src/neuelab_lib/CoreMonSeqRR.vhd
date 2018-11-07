@@ -258,9 +258,6 @@ begin
             OutFull_xSI    => MonOutFull_xS
         );
 
-ShortTimestamp_xD <= x"0000" & "000" & Timestamp_xD(12 downto 0);
-
-
     u_AEXSsequencerRR : AEXSsequencerRR
         generic map (
             TestEnableSequencerNoWait => TestEnableSequencerNoWait
@@ -269,9 +266,7 @@ ShortTimestamp_xD <= x"0000" & "000" & Timestamp_xD(12 downto 0);
             Rst_xRBI       => Reset_xRBI,
             Clk_xCI        => CoreClk_xCI,
             Enable_xSI     => EnableSequencer_xS,
-            TSMode         => "01",
-            --
-            Timestamp_xDI  => ShortTimestamp_xD, --Timestamp_xD,
+            Timestamp_xDI  => Timestamp_xD,
             --
             InAddrEvt_xDI  => SeqInAddrEvt_xD,
             InRead_xSO     => SeqInRead_xS,
