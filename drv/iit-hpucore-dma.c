@@ -1515,7 +1515,7 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
 	/* Disable interrupts */
-        priv->ctrl_reg &= HPU_CTRL_ENINT;
+        priv->ctrl_reg &= ~HPU_CTRL_ENINT;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
 	hpu_stop_dma(priv);
