@@ -595,6 +595,12 @@ port map(
                                TxPaerReqActLevel_o            => i_uP_TxPaerReqActLevel,       -- out std_logic;
                                TxPaerAckActLevel_o            => i_uP_TxPaerAckActLevel,       -- out std_logic;
                                TxSaerChanEn_o                 => i_uP_TxSaerChanEn,            -- out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
+
+                               TxTSMode_o                     => open, -- out std_logic_vector(1 downto 0);
+                               TxTSTimeout_o                  => open, -- out std_logic_vector(15 downto 0);
+                               TxTSRetrig_cmd_o               => open, -- out std_logic;
+                               TxTSRetrig_status_i            => '0', -- in  std_logic;
+                               TxTSEnable_i                   => open, -- out std_logic;
                    
                                LRxPaerEn_o                    => i_uP_LRxPaerEn,               -- out std_logic;
                                RRxPaerEn_o                    => i_uP_RRxPaerEn,               -- out std_logic;

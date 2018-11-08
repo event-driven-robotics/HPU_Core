@@ -105,7 +105,7 @@ package NEComponents_pkg is
             En1ms_xSI      : in  std_logic;
             --
             TSMode         : in  std_logic_vector(1 downto 0);
-            TSTimeout
+            TSTimeout      : in  std_logic_vector(15 downto 0);
             --
             Timestamp_xDI  : in  std_logic_vector(31 downto 0);
             LoadTimer_xSO  : out std_logic;

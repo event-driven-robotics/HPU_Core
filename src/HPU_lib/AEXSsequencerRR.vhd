@@ -18,7 +18,7 @@
 
 library ieee;
     use ieee.std_logic_1164.all;
-    use ieee.numeric_std.all;
+    use ieee.std_logic_arith.all;
     
 --****************************
 --   PORT DECLARATION
@@ -36,6 +36,7 @@ entity AEXSsequencerRR is
         En1ms_xSI      : in  std_logic;
         --
         TSMode         : in  std_logic_vector(1 downto 0);
+        TSTimeout      : in  std_logic_vector(15 downto 0);
         --
         Timestamp_xDI  : in  std_logic_vector(31 downto 0);
         LoadTimer_xSO  : out std_logic;
@@ -79,15 +80,17 @@ architecture beh of AEXSsequencerRR is
     signal combo                      : unsigned(2 downto 0);
 
         
-    signal TimestampPrev_xD : std_logic_vector(31 downto 0);
-  
+    signal TimestampPrev_xD  : std_logic_vector(31 downto 0);
+    signal TSTimeout_cnt     : unsigned(15 downto 0);
+    signal TSTimeout_cnt_tcn : std_logic;
+    
 begin
 
     
     
-    NmL_xDN <= NetxTime_xDN            + not LastTime_xDN + 1;
-    NmA_xDN <= NetxTime_xDN            + not unsigned(Timestamp_xDI);
-    AmL_xDN <= unsigned(Timestamp_xDI) + not LastTime_xDN + 1;
+    NmL_xDN <= NetxTime_xDN            + unsigned(not std_logic_vector(LastTime_xDN)) + 1;
+    NmA_xDN <= NetxTime_xDN            + unsigned(not Timestamp_xDI);
+    AmL_xDN <= unsigned(Timestamp_xDI) + unsigned(not std_logic_vector(LastTime_xDN)) + 1;
     combo   <= NmL_xDN(31) & NmA_xDN(31) & AmL_xDN(31);
 
     -- wiring
@@ -98,7 +101,7 @@ begin
     p_next : process (Address_xDP, Delta_xDN, Delta_xDP,
                       Enable_xSI, InAddrEvt_xDI, InEmpty_xSI, OutDstRdy_xSI,
                       State_xDP, TimestampPrev_xD, Timestamp_xDI,
-                      NetxTime_xDP, NetxTime_xDN, combo, LastTime_xDP
+                      NetxTime_xDP, NetxTime_xDN, combo, LastTime_xDP, TSTimeout_cnt_tcn
                       )
     begin
 
@@ -112,6 +115,8 @@ begin
 
         InRead_xSO    <= '0';
         OutSrcRdy_xSO <= '0';
+        
+        LoadTimer_xSO <= '0';
 
         --ConfigReq_xSO <= '0';
 
@@ -147,11 +152,12 @@ begin
                              State_xDN <= stSend;
                             
                          elsif (TSMode = "10") then  -- (Absolute Time)
-                         
-                             if (combo = 0 or combo = 6 or combo = 5) then
+                             
+                             if ((combo = 0 or combo = 6 or combo = 5) and TSTimeout_cnt_tcn = '0') then
                                  State_xDN <= stWaitDelta;
                              else 
                                  State_xDN <= stSend;
+                                 LoadTimer_xSO <= TSTimeout_cnt_tcn;
                              end if;
                          
                          else 
@@ -207,7 +213,7 @@ begin
             when stSend =>
 
                 OutSrcRdy_xSO <= '1';
-
+                
                 if (OutDstRdy_xSI = '1') then
             --        State_xDN <= stWait; -- ADDED -=FD=-
             --    end if; -- ADDED -=FD=-
@@ -275,7 +281,27 @@ begin
           
         end if;
     end process p_state;
+    
+    -----------------------------------------------------------------------------
 
+LoadValue_xSO <= std_logic_vector(NetxTime_xDN);
+
+TSTimeout_cnt_tcn <= '1' when (TSTimeout_cnt = conv_unsigned(0, TSTimeout_cnt'length)) else '0';
+
+    resync_timeout_counter : process (Clk_xCI, Rst_xRBI)
+    begin
+        if (Rst_xRBI = '0') then           -- asynchronous reset (active low)
+            TSTimeout_cnt      <= conv_unsigned(0, TSTimeout_cnt'length);
+          
+        elsif (rising_edge(Clk_xCI)) then  -- rising clock edge
+            if (State_xDP = stSend) then
+                TSTimeout_cnt <= unsigned(TSTimeout);
+            elsif (En1ms_xSI = '1' and TSTimeout_cnt_tcn = '0') then
+                TSTimeout_cnt <= TSTimeout_cnt - 1;
+            end if;    
+          
+        end if;
+    end process resync_timeout_counter;
     
 end architecture beh;
 

@@ -21,18 +21,19 @@
     <Option Name="ActiveSimSet" Val="sim_1"/>
     <Option Name="DefaultLib" Val="work"/>
     <Option Name="ProjectType" Val="Default"/>
+    <Option Name="IPRepoPath" Val="$PPRDIR/../../HPU_Core"/>
     <Option Name="IPRepoPath" Val="$PPRDIR/../../../../projects/repository/hpu_core"/>
-    <Option Name="IPOutputRepo" Val="$PCACHEDIR/ip"/>
+    <Option Name="IPOutputRepo" Val="$PPRDIR/../../HPU_Core_Git/Vivado/HPU_core.cache/ip"/>
     <Option Name="IPCachePermission" Val="read"/>
     <Option Name="IPCachePermission" Val="write"/>
     <Option Name="EnableCoreContainer" Val="FALSE"/>
     <Option Name="CreateRefXciForCoreContainers" Val="FALSE"/>
-    <Option Name="IPUserFilesDir" Val="$PIPUSERFILESDIR"/>
+    <Option Name="IPUserFilesDir" Val="$PPRDIR/../../HPU_Core_Git/Vivado/HPU_core.ip_user_files"/>
     <Option Name="IPStaticSourceDir" Val="$PIPUSERFILESDIR/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="828"/>
+    <Option Name="WTXSimLaunchSim" Val="1273"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -253,7 +254,7 @@
       </File>
       <File Path="$PPRDIR/../src/HPU_lib/MonitorRR.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="HPU_lib"/>
+          <Attr Name="Library" Val="neuelab_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -288,7 +289,7 @@
       </File>
       <File Path="$PPRDIR/../src/HPU_lib/ShiftRegFifoRROut.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="HPU_lib"/>
+          <Attr Name="Library" Val="datapath_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -472,14 +473,6 @@
       </File>
       <File Path="$PPRDIR/../sim/HPUcore_tb.vhd">
         <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../sim/Time_Machine_tb.vhd">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
@@ -497,6 +490,13 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../sim/Data_To_AUX.txt"/>
+      <File Path="$PPRDIR/../sim/Time_Machine_tb.vhd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
         <Option Name="TopModule" Val="HPUcore_tb"/>
@@ -505,7 +505,7 @@
         <Option Name="SrcSet" Val="sources_1"/>
         <Option Name="XSimWcfgFile" Val="$PPRDIR/../../../Vivado/HPU_core/HPU_core.sim/sim_1/behav/HPUcore_tb_behav.wcfg"/>
         <Option Name="XSimWcfgFile" Val="$PPRDIR/../../Vivado/HPU_core/HPU_core.sim/sim_1/behav/xsim/HPUcore_tb_behav.wcfg"/>
-        <Option Name="NLNetlistMode" Val="funcsim"/>
+        <Option Name="xsim.simulate.runtime" Val="1170us"/>
       </Config>
     </FileSet>
   </FileSets>

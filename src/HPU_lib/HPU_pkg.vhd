@@ -362,6 +362,12 @@ port (
     TxPaerAckActLevel_o            : out std_logic;
     TxSaerChanEn_o                 : out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
 
+    TxTSMode_o                     : out std_logic_vector(1 downto 0);
+    TxTSTimeout_o                  : out std_logic_vector(15 downto 0);
+    TxTSRetrig_cmd_o               : out std_logic;
+    TxTSRetrig_status_i            : in  std_logic;
+    TxTSEnable_i                   : out std_logic;
+
     LRxPaerEn_o                    : out std_logic;
     RRxPaerEn_o                    : out std_logic;
     AUXRxPaerEn_o                  : out std_logic;

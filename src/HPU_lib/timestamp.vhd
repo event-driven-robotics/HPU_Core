@@ -42,7 +42,7 @@ begin
     Timestamp_xDO <= std_logic_vector(TsCnt_xDP);
 
 
-    p_next : process (ClkCnt_xDP, TsCnt_xDP, Zero_xSI, CleanTimer_xSI, ClkCnt_xDN)
+    p_next : process (ClkCnt_xDP, TsCnt_xDP, Zero_xSI, CleanTimer_xSI, ClkCnt_xDN, LoadTimer_xSI, LoadValue_xSI)
     begin
 
         ClkCnt_xDN <= ClkCnt_xDP;
@@ -51,6 +51,9 @@ begin
         if ((Zero_xSI = '1') or (CleanTimer_xSI = '1')) then
             ClkCnt_xDN <= (others => '0');
             TsCnt_xDN  <= (others => '0');
+        elsif (LoadTimer_xSI = '1') then
+            ClkCnt_xDN <= (others => '0');
+            TsCnt_xDN  <= unsigned(LoadValue_xSI);        
         else
             ClkCnt_xDN <= ClkCnt_xDP + 1;
 

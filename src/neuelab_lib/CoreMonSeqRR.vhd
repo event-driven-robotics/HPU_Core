@@ -130,8 +130,9 @@ architecture str of CoreMonSeqRR is
     -- Timestamp Counter
     signal EnableTimestampCounter_xS  : std_logic;
     signal EnableTimestampCounter_xSB : std_logic;
-    signal Timestamp_xD               : std_logic_vector(31 downto 0);
-    signal ShortTimestamp_xD          : std_logic_vector(31 downto 0);
+    signal Timestamp_RX_xD            : std_logic_vector(31 downto 0);
+    signal Timestamp_TX_xD            : std_logic_vector(31 downto 0);
+    signal ShortTimestamp_TX_xD       : std_logic_vector(31 downto 0);
     signal LoadTimer_xS               : std_logic;
     signal LoadValue_xS               : std_logic_vector(31 downto 0);
 
@@ -230,8 +231,8 @@ begin
             Zero_xSI       => '0',
             LoadTimer_xSI  => LoadTimer_xS,
             LoadValue_xSI  => LoadValue_xS,
-            CleanTimer_xSI => CleanTimer_xSI,
-            Timestamp_xDO  => Timestamp_xD
+            CleanTimer_xSI => '0',
+            Timestamp_xDO  => Timestamp_TX_xD
         );
         
     u_Timestamp_RX : Timestamp
@@ -242,7 +243,7 @@ begin
             LoadTimer_xSI  => '0',
             LoadValue_xSI  => (others => '0'),
             CleanTimer_xSI => CleanTimer_xSI,
-            Timestamp_xDO  => Timestamp_xD
+            Timestamp_xDO  => Timestamp_RX_xD
         );
 
     u_TimestampWrapDetector_RX: TimestampWrapDetector
@@ -253,15 +254,15 @@ begin
             WrapDetected   => WrapDetected_xSO
         );
         
-    MSB <= Timestamp_xD(23) when FullTimestamp_i='0' else
-           Timestamp_xD(31);
+    MSB <= Timestamp_RX_xD(23) when FullTimestamp_i='0' else
+           Timestamp_RX_xD(31);
 
     u_MonitorRR : MonitorRR
         port map (
             Rst_xRBI       => Reset_xRBI,
             Clk_xCI        => CoreClk_xCI,
             FullTimestamp_i=> FullTimestamp_i,
-            Timestamp_xDI  => Timestamp_xD,
+            Timestamp_xDI  => Timestamp_RX_xD,
             MonEn_xSAI     => EnableMonitor_xSI,
             --
             InAddr_xDI     => MonInAddr_xD,
@@ -273,7 +274,7 @@ begin
             OutFull_xSI    => MonOutFull_xS
         );
 
-ShortTimestamp_xD <= x"0000" & "000" & Timestamp_xD(12 downto 0);
+ShortTimestamp_TX_xD <= x"0000" & "000" & Timestamp_TX_xD(12 downto 0);
 
 
     u_AEXSsequencerRR : AEXSsequencerRR
@@ -286,10 +287,11 @@ ShortTimestamp_xD <= x"0000" & "000" & Timestamp_xD(12 downto 0);
             Enable_xSI     => EnableSequencer_xS,
             --
             En1ms_xSI      => Timing_xSI.en1ms,
+            TSTimeout      => x"0064",
             --
-            TSMode         => "00",
+            TSMode         => "10",
             --
-            Timestamp_xDI  => ShortTimestamp_xD, --Timestamp_xD,
+            Timestamp_xDI  => ShortTimestamp_TX_xD, --Timestamp_xD,
             LoadTimer_xSO  => LoadTimer_xS, -- std_logic;
             LoadValue_xSO  => LoadValue_xS, -- std_logic_vector(31 downto 0);
             --
@@ -519,7 +521,7 @@ FifoCoreAlmostEmpty_xSO <= i_FifoCoreAlmostEmpty_xSO;
 
 --DBG_underflow       <= DBG_underflow;   
 DBG_data_count      <= fifoWrDataCount_xD;
-DBG_Timestamp_xD   <= Timestamp_xD;
+DBG_Timestamp_xD   <= Timestamp_RX_xD;
 DBG_MonInAddr_xD   <= MonInAddr_xD;
 DBG_MonInSrcRdy_xS <= MonInSrcRdy_xS;
 DBG_MonInDstRdy_xS <= MonInDstRdy_xS;
