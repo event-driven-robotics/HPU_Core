@@ -85,25 +85,24 @@ architecture beh of AEXSsequencerRR is
     signal TSTimeout_cnt_tcn : std_logic;
     
     type rom_array is array (0 to 15) of unsigned (23 downto 0);
---     constant Timeout_Table : rom_array := ( conv_unsigned(      1_0, 24),  -- Address 0   :    DISABLED
---                                             conv_unsigned(      5_0, 24),  -- Address 1   :      1.0 ms
---                                             conv_unsigned(     10_0, 24),  -- Address 2   :      5.0 ms
---                                             conv_unsigned(     50_0, 24),  -- Address 3   :     10.0 ms
---                                             conv_unsigned(    100_0, 24),  -- Address 4   :     50.0 ms
---                                             conv_unsigned(    500_0, 24),  -- Address 5   :    100.0 ms
---                                             conv_unsigned(   1000_0, 24),  -- Address 6   :    500.0 ms
---                                             conv_unsigned(   2500_0, 24),  -- Address 7   :   1000.0 ms
---                                             conv_unsigned(   5000_0, 24),  -- Address 8   :   2500.0 ms
---                                             conv_unsigned(  10000_0, 24),  -- Address 9   :   5000.0 ms
---                                             conv_unsigned(  25000_0, 24),  -- Address A   :  10000.0 ms
---                                             conv_unsigned(  50000_0, 24),  -- Address B   :  25000.0 ms
---                                             conv_unsigned( 100000_0, 24),  -- Address C   :  50000.0 ms
---                                             conv_unsigned( 250000_0, 24),  -- Address D   : 100000.0 ms
---                                             conv_unsigned( 500000_0, 24),  -- Address E   : 250000.0 ms
---                                             conv_unsigned(1000000_0, 24)   -- Address F   : 500000.0 ms
---                                             );
+    constant Timeout_Table : rom_array := ( conv_unsigned(      1_0, 24),  -- Address 0   :    DISABLED
+                                            conv_unsigned(      5_0, 24),  -- Address 1   :      1.0 ms
+                                            conv_unsigned(     10_0, 24),  -- Address 2   :      5.0 ms
+                                            conv_unsigned(     50_0, 24),  -- Address 3   :     10.0 ms
+                                            conv_unsigned(    100_0, 24),  -- Address 4   :     50.0 ms
+                                            conv_unsigned(    500_0, 24),  -- Address 5   :    100.0 ms
+                                            conv_unsigned(   1000_0, 24),  -- Address 6   :    500.0 ms
+                                            conv_unsigned(   2500_0, 24),  -- Address 7   :   1000.0 ms
+                                            conv_unsigned(   5000_0, 24),  -- Address 8   :   2500.0 ms
+                                            conv_unsigned(  10000_0, 24),  -- Address 9   :   5000.0 ms
+                                            conv_unsigned(  25000_0, 24),  -- Address A   :  10000.0 ms
+                                            conv_unsigned(  50000_0, 24),  -- Address B   :  25000.0 ms
+                                            conv_unsigned( 100000_0, 24),  -- Address C   :  50000.0 ms
+                                            conv_unsigned( 250000_0, 24),  -- Address D   : 100000.0 ms
+                                            conv_unsigned( 500000_0, 24),  -- Address E   : 250000.0 ms
+                                            conv_unsigned(1000000_0, 24)   -- Address F   : 500000.0 ms
+                                            );
 
-    signal Timeout_Table : rom_array := ( others => (others => '0'));
     signal timeout_sel   : integer range 0 to 15;
     signal timeout_value : unsigned (23 downto 0);
     

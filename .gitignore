@@ -16,4 +16,4 @@ Local/*
 *DRAFT.zip 
 
 # Ignore Word temporary documents
-*~&*.doc*
+*~$*.doc*
