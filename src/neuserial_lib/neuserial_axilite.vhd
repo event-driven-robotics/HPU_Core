@@ -118,7 +118,7 @@ TxTSMode_o                     : out std_logic_vector(1 downto 0);
 TxTSTimeout_o                  : out std_logic_vector(15 downto 0);
 TxTSRetrig_cmd_o               : out std_logic;
 TxTSRetrig_status_i            : in  std_logic;
-TxTSEnable_i                   : out std_logic;
+TxTSSyncEnable_o               : out std_logic;
 
 LRxPaerEn_o                    : out std_logic;
 RRxPaerEn_o                    : out std_logic;
@@ -414,8 +414,13 @@ architecture rtl of neuserial_axilite is
     signal  i_TxPaerEn      : std_logic;
     signal  i_TxHSSaerEn    : std_logic;
     
+    signal  i_TxTSMode          : std_logic_vector(1 downto 0);
+    signal  i_TxTSTimeout       : std_logic_vector(15 downto 0);
+    signal  i_TxTSRetrig_cmd    : std_logic;
+    signal  i_TxTSRetrig_status : std_logic;
+    signal  i_TxTSSyncEnable    : std_logic;    
+    
     signal  i_TxDestSwitch  : std_logic_vector(2 downto 0);
-
 
     signal  i_TxPaerAckActLevel    : std_logic;
     signal  i_TxPaerReqActLevel    : std_logic;
@@ -626,7 +631,7 @@ begin
                 i_HSSAER_RX_ERR_reg   <= (others => '0');
                 i_HSSAER_RX_MSK_reg   <= (others => '0');
                 i_RX_CTRL_reg       <= (others => '0');
-                i_TX_CTRL_reg       <= (others => '0');
+                i_TX_CTRL_reg       <= x"00050000";
                 i_RX_CNFG_reg       <= (others => '0');
                 i_TX_CNFG_reg       <= (others => '0');
                 i_FIFOTHRESH_reg    <= (others => '0');
@@ -659,6 +664,8 @@ begin
                 i_CTRL_reg( 6) <= '0';   -- RRxPaerFlushFifos_o     (WO: monostable)
                 i_CTRL_reg( 7) <= '0';   -- AuxRxPaerFlushFifos_o   (WO: monostable)
                 i_CTRL_reg(12) <= '0';   -- ResetStream_o           (WO: monostable)
+                
+                i_TX_CTRL_reg(14) <= '0'; -- TxTSRetrig_cmd_o       (Cleared after Write)
 
                 -- IRQ Register
                 -- Update the value of the IRQ
@@ -1542,17 +1549,29 @@ begin
     -- Tx Datapath Control register
     -- ------------------------------------------------------------------------
     -- TX_CTRL_reg - R/W
+--    TxTSTimeout_o                  : out std_logic_vector(15 downto 0);
+--    TxTSRetrig_cmd_o               : out std_logic;
+--    TxTSRetrig_status_i            : in  std_logic;
+--    TxTSSyncEnable_o               : out std_logic;
+--                  <= i_TX_CTRL_reg(31 downto 20);    -- Available 
 
---                  <= i_TX_CTRL_reg(31 downto 12);    -- Available   
-    i_TxSaerChanEn  <= i_TX_CTRL_reg(11 downto  8)   when C_TX_HAS_HSSAER  else (others => '0');
---                  <= i_TX_CTRL_reg(7);               -- Available   
-    i_TxDestSwitch  <= i_TX_CTRL_reg(6 downto 4)     when (C_TX_HAS_HSSAER or C_TX_HAS_SPNNLNK or C_TX_HAS_GTP or C_TX_HAS_PAER) else "000";
-    i_TxSpnnLnkEn   <= i_TX_CTRL_reg(3)              when C_TX_HAS_SPNNLNK else '0';
-    i_TxGtpEn       <= i_TX_CTRL_reg(2)              when C_TX_HAS_GTP     else '0';
-    i_TxPaerEn      <= i_TX_CTRL_reg(1)              when C_TX_HAS_PAER    else '0';
-    i_TxHSSaerEn    <= i_TX_CTRL_reg(0)              when C_TX_HAS_HSSAER  else '0';
+    i_TxTSTimeout     <= x"000" & i_TX_CTRL_reg(19 downto 16);
+    i_TxTSSyncEnable  <= i_TX_CTRL_reg(15);
+    i_TxTSRetrig_cmd  <= i_TX_CTRL_reg(14); -- **** NOTE: Cleared after Write
+    i_TxTSMode        <= i_TX_CTRL_reg(13 downto 12);
+    i_TxSaerChanEn    <= i_TX_CTRL_reg(11 downto  8)   when C_TX_HAS_HSSAER  else (others => '0');
+--                    <= i_TX_CTRL_reg(7);               -- Available   
+    i_TxDestSwitch    <= i_TX_CTRL_reg(6 downto 4)     when (C_TX_HAS_HSSAER or C_TX_HAS_SPNNLNK or C_TX_HAS_GTP or C_TX_HAS_PAER) else "000";
+    i_TxSpnnLnkEn     <= i_TX_CTRL_reg(3)              when C_TX_HAS_SPNNLNK else '0';
+    i_TxGtpEn         <= i_TX_CTRL_reg(2)              when C_TX_HAS_GTP     else '0';
+    i_TxPaerEn        <= i_TX_CTRL_reg(1)              when C_TX_HAS_PAER    else '0';
+    i_TxHSSaerEn      <= i_TX_CTRL_reg(0)              when C_TX_HAS_HSSAER  else '0';
 
-    i_TX_CTRL_rd <= c_zero_vect(31 downto 12) &
+    i_TX_CTRL_rd <= c_zero_vect(31 downto 20) &
+                    i_TxTSTimeout(3 downto 0) &
+                    i_TxTSSyncEnable          &
+                    TxTSRetrig_status_i       &   -- From input
+                    i_TxTSMode                &
                     i_TxSaerChanEn            &
                     c_zero_vect(7)            &
                     i_TxDestSwitch            &
@@ -1567,8 +1586,12 @@ begin
     TxGtpEn_o      <= i_TxGtpEn;
     TxPaerEn_o     <= i_TxPaerEn;
     TxHSSaerEn_o   <= i_TxHSSaerEn;
-
-
+    
+     
+    TxTSTimeout_o    <= i_TxTSTimeout;   
+    TxTSSyncEnable_o <= i_TxTSSyncEnable;   
+    TxTSRetrig_cmd_o <= i_TxTSRetrig_cmd;   
+    TxTSMode_o       <= i_TxTSMode;  
     -- ------------------------------------------------------------------------
     -- Tx Datapath Configuration register
     -- ------------------------------------------------------------------------

@@ -388,6 +388,11 @@ architecture str of HPUCore is
     signal i_uP_TxPaerReqActLevel    : std_logic;
     signal i_uP_TxPaerAckActLevel    : std_logic;
     signal i_uP_TxSaerChanEn         : std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
+    signal i_uP_TxTSMode             : std_logic_vector(1 downto 0);
+    signal i_uP_TxTSTimeout          : std_logic_vector(15 downto 0);
+    signal i_uP_TxTSRetrig_cmd       : std_logic;
+    signal i_uP_TxTSRetrig_status    : std_logic;
+    signal i_uP_TxTSSyncEnable       : std_logic;    
     signal i_uP_LRxPaerEn            : std_logic;
     signal i_uP_RRxPaerEn            : std_logic;
     signal i_uP_AUXRxPaerEn          : std_logic;
@@ -596,11 +601,11 @@ port map(
                                TxPaerAckActLevel_o            => i_uP_TxPaerAckActLevel,       -- out std_logic;
                                TxSaerChanEn_o                 => i_uP_TxSaerChanEn,            -- out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
 
-                               TxTSMode_o                     => open, -- out std_logic_vector(1 downto 0);
-                               TxTSTimeout_o                  => open, -- out std_logic_vector(15 downto 0);
-                               TxTSRetrig_cmd_o               => open, -- out std_logic;
-                               TxTSRetrig_status_i            => '0', -- in  std_logic;
-                               TxTSEnable_i                   => open, -- out std_logic;
+                               TxTSMode_o                     => i_uP_TxTSMode,                -- out std_logic_vector(1 downto 0);
+                               TxTSTimeout_o                  => i_uP_TxTSTimeout,             -- out std_logic_vector(15 downto 0);
+                               TxTSRetrig_cmd_o               => i_uP_TxTSRetrig_cmd,          -- out std_logic;
+                               TxTSRetrig_status_i            => i_uP_TxTSRetrig_status,       -- in  std_logic;
+                               TxTSSyncEnable_o               => i_uP_TxTSSyncEnable,              -- out std_logic;
                    
                                LRxPaerEn_o                    => i_uP_LRxPaerEn,               -- out std_logic;
                                RRxPaerEn_o                    => i_uP_RRxPaerEn,               -- out std_logic;
@@ -897,6 +902,12 @@ port map(
             TxPaerAckActLevel_i     => i_uP_TxPaerAckActLevel,       -- in  std_logic;
             TxSaerChanEn_i          => i_uP_TxSaerChanEn,            -- in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
             --TxSaerChanCfg_i         => ,                             -- in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
+
+            TxTSMode_i              => i_uP_TxTSMode,                -- in  std_logic_vector(1 downto 0);
+            TxTSTimeout_i           => i_uP_TxTSTimeout,             -- in  std_logic_vector(15 downto 0);
+            TxTSRetrig_cmd_i        => i_uP_TxTSRetrig_cmd,          -- in  std_logic;
+            TxTSRetrig_status_o     => i_uP_TxTSRetrig_status,       -- out std_logic;
+            TxTSSyncEnable_i        => i_uP_TxTSSyncEnable,              -- in  std_logic;
 
             LRxPaerEn_i             => i_uP_LRxPaerEn,               -- in  std_logic;
             RRxPaerEn_i             => i_uP_RRxPaerEn,               -- in  std_logic;

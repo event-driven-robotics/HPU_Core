@@ -25,30 +25,30 @@ library ieee;
 --****************************
 
 entity AEXSsequencerRR is
-    generic (
-        TestEnableSequencerNoWait : boolean
-    );
     port (
-        Rst_xRBI       : in  std_logic;
-        Clk_xCI        : in  std_logic;
-        Enable_xSI     : in  std_logic;
+        Rst_xRBI              : in  std_logic;
+        Clk_xCI               : in  std_logic;
+        Enable_xSI            : in  std_logic;
         --
-        En1ms_xSI      : in  std_logic;
+        En100us_xSI           : in  std_logic;
         --
-        TSMode         : in  std_logic_vector(1 downto 0);
-        TSTimeout      : in  std_logic_vector(15 downto 0);
+        TSMode                : in  std_logic_vector(1 downto 0);
+        TSTimeout             : in  std_logic_vector(15 downto 0);
         --
-        Timestamp_xDI  : in  std_logic_vector(31 downto 0);
-        LoadTimer_xSO  : out std_logic;
-        LoadValue_xSO  : out std_logic_vector(31 downto 0);
+        Timestamp_xDI         : in  std_logic_vector(31 downto 0);
+        LoadTimer_xSO         : out std_logic;
+        LoadValue_xSO         : out std_logic_vector(31 downto 0);
+        TxTSRetrig_cmd_xSI    : in  std_logic;
+        TxTSRetrig_status_xSO : out std_logic;
+        TxTSSyncEnable_i      : in  std_logic;
         --
-        InAddrEvt_xDI  : in  std_logic_vector(63 downto 0);
-        InRead_xSO     : out std_logic;
-        InEmpty_xSI    : in  std_logic;
+        InAddrEvt_xDI         : in  std_logic_vector(63 downto 0);
+        InRead_xSO            : out std_logic;
+        InEmpty_xSI           : in  std_logic;
         --
-        OutAddr_xDO    : out std_logic_vector(31 downto 0);
-        OutSrcRdy_xSO  : out std_logic;
-        OutDstRdy_xSI  : in  std_logic
+        OutAddr_xDO           : out std_logic_vector(31 downto 0);
+        OutSrcRdy_xSO         : out std_logic;
+        OutDstRdy_xSI         : in  std_logic
         --
         --ConfigAddr_xDO : out std_logic_vector(31 downto 0);
         --ConfigReq_xSO  : out std_logic;
@@ -81,8 +81,31 @@ architecture beh of AEXSsequencerRR is
 
         
     signal TimestampPrev_xD  : std_logic_vector(31 downto 0);
-    signal TSTimeout_cnt     : unsigned(15 downto 0);
+    signal TSTimeout_cnt     : unsigned(23 downto 0);
     signal TSTimeout_cnt_tcn : std_logic;
+    
+    type rom_array is array (0 to 15) of unsigned (23 downto 0);
+--     constant Timeout_Table : rom_array := ( conv_unsigned(      1_0, 24),  -- Address 0   :    DISABLED
+--                                             conv_unsigned(      5_0, 24),  -- Address 1   :      1.0 ms
+--                                             conv_unsigned(     10_0, 24),  -- Address 2   :      5.0 ms
+--                                             conv_unsigned(     50_0, 24),  -- Address 3   :     10.0 ms
+--                                             conv_unsigned(    100_0, 24),  -- Address 4   :     50.0 ms
+--                                             conv_unsigned(    500_0, 24),  -- Address 5   :    100.0 ms
+--                                             conv_unsigned(   1000_0, 24),  -- Address 6   :    500.0 ms
+--                                             conv_unsigned(   2500_0, 24),  -- Address 7   :   1000.0 ms
+--                                             conv_unsigned(   5000_0, 24),  -- Address 8   :   2500.0 ms
+--                                             conv_unsigned(  10000_0, 24),  -- Address 9   :   5000.0 ms
+--                                             conv_unsigned(  25000_0, 24),  -- Address A   :  10000.0 ms
+--                                             conv_unsigned(  50000_0, 24),  -- Address B   :  25000.0 ms
+--                                             conv_unsigned( 100000_0, 24),  -- Address C   :  50000.0 ms
+--                                             conv_unsigned( 250000_0, 24),  -- Address D   : 100000.0 ms
+--                                             conv_unsigned( 500000_0, 24),  -- Address E   : 250000.0 ms
+--                                             conv_unsigned(1000000_0, 24)   -- Address F   : 500000.0 ms
+--                                             );
+
+    signal Timeout_Table : rom_array := ( others => (others => '0'));
+    signal timeout_sel   : integer range 0 to 15;
+    signal timeout_value : unsigned (23 downto 0);
     
 begin
 
@@ -101,7 +124,8 @@ begin
     p_next : process (Address_xDP, Delta_xDN, Delta_xDP,
                       Enable_xSI, InAddrEvt_xDI, InEmpty_xSI, OutDstRdy_xSI,
                       State_xDP, TimestampPrev_xD, Timestamp_xDI,
-                      NetxTime_xDP, NetxTime_xDN, combo, LastTime_xDP, TSTimeout_cnt_tcn
+                      NetxTime_xDP, NetxTime_xDN, combo, LastTime_xDP, TSTimeout_cnt_tcn,
+                      TSMode
                       )
     begin
 
@@ -134,9 +158,8 @@ begin
                         LastTime_xDN <= NetxTime_xDP;
 
                         if (TSMode = "00") then  -- Old Mode (Delta Time)
-                            -- if we have a zero ISI or TestEnableSequencerNoWait
-                            -- we go to the stWaitDelta state, otherwise we send now...
-                            if (Delta_xDN /= 0 and not TestEnableSequencerNoWait) then
+                            -- if Delta_xDN is not zero we go to the stWaitDelta state, otherwise we send now...
+                            if (Delta_xDN /= 0) then
                                 State_xDN <= stWaitDelta;
                             else
                                 -- address or config..?
@@ -283,26 +306,33 @@ begin
     end process p_state;
     
     -----------------------------------------------------------------------------
-
-LoadValue_xSO <= std_logic_vector(NetxTime_xDN);
-
-TSTimeout_cnt_tcn <= '1' when (TSTimeout_cnt = conv_unsigned(0, TSTimeout_cnt'length)) else '0';
-
-    resync_timeout_counter : process (Clk_xCI, Rst_xRBI)
-    begin
-        if (Rst_xRBI = '0') then           -- asynchronous reset (active low)
-            TSTimeout_cnt      <= conv_unsigned(0, TSTimeout_cnt'length);
-          
-        elsif (rising_edge(Clk_xCI)) then  -- rising clock edge
-            if (State_xDP = stSend) then
-                TSTimeout_cnt <= unsigned(TSTimeout);
-            elsif (En1ms_xSI = '1' and TSTimeout_cnt_tcn = '0') then
-                TSTimeout_cnt <= TSTimeout_cnt - 1;
-            end if;    
-          
-        end if;
-    end process resync_timeout_counter;
+    -- RESYNC
     
+    LoadValue_xSO <= std_logic_vector(NetxTime_xDN);                                                 -- Value to be forced in TimeStamp TX
+    
+    TSTimeout_cnt_tcn <= '1' when (TSTimeout_cnt = conv_unsigned(0, TSTimeout_cnt'length)) else '0'; -- Terminal Count, at Zero
+    TxTSRetrig_status_xSO <= TSTimeout_cnt_tcn;                                                      -- Reply of Terminal Count
+    timeout_sel <= conv_integer(unsigned(TSTimeout(3 downto 0)));                                    -- Timeout value selector
+    timeout_value <= Timeout_Table(timeout_sel);                                                     -- Timeout value frome table
+    
+        resync_timeout_counter : process (Clk_xCI, Rst_xRBI)
+        begin
+            if (Rst_xRBI = '0') then           -- asynchronous reset (active low)
+                TSTimeout_cnt      <= conv_unsigned(0, TSTimeout_cnt'length);
+              
+            elsif (rising_edge(Clk_xCI)) then  -- rising clock edge
+                if (TxTSRetrig_cmd_xSI = '1') then
+                    TSTimeout_cnt <= conv_unsigned(0, TSTimeout_cnt'length);
+                elsif (State_xDP = stSend or TxTSSyncEnable_i = '1') then
+                    TSTimeout_cnt <= timeout_value;
+                elsif (En100us_xSI = '1' and TSTimeout_cnt_tcn = '0') then
+                    TSTimeout_cnt <= TSTimeout_cnt - 1;
+                end if;    
+              
+            end if;
+        end process resync_timeout_counter;
+        
 end architecture beh;
+
 
 -------------------------------------------------------------------------------

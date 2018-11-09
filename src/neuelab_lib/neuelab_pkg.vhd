@@ -94,30 +94,30 @@ package NEComponents_pkg is
 
 
     component AEXSsequencerRR is
-        generic (
-            TestEnableSequencerNoWait : boolean
-        );
         port (
-            Rst_xRBI       : in  std_logic;
-            Clk_xCI        : in  std_logic;
-            Enable_xSI     : in  std_logic;
+            Rst_xRBI              : in  std_logic;
+            Clk_xCI               : in  std_logic;
+            Enable_xSI            : in  std_logic;
             --
-            En1ms_xSI      : in  std_logic;
+            En100us_xSI           : in  std_logic;
             --
-            TSMode         : in  std_logic_vector(1 downto 0);
-            TSTimeout      : in  std_logic_vector(15 downto 0);
+            TSMode                : in  std_logic_vector(1 downto 0);
+            TSTimeout             : in  std_logic_vector(15 downto 0);
             --
-            Timestamp_xDI  : in  std_logic_vector(31 downto 0);
-            LoadTimer_xSO  : out std_logic;
-            LoadValue_xSO  : out std_logic_vector(31 downto 0);
+            Timestamp_xDI         : in  std_logic_vector(31 downto 0);
+            LoadTimer_xSO         : out std_logic;
+            LoadValue_xSO         : out std_logic_vector(31 downto 0);
+            TxTSRetrig_cmd_xSI    : in  std_logic;
+            TxTSRetrig_status_xSO : out std_logic;
+            TxTSSyncEnable_i      : in  std_logic;
             --
-            InAddrEvt_xDI  : in  std_logic_vector(63 downto 0);
-            InRead_xSO     : out std_logic;
-            InEmpty_xSI    : in  std_logic;
+            InAddrEvt_xDI         : in  std_logic_vector(63 downto 0);
+            InRead_xSO            : out std_logic;
+            InEmpty_xSI           : in  std_logic;
             --
-            OutAddr_xDO    : out std_logic_vector(31 downto 0);
-            OutSrcRdy_xSO  : out std_logic;
-            OutDstRdy_xSI  : in  std_logic
+            OutAddr_xDO           : out std_logic_vector(31 downto 0);
+            OutSrcRdy_xSO         : out std_logic;
+            OutDstRdy_xSI         : in  std_logic
             --
             --ConfigAddr_xDO : out std_logic_vector(31 downto 0);
             --ConfigReq_xSO  : out std_logic;

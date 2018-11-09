@@ -181,6 +181,12 @@ type time_tick is record
             TxSaerChanEn_i          : in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
             --TxSaerChanCfg_i         : in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
 
+            TxTSMode_i              : in  std_logic_vector(1 downto 0);
+            TxTSTimeout_i           : in  std_logic_vector(15 downto 0);
+            TxTSRetrig_cmd_i        : in  std_logic;
+            TxTSRetrig_status_o     : out std_logic;
+            TxTSSyncEnable_i        : in  std_logic;
+
             LRxPaerEn_i             : in  std_logic;
             RRxPaerEn_i             : in  std_logic;
             AuxRxPaerEn_i           : in  std_logic;
@@ -366,7 +372,7 @@ port (
     TxTSTimeout_o                  : out std_logic_vector(15 downto 0);
     TxTSRetrig_cmd_o               : out std_logic;
     TxTSRetrig_status_i            : in  std_logic;
-    TxTSEnable_i                   : out std_logic;
+    TxTSSyncEnable_o               : out std_logic;
 
     LRxPaerEn_o                    : out std_logic;
     RRxPaerEn_o                    : out std_logic;
@@ -484,6 +490,7 @@ port (
 
         );
     end component neuserial_axistream;
+
 
     component time_machine is
        generic ( 
