@@ -19,17 +19,17 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="1170000000001fs"></ZoomEndTime>
-      <Cursor1Time time="96441408000fs"></Cursor1Time>
+      <ZoomStartTime time="195000000000fs"></ZoomStartTime>
+      <ZoomEndTime time="549693593315fs"></ZoomEndTime>
+      <Cursor1Time time="1170000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="294"></NameColumnWidth>
-      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+      <ValueColumnWidth column_width="68"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="12" />
    <wave_markers>
-      <marker time="124878032000" label="" />
+      <marker time="529052925000" label="" />
    </wave_markers>
    <wvobject fp_name="/HPUcore_tb/HSSAER_ClkLS_p" type="logic">
       <obj_property name="ElementShortName">HSSAER_ClkLS_p</obj_property>
@@ -638,7 +638,6 @@
    <wvobject fp_name="group145" type="group">
       <obj_property name="label">AXI Stream</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TREADY" type="logic">
          <obj_property name="ElementShortName">S_AXIS_TREADY</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TREADY</obj_property>
@@ -675,7 +674,6 @@
    <wvobject fp_name="group144" type="group">
       <obj_property name="label">AXI Lite</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXI_ACLK" type="logic">
          <obj_property name="ElementShortName">S_AXI_ACLK</obj_property>
          <obj_property name="ObjectShortName">S_AXI_ACLK</obj_property>
@@ -996,6 +994,14 @@
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeout" type="array">
          <obj_property name="ElementShortName">TSTimeout[15:0]</obj_property>
          <obj_property name="ObjectShortName">TSTimeout[15:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeout_cnt" type="array">
+         <obj_property name="ElementShortName">TSTimeout_cnt[23:0]</obj_property>
+         <obj_property name="ObjectShortName">TSTimeout_cnt[23:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeout_cnt_tcn" type="logic">
+         <obj_property name="ElementShortName">TSTimeout_cnt_tcn</obj_property>
+         <obj_property name="ObjectShortName">TSTimeout_cnt_tcn</obj_property>
       </wvobject>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/timeout" type="logic">
          <obj_property name="ElementShortName">timeout</obj_property>
