@@ -244,9 +244,10 @@ package NSComponents_pkg is
         -- clock and reset
         Reset_xRBI          : in  std_logic;
         CoreClk_xCI         : in  std_logic;
-        FlushFifos_xSI      : in  std_logic;
+        FlushRXFifos_xSI    : in  std_logic;
+        FlushTXFifos_xSI    : in  std_logic;
         --ChipType_xSI        : in  std_logic;
-        DmaLength_xDI       : in  std_logic_vector(10 downto 0);
+        DmaLength_xDI       : in  std_logic_vector(15 downto 0);
         --
         ---------------------------------------------------------------------------
         -- Enable per timing

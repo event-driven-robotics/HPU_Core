@@ -72,12 +72,19 @@ TxDataBuffer_o                 : out std_logic_vector(31 downto 0);
 DMA_is_running_i               : in  std_logic;
 EnableDMAIf_o                  : out std_logic;
 ResetStream_o                  : out std_logic;
-DmaLength_o                    : out std_logic_vector(10 downto 0);
+DmaLength_o                    : out std_logic_vector(15 downto 0);
 DMA_test_mode_o                : out std_logic;
 fulltimestamp_o                : out std_logic;
 
 CleanTimer_o                   : out std_logic;
-FlushFifos_o                   : out std_logic;
+FlushRXFifos_o                 : out std_logic;
+FlushTXFifos_o                 : out std_logic;
+LatTlast_o                     : out std_logic;
+TlastCnt_i                     : in  std_logic_vector(31 downto 0);
+TDataCnt_i                     : in  std_logic_vector(31 downto 0);
+TlastTO_o                      : out std_logic_vector(31 downto 0);
+TlastTOwritten_o               : out std_logic;
+
 --TxEnable_o                     : out std_logic;
 --TxPaerFlushFifos_o             : out std_logic;
 --LRxEnable_o                    : out std_logic;
@@ -327,6 +334,9 @@ architecture rtl of neuserial_axilite is
     signal  i_SPNN_STOP_KEY_rd    : std_logic_vector (31 downto 0);
     signal  i_SPNN_TX_MASK_rd     : std_logic_vector (31 downto 0);
     signal  i_SPNN_RX_MASK_rd     : std_logic_vector (31 downto 0);
+    signal  i_TlastCnt_rd         : std_logic_vector (31 downto 0);
+    signal  i_TDataCnt_rd         : std_logic_vector (31 downto 0);
+    signal  i_TlastTO_rd          : std_logic_vector (31 downto 0);
 
 
     signal  i_rawHSSaerErr  : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -352,7 +362,9 @@ architecture rtl of neuserial_axilite is
     signal  i_RRxPaerFlushFifos    : std_logic;
     signal  i_LRxPaerFlushFifos    : std_logic;
     signal  i_AuxRxPaerFlushFifos  : std_logic;
-    signal  i_FlushFifos           : std_logic;
+    signal  i_FlushRXFifos           : std_logic;
+    signal  i_FlushTXFifos           : std_logic;
+    signal  i_LatTlast             : std_logic;
     -- signal  i_EnableLoopBack       : std_logic;
     signal  i_interruptEnable      : std_logic;
     signal  i_EnableDmaIf          : std_logic;
@@ -365,7 +377,7 @@ architecture rtl of neuserial_axilite is
     signal  i_TxDataBuffer         : std_logic_vector(31 downto 0);
 
 
-    signal  i_DmaLength            : std_logic_vector(10 downto 0);
+    signal  i_DmaLength            : std_logic_vector(15 downto 0);
 
 
     -- signal  i_LatchTime            : natural range 0 to 255;
@@ -432,6 +444,9 @@ architecture rtl of neuserial_axilite is
     signal  i_AUXRxHSSaerEn    : std_logic;
     signal  i_rawInterrupt     : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_SpnnLnk_err      : std_logic_vector(26 downto 20);
+
+    signal  i_TlastTO          : std_logic_vector(31 downto 0);
+    signal  i_TlastTowritten   : std_logic;
 
 begin
 
@@ -631,8 +646,8 @@ begin
                 i_HSSAER_RX_ERR_reg   <= (others => '0');
                 i_HSSAER_RX_MSK_reg   <= (others => '0');
                 i_RX_CTRL_reg       <= (others => '0');
-                i_TX_CTRL_reg       <= x"00050000";
-                i_RX_CNFG_reg       <= (others => '0');
+                i_TX_CTRL_reg       <= (others => '0');
+                i_RX_CNFG_reg       <= ( 25 => '1', 8 => '1',others => '0');
                 i_TX_CNFG_reg       <= (others => '0');
                 i_FIFOTHRESH_reg    <= (others => '0');
                 i_LPBK_CNFG_AUX_reg <= (others => '0');
@@ -647,6 +662,9 @@ begin
 
                 WriteTxBuffer_o <= '0';
                 i_cleanTimer  <= '0';
+                
+                i_TlastTO <= X"00010000";
+                i_TlastTowritten <= '0';
 
             else
                 WriteTxBuffer_o <= '0';
@@ -659,13 +677,17 @@ begin
                 i_cleanTimer <= '0';     -- i_WRAPTime_reg cleared on write
 
                 -- Ctrl register
-                i_CTRL_reg( 4) <= '0';   -- FlushFifos_o            (WO: monostable)
+                i_CTRL_reg( 4) <= '0';   -- FlushRXFifos_o          (WO: monostable)
                 i_CTRL_reg( 5) <= '0';   -- LRxPaerFlushFifos_o     (WO: monostable)
                 i_CTRL_reg( 6) <= '0';   -- RRxPaerFlushFifos_o     (WO: monostable)
                 i_CTRL_reg( 7) <= '0';   -- AuxRxPaerFlushFifos_o   (WO: monostable)
+                i_CTRL_reg( 8) <= '0';   -- FlushTXFifos_o          (WO: monostable)
                 i_CTRL_reg(12) <= '0';   -- ResetStream_o           (WO: monostable)
-                
+				
                 i_TX_CTRL_reg(14) <= '0'; -- TxTSRetrig_cmd_o       (Cleared after Write)
+				
+                -- TlastTO register
+                i_TlastTowritten <= '0';
 
                 -- IRQ Register
                 -- Update the value of the IRQ
@@ -909,6 +931,21 @@ begin
                                end if;
                            end loop;  
 
+                       -- i_TlastTO_reg
+                       when 40 =>
+                           for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
+                               if (S_AXI_WSTRB(byte_index) = '1') then
+                                  i_TlastTO(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
+                                  i_TlastTowritten <= '1';
+                               end if;
+                           end loop;  
+
+                        -- i_TlastCnt_reg Read Only Register
+                        -- when 41 =>
+
+                        -- i_TDataCnt_reg Read Only Register
+                        -- when 42 =>
+                        
                         when others => null;
 
                     end case;
@@ -1024,7 +1061,8 @@ begin
                           i_IP_CONFIG_rd, i_FIFOTHRESH_rd, i_LPBK_CNFG_AUX_rd, i_ID_rd, i_AUX_CTRL_rd,
                           i_HSSAER_AUX_RX_ERR_rd, i_HSSAER_AUX_RX_MSK_rd,
                           i_readRxErrCnt, i_HSSAER_AUX_RX_ERR_THR_rd, i_HSSAER_AUX_RX_ERR_CNT_rd,
-                          i_SPNN_START_KEY_rd, i_SPNN_STOP_KEY_rd, i_SPNN_TX_MASK_rd, i_SPNN_RX_MASK_rd )
+                          i_SPNN_START_KEY_rd, i_SPNN_STOP_KEY_rd, i_SPNN_TX_MASK_rd, i_SPNN_RX_MASK_rd,
+                          i_TlastCnt_rd, i_TDataCnt_rd, i_TlastTO_rd)
     begin
         if (S_AXI_ARESETN = '0') then
             regDataOut <= (others => '0');
@@ -1085,6 +1123,10 @@ begin
                 when 33 => regDataOut  <= i_SPNN_STOP_KEY_rd;
                 when 34 => regDataOut  <= i_SPNN_TX_MASK_rd;
                 when 35 => regDataOut  <= i_SPNN_RX_MASK_rd;
+                
+                when 40 => regDataOut  <= i_TlastTO_rd;
+                when 41 => regDataOut  <= i_TlastCnt_rd;
+                when 42 => regDataOut  <= i_TDataCnt_rd;
 
                when others  => regDataOut  <= x"BAB0BAB0";
             end case;
@@ -1155,12 +1197,12 @@ begin
     i_ResetStream          <= i_CTRL_reg(12);
  -- i_TxEnable             <= i_CTRL_reg(11) when C_TX_HAS_PAER else '0';   -- Reserved for future use
  -- i_RRxEnable            <= i_CTRL_reg(10) when C_RX_HAS_PAER else '0';   -- Reserved for future use
- -- i_LRxEnable            <= i_CTRL_reg(9)  when C_RX_HAS_PAER else '0';   -- Reserved for future use
- -- i_BG_PowerDown         <= i_CTRL_reg(8);                                -- Reserved for back compatibility with neuelab
+    i_LatTlast             <= i_CTRL_reg(9);
+    i_FlushTXFifos         <= i_CTRL_reg(8);
     i_AuxRxPaerFlushFifos  <= i_CTRL_reg(7)  when C_RX_HAS_PAER else '0';
     i_RRxPaerFlushFifos    <= i_CTRL_reg(6)  when C_RX_HAS_PAER else '0';
     i_LRxPaerFlushFifos    <= i_CTRL_reg(5)  when C_RX_HAS_PAER else '0';
-    i_FlushFifos           <= i_CTRL_reg(4);
+    i_FlushRXFifos         <= i_CTRL_reg(4);
  -- i_EnableLoopBack       <= i_CTRL_reg(3);                                -- Reserved for back compatibility with neuelab
     i_interruptEnable      <= i_CTRL_reg(2);
     i_EnableDmaIf          <= i_CTRL_reg(1);
@@ -1180,13 +1222,13 @@ begin
                     i_fulltimestamp            &
                     c_zero_vect(14 downto 13)  &
                     i_ResetStream              &
-                    c_zero_vect(11 downto 10)  &   -- Reserved for future use                 
-                    c_zero_vect(9)             &   -- Reserved for future use
-                    c_zero_vect(8)             &   -- Reserved for back compatibility with neuelab
+                    c_zero_vect(11 downto 10)  &                    
+                    i_LatTlast                 &
+                    i_FlushTXFifos             &
                     i_AuxRxPaerFlushFifos      &
                     i_RRxPaerFlushFifos        &
                     i_LRxPaerFlushFifos        &
-                    i_FlushFifos               &
+                    i_FlushRXFifos             &
                     c_zero_vect(3)             &   -- Reserved for back compatibility with neuelab
                     i_interruptEnable          &
                     i_EnableDmaIf              &
@@ -1212,9 +1254,11 @@ begin
     RRxPaerFlushFifos_o        <= i_RRxPaerFlushFifos;
     LRxPaerFlushFifos_o        <= i_LRxPaerFlushFifos;
     AuxRxPaerFlushFifos_o      <= i_AuxRxPaerFlushFifos;
-    FlushFifos_o               <= i_FlushFifos;
+    FlushRXFifos_o             <= i_FlushRXFifos;
+    FlushTXFifos_o             <= i_FlushTXFifos;
  -- EnableLoopBack_o           <= i_EnableLoopBack;                -- Reserved for back compatibility with neuelab
     EnableDmaIf_o              <= i_EnableDmaIf;
+    LatTlast_o                 <= i_LatTlast;
 
 
     -- ------------------------------------------------------------------------
@@ -1295,10 +1339,11 @@ begin
     -- DMA_reg - DMA Interface register R/W
     --
 
-    i_DmaLength <= i_DMA_reg(10 downto 0);
+    -- The bit 0 is always zero, this means that only even number of data are
+    i_DmaLength <= i_DMA_reg(15 downto 1)&'0';
 
-    i_DMA_rd <= c_zero_vect(31 downto 17) & i_DMA_reg(16) & c_zero_vect(15 downto 11) &
-                i_DmaLength;
+    i_DMA_rd <= c_zero_vect(31 downto 17) & i_DMA_reg(16) &
+                i_DmaLength(15 downto 1)&'0';
 
     DmaLength_o <= i_DmaLength;
 
@@ -1832,6 +1877,22 @@ begin
 
     i_SPNN_RX_MASK_rd <= i_SPNN_RX_MASK_reg;
 
+    -- ------------------------------------------------------------------------
+    -- Tlast TimeOut register
+    -- ------------------------------------------------------------------------
+    i_TlastTO_rd <= i_TlastTO;
+    TlastTO_o <= i_TlastTO;
+    TlastTOwritten_o <= i_TlastTowritten;
+
+    -- ------------------------------------------------------------------------
+    -- Tlast Counter register
+    -- ------------------------------------------------------------------------
+    i_TlastCnt_rd <= TlastCnt_i;
+
+    -- ------------------------------------------------------------------------
+    -- TData Counter register
+    -- ------------------------------------------------------------------------
+    i_TDataCnt_rd <= TDataCnt_i;
 
     -- ------------------------------------------------------------------------
     -- DEBUG Registers

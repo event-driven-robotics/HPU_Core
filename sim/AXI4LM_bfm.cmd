@@ -6,7 +6,6 @@ PRT Tlast features TEST
 ##  
 WAT 1000
 
-
 ##  Control Register
 ## WRD CTRL    00E01002   ## Con Loopback
 WRD CTRL    00001002   ## Senza Loopback

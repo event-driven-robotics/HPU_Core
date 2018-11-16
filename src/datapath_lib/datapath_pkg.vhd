@@ -143,6 +143,7 @@ package DPComponents_pkg is
             EnableIp                 : in  std_logic;
             FlushFifo                : in  std_logic;
             IgnoreFifoFull_i         : in  std_logic;
+            aux_channel              : in  std_logic;
 
 
             -- parallel AER

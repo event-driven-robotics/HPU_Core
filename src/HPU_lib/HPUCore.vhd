@@ -343,7 +343,7 @@ architecture str of HPUCore is
     signal i_uP_DMAIsRunning         : std_logic;
     signal i_uP_enableDmaIf          : std_logic;
     signal i_uP_resetstream          : std_logic;
-    signal i_uP_dmaLength            : std_logic_vector(10 downto 0);
+    signal i_uP_dmaLength            : std_logic_vector(15 downto 0);
     signal i_uP_DMA_test_mode        : std_logic;
     signal i_uP_fulltimestamp        : std_logic;
 
@@ -365,10 +365,16 @@ architecture str of HPUCore is
     signal i_uP_txBufferFull         : std_logic;
 
     signal i_uP_cleanTimer           : std_logic;
-    signal i_uP_flushFifos           : std_logic;
+    signal i_uP_flushRXFifos           : std_logic;
+    signal i_uP_flushTXFifos           : std_logic;
     signal i_uP_LRxFlushFifos        : std_logic;
     signal i_uP_RRxFlushFifos        : std_logic;
     signal i_uP_AuxRxPaerFlushFifos  : std_logic;
+    signal i_up_TlastCnt             : std_logic_vector(31 downto 0);
+    signal i_up_TDataCnt             : std_logic_vector(31 downto 0);
+    signal i_up_TlastTO              : std_logic_vector(31 downto 0);
+    signal i_up_TlastTOwritten       : std_logic;
+    signal i_up_LatTlast             : std_logic;
 
     signal i_uP_RemoteLpbk           : std_logic;
     signal i_uP_LocalNearLpbk        : std_logic;
@@ -447,6 +453,7 @@ architecture str of HPUCore is
     signal init_reset_n              : std_logic; 
     signal timing                    : time_tick;	    
 
+    signal i_FifoCoreLastData        : std_logic;
     
  --   for all : neuserial_axilite  use entity neuserial_lib.neuserial_axilite(rtl);
  --   for all : neuserial_axistream  use entity neuserial_lib.neuserial_axistream(rtl);
@@ -564,7 +571,13 @@ port map(
                                fulltimestamp_o                => i_uP_fulltimestamp,               -- out std_logic;
                    
                                CleanTimer_o                   => i_uP_cleanTimer,              -- out std_logic;
-                               FlushFifos_o                   => i_uP_flushFifos,              -- out std_logic;
+                               FlushRXFifos_o                 => i_uP_flushRXFifos,              -- out std_logic;
+                               FlushTXFifos_o                 => i_uP_flushTXFifos,            -- out std_logic;
+                               LatTlast_o                     => i_up_LatTlast,                -- out std_logic;
+                               TlastCnt_i                     => i_up_TlastCnt,                -- in  std_logic_vector(31 downto 0);
+                               TDataCnt_i                     => i_up_TDataCnt,                -- in  std_logic_vector(31 downto 0);
+                               TlastTO_o                      => i_up_TlastTO,                 -- out std_logic_vector(31 downto 0);
+                               TlastTOwritten_o               => i_up_TlastTOwritten,          -- out std_logic;
                                --TxEnable_o                     => ,                             -- out std_logic;
                                --TxPaerFlushFifos_o             => ,                             -- out std_logic;
                                --LRxEnable_o                    => ,                             -- out std_logic;
@@ -691,13 +704,19 @@ port map(
             DMA_test_mode_i                => i_uP_DMA_test_mode,               -- in  std_logic;
             EnableAxistreamIf_i            => i_uP_enableDmaIf,                 -- in  std_logic;
             DMA_is_running_o               => i_uP_DMAIsRunning,                -- out std_logic;
-            DmaLength_i                    => i_uP_dmaLength,                   -- in  std_logic_vector(10 downto 0);
+            DmaLength_i                    => i_uP_dmaLength,                   -- in  std_logic_vector(15 downto 0);
             ResetStream_i                  => i_uP_resetstream,                 -- in  std_logic;
+            LatTlat_i                      => i_up_LatTlast,                    -- in  std_logic;
+            TlastCnt_o                     => i_up_TlastCnt,                    -- out std_logic_vector(31 downto 0);
+            TlastTO_i                      => i_up_TlastTO,                     -- in  std_logic_vector(31 downto 0);
+            TlastTOwritten_i               => i_up_TlastTOwritten,              -- in  std_logic;
+            TDataCnt_o                     => i_up_TDataCnt,                    -- out std_logic_vector(31 downto 0);
             -- From Fifo to core/dma
             FifoCoreDat_i                  => i_dma_rxDataBuffer,               -- in  std_logic_vector(31 downto 0);
             FifoCoreRead_o                 => i_dma_readRxBuffer,               -- out std_logic;
             FifoCoreEmpty_i                => i_dma_rxBufferEmpty,              -- in  std_logic;
             FifoCoreBurstReady_i           => i_dma_rxBufferReady,              -- in  std_logic;
+            FifoCoreLastData_i             => i_FifoCoreLastData,               -- in  std_logic;
             -- From core/dma to Fifo
             CoreFifoDat_o                  => i_dma_txDataBuffer,               -- out std_logic_vector(31 downto 0);
             CoreFifoWrite_o                => i_dma_writeTxBuffer,              -- out std_logic;
@@ -710,18 +729,19 @@ port map(
             M_AXIS_TVALID                  => M_AXIS_TVALID,                    -- out std_logic;
             M_AXIS_TDATA                   => M_AXIS_TDATA,                     -- out std_logic_vector(31 downto 0);
             M_AXIS_TLAST                   => M_AXIS_TLAST,                     -- out std_logic;
-            M_AXIS_TREADY                  => M_AXIS_TREADY,                    -- in  std_logic;
-            -- DBG
-            DBG_data_written               => DBG_data_written,                 -- out std_logic;
-            DBG_dma_burst_counter          => DBG_dma_burst_counter,            -- out std_logic_vector(10 downto 0)
-            DBG_dma_test_mode              => DBG_dma_test_mode,                -- out std_logic;
-            DBG_dma_EnableDma              => DBG_dma_EnableDma,                -- std_logic;
-            DBG_dma_is_running             => DBG_dma_is_running,               -- std_logic;
-            DBG_dma_Length                 => DBG_dma_Length,                   -- std_logic_vector(10 downto 0);
-            DBG_dma_nedge_run              => DBG_dma_nedge_run                 -- std_logic
-
+            M_AXIS_TREADY                  => M_AXIS_TREADY                      -- in  std_logic
         );
 
+    -- Removed DBG out port from AXIstream module
+    DBG_data_written      <= '0';
+    DBG_dma_burst_counter <= (others => '0');
+    DBG_dma_test_mode     <= '0';
+    DBG_dma_EnableDma     <= '0';
+    DBG_dma_is_running    <= '0';
+    DBG_dma_Length        <= (others => '0');
+    DBG_dma_nedge_run     <= '0';
+
+    i_FifoCoreLastData <= '1' when i_fifoCoreNumData="00000000001" else '0';
 
     -- Muxing AXI-Lite and AXI-Stream Fifo interfaces --
     ----------------------------------------------------
@@ -868,7 +888,8 @@ port map(
             ---------------------
             -- Control
             CleanTimer_i            => i_uP_cleanTimer,              -- in  std_logic;
-            FlushFifos_i            => i_uP_flushFifos,              -- in  std_logic;
+            FlushRXFifos_i          => i_uP_flushRXFifos,              -- in  std_logic;
+            FlushTXFifos_i          => i_uP_flushTXFifos,              -- in  std_logic;
             --TxEnable_i              => ,                             -- in  std_logic;
             --TxPaerFlushFifos_i      => ,                             -- in  std_logic;
             --LRxEnable_i             => ,                             -- in  std_logic;
@@ -880,7 +901,7 @@ port map(
 
 
             -- Configurations
-            DmaLength_i             => i_uP_dmaLength,               -- in  std_logic_vector(10 downto 0);
+            DmaLength_i             => i_uP_dmaLength,               -- in  std_logic_vector(15 downto 0);
             RemoteLoopback_i        => i_uP_RemoteLpbk,              -- in  std_logic;
             LocNearLoopback_i       => i_uP_LocalNearLpbk,           -- in  std_logic;
             LocFarLPaerLoopback_i   => i_uP_LocalFarLPaerLpbk,       -- in  std_logic;

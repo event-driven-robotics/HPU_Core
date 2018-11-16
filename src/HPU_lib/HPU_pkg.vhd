@@ -147,7 +147,8 @@ type time_tick is record
             ---------------------
             -- Control
             CleanTimer_i            : in  std_logic;
-            FlushFifos_i            : in  std_logic;
+            FlushRXFifos_i          : in  std_logic;
+            FlushTXFifos_i          : in  std_logic;        
             --TxEnable_i              : in  std_logic;
             --TxPaerFlushFifos_i      : in  std_logic;
             --LRxEnable_i             : in  std_logic;
@@ -158,7 +159,7 @@ type time_tick is record
             FullTimestamp_i         : in  std_logic;
 
             -- Configurations
-            DmaLength_i             : in  std_logic_vector(10 downto 0);
+            DmaLength_i             : in  std_logic_vector(15 downto 0);
             RemoteLoopback_i        : in  std_logic;
             LocNearLoopback_i       : in  std_logic;
             LocFarLPaerLoopback_i   : in  std_logic;
@@ -326,12 +327,19 @@ port (
     DMA_is_running_i               : in  std_logic;
     EnableDMAIf_o                  : out std_logic;
     ResetStream_o                  : out std_logic;
-    DmaLength_o                    : out std_logic_vector(10 downto 0);
+    DmaLength_o                    : out std_logic_vector(15 downto 0);
     DMA_test_mode_o                : out std_logic;
     fulltimestamp_o                : out std_logic;
 
     CleanTimer_o                   : out std_logic;
-    FlushFifos_o                   : out std_logic;
+    FlushRXFifos_o                 : out std_logic;
+    FlushTXFifos_o                 : out std_logic;
+    LatTlast_o                     : out std_logic;
+    TlastCnt_i                     : in  std_logic_vector(31 downto 0);
+    TDataCnt_i                     : in  std_logic_vector(31 downto 0);
+    TlastTO_o                      : out std_logic_vector(31 downto 0);
+    TlastTOwritten_o               : out std_logic;
+
     --TxEnable_o                     : out std_logic;
     --TxPaerFlushFifos_o             : out std_logic;
     --LRxEnable_o                    : out std_logic;
@@ -458,13 +466,19 @@ port (
             DMA_test_mode_i        : in  std_logic;
             EnableAxistreamIf_i    : in  std_logic;
             DMA_is_running_o       : out std_logic;
-            DmaLength_i            : in  std_logic_vector(10 downto 0);
+            DmaLength_i            : in  std_logic_vector(15 downto 0);
             ResetStream_i          : in  std_logic;
+            LatTlat_i              : in  std_logic;
+            TlastCnt_o             : out std_logic_vector(31 downto 0);
+            TlastTO_i              : in  std_logic_vector(31 downto 0);
+            TlastTOwritten_i       : in  std_logic;
+            TDataCnt_o             : out std_logic_vector(31 downto 0);
             -- From Fifo to core/dma
             FifoCoreDat_i          : in  std_logic_vector(31 downto 0);
             FifoCoreRead_o         : out std_logic;
             FifoCoreEmpty_i        : in  std_logic;
             FifoCoreBurstReady_i   : in  std_logic;
+            FifoCoreLastData_i     : in  std_logic;
             -- From core/dma to Fifo
             CoreFifoDat_o          : out std_logic_vector(31 downto 0);
             CoreFifoWrite_o        : out std_logic;
@@ -477,16 +491,7 @@ port (
             M_AXIS_TVALID          : out std_logic;
             M_AXIS_TDATA           : out std_logic_vector(31 downto 0);
             M_AXIS_TLAST           : out std_logic;
-            M_AXIS_TREADY          : in  std_logic;
-
-            -- DBG
-            DBG_data_written       : out std_logic;
-            DBG_dma_burst_counter  : out std_logic_vector(10 downto 0);
-            DBG_dma_test_mode      : out std_logic;
-            DBG_dma_EnableDma      : out std_logic;
-            DBG_dma_is_running     : out std_logic;
-            DBG_dma_Length         : out std_logic_vector(10 downto 0);
-            DBG_dma_nedge_run      : out std_logic
+            M_AXIS_TREADY          : in  std_logic
 
         );
     end component neuserial_axistream;

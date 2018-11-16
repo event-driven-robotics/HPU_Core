@@ -47,6 +47,7 @@ module hssaer_paer_rx_wrapper
     
     wire [dsize-1:0] i_ae;
 
+    // This header coding comes from AERsensorsMap.xlsx (svn version r12867)
     assign ae = (aux_channel==1) ? {higher_bits[int_dsize-1:dsize+3], i_ae[dsize-1-2:dsize-1-2-2],  i_ae} : {higher_bits, i_ae};
 
 	hssaer_paer_rx

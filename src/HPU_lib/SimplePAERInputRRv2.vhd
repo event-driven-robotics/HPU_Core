@@ -35,6 +35,7 @@ entity SimplePAERInputRRv2 is
         EnableIp         : in  std_logic;
         FlushFifo        : in  std_logic;
         IgnoreFifoFull_i : in  std_logic;
+        aux_channel      : in  std_logic;
 
         -- parallel AER
         AerReqxAI    : in  std_logic;
@@ -116,10 +117,11 @@ begin
             OverflowxSO     => open
         );
 
+    -- This header coding comes from AERsensorsMap.xlsx (svn version r12867)
     -- fifo data wiring
-    FifoInpDataxD(internal_width-1 downto paer_width) <= AerHighBitsxDI;
+    FifoInpDataxD(internal_width-1 downto paer_width) <= AerHighBitsxDI when (aux_channel='0') else 
+                                                         AerHighBitsxDI(internal_width-1-paer_width downto 3) &  AerDataxADI(paer_width-1-2 downto paer_width-1-2-2);
     FifoInpDataxD(paer_width-1 downto 0)              <= AerDataxADI;
-
     
     -- If IgnoreFifoFull_i is High the request is always granted
     i_fifoReady <= IgnoreFifoFull_i or not FifoFullxS;
