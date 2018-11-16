@@ -12,8 +12,9 @@ Vivado/*
 # ignore Local folder
 Local/*
 
-# Ignore zip files with DRAFT suffix
-*DRAFT.zip 
+# Ignore any files with DRAFT suffix
+*DRAFT* 
 
 # Ignore Word temporary documents
 *~$*.doc*
+

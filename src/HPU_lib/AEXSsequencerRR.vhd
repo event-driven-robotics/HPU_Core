@@ -81,30 +81,34 @@ architecture beh of AEXSsequencerRR is
 
         
     signal TimestampPrev_xD  : std_logic_vector(31 downto 0);
+    signal timeout           : std_logic;
     signal TSTimeout_cnt     : unsigned(23 downto 0);
     signal TSTimeout_cnt_tcn : std_logic;
     
     type rom_array is array (0 to 15) of unsigned (23 downto 0);
-    constant Timeout_Table : rom_array := ( conv_unsigned(      1_0, 24),  -- Address 0   :    DISABLED
-                                            conv_unsigned(      5_0, 24),  -- Address 1   :      1.0 ms
-                                            conv_unsigned(     10_0, 24),  -- Address 2   :      5.0 ms
-                                            conv_unsigned(     50_0, 24),  -- Address 3   :     10.0 ms
-                                            conv_unsigned(    100_0, 24),  -- Address 4   :     50.0 ms
-                                            conv_unsigned(    500_0, 24),  -- Address 5   :    100.0 ms
-                                            conv_unsigned(   1000_0, 24),  -- Address 6   :    500.0 ms
-                                            conv_unsigned(   2500_0, 24),  -- Address 7   :   1000.0 ms
-                                            conv_unsigned(   5000_0, 24),  -- Address 8   :   2500.0 ms
-                                            conv_unsigned(  10000_0, 24),  -- Address 9   :   5000.0 ms
-                                            conv_unsigned(  25000_0, 24),  -- Address A   :  10000.0 ms
-                                            conv_unsigned(  50000_0, 24),  -- Address B   :  25000.0 ms
-                                            conv_unsigned( 100000_0, 24),  -- Address C   :  50000.0 ms
-                                            conv_unsigned( 250000_0, 24),  -- Address D   : 100000.0 ms
-                                            conv_unsigned( 500000_0, 24),  -- Address E   : 250000.0 ms
-                                            conv_unsigned(1000000_0, 24)   -- Address F   : 500000.0 ms
+    constant Timeout_Table : rom_array := ( conv_unsigned(      1_0, 24),  -- Address 0   :       1.0 ms
+                                            conv_unsigned(      5_0, 24),  -- Address 1   :       5.0 ms
+                                            conv_unsigned(     10_0, 24),  -- Address 2   :      10.0 ms
+                                            conv_unsigned(     50_0, 24),  -- Address 3   :      50.0 ms
+                                            conv_unsigned(    100_0, 24),  -- Address 4   :     100.0 ms
+                                            conv_unsigned(    500_0, 24),  -- Address 5   :     500.0 ms
+                                            conv_unsigned(   1000_0, 24),  -- Address 6   :    1000.0 ms
+                                            conv_unsigned(   2500_0, 24),  -- Address 7   :    2500.0 ms
+                                            conv_unsigned(   5000_0, 24),  -- Address 8   :    5000.0 ms
+                                            conv_unsigned(  10000_0, 24),  -- Address 9   :   10000.0 ms
+                                            conv_unsigned(  25000_0, 24),  -- Address A   :   25000.0 ms
+                                            conv_unsigned(  50000_0, 24),  -- Address B   :   50000.0 ms
+                                            conv_unsigned( 100000_0, 24),  -- Address C   :  100000.0 ms
+                                            conv_unsigned( 250000_0, 24),  -- Address D   :  250000.0 ms
+                                            conv_unsigned( 500000_0, 24),  -- Address E   :  500000.0 ms
+                                            conv_unsigned(1000000_0, 24)   -- Address F   : 1000000.0 ms
                                             );
 
     signal timeout_sel   : integer range 0 to 15;
     signal timeout_value : unsigned (23 downto 0);
+    signal SendPending   : std_logic; 
+    signal SendPending_d : std_logic; 
+    signal timeout_rearm : std_logic;
     
 begin
 
@@ -140,6 +144,7 @@ begin
         OutSrcRdy_xSO <= '0';
         
         LoadTimer_xSO <= '0';
+        SendPending   <= '0';
 
         --ConfigReq_xSO <= '0';
 
@@ -175,11 +180,11 @@ begin
                             
                          elsif (TSMode = "10") then  -- (Absolute Time)
                              
-                             if ((combo = 0 or combo = 6 or combo = 5) and TSTimeout_cnt_tcn = '0') then
+                             if ((combo = 0 or combo = 6 or combo = 5) and timeout = '0') then
                                  State_xDN <= stWaitDelta;
                              else 
                                  State_xDN <= stSend;
-                                 LoadTimer_xSO <= TSTimeout_cnt_tcn;
+                                 LoadTimer_xSO <= timeout;
                              end if;
                          
                          else 
@@ -234,6 +239,7 @@ begin
             
             when stSend =>
 
+                SendPending   <= '1';
                 OutSrcRdy_xSO <= '1';
                 
                 if (OutDstRdy_xSI = '1') then
@@ -288,6 +294,8 @@ begin
             NmA_xDP          <= (others => '0');
             AmL_xDP          <= (others => '0');
             
+            SendPending_d    <= '0';
+            
           
         elsif (rising_edge(Clk_xCI)) then  -- rising clock edge
             State_xDP        <= State_xDN;
@@ -299,7 +307,9 @@ begin
             LastTime_xDP     <= LastTime_xDN;
             NmL_xDP          <= NmL_xDN;
             NmA_xDP          <= NmA_xDN;
-            AmL_xDP          <= AmL_xDN;            
+            AmL_xDP          <= AmL_xDN;      
+            
+            SendPending_d    <= SendPending;      
           
         end if;
     end process p_state;
@@ -308,9 +318,10 @@ begin
     -- RESYNC
     
     LoadValue_xSO <= std_logic_vector(NetxTime_xDN);                                                 -- Value to be forced in TimeStamp TX
-    
+    timeout_rearm <= not SendPending and SendPending_d;                                              -- Timeout counter rearm signal
     TSTimeout_cnt_tcn <= '1' when (TSTimeout_cnt = conv_unsigned(0, TSTimeout_cnt'length)) else '0'; -- Terminal Count, at Zero
-    TxTSRetrig_status_xSO <= TSTimeout_cnt_tcn;                                                      -- Reply of Terminal Count
+    timeout <=  TSTimeout_cnt_tcn and TxTSSyncEnable_i;                                              -- Timeout internal signal
+    TxTSRetrig_status_xSO <= timeout;                                                                -- Reply of Timeout internal signal
     timeout_sel <= conv_integer(unsigned(TSTimeout(3 downto 0)));                                    -- Timeout value selector
     timeout_value <= Timeout_Table(timeout_sel);                                                     -- Timeout value frome table
     
@@ -322,7 +333,7 @@ begin
             elsif (rising_edge(Clk_xCI)) then  -- rising clock edge
                 if (TxTSRetrig_cmd_xSI = '1') then
                     TSTimeout_cnt <= conv_unsigned(0, TSTimeout_cnt'length);
-                elsif (State_xDP = stSend or TxTSSyncEnable_i = '1') then
+                elsif (timeout_rearm = '1' or State_xDP /= stIdle) then
                     TSTimeout_cnt <= timeout_value;
                 elsif (En100us_xSI = '1' and TSTimeout_cnt_tcn = '0') then
                     TSTimeout_cnt <= TSTimeout_cnt - 1;
