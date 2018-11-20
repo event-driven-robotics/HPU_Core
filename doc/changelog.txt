@@ -1,5 +1,5 @@
 ********************************************
-Version 3.4 Rev 1:  16th, November 2018
+Version 3.4 Rev 3:  16th, November 2018
 - Absolute Timing Feature for Transmission 
   (M. Casti - IIT)
 

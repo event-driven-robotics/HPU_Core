@@ -180,12 +180,15 @@ entity neuserial_core is
         TxSaerChanEn_i          : in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
         --TxSaerChanCfg_i         : in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
 
-        TxTSMode_i              : in  std_logic_vector(1 downto 0);
-        TxTSTimeout_i           : in  std_logic_vector(15 downto 0);
-        TxTSRetrig_cmd_i        : in  std_logic;
-        TxTSRetrig_status_o     : out std_logic;
-        TxTSSyncEnable_i        : in  std_logic;
+        -- TX Timestamp
+        TxTSMode_i                     : in  std_logic_vector(1 downto 0);
+        TxTSTimeoutSel_i               : in  std_logic_vector(3 downto 0);
+        TxTSRetrigCmd_i                : in  std_logic;
+        TxTSRetrigStatus_o             : out std_logic;
+        TxTSSyncEnable_i               : in  std_logic;
+        TxTSMaskSel_i                  : in  std_logic_vector(1 downto 0);
         
+        --
         LRxPaerEn_i             : in  std_logic;
         RRxPaerEn_i             : in  std_logic;
         AuxRxPaerEn_i           : in  std_logic;
@@ -1076,11 +1079,12 @@ begin
             EnableMonitor_xSI       => '1',                      -- in  std_logic;
             CoreReady_xSI           => '1',                      -- in  std_logic;
             --
-            TxTSMode_i              => TxTSMode_i,               -- in  std_logic_vector(1 downto 0);
-            TxTSTimeout_i           => TxTSTimeout_i,            -- in  std_logic_vector(15 downto 0);
-            TxTSRetrig_cmd_i        => TxTSRetrig_cmd_i,         -- in  std_logic;
-            TxTSRetrig_status_o     => TxTSRetrig_status_o,      -- out std_logic;
-            TxTSSyncEnable_i        => TxTSSyncEnable_i,         -- in  std_logic;
+            TxTSMode_xDI            => TxTSMode_i,               -- in  std_logic_vector(1 downto 0);
+            TxTSTimeoutSel_xDI      => TxTSTimeoutSel_i,         -- in  std_logic_vector(3 downto 0);
+            TxTSRetrigCmd_xSI       => TxTSRetrigCmd_i,          -- in  std_logic;
+            TxTSRetrigStatus_xSO    => TxTSRetrigStatus_o,       -- out std_logic;
+            TxTSSyncEnable_xSI      => TxTSSyncEnable_i,         -- in  std_logic;
+            TxTSMaskSel_xSI         => TxTSMaskSel_i,            -- in  std_logic_vector(1 downto 0);
             --
             FifoCoreDat_xDO         => FifoCoreDat_o,            -- out std_logic_vector(31 downto 0);
             FifoCoreRead_xSI        => FifoCoreRead_i,           -- in  std_logic;

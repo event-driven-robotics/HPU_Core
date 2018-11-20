@@ -17,3 +17,6 @@ Local/*
 
 # Ignore Word temporary documents
 *~$*.doc*
+
+# Ignore any files with BETA suffix
+*BETA* 

@@ -66,12 +66,13 @@ entity CoreMonSeqRR is
         EnableMonitor_xSI       : in  std_logic;
         CoreReady_xSI           : in  std_logic;
         ---------------------------------------------------------------------------
-        -- Time Sequencer
-        TxTSMode_i              : in  std_logic_vector(1 downto 0);
-        TxTSTimeout_i           : in  std_logic_vector(15 downto 0);
-        TxTSRetrig_cmd_i        : in  std_logic;
-        TxTSRetrig_status_o     : out std_logic;
-        TxTSSyncEnable_i        : in  std_logic;
+        -- TX Timestamp
+        TxTSMode_xDI            : in  std_logic_vector(1 downto 0);
+        TxTSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
+        TxTSRetrigCmd_xSI       : in  std_logic;
+        TxTSRetrigStatus_xSO    : out std_logic;
+        TxTSSyncEnable_xSI      : in  std_logic;
+        TxTSMaskSel_xSI         : in  std_logic_vector(1 downto 0);
         --
         ---------------------------------------------------------------------------
         -- FIFO -> Core
@@ -288,7 +289,7 @@ begin
             OutFull_xSI    => MonOutFull_xS
         );
 
-ShortTimestamp_TX_xD <= x"0000" & "000" & Timestamp_TX_xD(12 downto 0);
+ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
 
 
     u_AEXSsequencerRR : AEXSsequencerRR
@@ -297,17 +298,18 @@ ShortTimestamp_TX_xD <= x"0000" & "000" & Timestamp_TX_xD(12 downto 0);
             Clk_xCI                => CoreClk_xCI,
             Enable_xSI             => EnableSequencer_xS,
             --
-            En100us_xSI            => Timing_xSI.en1ms,
-            TSTimeout              => TxTSTimeout_i,
+            En100us_xSI            => Timing_xSI.en100us,
+            -- 
+            TSMode_xDI             => TxTSMode_xDI,
+            TSTimeoutSel_xDI       => TxTSTimeoutSel_xDI,
+            TSMaskSel_xDI          => TxTSMaskSel_xSI,
             --
-            TSMode                 => TxTSMode_i,
-            --
-            Timestamp_xDI          => ShortTimestamp_TX_xD, --Timestamp_xD,
-            LoadTimer_xSO          => LoadTimer_xS,        -- out std_logic;
-            LoadValue_xSO          => LoadValue_xS,        -- out std_logic_vector(31 downto 0);
-            TxTSRetrig_cmd_xSI     => TxTSRetrig_cmd_i,    -- in  std_logic;
-            TxTSRetrig_status_xSO  => TxTSRetrig_status_o, -- out std_logic;
-            TxTSSyncEnable_i       => TxTSSyncEnable_i,    -- in  std_logic;
+            Timestamp_xDI          => Timestamp_TX_xD,  
+            LoadTimer_xSO          => LoadTimer_xS,        
+            LoadValue_xSO          => LoadValue_xS,        
+            TxTSRetrigCmd_xSI      => TxTSRetrigCmd_xSI,   
+            TxTSRetrigStatus_xSO   => TxTSRetrigStatus_xSO,
+            TxTSSyncEnable_xSI     => TxTSSyncEnable_xSI,  
             --
             InAddrEvt_xDI          => SeqInAddrEvt_xD,
             InRead_xSO             => SeqInRead_xS,

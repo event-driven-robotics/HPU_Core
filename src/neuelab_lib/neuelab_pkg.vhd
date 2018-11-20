@@ -101,15 +101,16 @@ package NEComponents_pkg is
             --
             En100us_xSI           : in  std_logic;
             --
-            TSMode                : in  std_logic_vector(1 downto 0);
-            TSTimeout             : in  std_logic_vector(15 downto 0);
+            TSMode_xDI            : in  std_logic_vector(1 downto 0);
+            TSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
+            TSMaskSel_xDI         : in  std_logic_vector(1 downto 0);
             --
             Timestamp_xDI         : in  std_logic_vector(31 downto 0);
             LoadTimer_xSO         : out std_logic;
             LoadValue_xSO         : out std_logic_vector(31 downto 0);
-            TxTSRetrig_cmd_xSI    : in  std_logic;
-            TxTSRetrig_status_xSO : out std_logic;
-            TxTSSyncEnable_i      : in  std_logic;
+            TxTSRetrigCmd_xSI     : in  std_logic;
+            TxTSRetrigStatus_xSO  : out std_logic;
+            TxTSSyncEnable_xSI    : in  std_logic;
             --
             InAddrEvt_xDI         : in  std_logic_vector(63 downto 0);
             InRead_xSO            : out std_logic;

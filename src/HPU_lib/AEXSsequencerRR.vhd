@@ -32,15 +32,16 @@ entity AEXSsequencerRR is
         --
         En100us_xSI           : in  std_logic;
         --
-        TSMode                : in  std_logic_vector(1 downto 0);
-        TSTimeout             : in  std_logic_vector(15 downto 0);
+        TSMode_xDI            : in  std_logic_vector(1 downto 0);
+        TSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
+        TSMaskSel_xDI         : in  std_logic_vector(1 downto 0);
         --
         Timestamp_xDI         : in  std_logic_vector(31 downto 0);
         LoadTimer_xSO         : out std_logic;
         LoadValue_xSO         : out std_logic_vector(31 downto 0);
-        TxTSRetrig_cmd_xSI    : in  std_logic;
-        TxTSRetrig_status_xSO : out std_logic;
-        TxTSSyncEnable_i      : in  std_logic;
+        TxTSRetrigCmd_xSI     : in  std_logic;
+        TxTSRetrigStatus_xSO  : out std_logic;
+        TxTSSyncEnable_xSI    : in  std_logic;
         --
         InAddrEvt_xDI         : in  std_logic_vector(63 downto 0);
         InRead_xSO            : out std_logic;
@@ -82,8 +83,10 @@ architecture beh of AEXSsequencerRR is
         
     signal TimestampPrev_xD  : std_logic_vector(31 downto 0);
     signal timeout           : std_logic;
-    signal TSTimeout_cnt     : unsigned(23 downto 0);
-    signal TSTimeout_cnt_tcn : std_logic;
+    signal TSTimeoutSel_xDI_cnt     : unsigned(23 downto 0);
+    signal TSTimeoutSel_xDI_cnt_tcn : std_logic;
+    signal TimestampMskd     : std_logic_vector(31 downto 0);
+    signal TSMask            : std_logic_vector(31 downto 0);
     
     type rom_array is array (0 to 15) of unsigned (23 downto 0);
     constant Timeout_Table : rom_array := ( conv_unsigned(      1_0, 24),  -- Address 0   :       1.0 ms
@@ -112,11 +115,11 @@ architecture beh of AEXSsequencerRR is
     
 begin
 
-    
+    TimestampMskd <= Timestamp_xDI and TSMask;
     
     NmL_xDN <= NetxTime_xDN            + unsigned(not std_logic_vector(LastTime_xDN)) + 1;
-    NmA_xDN <= NetxTime_xDN            + unsigned(not Timestamp_xDI);
-    AmL_xDN <= unsigned(Timestamp_xDI) + unsigned(not std_logic_vector(LastTime_xDN)) + 1;
+    NmA_xDN <= NetxTime_xDN            + unsigned(not TimestampMskd);
+    AmL_xDN <= unsigned(TimestampMskd) + unsigned(not std_logic_vector(LastTime_xDN)) + 1;
     combo   <= NmL_xDN(31) & NmA_xDN(31) & AmL_xDN(31);
 
     -- wiring
@@ -126,9 +129,9 @@ begin
     --p_next : process (Address_xDN, Address_xDP, ConfigAck_xSI, Delta_xDN, Delta_xDP,
     p_next : process (Address_xDP, Delta_xDN, Delta_xDP,
                       Enable_xSI, InAddrEvt_xDI, InEmpty_xSI, OutDstRdy_xSI,
-                      State_xDP, TimestampPrev_xD, Timestamp_xDI,
-                      NetxTime_xDP, NetxTime_xDN, combo, LastTime_xDP, TSTimeout_cnt_tcn,
-                      TSMode
+                      State_xDP, TimestampPrev_xD, TimestampMskd,
+                      NetxTime_xDP, NetxTime_xDN, combo, LastTime_xDP, TSTimeoutSel_xDI_cnt_tcn,
+                      TSMode_xDI, TSMask
                       )
     begin
 
@@ -158,10 +161,10 @@ begin
                         Address_xDN <= InAddrEvt_xDI(31 downto 0);
                         InRead_xSO  <= '1';
                         
-                        NetxTime_xDN <= unsigned(InAddrEvt_xDI(63 downto 32));
+                        NetxTime_xDN <= unsigned(InAddrEvt_xDI(63 downto 32) and TSMask);
                         LastTime_xDN <= NetxTime_xDP;
 
-                        if (TSMode = "00") then  -- Old Mode (Delta Time)
+                        if (TSMode_xDI = "00") then  -- Old Mode (Delta Time)
                             -- if Delta_xDN is not zero we go to the stWaitDelta state, otherwise we send now...
                             if (Delta_xDN /= 0) then
                                 State_xDN <= stWaitDelta;
@@ -174,11 +177,11 @@ begin
                                 --end if;
                             end if;
                          
-                         elsif (TSMode = "01") then  -- (Send immediatly)
+                         elsif (TSMode_xDI = "01") then  -- (Send immediatly)
                              
                              State_xDN <= stSend;
                             
-                         elsif (TSMode = "10") then  -- (Absolute Time)
+                         elsif (TSMode_xDI = "10") then  -- (Absolute Time)
                              
                              if ((combo = 0 or combo = 6 or combo = 5) and timeout = '0') then
                                  State_xDN <= stWaitDelta;
@@ -202,7 +205,7 @@ begin
             when stWaitDelta =>
 
                 if (Enable_xSI = '1') then
-                    if (TSMode = "00") then  -- Old Mode (Delta Time)
+                    if (TSMode_xDI = "00") then  -- Old Mode (Delta Time)
                         -- already zero? transmit or keep counting
                         if (Delta_xDP = 0) then
                             -- address or config..?
@@ -212,17 +215,17 @@ begin
                             --    State_xDN <= stConfigReq;
                             --end if;                    
                         else
-                            if (TimestampPrev_xD /= Timestamp_xDI) then
+                            if (TimestampPrev_xD /= TimestampMskd) then
                                 Delta_xDN <= Delta_xDP - 1;
                             end if;
                         end if;
                     
-                    elsif (TSMode = "01") then  
+                    elsif (TSMode_xDI = "01") then  
                     
                         State_xDN <= stIdle;
                     
-                    elsif (TSMode = "10") then 
-                        if (unsigned(Timestamp_xDI) = NetxTime_xDN) then
+                    elsif (TSMode_xDI = "10") then 
+                        if (unsigned(TimestampMskd) = NetxTime_xDN) then
                             State_xDN <= stSend;
                         else 
                             State_xDN <= stWaitDelta;
@@ -301,7 +304,7 @@ begin
             State_xDP        <= State_xDN;
             Address_xDP      <= Address_xDN;
             Delta_xDP        <= Delta_xDN;
-            TimestampPrev_xD <= Timestamp_xDI;
+            TimestampPrev_xD <= TimestampMskd;
             
             NetxTime_xDP     <= NetxTime_xDN;
             LastTime_xDP     <= LastTime_xDN;
@@ -319,28 +322,48 @@ begin
     
     LoadValue_xSO <= std_logic_vector(NetxTime_xDN);                                                 -- Value to be forced in TimeStamp TX
     timeout_rearm <= not SendPending and SendPending_d;                                              -- Timeout counter rearm signal
-    TSTimeout_cnt_tcn <= '1' when (TSTimeout_cnt = conv_unsigned(0, TSTimeout_cnt'length)) else '0'; -- Terminal Count, at Zero
-    timeout <=  TSTimeout_cnt_tcn and TxTSSyncEnable_i;                                              -- Timeout internal signal
-    TxTSRetrig_status_xSO <= timeout;                                                                -- Reply of Timeout internal signal
-    timeout_sel <= conv_integer(unsigned(TSTimeout(3 downto 0)));                                    -- Timeout value selector
+    TSTimeoutSel_xDI_cnt_tcn <= '1' when (TSTimeoutSel_xDI_cnt = conv_unsigned(0, TSTimeoutSel_xDI_cnt'length)) else '0'; -- Terminal Count, at Zero
+    timeout <=  TSTimeoutSel_xDI_cnt_tcn and TxTSSyncEnable_xSI;                                              -- Timeout internal signal
+    TxTSRetrigStatus_xSO <= timeout;                                                                -- Reply of Timeout internal signal
+    timeout_sel <= conv_integer(unsigned(TSTimeoutSel_xDI(3 downto 0)));                                    -- Timeout value selector
     timeout_value <= Timeout_Table(timeout_sel);                                                     -- Timeout value frome table
     
         resync_timeout_counter : process (Clk_xCI, Rst_xRBI)
         begin
             if (Rst_xRBI = '0') then           -- asynchronous reset (active low)
-                TSTimeout_cnt      <= conv_unsigned(0, TSTimeout_cnt'length);
+                TSTimeoutSel_xDI_cnt      <= conv_unsigned(0, TSTimeoutSel_xDI_cnt'length);
               
             elsif (rising_edge(Clk_xCI)) then  -- rising clock edge
-                if (TxTSRetrig_cmd_xSI = '1') then
-                    TSTimeout_cnt <= conv_unsigned(0, TSTimeout_cnt'length);
+                if (TxTSRetrigCmd_xSI = '1') then
+                    TSTimeoutSel_xDI_cnt <= conv_unsigned(0, TSTimeoutSel_xDI_cnt'length);
                 elsif (timeout_rearm = '1' or State_xDP /= stIdle) then
-                    TSTimeout_cnt <= timeout_value;
-                elsif (En100us_xSI = '1' and TSTimeout_cnt_tcn = '0') then
-                    TSTimeout_cnt <= TSTimeout_cnt - 1;
+                    TSTimeoutSel_xDI_cnt <= timeout_value;
+                elsif (En100us_xSI = '1' and TSTimeoutSel_xDI_cnt_tcn = '0') then
+                    TSTimeoutSel_xDI_cnt <= TSTimeoutSel_xDI_cnt - 1;
                 end if;    
               
             end if;
         end process resync_timeout_counter;
-        
+
+
+    ----------------------------------------------------------------------------
+    -- Implement TX Timestamp Mask value selection
+
+    p_TSMask : process (Clk_xCI, Rst_xRBI)
+    begin
+        if (Rst_xRBI = '0') then
+                TSMask <= (others => '0');
+            
+        elsif (rising_edge(Clk_xCI)) then
+            case TSMaskSel_xDI is 
+                when "00"    => TSMask <= x"000FFFFF";
+                when "01"    => TSMask <= x"00FFFFFF";
+                when "10"    => TSMask <= x"0FFFFFFF";
+                when "11"    => TSMask <= x"FFFFFFFF";
+                when others  => TSMask <= x"FFFFFFFF";
+            end case;
+        end if;
+    end process p_TSMask;       
+     
 end architecture beh;
 

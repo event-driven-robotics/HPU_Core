@@ -273,12 +273,13 @@ package NSComponents_pkg is
         EnableMonitor_xSI       : in  std_logic;
         CoreReady_xSI           : in  std_logic;
         ---------------------------------------------------------------------------
-        -- Time Sequencer
-        TxTSMode_i              : in  std_logic_vector(1 downto 0);
-        TxTSTimeout_i           : in  std_logic_vector(15 downto 0);
-        TxTSRetrig_cmd_i        : in  std_logic;
-        TxTSRetrig_status_o     : out std_logic;
-        TxTSSyncEnable_i        : in  std_logic;
+        -- TX Timestamp
+        TxTSMode_xDI            : in  std_logic_vector(1 downto 0);
+        TxTSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
+        TxTSRetrigCmd_xSI       : in  std_logic;
+        TxTSRetrigStatus_xSO    : out std_logic;
+        TxTSSyncEnable_xSI      : in  std_logic;
+        TxTSMaskSel_xSI         : in  std_logic_vector(1 downto 0);
         --
         ---------------------------------------------------------------------------
         -- FIFO -> Core

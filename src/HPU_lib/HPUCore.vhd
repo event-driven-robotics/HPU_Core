@@ -395,10 +395,11 @@ architecture str of HPUCore is
     signal i_uP_TxPaerAckActLevel    : std_logic;
     signal i_uP_TxSaerChanEn         : std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
     signal i_uP_TxTSMode             : std_logic_vector(1 downto 0);
-    signal i_uP_TxTSTimeout          : std_logic_vector(15 downto 0);
-    signal i_uP_TxTSRetrig_cmd       : std_logic;
-    signal i_uP_TxTSRetrig_status    : std_logic;
-    signal i_uP_TxTSSyncEnable       : std_logic;    
+    signal i_uP_TxTSTimeoutSel       : std_logic_vector(3 downto 0);
+    signal i_uP_TxTSRetrigCmd        : std_logic;
+    signal i_uP_TxTSRetrigStatus     : std_logic;
+    signal i_uP_TxTSSyncEnable       : std_logic;
+    signal i_uP_TxTSMaskSel          : std_logic_vector(1 downto 0);    
     signal i_uP_LRxPaerEn            : std_logic;
     signal i_uP_RRxPaerEn            : std_logic;
     signal i_uP_AUXRxPaerEn          : std_logic;
@@ -478,7 +479,7 @@ begin
 
 u_time_machine : time_machine 
 generic map( 
-  SIM_TIME_COMPRESSION_g => TRUE,  -- Se "TRUE", la simulazione viene "compressa": i clock enable non seguono le tempistiche reali
+  SIM_TIME_COMPRESSION_g => FALSE, -- Se "TRUE", la simulazione viene "compressa": i clock enable non seguono le tempistiche reali
   INIT_DELAY             => 32     -- Ritardo dal rilascio del reset all'impulso di "init"
   )
 port map(
@@ -615,10 +616,11 @@ port map(
                                TxSaerChanEn_o                 => i_uP_TxSaerChanEn,            -- out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
 
                                TxTSMode_o                     => i_uP_TxTSMode,                -- out std_logic_vector(1 downto 0);
-                               TxTSTimeout_o                  => i_uP_TxTSTimeout,             -- out std_logic_vector(15 downto 0);
-                               TxTSRetrig_cmd_o               => i_uP_TxTSRetrig_cmd,          -- out std_logic;
-                               TxTSRetrig_status_i            => i_uP_TxTSRetrig_status,       -- in  std_logic;
-                               TxTSSyncEnable_o               => i_uP_TxTSSyncEnable,              -- out std_logic;
+                               TxTSTimeoutSel_o               => i_uP_TxTSTimeoutSel,          -- out std_logic_vector(3 downto 0);
+                               TxTSRetrigCmd_o                => i_uP_TxTSRetrigCmd,           -- out std_logic;
+                               TxTSRetrigStatus_i             => i_uP_TxTSRetrigStatus,        -- in  std_logic;
+                               TxTSSyncEnable_o               => i_uP_TxTSSyncEnable,          -- out std_logic;
+                               TxTSMaskSel_o                  => i_uP_TxTSMaskSel,             -- out std_logic_vector(1 downto 0);
                    
                                LRxPaerEn_o                    => i_uP_LRxPaerEn,               -- out std_logic;
                                RRxPaerEn_o                    => i_uP_RRxPaerEn,               -- out std_logic;
@@ -925,10 +927,11 @@ port map(
             --TxSaerChanCfg_i         => ,                             -- in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
 
             TxTSMode_i              => i_uP_TxTSMode,                -- in  std_logic_vector(1 downto 0);
-            TxTSTimeout_i           => i_uP_TxTSTimeout,             -- in  std_logic_vector(15 downto 0);
-            TxTSRetrig_cmd_i        => i_uP_TxTSRetrig_cmd,          -- in  std_logic;
-            TxTSRetrig_status_o     => i_uP_TxTSRetrig_status,       -- out std_logic;
-            TxTSSyncEnable_i        => i_uP_TxTSSyncEnable,              -- in  std_logic;
+            TxTSTimeoutSel_i        => i_uP_TxTSTimeoutSel,          -- in  std_logic_vector(3 downto 0);
+            TxTSRetrigCmd_i         => i_uP_TxTSRetrigCmd,           -- in  std_logic;
+            TxTSRetrigStatus_o      => i_uP_TxTSRetrigStatus,        -- out std_logic;
+            TxTSSyncEnable_i        => i_uP_TxTSSyncEnable,          -- in  std_logic;
+            TxTSMaskSel_i           => i_uP_TxTSMaskSel,             -- in  std_logic_vector(1 downto 0);
 
             LRxPaerEn_i             => i_uP_LRxPaerEn,               -- in  std_logic;
             RRxPaerEn_i             => i_uP_RRxPaerEn,               -- in  std_logic;
