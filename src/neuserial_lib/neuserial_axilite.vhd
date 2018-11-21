@@ -125,8 +125,9 @@ TxSaerChanEn_o                 : out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downt
 TxTSMode_o                     : out std_logic_vector(1 downto 0);
 TxTSTimeoutSel_o               : out std_logic_vector(3 downto 0);
 TxTSRetrigCmd_o                : out std_logic;
+TxTSRearmCmd_o                 : out std_logic;
 TxTSRetrigStatus_i             : in  std_logic;
-TxTSSyncEnable_o               : out std_logic;
+TxTSTimeoutCounts_i            : in  std_logic;
 TxTSMaskSel_o                  : out std_logic_vector(1 downto 0);
 
 --
@@ -216,7 +217,7 @@ end entity neuserial_axilite;
 
 architecture rtl of neuserial_axilite is
 
-    constant cVer   : string(3 downto 1) := "B03";
+    constant cVer   : string(3 downto 1) := "B04";
     constant cMAJOR : std_logic_vector(3 downto 0) :="0011";
     constant cMINOR : std_logic_vector(3 downto 0) :="0100";
 
@@ -432,8 +433,8 @@ architecture rtl of neuserial_axilite is
     signal  i_TxTSMode         : std_logic_vector(1 downto 0);
     signal  i_TxTSTimeoutSel   : std_logic_vector(3 downto 0);
     signal  i_TxTSRetrigCmd    : std_logic;
+    signal  i_TxTSRearmCmd     : std_logic;
     signal  i_TxTSRetrigStatus : std_logic;
-    signal  i_TxTSSyncEnable   : std_logic; 
     signal  i_TxTSMaskSel      : std_logic_vector(1 downto 0);   
     
     signal  i_TxDestSwitch  : std_logic_vector(2 downto 0);
@@ -689,6 +690,7 @@ begin
                 i_CTRL_reg(12) <= '0';   -- ResetStream_o           (WO: monostable)
 				
                 i_TX_CTRL_reg(14) <= '0'; -- TxTSRetrigCmd_o        (Cleared after Write)
+				i_TX_CTRL_reg(15) <= '0'; -- TxTSRearmCmd_o         (Cleared after Write)
 				
                 -- TlastTO register
                 i_TlastTowritten <= '0';
@@ -1597,16 +1599,9 @@ begin
     -- ------------------------------------------------------------------------
     -- Tx Datapath Control register
     -- ------------------------------------------------------------------------
-    -- TX_CTRL_reg - R/W
---    TxTSTimeout_o                  : out std_logic_vector(15 downto 0);
---    TxTSRetrig_cmd_o               : out std_logic;
---    TxTSRetrig_status_i            : in  std_logic;
---    TxTSSyncEnable_o               : out std_logic;
---                  <= i_TX_CTRL_reg(31 downto 20);    -- Available 
-
     i_TxTSMaskSel     <= i_TX_CTRL_reg(21 downto 20);
     i_TxTSTimeoutSel  <= i_TX_CTRL_reg(19 downto 16);
-    i_TxTSSyncEnable  <= i_TX_CTRL_reg(15);
+    i_TxTSRearmCmd    <= i_TX_CTRL_reg(15); -- **** NOTE: Cleared after Write
     i_TxTSRetrigCmd   <= i_TX_CTRL_reg(14); -- **** NOTE: Cleared after Write
     i_TxTSMode        <= i_TX_CTRL_reg(13 downto 12);
     i_TxSaerChanEn    <= i_TX_CTRL_reg(11 downto  8)   when C_TX_HAS_HSSAER  else (others => '0');
@@ -1620,7 +1615,7 @@ begin
     i_TX_CTRL_rd <= c_zero_vect(31 downto 22)    &
                     i_TxTSMaskSel(1 downto 0)    &
                     i_TxTSTimeoutSel(3 downto 0) &
-                    i_TxTSSyncEnable             &
+                    TxTSTimeoutCounts_i          &
                     TxTSRetrigStatus_i           &   -- From input
                     i_TxTSMode                   &
                     i_TxSaerChanEn               &
@@ -1640,8 +1635,8 @@ begin
     
      
     TxTSTimeoutSel_o <= i_TxTSTimeoutSel;   
-    TxTSSyncEnable_o <= i_TxTSSyncEnable;   
-    TxTSRetrigCmd_o  <= i_TxTSRetrigCmd;   
+    TxTSRetrigCmd_o  <= i_TxTSRetrigCmd; 
+    TxTSRearmCmd_o   <= i_TxTSRearmCmd;  
     TxTSMode_o       <= i_TxTSMode;  
     TxTSMaskSel_o    <= i_TxTSMaskSel;
     -- ------------------------------------------------------------------------

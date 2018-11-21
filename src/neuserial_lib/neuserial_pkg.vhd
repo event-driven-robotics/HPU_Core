@@ -277,8 +277,9 @@ package NSComponents_pkg is
         TxTSMode_xDI            : in  std_logic_vector(1 downto 0);
         TxTSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
         TxTSRetrigCmd_xSI       : in  std_logic;
+        TxTSRearmCmd_xSI        : in  std_logic;
         TxTSRetrigStatus_xSO    : out std_logic;
-        TxTSSyncEnable_xSI      : in  std_logic;
+        TxTSTimeoutCounts_xSO   : out std_logic;
         TxTSMaskSel_xSI         : in  std_logic_vector(1 downto 0);
         --
         ---------------------------------------------------------------------------

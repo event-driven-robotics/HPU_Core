@@ -186,8 +186,9 @@ type time_tick is record
             TxTSMode_i                     : in  std_logic_vector(1 downto 0);
             TxTSTimeoutSel_i               : in  std_logic_vector(3 downto 0);
             TxTSRetrigCmd_i                : in  std_logic;
+            TxTSRearmCmd_i                 : in  std_logic;
             TxTSRetrigStatus_o             : out std_logic;
-            TxTSSyncEnable_i               : in  std_logic;
+            TxTSTimeoutCounts_o            : out std_logic;
             TxTSMaskSel_i                  : in  std_logic_vector(1 downto 0);
             
             --
@@ -383,8 +384,9 @@ port (
     TxTSMode_o                     : out std_logic_vector(1 downto 0);
     TxTSTimeoutSel_o               : out std_logic_vector(3 downto 0);
     TxTSRetrigCmd_o                : out std_logic;
+    TxTSRearmCmd_o                 : out std_logic;
     TxTSRetrigStatus_i             : in  std_logic;
-    TxTSSyncEnable_o               : out std_logic;
+    TxTSTimeoutCounts_i            : in  std_logic;
     TxTSMaskSel_o                  : out std_logic_vector(1 downto 0);
 
 --

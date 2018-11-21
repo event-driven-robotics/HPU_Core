@@ -109,8 +109,9 @@ package NEComponents_pkg is
             LoadTimer_xSO         : out std_logic;
             LoadValue_xSO         : out std_logic_vector(31 downto 0);
             TxTSRetrigCmd_xSI     : in  std_logic;
+            TxTSRearmCmd_xSI      : in  std_logic;
             TxTSRetrigStatus_xSO  : out std_logic;
-            TxTSSyncEnable_xSI    : in  std_logic;
+            TxTSTimeoutCounts_xSO : out std_logic;
             --
             InAddrEvt_xDI         : in  std_logic_vector(63 downto 0);
             InRead_xSO            : out std_logic;

@@ -70,8 +70,9 @@ entity CoreMonSeqRR is
         TxTSMode_xDI            : in  std_logic_vector(1 downto 0);
         TxTSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
         TxTSRetrigCmd_xSI       : in  std_logic;
+        TxTSRearmCmd_xSI        : in  std_logic;
         TxTSRetrigStatus_xSO    : out std_logic;
-        TxTSSyncEnable_xSI      : in  std_logic;
+        TxTSTimeoutCounts_xSO   : out std_logic;
         TxTSMaskSel_xSI         : in  std_logic_vector(1 downto 0);
         --
         ---------------------------------------------------------------------------
@@ -308,8 +309,9 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
             LoadTimer_xSO          => LoadTimer_xS,        
             LoadValue_xSO          => LoadValue_xS,        
             TxTSRetrigCmd_xSI      => TxTSRetrigCmd_xSI,   
+            TxTSRearmCmd_xSI       => TxTSRearmCmd_xSI,
             TxTSRetrigStatus_xSO   => TxTSRetrigStatus_xSO,
-            TxTSSyncEnable_xSI     => TxTSSyncEnable_xSI,  
+            TxTSTimeoutCounts_xSO  => TxTSTimeoutCounts_xSO,  
             --
             InAddrEvt_xDI          => SeqInAddrEvt_xD,
             InRead_xSO             => SeqInRead_xS,

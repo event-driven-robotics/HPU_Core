@@ -184,8 +184,9 @@ entity neuserial_core is
         TxTSMode_i                     : in  std_logic_vector(1 downto 0);
         TxTSTimeoutSel_i               : in  std_logic_vector(3 downto 0);
         TxTSRetrigCmd_i                : in  std_logic;
+        TxTSRearmCmd_i                 : in  std_logic;
         TxTSRetrigStatus_o             : out std_logic;
-        TxTSSyncEnable_i               : in  std_logic;
+        TxTSTimeoutCounts_o            : out std_logic;
         TxTSMaskSel_i                  : in  std_logic_vector(1 downto 0);
         
         --
@@ -1082,8 +1083,9 @@ begin
             TxTSMode_xDI            => TxTSMode_i,               -- in  std_logic_vector(1 downto 0);
             TxTSTimeoutSel_xDI      => TxTSTimeoutSel_i,         -- in  std_logic_vector(3 downto 0);
             TxTSRetrigCmd_xSI       => TxTSRetrigCmd_i,          -- in  std_logic;
+            TxTSRearmCmd_xSI        => TxTSRearmCmd_i,           -- in  std_logic;
             TxTSRetrigStatus_xSO    => TxTSRetrigStatus_o,       -- out std_logic;
-            TxTSSyncEnable_xSI      => TxTSSyncEnable_i,         -- in  std_logic;
+            TxTSTimeoutCounts_xSO   => TxTSTimeoutCounts_o,      -- out std_logic;
             TxTSMaskSel_xSI         => TxTSMaskSel_i,            -- in  std_logic_vector(1 downto 0);
             --
             FifoCoreDat_xDO         => FifoCoreDat_o,            -- out std_logic_vector(31 downto 0);

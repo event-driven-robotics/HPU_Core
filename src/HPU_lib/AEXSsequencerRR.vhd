@@ -40,8 +40,9 @@ entity AEXSsequencerRR is
         LoadTimer_xSO         : out std_logic;
         LoadValue_xSO         : out std_logic_vector(31 downto 0);
         TxTSRetrigCmd_xSI     : in  std_logic;
+        TxTSRearmCmd_xSI      : in  std_logic;
         TxTSRetrigStatus_xSO  : out std_logic;
-        TxTSSyncEnable_xSI    : in  std_logic;
+        TxTSTimeoutCounts_xSO : out std_logic;
         --
         InAddrEvt_xDI         : in  std_logic_vector(63 downto 0);
         InRead_xSO            : out std_logic;
@@ -87,6 +88,7 @@ architecture beh of AEXSsequencerRR is
     signal TSTimeoutSel_xDI_cnt_tcn : std_logic;
     signal TimestampMskd     : std_logic_vector(31 downto 0);
     signal TSMask            : std_logic_vector(31 downto 0);
+    signal TSTimeoutEnable   : std_logic;
     
     type rom_array is array (0 to 15) of unsigned (23 downto 0);
     constant Timeout_Table : rom_array := ( conv_unsigned(      1_0, 24),  -- Address 0   :       1.0 ms
@@ -104,7 +106,7 @@ architecture beh of AEXSsequencerRR is
                                             conv_unsigned( 100000_0, 24),  -- Address C   :  100000.0 ms
                                             conv_unsigned( 250000_0, 24),  -- Address D   :  250000.0 ms
                                             conv_unsigned( 500000_0, 24),  -- Address E   :  500000.0 ms
-                                            conv_unsigned(1000000_0, 24)   -- Address F   : 1000000.0 ms
+                                            conv_unsigned(1000000_0, 24)   -- Address F   : 1000000.0 ms   -- NOTE: this selection DISABLES the timeout timer (see at "resync_timeout_counter" process)
                                             );
 
     signal timeout_sel   : integer range 0 to 15;
@@ -112,6 +114,7 @@ architecture beh of AEXSsequencerRR is
     signal SendPending   : std_logic; 
     signal SendPending_d : std_logic; 
     signal timeout_rearm : std_logic;
+    signal StateIsIdle   : std_logic;
     
 begin
 
@@ -320,27 +323,34 @@ begin
     -----------------------------------------------------------------------------
     -- RESYNC
     
-    LoadValue_xSO <= std_logic_vector(NetxTime_xDN);                                                 -- Value to be forced in TimeStamp TX
-    timeout_rearm <= not SendPending and SendPending_d;                                              -- Timeout counter rearm signal
+    LoadValue_xSO <= std_logic_vector(NetxTime_xDN);                                                -- Value to be forced in TimeStamp TX
+    timeout_rearm <= not SendPending and SendPending_d;                                             -- Timeout counter rearm signal
     TSTimeoutSel_xDI_cnt_tcn <= '1' when (TSTimeoutSel_xDI_cnt = conv_unsigned(0, TSTimeoutSel_xDI_cnt'length)) else '0'; -- Terminal Count, at Zero
-    timeout <=  TSTimeoutSel_xDI_cnt_tcn and TxTSSyncEnable_xSI;                                              -- Timeout internal signal
-    TxTSRetrigStatus_xSO <= timeout;                                                                -- Reply of Timeout internal signal
-    timeout_sel <= conv_integer(unsigned(TSTimeoutSel_xDI(3 downto 0)));                                    -- Timeout value selector
+
+    TxTSRetrigStatus_xSO <= timeout;                                                                 -- Reply of Timeout internal signal
+    timeout_sel <= conv_integer(unsigned(TSTimeoutSel_xDI));                                         -- Timeout value selector
     timeout_value <= Timeout_Table(timeout_sel);                                                     -- Timeout value frome table
+    TSTimeoutEnable <= '0' when (TSTimeoutSel_xDI = x"F") else '1';
+    StateIsIdle <= '1' when (State_xDP = stIdle) else '0';
     
         resync_timeout_counter : process (Clk_xCI, Rst_xRBI)
         begin
             if (Rst_xRBI = '0') then           -- asynchronous reset (active low)
                 TSTimeoutSel_xDI_cnt      <= conv_unsigned(0, TSTimeoutSel_xDI_cnt'length);
-              
+                timeout                   <= '1';
+                TxTSTimeoutCounts_xSO     <= '0';
+                
             elsif (rising_edge(Clk_xCI)) then  -- rising clock edge
                 if (TxTSRetrigCmd_xSI = '1') then
-                    TSTimeoutSel_xDI_cnt <= conv_unsigned(0, TSTimeoutSel_xDI_cnt'length);
-                elsif (timeout_rearm = '1' or State_xDP /= stIdle) then
-                    TSTimeoutSel_xDI_cnt <= timeout_value;
-                elsif (En100us_xSI = '1' and TSTimeoutSel_xDI_cnt_tcn = '0') then
-                    TSTimeoutSel_xDI_cnt <= TSTimeoutSel_xDI_cnt - 1;
+                    TSTimeoutSel_xDI_cnt  <= conv_unsigned(0, TSTimeoutSel_xDI_cnt'length);
+                elsif (timeout_rearm = '1' or StateIsIdle = '0' or TxTSRearmCmd_xSI = '1' or TSTimeoutEnable = '0') then
+                    TSTimeoutSel_xDI_cnt  <= timeout_value;
+                elsif (En100us_xSI = '1' and TSTimeoutSel_xDI_cnt_tcn = '0' and InEmpty_xSI = '1') then
+                    TSTimeoutSel_xDI_cnt  <= TSTimeoutSel_xDI_cnt - 1;
                 end if;    
+                
+                TxTSTimeoutCounts_xSO <= StateIsIdle and TSTimeoutEnable and not TSTimeoutSel_xDI_cnt_tcn and InEmpty_xSI; 
+                timeout <=  TSTimeoutSel_xDI_cnt_tcn;                                                -- Timeout internal signal
               
             end if;
         end process resync_timeout_counter;

@@ -397,8 +397,9 @@ architecture str of HPUCore is
     signal i_uP_TxTSMode             : std_logic_vector(1 downto 0);
     signal i_uP_TxTSTimeoutSel       : std_logic_vector(3 downto 0);
     signal i_uP_TxTSRetrigCmd        : std_logic;
+    signal i_uP_TxTSRearmCmd         : std_logic;
     signal i_uP_TxTSRetrigStatus     : std_logic;
-    signal i_uP_TxTSSyncEnable       : std_logic;
+    signal i_uP_TxTSTimeoutCounts    : std_logic;
     signal i_uP_TxTSMaskSel          : std_logic_vector(1 downto 0);    
     signal i_uP_LRxPaerEn            : std_logic;
     signal i_uP_RRxPaerEn            : std_logic;
@@ -618,8 +619,9 @@ port map(
                                TxTSMode_o                     => i_uP_TxTSMode,                -- out std_logic_vector(1 downto 0);
                                TxTSTimeoutSel_o               => i_uP_TxTSTimeoutSel,          -- out std_logic_vector(3 downto 0);
                                TxTSRetrigCmd_o                => i_uP_TxTSRetrigCmd,           -- out std_logic;
+                               TxTSRearmCmd_o                 => i_uP_TxTSRearmCmd,            -- out std_logic;
                                TxTSRetrigStatus_i             => i_uP_TxTSRetrigStatus,        -- in  std_logic;
-                               TxTSSyncEnable_o               => i_uP_TxTSSyncEnable,          -- out std_logic;
+                               TxTSTimeoutCounts_i            => i_uP_TxTSTimeoutCounts,       -- in  std_logic;
                                TxTSMaskSel_o                  => i_uP_TxTSMaskSel,             -- out std_logic_vector(1 downto 0);
                    
                                LRxPaerEn_o                    => i_uP_LRxPaerEn,               -- out std_logic;
@@ -929,8 +931,9 @@ port map(
             TxTSMode_i              => i_uP_TxTSMode,                -- in  std_logic_vector(1 downto 0);
             TxTSTimeoutSel_i        => i_uP_TxTSTimeoutSel,          -- in  std_logic_vector(3 downto 0);
             TxTSRetrigCmd_i         => i_uP_TxTSRetrigCmd,           -- in  std_logic;
+            TxTSRearmCmd_i          => i_uP_TxTSRearmCmd,            -- in  std_logic;
             TxTSRetrigStatus_o      => i_uP_TxTSRetrigStatus,        -- out std_logic;
-            TxTSSyncEnable_i        => i_uP_TxTSSyncEnable,          -- in  std_logic;
+            TxTSTimeoutCounts_o     => i_uP_TxTSTimeoutCounts,       -- out std_logic;
             TxTSMaskSel_i           => i_uP_TxTSMaskSel,             -- in  std_logic_vector(1 downto 0);
 
             LRxPaerEn_i             => i_uP_LRxPaerEn,               -- in  std_logic;
