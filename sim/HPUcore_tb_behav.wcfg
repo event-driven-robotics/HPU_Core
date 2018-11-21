@@ -20,12 +20,12 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="6985934508001fs"></ZoomEndTime>
-      <Cursor1Time time="1895661432000fs"></Cursor1Time>
+      <ZoomEndTime time="7402053999015fs"></ZoomEndTime>
+      <Cursor1Time time="3052693126000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="292"></NameColumnWidth>
-      <ValueColumnWidth column_width="74"></ValueColumnWidth>
+      <ValueColumnWidth column_width="70"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="12" />
    <wave_markers>
@@ -1088,10 +1088,6 @@
          <obj_property name="ElementShortName">TimestampPrev_xD[31:0]</obj_property>
          <obj_property name="ObjectShortName">TimestampPrev_xD[31:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeoutSel_xDI_cnt" type="array">
-         <obj_property name="ElementShortName">TSTimeoutSel_xDI_cnt[23:0]</obj_property>
-         <obj_property name="ObjectShortName">TSTimeoutSel_xDI_cnt[23:0]</obj_property>
-      </wvobject>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TxTSTimeoutCounts_xSO" type="logic">
          <obj_property name="ElementShortName">TxTSTimeoutCounts_xSO</obj_property>
          <obj_property name="ObjectShortName">TxTSTimeoutCounts_xSO</obj_property>
@@ -1100,9 +1096,21 @@
          <obj_property name="ElementShortName">timeout</obj_property>
          <obj_property name="ObjectShortName">timeout</obj_property>
       </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeoutSel_xDI_cnt_tcn" type="logic">
-         <obj_property name="ElementShortName">TSTimeoutSel_xDI_cnt_tcn</obj_property>
-         <obj_property name="ObjectShortName">TSTimeoutSel_xDI_cnt_tcn</obj_property>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeout_cnt" type="array">
+         <obj_property name="ElementShortName">TSTimeout_cnt[23:0]</obj_property>
+         <obj_property name="ObjectShortName">TSTimeout_cnt[23:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeout_cnt_tcn" type="logic">
+         <obj_property name="ElementShortName">TSTimeout_cnt_tcn</obj_property>
+         <obj_property name="ObjectShortName">TSTimeout_cnt_tcn</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeoutEnable" type="logic">
+         <obj_property name="ElementShortName">TSTimeoutEnable</obj_property>
+         <obj_property name="ObjectShortName">TSTimeoutEnable</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeoutEnable_d" type="logic">
+         <obj_property name="ElementShortName">TSTimeoutEnable_d</obj_property>
+         <obj_property name="ObjectShortName">TSTimeoutEnable_d</obj_property>
       </wvobject>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TimestampMskd" type="array">
          <obj_property name="ElementShortName">TimestampMskd[31:0]</obj_property>
@@ -1111,10 +1119,6 @@
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSMask" type="array">
          <obj_property name="ElementShortName">TSMask[31:0]</obj_property>
          <obj_property name="ObjectShortName">TSMask[31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeoutEnable" type="logic">
-         <obj_property name="ElementShortName">TSTimeoutEnable</obj_property>
-         <obj_property name="ObjectShortName">TSTimeoutEnable</obj_property>
       </wvobject>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/timeout_sel" type="other">
          <obj_property name="ElementShortName">timeout_sel</obj_property>
