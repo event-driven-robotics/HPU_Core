@@ -8,34 +8,35 @@ IOCTLs
 
 Here there is a list of the currently supported IOCTLs.
 
-| Name                         |# |R/W| arg type               |
-|------------------------------|--|---|------------------------|
-|HPU_IOCTL_READTIMESTAMP       |1 | R |      unsigned int      |
-|HPU_IOCTL_CLEARTIMESTAMP      |2 | W |      unsigned int      |
-|HPU_IOCTL_READVERSION         |3 | R |      unsigned int      |
-| *not supported anymore*      |4 |   |                        |
-|HPU_IOCTL_SETTIMESTAMP        |7 | W |      unsigned int      |
-|HPU_IOCTL_GEN_REG             |8 |R/W|      ip_regs_t         |
-|HPU_IOCTL_GET_RX_PS           |9 | R |      unsigned int      |
-|HPU_IOCTL_SET_AUX_THRS        |10| W |     struct aux_cnt     |
-|HPU_IOCTL_GET_AUX_THRS        |11| R |      unsigned int      |
-|HPU_IOCTL_GET_AUX_CNT0        |12| R |      unsigned int      |
-|HPU_IOCTL_GET_AUX_CNT1        |13| R |      unsigned int      |
-|HPU_IOCTL_GET_AUX_CNT2        |14| R |      unsigned int      |
-|HPU_IOCTL_GET_AUX_CNT3        |15| R |      unsigned int      |
-|HPU_IOCTL_GET_LOST_CNT        |16| R |      unsigned int      |
-| *not supported anymore*      |17|   |                        |
-|HPU_IOCTL_SET_LOOP_CFG        |18| W |      spinn_loop_t      |
-| *not supported anymore*      |19|   |                        |
-|HPU_IOCTL_GET_TX_PS           |20| R |      unsigned int      |
-|HPU_IOCTL_SET_BLK_TX_THR      |21| W |      unsigned int      |
-|HPU_IOCTL_SET_BLK_RX_THR      |22| W |      unsigned int      |
-|HPU_IOCTL_SET_SPINN_KEYS      |23| W |      spinn_keys_t      |
-|HPU_IOCTL_SET_SPINN_KEYS_EN   |24| W |      unsigned int      |
-|HPU_IOCTL_SET_SPINN_STARTSTOP |25| W |      unsigned int      |
-|HPU_IOCTL_SET_RX_INTERFACE    |26| W |hpu_rx_interface_ioctl_t|
-|HPU_IOCTL_SET_TX_INTERFACE    |27| W |hpu_tx_interface_ioctl_t|
-|HPU_IOCTL_SET_AXIS_LATENCY    |28| W |      unsigned int      |
+| Name                                   |# |R/W| arg type               |
+|----------------------------------------|--|---|------------------------|
+|HPU_IOCTL_READTIMESTAMP                 |1 | R |      unsigned int      |
+|HPU_IOCTL_CLEARTIMESTAMP                |2 | W |      unsigned int      |
+|HPU_IOCTL_READVERSION                   |3 | R |      unsigned int      |
+| *not supported anymore*                |4 |   |                        |
+|HPU_IOCTL_SETTIMESTAMP                  |7 | W |      unsigned int      |
+|HPU_IOCTL_GEN_REG                       |8 |R/W|      ip_regs_t         |
+|HPU_IOCTL_GET_RX_PS                     |9 | R |      unsigned int      |
+|HPU_IOCTL_SET_AUX_THRS                  |10| W |     struct aux_cnt     |
+|HPU_IOCTL_GET_AUX_THRS                  |11| R |      unsigned int      |
+|HPU_IOCTL_GET_AUX_CNT0                  |12| R |      unsigned int      |
+|HPU_IOCTL_GET_AUX_CNT1                  |13| R |      unsigned int      |
+|HPU_IOCTL_GET_AUX_CNT2                  |14| R |      unsigned int      |
+|HPU_IOCTL_GET_AUX_CNT3                  |15| R |      unsigned int      |
+|HPU_IOCTL_GET_LOST_CNT                  |16| R |      unsigned int      |
+| *not supported anymore*                |17|   |                        |
+|HPU_IOCTL_SET_LOOP_CFG                  |18| W |      spinn_loop_t      |
+| *not supported anymore*                |19|   |                        |
+|HPU_IOCTL_GET_TX_PS                     |20| R |      unsigned int      |
+|HPU_IOCTL_SET_BLK_TX_THR                |21| W |      unsigned int      |
+|HPU_IOCTL_SET_BLK_RX_THR                |22| W |      unsigned int      |
+|HPU_IOCTL_SET_SPINN_KEYS                |23| W |      spinn_keys_t      |
+| *not supported anymore*                |24|   |                        |
+| *not supported anymore*                |25|   |                        |
+|HPU_IOCTL_SET_RX_INTERFACE              |26| W |hpu_rx_interface_ioctl_t|
+|HPU_IOCTL_SET_TX_INTERFACE              |27| W |hpu_tx_interface_ioctl_t|
+|HPU_IOCTL_SET_AXIS_LATENCY              |28| W |      unsigned int      |
+|HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY    |29| W |      unsigned int      |
 
 All ioctls have *zero* as magic number.
 
@@ -137,13 +138,6 @@ typedef struct {
 } spinn_keys_t;
 ```
 
-### HPU_IOCTL_SPINN_KEYS_EN
-Disables/Enables the *start* and *stop* keys recognization on the SPINN bus.
-
-
-### HPU_IOCTL_SET_SPINN_STARTSTOP
-Forces a *start* (argument = 1) or *stop* (argument = 0) trigger for the SPINN interface. Start/stop keys settings will survive this IOCTL (i.e. if you have set and enabled start/stop keys and you force-start the bus, receiving a stop key will stop the bus).
-
 ### HPU_IOCTL_SET_LOOP_CFG
 Allows to enable loopback mode (debug). It wants a pointer to an instance of the follwing type as argument
 
@@ -238,6 +232,24 @@ MSBs|  dest  |
 Set the maximum time (in mS) after which a data transfer is forced to happen, even if it would contain less data than expected.
 
 This affects only the RX channel, and it allows to limit the latency when few data is received, while still keeping large buffers to be able to handle also high-load situations.
+
+
+### HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY
+Configures the SPINN BUS start/stop policy. It wants a pointer to an instance of the follwing type as argument
+
+``` C
+typedef enum {
+	FORCE_START_KEY_ENABLE,
+	FORCE_STOP_KEY_ENABLE,
+	FORCE_START_KEY_DISABLE,
+	FORCE_STOP_KEY_DISABLE,
+	KEY_ENABLE,
+} spinn_start_stop_policy_t;
+```
+
+The first four enumerators define the START/STOP behavior: the BUS can be force-started or force-stopped and the keys can be enabled or disabled; when keys are enabled the BUS can change the current state (started or stopped) when the key values are received.
+
+Furthermore it is possible to enable the keys without altering the current bus state (started or stopped). Note that it is not possible to disable keys without explicitly stopping or starting the bus. The older IOCTLs that implicitly allowed to do this could cause wrong behavior..
 
 Module parameters
 -----------------
