@@ -140,10 +140,15 @@ module out_mapper #
             cmd_stop  <= 0;
             end 
         else 
-            if ({cmd_start_key, cmd_stop_key} == 0)
+            if ({cmd_start_key, cmd_stop_key} == 64'h0000000000000000)
                 begin
                 cmd_start <= 1'b1;
                 cmd_stop <= 1'b0;
+                end
+            else if ({cmd_start_key, cmd_stop_key} == 64'hFFFFFFFFFFFFFFFF)
+                begin
+                cmd_start <= 1'b0;
+                cmd_stop <= 1'b1;
                 end
             else
                 begin 
