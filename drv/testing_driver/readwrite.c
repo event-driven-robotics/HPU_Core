@@ -68,12 +68,11 @@
 #define IOC_GET_TX_PS			_IOR(IOC_MAGIC_NUMBER, 20, unsigned int *)
 #define IOCTL_SET_BLK_TX_THR		_IOW(IOC_MAGIC_NUMBER, 21, unsigned int *)
 #define IOCTL_SET_BLK_RX_THR		_IOW(IOC_MAGIC_NUMBER, 22, unsigned int *)
-#define IOC_SET_SPINN_STARTSTOP		_IOW(IOC_MAGIC_NUMBER, 25, unsigned int *)
 #define IOC_SET_RX_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 26, hpu_rx_interface_ioctl_t *)
 #define IOC_SET_TX_INTERFACE		_IOW(IOC_MAGIC_NUMBER, 27, hpu_tx_interface_ioctl_t *)
 #define IOC_SET_AXIS_LATENCY		_IOW(IOC_MAGIC_NUMBER, 28, unsigned int *)
 #define IOC_GET_RX_PN			_IOR(IOC_MAGIC_NUMBER, 29, unsigned int *)
-
+#define IOC_SET_SPINN_STARTSTOP_POLICY		_IOW(IOC_MAGIC_NUMBER, 30, unsigned int *)
 typedef enum {
 	LOOP_NONE,
 	LOOP_LNEAR,
@@ -108,6 +107,13 @@ typedef struct {
 	hpu_tx_route_t route;
 } hpu_tx_interface_ioctl_t;
 
+typedef enum {
+	FORCE_START,
+	FORCE_STOP,
+	FORCE_START_KEY_DISABLE,
+	FORCE_STOP_KEY_DISABLE,
+	KEY_ENABLE,
+} spinn_start_stop_policy_t;
 
 unsigned int data[65536], wdata[65536];
 int iit_hpu;
@@ -197,7 +203,7 @@ void read_thr_data(int chunk_size, int chunk_num)
 	}
 }
 
-const int loop_near = 1;
+const int loop_near = 0;
 double time_diff(struct timespec *start, struct timespec *stop)
 {
 	double ret;
@@ -225,6 +231,7 @@ int main(int argc, char * argv[])
 	int rx_n = 32;
 	hpu_rx_interface_ioctl_t rxiface;
 	hpu_tx_interface_ioctl_t txiface;
+	spinn_start_stop_policy_t policy;
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGTERM, handle_kill);
@@ -272,8 +279,8 @@ int main(int argc, char * argv[])
 		txiface.cfg.spinn = 1;
 		txiface.route = ROUTE_FIXED;
 		ioctl(iit_hpu, IOC_SET_TX_INTERFACE, &txiface);
-		val = 1;
-		ioctl(iit_hpu, IOC_SET_SPINN_STARTSTOP, &val);
+		policy = FORCE_START_KEY_DISABLE;
+		ioctl(iit_hpu, IOC_SET_SPINN_STARTSTOP_POLICY, &policy);
 	}
 	// Set TimeStamp size
 	timestamp = 1;
