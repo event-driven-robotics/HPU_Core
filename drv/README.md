@@ -8,35 +8,43 @@ IOCTLs
 
 Here there is a list of the currently supported IOCTLs.
 
-| Name                                   |# |R/W| arg type               |
-|----------------------------------------|--|---|------------------------|
-|HPU_IOCTL_READTIMESTAMP                 |1 | R |      unsigned int      |
-|HPU_IOCTL_CLEARTIMESTAMP                |2 | W |      unsigned int      |
-|HPU_IOCTL_READVERSION                   |3 | R |      unsigned int      |
-| *not supported anymore*                |4 |   |                        |
-|HPU_IOCTL_SETTIMESTAMP                  |7 | W |      unsigned int      |
-|HPU_IOCTL_GEN_REG                       |8 |R/W|      ip_regs_t         |
-|HPU_IOCTL_GET_RX_PS                     |9 | R |      unsigned int      |
-|HPU_IOCTL_SET_AUX_THRS                  |10| W |     struct aux_cnt     |
-|HPU_IOCTL_GET_AUX_THRS                  |11| R |      unsigned int      |
-|HPU_IOCTL_GET_AUX_CNT0                  |12| R |      unsigned int      |
-|HPU_IOCTL_GET_AUX_CNT1                  |13| R |      unsigned int      |
-|HPU_IOCTL_GET_AUX_CNT2                  |14| R |      unsigned int      |
-|HPU_IOCTL_GET_AUX_CNT3                  |15| R |      unsigned int      |
-|HPU_IOCTL_GET_LOST_CNT                  |16| R |      unsigned int      |
-| *not supported anymore*                |17|   |                        |
-|HPU_IOCTL_SET_LOOP_CFG                  |18| W |      spinn_loop_t      |
-| *not supported anymore*                |19|   |                        |
-|HPU_IOCTL_GET_TX_PS                     |20| R |      unsigned int      |
-|HPU_IOCTL_SET_BLK_TX_THR                |21| W |      unsigned int      |
-|HPU_IOCTL_SET_BLK_RX_THR                |22| W |      unsigned int      |
-|HPU_IOCTL_SET_SPINN_KEYS                |23| W |      spinn_keys_t      |
-| *not supported anymore*                |24|   |                        |
-| *not supported anymore*                |25|   |                        |
-|HPU_IOCTL_SET_RX_INTERFACE              |26| W |hpu_rx_interface_ioctl_t|
-|HPU_IOCTL_SET_TX_INTERFACE              |27| W |hpu_tx_interface_ioctl_t|
-|HPU_IOCTL_SET_AXIS_LATENCY              |28| W |      unsigned int      |
-|HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY    |29| W |      unsigned int      |
+| Name                                   |# |R/W|  arg type                 |
+|----------------------------------------|--|---|---------------------------|
+|HPU_IOCTL_READTIMESTAMP                 |1 | R |        unsigned int       |
+|HPU_IOCTL_CLEARTIMESTAMP                |2 | W |        unsigned int       |
+|HPU_IOCTL_READVERSION                   |3 | R |        unsigned int       |
+| *not supported anymore*                |4 |   |                           |
+|HPU_IOCTL_SETTIMESTAMP                  |7 | W |        unsigned int       |
+|HPU_IOCTL_GEN_REG                       |8 |R/W|        ip_regs_t          |
+|HPU_IOCTL_GET_RX_PS                     |9 | R |        unsigned int       |
+|HPU_IOCTL_SET_AUX_THRS                  |10| W |       struct aux_cnt      |
+|HPU_IOCTL_GET_AUX_THRS                  |11| R |        unsigned int       |
+|HPU_IOCTL_GET_AUX_CNT0                  |12| R |        unsigned int       |
+|HPU_IOCTL_GET_AUX_CNT1                  |13| R |        unsigned int       |
+|HPU_IOCTL_GET_AUX_CNT2                  |14| R |        unsigned int       |
+|HPU_IOCTL_GET_AUX_CNT3                  |15| R |        unsigned int       |
+|HPU_IOCTL_GET_LOST_CNT                  |16| R |        unsigned int       |
+| *not supported anymore*                |17|   |                           |
+|HPU_IOCTL_SET_LOOP_CFG                  |18| W |        spinn_loop_t       |
+| *not supported anymore*                |19|   |                           |
+|HPU_IOCTL_GET_TX_PS                     |20| R |        unsigned int       |
+|HPU_IOCTL_SET_BLK_TX_THR                |21| W |        unsigned int       |
+|HPU_IOCTL_SET_BLK_RX_THR                |22| W |        unsigned int       |
+|HPU_IOCTL_SET_SPINN_KEYS                |23| W |        spinn_keys_t       |
+| *not supported anymore*                |24|   |                           |
+| *not supported anymore*                |25|   |                           |
+|HPU_IOCTL_SET_RX_INTERFACE              |26| W |  hpu_rx_interface_ioctl_t |
+|HPU_IOCTL_SET_TX_INTERFACE              |27| W |  hpu_tx_interface_ioctl_t |
+|HPU_IOCTL_SET_AXIS_LATENCY              |28| W |      unsigned int         |
+|HPU_IOCTL_GET_RX_PN                     |29| R |        unsigned int       |
+|HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY    |30| W | spinn_start_stop_policy_t |
+|HPU_IOCTL_SET_TS_MASK                   |31| W |   hpu_timestamp_mask_t    |
+|HPU_IOCTL_SET_TX_TIMING_MODE            |32| W |   hpu_tx_timing_mode_t    |
+|HPU_IOCTL_SET_TX_RESYNC_TIMER           |33| W |   hpu_tx_resync_time_t    |
+|HPU_IOCTL_RESET_TX_RESYNC_TIMER         |34| - |                           |
+|HPU_IOCTL_FORCE_TX_RESYNC_TIMER         |35| - |                           |
+
+
 
 All ioctls have *zero* as magic number.
 
@@ -250,6 +258,69 @@ typedef enum {
 The first four enumerators define the START/STOP behavior: the BUS can be force-started or force-stopped and the keys can be enabled or disabled; when keys are enabled the BUS can change the current state (started or stopped) when the key values are received.
 
 Furthermore it is possible to enable the keys without altering the current bus state (started or stopped). Note that it is not possible to disable keys without explicitly stopping or starting the bus. The older IOCTLs that implicitly allowed to do this could cause wrong behavior..
+
+## HPU_IOCTL_SET_TS_MASK
+Sets the TX timestamp mask. It wants a pointer to an instance of the follwing type as argument.
+
+``` C
+typedef enum {
+	MASK_20BIT,
+	MASK_24BIT,
+	MASK_28BIT,
+	MASK_32BIT,
+} hpu_timestamp_mask_t;
+```
+
+## HPU_IOCTL_SET_TX_TIMING_MODE
+Sets how the TX timestamp is interpreted by the HW. It wants a pointer to an instance of the follwing type as argument.
+
+``` C
+typedef enum {
+	TIMINGMODE_DELTA,
+	TIMINGMODE_ASAP,
+	TIMINGMODE_ABS,
+} hpu_tx_timing_mode_t;
+```
+
+- In TIMINGMODE_DELTA the timestamp is interpreted as the time to wait before sending the current packet, calculated since the last sent packet.
+- In TIMINGMODE_ASAP the timestamp is ignored by the HW
+- In TIMINGMODE_ABS the timestamp is interpreted as the absolute time at which the current packet has to be sent. In this case the HPU clock has to be synchronized wrt the system clock. Please look below for more information
+
+## HPU_IOCTL_SET_TX_RESYNC_TIMER
+Valid only when the TX timing mode is set as TIMINGMODE_ABS.
+
+This IOCTL configures (or disables) the timeout value after which the HPU assumes its internal clock has to be resynchronized wrt the host clock.
+
+Once the timeout expires the HPU will resynchronize its clock by looking at the timestamp of the next packet TXed by the host.
+
+This IOCTL wants a pointer to an instance of the follwing type as argument:
+
+``` C
+typedef enum {
+	TIME_1mS,
+	TIME_5mS,
+	TIME_10mS,
+	TIME_50mS,
+	TIME_100mS,
+	TIME_500mS,
+	TIME_1000mS,
+	TIME_2500mS,
+	TIME_5000mS,
+	TIME_10S,
+	TIME_25S,
+	TIME_50S,
+	TIME_100S,
+	TIME_250S,
+	TIME_500S,
+	TIME_DISABLE,
+} hpu_tx_resync_time_t;
+```
+
+## HPU_IOCTL_RESET_TX_RESYNC_TIMER
+This IOCTL had no effect unless the TX timing mode is set as TIMINGMODE_ABS; it takes no arguments and cause the resync timer (see above) to be reset, so it will restart counting and waiting.
+
+## HPU_IOCTL_FORCE_TX_RESYNC_TIMER
+This IOCTL has no effect unless the TX timing mode is set as TIMINGMODE_ABS; it takes no arguments and cause the resync timer (see above) to forcefully expire. The HPU will resync on the next TXed packet.
 
 Module parameters
 -----------------
