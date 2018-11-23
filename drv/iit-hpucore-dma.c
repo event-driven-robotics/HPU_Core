@@ -130,6 +130,38 @@
 #define HPU_TXCTRL_DEST_SPINN		(2 << 4)
 #define HPU_TXCTRL_DEST_ALL		(3 << 4)
 #define HPU_TXCTRL_ROUTE		BIT(6)
+#define HPU_TXCTRL_IFACECFG_MASK        0xF7F
+#define HPU_TXCTRL_TIMINGMODE_DELTA	(0 << 12)
+#define HPU_TXCTRL_TIMINGMODE_ASAP	(1 << 12)
+#define HPU_TXCTRL_TIMINGMODE_ABS	(2 << 12)
+#define HPU_TXCTRL_TIMINGMODE_MASK	(3 << 12)
+
+#define HPU_TXCTRL_REG_TS_20BIT		(0 << 20)
+#define HPU_TXCTRL_REG_TS_24BIT		(1 << 20)
+#define HPU_TXCTRL_REG_TS_28BIT		(2 << 20)
+#define HPU_TXCTRL_REG_TS_32BIT		(3 << 20)
+#define HPU_TXCTRL_REG_TS_MASK		(3 << 20)
+
+#define HPU_TXCTRL_REG_SYNCTIME_1mS	(0 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_5mS	(1 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_10mS	(2 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_50mS	(3 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_100mS	(4 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_500mS	(5 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_1000mS	(6 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_2500mS	(7 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_5000mS	(8 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_10S	(9 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_25S	(10 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_50S	(11 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_100S	(12 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_250S	(13 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_500S	(14 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_DISABLE	(15 << 16)
+#define HPU_TXCTRL_REG_SYNCTIME_MASK	(15 << 16)
+
+#define HPU_TXCTRL_REG_FORCE_RESYNC	BIT(14)
+#define HPU_TXCTRL_REG_FORCE_REARM	BIT(15)
 
 #define HPU_MSK_INT_RXFIFOFULL		0x004
 #define HPU_MSK_INT_TSTAMPWRAPPED	0x080
@@ -167,6 +199,11 @@
 #define HPU_IOCTL_SET_AXIS_LATENCY		28
 #define HPU_IOCTL_GET_RX_PN			29
 #define HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY	30
+#define HPU_IOCTL_SET_TS_MASK			31
+#define HPU_IOCTL_SET_TX_TIMING_MODE		32
+#define HPU_IOCTL_SET_TX_RESYNC_TIMER		33
+#define HPU_IOCTL_RESET_TX_RESYNC_TIMER		34
+#define HPU_IOCTL_FORCE_TX_RESYNC_TIMER		35
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -289,6 +326,38 @@ typedef enum {
 	LOOP_LSPINN,
 } spinn_loop_t;
 
+typedef enum {
+	MASK_20BIT,
+	MASK_24BIT,
+	MASK_28BIT,
+	MASK_32BIT,
+} hpu_timestamp_mask_t;
+
+typedef enum {
+	TIMINGMODE_DELTA,
+	TIMINGMODE_ASAP,
+	TIMINGMODE_ABS,
+} hpu_tx_timing_mode_t;
+
+typedef enum {
+	TIME_1mS,
+	TIME_5mS,
+	TIME_10mS,
+	TIME_50mS,
+	TIME_100mS,
+	TIME_500mS,
+	TIME_1000mS,
+	TIME_2500mS,
+	TIME_5000mS,
+	TIME_10S,
+	TIME_25S,
+	TIME_50S,
+	TIME_100S,
+	TIME_250S,
+	TIME_500S,
+	TIME_DISABLE,
+} hpu_tx_resync_time_t;
+
 struct hpu_priv;
 
 struct hpu_buf {
@@ -332,6 +401,7 @@ struct hpu_priv {
 	uint32_t ctrl_reg;
 	uint32_t loop_bits;
 	uint32_t rx_ctrl_reg;
+	uint32_t tx_ctrl_reg;
 	uint32_t rx_aux_ctrl_reg;
 	uint32_t irq_msk;
 	struct dentry *debugfsdir;
@@ -1270,9 +1340,150 @@ static int hpu_set_tx_interface(struct hpu_priv *priv,
 			break;
 		}
 	}
+	priv->tx_ctrl_reg &= ~HPU_TXCTRL_IFACECFG_MASK;
+	priv->tx_ctrl_reg |= reg;
+	dev_dbg(&priv->pdev->dev, "writing TX CTRL REG: 0x%x\n", priv->tx_ctrl_reg);
+	hpu_reg_write(priv, priv->tx_ctrl_reg, HPU_TXCTRL_REG);
 
-	dev_dbg(&priv->pdev->dev, "writing TX CTRL REG: 0x%x\n", reg);
-	hpu_reg_write(priv, reg, HPU_TXCTRL_REG);
+	return 0;
+}
+
+static int hpu_set_ts_mask(struct hpu_priv *priv, hpu_timestamp_mask_t ts_mask)
+{
+	u32 reg = 0;
+
+	switch (ts_mask) {
+	case MASK_20BIT:
+		reg = HPU_TXCTRL_REG_TS_20BIT;
+		break;
+
+	case MASK_24BIT:
+		reg = HPU_TXCTRL_REG_TS_24BIT;
+		break;
+
+	case MASK_28BIT:
+		reg = HPU_TXCTRL_REG_TS_28BIT;
+		break;
+
+	case MASK_32BIT:
+		reg = HPU_TXCTRL_REG_TS_32BIT;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	priv->tx_ctrl_reg &= ~HPU_TXCTRL_REG_TS_MASK;
+	priv->tx_ctrl_reg |= reg;
+
+	hpu_reg_write(priv, priv->tx_ctrl_reg, HPU_TXCTRL_REG);
+	dev_dbg(&priv->pdev->dev, "writing TX CTRL REG: 0x%x\n", priv->tx_ctrl_reg);
+	return 0;
+}
+
+static void hpu_reset_tx_resync_timer(struct hpu_priv *priv)
+{
+	hpu_reg_write(priv, priv->tx_ctrl_reg |
+		      HPU_TXCTRL_REG_FORCE_REARM, HPU_TXCTRL_REG);
+	dev_dbg(&priv->pdev->dev, "HPU_TXCTRL_REG_FORCE_REARM\n");
+}
+
+static void hpu_force_tx_resync_timer(struct hpu_priv *priv)
+{
+	hpu_reg_write(priv, priv->tx_ctrl_reg |
+		      HPU_TXCTRL_REG_FORCE_RESYNC, HPU_TXCTRL_REG);
+	dev_dbg(&priv->pdev->dev, "HPU_TXCTRL_REG_FORCE_RESYNC\n");
+}
+
+static int hpu_set_tx_timing_mode(struct hpu_priv *priv,
+				  hpu_tx_timing_mode_t mode)
+{
+	u32 reg = 0;
+
+	switch (mode) {
+	case TIMINGMODE_DELTA:
+		reg = HPU_TXCTRL_TIMINGMODE_DELTA;
+		break;
+	case TIMINGMODE_ASAP:
+		reg = HPU_TXCTRL_TIMINGMODE_ASAP;
+		break;
+	case TIMINGMODE_ABS:
+		hpu_force_tx_resync_timer(priv);
+		reg = HPU_TXCTRL_TIMINGMODE_ABS;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	priv->tx_ctrl_reg &= ~HPU_TXCTRL_TIMINGMODE_MASK;
+	priv->tx_ctrl_reg |= reg;
+
+	hpu_reg_write(priv, priv->tx_ctrl_reg, HPU_TXCTRL_REG);
+	dev_dbg(&priv->pdev->dev, "writing TX CTRL REG: 0x%x\n", priv->tx_ctrl_reg);
+	return 0;
+}
+
+static int hpu_set_tx_resync_time(struct hpu_priv *priv,
+				  hpu_tx_resync_time_t time)
+{
+	u32 reg = 0;
+
+	switch (time) {
+	case TIME_1mS:
+		reg = HPU_TXCTRL_REG_SYNCTIME_1mS;
+		break;
+	case TIME_5mS:
+		reg = HPU_TXCTRL_REG_SYNCTIME_5mS;
+		break;
+	case TIME_10mS:
+		reg = HPU_TXCTRL_REG_SYNCTIME_10mS;
+		break;
+	case TIME_50mS:
+		reg = HPU_TXCTRL_REG_SYNCTIME_50mS;
+		break;
+	case TIME_100mS:
+		reg = HPU_TXCTRL_REG_SYNCTIME_100mS;
+		break;
+	case TIME_500mS:
+		reg = HPU_TXCTRL_REG_SYNCTIME_500mS;
+		break;
+	case TIME_1000mS:
+		reg = HPU_TXCTRL_REG_SYNCTIME_1000mS;
+		break;
+	case TIME_2500mS:
+		reg = HPU_TXCTRL_REG_SYNCTIME_2500mS;
+		break;
+	case TIME_5000mS:
+		reg = HPU_TXCTRL_REG_SYNCTIME_5000mS;
+		break;
+	case TIME_10S:
+		reg = HPU_TXCTRL_REG_SYNCTIME_10S;
+		break;
+	case TIME_25S:
+		reg = HPU_TXCTRL_REG_SYNCTIME_25S;
+		break;
+	case TIME_50S:
+		reg = HPU_TXCTRL_REG_SYNCTIME_50S;
+		break;
+	case TIME_100S:
+		reg = HPU_TXCTRL_REG_SYNCTIME_100S;
+		break;
+	case TIME_250S:
+		reg = HPU_TXCTRL_REG_SYNCTIME_250S;
+		break;
+	case TIME_500S:
+		reg = HPU_TXCTRL_REG_SYNCTIME_500S;
+		break;
+	case TIME_DISABLE:
+		reg = HPU_TXCTRL_REG_SYNCTIME_DISABLE;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	priv->tx_ctrl_reg &= ~HPU_TXCTRL_REG_SYNCTIME_MASK;
+	priv->tx_ctrl_reg |= reg;
+
+	hpu_reg_write(priv, priv->tx_ctrl_reg, HPU_TXCTRL_REG);
 
 	return 0;
 }
@@ -1459,6 +1670,10 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	priv->rx_ctrl_reg = 0;
 	hpu_rx_resume(priv);
 
+	priv->tx_ctrl_reg = HPU_TXCTRL_TIMINGMODE_DELTA |
+		HPU_TXCTRL_REG_SYNCTIME_DISABLE;
+	hpu_reg_write(priv, priv->tx_ctrl_reg, HPU_TXCTRL_REG);
+
 	/* Initialize HPU with full TS, no loop */
 	priv->ctrl_reg = HPU_CTRL_FULLTS;
 	priv->loop_bits = 0;
@@ -1519,7 +1734,8 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	/* Disable RX */
 	hpu_rx_suspend(priv);
 	/* Disable TX */
-	hpu_reg_write(priv, 0x0, HPU_TXCTRL_REG);
+	priv->tx_ctrl_reg = 0;
+	hpu_reg_write(priv, priv->tx_ctrl_reg, HPU_TXCTRL_REG);
 
 	/* Mask interrupts - this ensure that pending IRQ are ignored by ISR */
 	priv->irq_msk = 0;
@@ -1689,6 +1905,9 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 	hpu_tx_interface_ioctl_t txiface;
 	ip_regs_t temp_reg;
 	spinn_start_stop_policy_t spinn_policy;
+	hpu_timestamp_mask_t ts_mask;
+	hpu_tx_timing_mode_t timing_mode;
+	hpu_tx_resync_time_t resync_time;
 	unsigned int val = 0;
 	int res = 0;
 	struct hpu_priv *priv = fp->private_data;
@@ -1849,6 +2068,34 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		res = hpu_spinn_set_startstop_policy(priv, spinn_policy);
 		break;
 
+	case _IOW(0x0, HPU_IOCTL_SET_TS_MASK, hpu_timestamp_mask_t *):
+		if (copy_from_user(&ts_mask, arg,
+				   sizeof(hpu_timestamp_mask_t)))
+			goto cfuser_err;
+		hpu_set_ts_mask(priv, ts_mask);
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_TX_TIMING_MODE, hpu_tx_timing_mode_t *):
+		if (copy_from_user(&timing_mode, arg,
+				   sizeof(hpu_tx_timing_mode_t)))
+			goto cfuser_err;
+		hpu_set_tx_timing_mode(priv, timing_mode);
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_TX_RESYNC_TIMER, hpu_tx_resync_time_t *):
+		if (copy_from_user(&resync_time, arg,
+				   sizeof(hpu_tx_resync_time_t)))
+			goto cfuser_err;
+		hpu_set_tx_resync_time(priv, resync_time);
+		break;
+
+	case _IO(0x0, HPU_IOCTL_RESET_TX_RESYNC_TIMER):
+		hpu_reset_tx_resync_timer(priv);
+		break;
+
+	case _IO(0x0, HPU_IOCTL_FORCE_TX_RESYNC_TIMER):
+		hpu_force_tx_resync_timer(priv);
+		break;
 
 	default:
 		res = -EINVAL;
