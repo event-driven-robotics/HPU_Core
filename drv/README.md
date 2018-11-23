@@ -43,7 +43,8 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_SET_TX_RESYNC_TIMER           |33| W |   hpu_tx_resync_time_t    |
 |HPU_IOCTL_RESET_TX_RESYNC_TIMER         |34| - |                           |
 |HPU_IOCTL_FORCE_TX_RESYNC_TIMER         |35| - |                           |
-
+|HPU_IOCTL_SET_SPINN_TX_MASK             |36| W |        unsigned int       |
+|HPU_IOCTL_SET_SPINN_RX_MASK             |37| W |        unsigned int       |
 
 
 All ioctls have *zero* as magic number.
@@ -321,6 +322,12 @@ This IOCTL had no effect unless the TX timing mode is set as TIMINGMODE_ABS; it 
 
 ## HPU_IOCTL_FORCE_TX_RESYNC_TIMER
 This IOCTL has no effect unless the TX timing mode is set as TIMINGMODE_ABS; it takes no arguments and cause the resync timer (see above) to forcefully expire. The HPU will resync on the next TXed packet.
+
+## HPU_IOCTL_SET_SPINN_TX_MASK
+Sets the MASK to be applied to data that are transmitted to SPINNAKER.
+
+## HPU_IOCTL_SET_SPINN_RX_MASK
+Sets the MASK to be applied to data that are received from SPINNAKER.
 
 Module parameters
 -----------------
