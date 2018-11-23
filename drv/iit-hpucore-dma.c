@@ -206,6 +206,8 @@
 #define HPU_IOCTL_SET_TX_RESYNC_TIMER		33
 #define HPU_IOCTL_RESET_TX_RESYNC_TIMER		34
 #define HPU_IOCTL_FORCE_TX_RESYNC_TIMER		35
+#define HPU_IOCTL_SET_SPINN_TX_MASK		36
+#define HPU_IOCTL_SET_SPINN_RX_MASK		37
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -1577,6 +1579,16 @@ static void hpu_set_aux_thrs(struct hpu_priv *priv, aux_cnt_t aux_cnt_reg)
 		"HPU_AUX_RX_ERR_THRS_REG 0x%08X\n", reg);
 }
 
+static void hpu_set_spinn_rx_mask(struct hpu_priv *priv, unsigned int val)
+{
+	hpu_reg_write(priv, val, HPU_SPINN_TX_MASK_REG);
+}
+
+static void hpu_set_spinn_tx_mask(struct hpu_priv *priv, unsigned int val)
+{
+	hpu_reg_write(priv, val, HPU_SPINN_RX_MASK_REG);
+}
+
 static int hpu_set_timestamp(struct hpu_priv *priv, unsigned int val)
 {
 	unsigned long flags;
@@ -1684,6 +1696,10 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	hpu_reg_write(priv, priv->ctrl_reg |
 		      HPU_CTRL_FLUSH_TX_FIFO | HPU_CTRL_FLUSH_RX_FIFO,
 		      HPU_CTRL_REG);
+
+	/* default RX/TX mask */
+	hpu_reg_write(priv, 0xFFFFFF, HPU_SPINN_TX_MASK_REG);
+	hpu_reg_write(priv, 0xFFFFFF, HPU_SPINN_RX_MASK_REG);
 
 	/*
 	 * Sample initial value for IP RX TLAST and DATA counters; they are used
@@ -2099,6 +2115,20 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 
 	case _IO(0x0, HPU_IOCTL_FORCE_TX_RESYNC_TIMER):
 		hpu_force_tx_resync_timer(priv);
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_SPINN_TX_MASK, unsigned int *):
+		if (copy_from_user(&val, arg,
+				   sizeof(unsigned int)))
+			goto cfuser_err;
+		hpu_set_spinn_tx_mask(priv, val);
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_SPINN_RX_MASK, unsigned int *):
+		if (copy_from_user(&val, arg,
+				   sizeof(unsigned int)))
+			goto cfuser_err;
+		hpu_set_spinn_rx_mask(priv, val);
 		break;
 
 	default:
