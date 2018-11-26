@@ -111,6 +111,31 @@
 #define HPU_DMA_LENGTH_MASK		0xFFFF
 #define HPU_DMA_TEST_ON			0x10000
 
+#define HPU_RAWSTAT_RXDATAEMPTY		BIT(0)
+#define HPU_RAWSTAT_RXDATAALMOSTEMPTY	BIT(1)
+#define HPU_RAWSTAT_RXDATAFULL		BIT(2)
+#define HPU_RAWSTAT_TXDATAEMPTY		BIT(3)
+#define HPU_RAWSTAT_TXDATAALMOSTFULL	BIT(4)
+#define HPU_RAWSTAT_TXDATAFULL		BIT(5)
+#define HPU_RAWSTAT_TIMESTAMPWRAPPED	BIT(7)
+#define HPU_RAWSTAT_RXBUFFERREADY	BIT(8)
+#define HPU_RAWSTAT_RXFIFONOTEMPTY	BIT(9)
+#define HPU_RAWSTAT_LRXPAERFIFOFULL	BIT(12)
+#define HPU_RAWSTAT_RRXPAERFIFOFULL	BIT(13)
+#define HPU_RAWSTAT_AUXRXPAERFIFOFULL	BIT(14)
+#define HPU_RAWSTAT_RXFIFOTHRESHOLD	BIT(15)
+#define HPU_RAWSTAT_GLBLRXERR_KO	BIT(16)
+#define HPU_RAWSTAT_GLBLRXERR_TX	BIT(17)
+#define HPU_RAWSTAT_GLBLRXERR_TO	BIT(18)
+#define HPU_RAWSTAT_GLBLRXERR_OF	BIT(19)
+#define HPU_RAWSTAT_TXSPINNDUMP 	BIT(20)
+#define HPU_RAWSTAT_LSPINN_PARITY_ERR	BIT(21)
+#define HPU_RAWSTAT_RSPINN_PARITY_ERR	BIT(22)
+#define HPU_RAWSTAT_AUXSPINN_PARITY_ERR	BIT(23)
+#define HPU_RAWSTAT_LSPINN_RXERR	BIT(24)
+#define HPU_RAWSTAT_RSPINN_RXERR	BIT(25)
+#define HPU_RAWSTAT_AUXSPINN_RXERR	BIT(26)
+
 #define HPU_RXCTRL_RXHSSAER_EN		0x00000001
 #define HPU_RXCTRL_RXPAER_EN		0x00000002
 #define HPU_RXCTRL_RXGTP_EN		0x00000004
@@ -208,6 +233,7 @@
 #define HPU_IOCTL_FORCE_TX_RESYNC_TIMER		35
 #define HPU_IOCTL_SET_SPINN_TX_MASK		36
 #define HPU_IOCTL_SET_SPINN_RX_MASK		37
+#define HPU_IOCTL_GET_HW_STATUS			38
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -363,6 +389,35 @@ typedef enum {
 	TIME_500S,
 	TIME_DISABLE,
 } hpu_tx_resync_time_t;
+
+typedef enum {
+	EMPTY,
+	ALMOST_EMPTY,
+	FULL,
+	ALMOST_FULL,
+	NOT_EMPTY
+} fifo_status_t;
+
+typedef struct {
+	fifo_status_t rx_fifo_status;
+	fifo_status_t tx_fifo_status;
+	int rx_buffer_ready;
+	int lrx_paer_fifo_full;
+	int rrx_paer_fifo_full;
+	int auxrx_paer_fifo_full;
+	int rx_fifo_over_threshold;
+	int global_rx_err_ko;
+	int global_rx_err_tx;
+	int global_rx_err_to;
+	int global_rx_err_of;
+	int tx_spinn_dump;
+	int lspinn_parity_err;
+	int rspinn_parity_err;
+	int auxspinn_parity_err;
+	int lspinn_rx_err;
+	int rspinn_rx_err;
+	int auxspinn_rx_err;
+} hpu_hw_status_t;
 
 struct hpu_priv;
 
@@ -1608,6 +1663,72 @@ static int hpu_set_timestamp(struct hpu_priv *priv, unsigned int val)
 	return 0;
 }
 
+static void hpu_get_hw_status(struct hpu_priv *priv, hpu_hw_status_t *status)
+{
+	u32 reg = hpu_reg_read(priv, HPU_RAWSTAT_REG);
+
+	memset((void*)status, 0, sizeof(hpu_hw_status_t));
+
+	if (reg & HPU_RAWSTAT_RXDATAEMPTY) {
+		status->rx_fifo_status = EMPTY;
+	} else if (reg & HPU_RAWSTAT_RXDATAALMOSTEMPTY) {
+		status->rx_fifo_status = ALMOST_EMPTY;
+	} else if (reg & HPU_RAWSTAT_RXDATAFULL) {
+		status->rx_fifo_status = FULL;
+	} else {
+		status->rx_fifo_status = NOT_EMPTY;
+	}
+
+	if (reg & HPU_RAWSTAT_TXDATAEMPTY) {
+		status->tx_fifo_status = EMPTY;
+	} else if (reg & HPU_RAWSTAT_TXDATAALMOSTFULL) {
+		status->tx_fifo_status = ALMOST_FULL;
+	} else if (reg & HPU_RAWSTAT_TXDATAFULL) {
+		status->tx_fifo_status = FULL;
+	} else {
+		status->tx_fifo_status = NOT_EMPTY;
+	}
+
+	if (reg & HPU_RAWSTAT_RXBUFFERREADY)
+		status->rx_buffer_ready = 1;
+
+	if (reg & HPU_RAWSTAT_LRXPAERFIFOFULL)
+		status->lrx_paer_fifo_full = 1;
+
+	if (reg & HPU_RAWSTAT_RRXPAERFIFOFULL)
+		status->rrx_paer_fifo_full = 1;
+
+	if (reg & HPU_RAWSTAT_AUXRXPAERFIFOFULL)
+		status->auxrx_paer_fifo_full = 1;
+
+	if (reg & HPU_RAWSTAT_RXFIFOTHRESHOLD)
+		status->rx_fifo_over_threshold = 1;
+
+	if (reg & HPU_RAWSTAT_GLBLRXERR_KO)
+		status->global_rx_err_ko = 1;
+
+	if (reg & HPU_RAWSTAT_GLBLRXERR_TX)
+		status->global_rx_err_tx = 1;
+
+	if (reg & HPU_RAWSTAT_GLBLRXERR_TO)
+		status->global_rx_err_to = 1;
+
+	if (reg & HPU_RAWSTAT_GLBLRXERR_OF)
+		status->global_rx_err_of = 1;
+
+	if (reg & HPU_RAWSTAT_TXSPINNDUMP)
+		status->tx_spinn_dump = 1;
+
+	if (reg & HPU_RAWSTAT_LSPINN_PARITY_ERR)
+		status->lspinn_parity_err = 1;
+
+	if (reg & HPU_RAWSTAT_RSPINN_PARITY_ERR)
+		status->rspinn_parity_err = 1;
+
+	if (reg & HPU_RAWSTAT_AUXSPINN_PARITY_ERR)
+		status->auxspinn_parity_err = 1;
+}
+
 static int hpu_chardev_open(struct inode *i, struct file *f)
 {
 	int ret = 0;
@@ -1928,6 +2049,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 	hpu_timestamp_mask_t ts_mask;
 	hpu_tx_timing_mode_t timing_mode;
 	hpu_tx_resync_time_t resync_time;
+	hpu_hw_status_t hw_status;
 	unsigned int val = 0;
 	int res = 0;
 	struct hpu_priv *priv = fp->private_data;
@@ -2130,6 +2252,13 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 			goto cfuser_err;
 		hpu_set_spinn_rx_mask(priv, val);
 		break;
+
+	case _IOR(0x0, HPU_IOCTL_GET_HW_STATUS, hpu_hw_status_t *):
+		hpu_get_hw_status(priv, &hw_status);
+		if (copy_to_user(arg, &hw_status, sizeof(hpu_hw_status_t)))
+			goto cfuser_err;
+		break;
+
 
 	default:
 		res = -EINVAL;
