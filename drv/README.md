@@ -35,7 +35,7 @@ Here there is a list of the currently supported IOCTLs.
 | *not supported anymore*                |25|   |                           |
 |HPU_IOCTL_SET_RX_INTERFACE              |26| W |  hpu_rx_interface_ioctl_t |
 |HPU_IOCTL_SET_TX_INTERFACE              |27| W |  hpu_tx_interface_ioctl_t |
-|HPU_IOCTL_SET_AXIS_LATENCY              |28| W |      unsigned int         |
+|HPU_IOCTL_SET_AXIS_LATENCY              |28| W |        unsigned int       |
 |HPU_IOCTL_GET_RX_PN                     |29| R |        unsigned int       |
 |HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY    |30| W | spinn_start_stop_policy_t |
 |HPU_IOCTL_SET_TS_MASK                   |31| W |   hpu_timestamp_mask_t    |
@@ -45,7 +45,7 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_FORCE_TX_RESYNC_TIMER         |35| - |                           |
 |HPU_IOCTL_SET_SPINN_TX_MASK             |36| W |        unsigned int       |
 |HPU_IOCTL_SET_SPINN_RX_MASK             |37| W |        unsigned int       |
-
+|HPU_IOCTL_GET_HW_STATUS                 |28| R |      hpu_hw_status_t      |
 
 All ioctls have *zero* as magic number.
 
@@ -328,6 +328,41 @@ Sets the MASK to be applied to data that are transmitted to SPINNAKER.
 
 ## HPU_IOCTL_SET_SPINN_RX_MASK
 Sets the MASK to be applied to data that are received from SPINNAKER.
+
+## HPU_IOCTL_GET_HW_STATUS
+returns a collection of status flags as reported by the hw; It wants a pointer to an instance of the follwing type as argument.
+
+``` C
+typedef struct {
+	fifo_status_t rx_fifo_status;
+	fifo_status_t tx_fifo_status;
+	int rx_buffer_ready;
+	int lrx_paer_fifo_full;
+	int rrx_paer_fifo_full;
+	int auxrx_paer_fifo_full;
+	int rx_fifo_over_threshold;
+	int global_rx_err_ko;
+	int global_rx_err_tx;
+	int global_rx_err_to;
+	int global_rx_err_of;
+	int tx_spinn_dump;
+	int lspinn_parity_err;
+	int rspinn_parity_err;
+	int auxspinn_parity_err;
+	int lspinn_rx_err;
+	int rspinn_rx_err;
+	int auxspinn_rx_err;
+} hpu_hw_status_t;
+
+typedef enum {
+	EMPTY,
+	ALMOST_EMPTY,
+	FULL,
+	ALMOST_FULL,
+	NOT_EMPTY
+} fifo_status_t;
+
+```
 
 Module parameters
 -----------------
