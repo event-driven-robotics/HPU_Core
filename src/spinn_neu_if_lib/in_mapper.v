@@ -68,7 +68,7 @@ module in_mapper #
             spnnlnk_timeout <= 1'b0;
             if (ipkt_rdy) begin
                 spnnlnk_timeout_cnt <= 8'd128;  // spinn_driver ready resets counter
-            end else if (spnnlnk_timeout_cnt != 5'd0) begin
+            end else if (spnnlnk_timeout_cnt != 8'd0) begin
                 spnnlnk_timeout_cnt <= spnnlnk_timeout_cnt - 1;
             end else begin
                 spnnlnk_timeout_cnt <= spnnlnk_timeout_cnt;  // no change!

@@ -65,6 +65,8 @@ end entity AEXSsequencerRR;
 --****************************
 
 architecture beh of AEXSsequencerRR is
+
+
   
     --type   state is (stIdle, stWaitDelta, stSend, stWait, stConfigReq, stConfigAck);
     type   state is (stIdle, stWaitDelta, stSend);
@@ -89,7 +91,6 @@ architecture beh of AEXSsequencerRR is
     signal TimestampMskd     : std_logic_vector(31 downto 0);
     signal TSMask            : std_logic_vector(31 downto 0);
     signal TSTimeoutEnable   : std_logic;
-    signal TSTimeoutEnable_d : std_logic;
     
     type rom_array is array (0 to 15) of unsigned (23 downto 0);
     constant Timeout_Table : rom_array := ( conv_unsigned(      1_0, 24),  -- Address 0   :       1.0 ms
@@ -116,6 +117,8 @@ architecture beh of AEXSsequencerRR is
     signal SendPending_d : std_logic; 
     signal timeout_rearm : std_logic;
     signal StateIsIdle   : std_logic;
+    signal StateIsWaitDelta   : std_logic;
+    signal StateIsSend   : std_logic;
     
 begin
 
@@ -135,7 +138,7 @@ begin
                       Enable_xSI, InAddrEvt_xDI, InEmpty_xSI, OutDstRdy_xSI,
                       State_xDP, TimestampPrev_xD, TimestampMskd,
                       NetxTime_xDP, NetxTime_xDN, combo, LastTime_xDP, TSTimeout_cnt_tcn,
-                      TSMode_xDI, TSMask
+                      TSMode_xDI, TSMask, timeout
                       )
     begin
 
@@ -331,29 +334,28 @@ begin
     TxTSRetrigStatus_xSO <= timeout;                                                                 -- Reply of Timeout internal signal
     timeout_sel <= conv_integer(unsigned(TSTimeoutSel_xDI));                                         -- Timeout value selector
     timeout_value <= Timeout_Table(timeout_sel);                                                     -- Timeout value frome table
+    timeout <=  TSTimeout_cnt_tcn;                                                                   -- Timeout internal signal
     TSTimeoutEnable <= '0' when (TSTimeoutSel_xDI = x"F") else '1';
     StateIsIdle <= '1' when (State_xDP = stIdle) else '0';
+    StateIsWaitDelta <= '1' when (State_xDP = stWaitDelta) else '0';
+    StateIsSend <= '1' when (State_xDP = stSend) else '0';
     
         resync_timeout_counter : process (Clk_xCI, Rst_xRBI)
         begin
             if (Rst_xRBI = '0') then           -- asynchronous reset (active low)
                 TSTimeout_cnt      <= conv_unsigned(0, TSTimeout_cnt'length);
-                timeout                   <= '1';   -- NOTE: '1' in order to abilitate automatically the first sync after reset
                 TxTSTimeoutCounts_xSO     <= '0';
-                TSTimeoutEnable_d         <= '1';   -- NOTE: '1' in order to abilitate automatically the first sync after reset
                 
             elsif (rising_edge(Clk_xCI)) then  -- rising clock edge
                 if (TxTSRetrigCmd_xSI = '1') then
                     TSTimeout_cnt  <= conv_unsigned(0, TSTimeout_cnt'length);
-                elsif (timeout_rearm = '1' or StateIsIdle = '0' or TxTSRearmCmd_xSI = '1' or TSTimeoutEnable_d = '0') then   -- NOTE: TSTimeoutEnable_d is used in order to reload the new timeout value
+                elsif (timeout_rearm = '1' or StateIsIdle = '0' or TxTSRearmCmd_xSI = '1' or TSTimeoutEnable = '0') then
                     TSTimeout_cnt  <= timeout_value;
                 elsif (En100us_xSI = '1' and TSTimeout_cnt_tcn = '0' and InEmpty_xSI = '1') then
                     TSTimeout_cnt  <= TSTimeout_cnt - 1;
                 end if;    
                 
-                TSTimeoutEnable_d     <= TSTimeoutEnable;
-                TxTSTimeoutCounts_xSO <= StateIsIdle and TSTimeoutEnable_d and not TSTimeout_cnt_tcn and InEmpty_xSI; 
-                timeout               <=  TSTimeout_cnt_tcn;                                                          -- Timeout internal signal
+                TxTSTimeoutCounts_xSO <= StateIsIdle and TSTimeoutEnable and not TSTimeout_cnt_tcn and InEmpty_xSI; 
               
             end if;
         end process resync_timeout_counter;
