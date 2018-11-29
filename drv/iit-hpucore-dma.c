@@ -1800,7 +1800,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	priv->spinn_start_key = HPU_DEFAULT_START_KEY;
 	priv->spinn_stop_key = HPU_DEFAULT_STOP_KEY;
 	priv->spinn_keys_enable = 1;
-	hpu_spinn_do_startstop(priv, 0);
+
 	hpu_spinn_do_set_keys(priv);
 
 	priv->rx_aux_ctrl_reg = 0;
@@ -1888,7 +1888,6 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
 	hpu_stop_dma(priv);
-	hpu_spinn_do_startstop(priv, 0);
 
 	hpu_reg_write(priv, priv->ctrl_reg |
 		      HPU_CTRL_FLUSH_TX_FIFO | HPU_CTRL_FLUSH_RX_FIFO,
