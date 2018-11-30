@@ -424,12 +424,18 @@ port (
     LRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
     RRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
     AuxRxSpnnlnkStat_i             : in  t_RxSpnnlnkStat;
-
+                                   
+    -- Spinnaker                     
+    -------------------------
     Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
     Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
     Spnn_tx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
     Spnn_rx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
-
+    Spnn_ctrl_o                    : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+    Spnn_status_i                  : in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
+    
+    -- DEBUG
+    -------------------------
     DBG_CTRL_reg                   : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     DBG_ctrl_rd                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 

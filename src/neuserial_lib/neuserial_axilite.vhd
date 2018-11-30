@@ -165,12 +165,18 @@ TxSpnnlnkStat_i                : in  t_TxSpnnlnkStat;
 LRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
 RRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
 AuxRxSpnnlnkStat_i             : in  t_RxSpnnlnkStat;
-
+                               
+-- Spinnaker                     
+-------------------------
 Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
 Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
 Spnn_tx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
 Spnn_rx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+Spnn_ctrl_o                    : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+Spnn_status_i                  : in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
 
+-- DEBUG
+-------------------------
 DBG_CTRL_reg                   : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 DBG_ctrl_rd                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 
@@ -217,7 +223,7 @@ end entity neuserial_axilite;
 
 architecture rtl of neuserial_axilite is
 
-    constant cVer   : string(3 downto 1) := "B0C";
+    constant cVer   : string(3 downto 1) := "B0E";
     constant cMAJOR : std_logic_vector(3 downto 0) :="0011";
     constant cMINOR : std_logic_vector(3 downto 0) :="0100";
 
@@ -303,6 +309,8 @@ architecture rtl of neuserial_axilite is
     signal  i_SPNN_STOP_KEY_reg   : std_logic_vector (31 downto 0);    
     signal  i_SPNN_TX_MASK_reg    : std_logic_vector (31 downto 0);
     signal  i_SPNN_RX_MASK_reg    : std_logic_vector (31 downto 0);
+    signal  i_SPNN_CTRL_reg       : std_logic_vector (31 downto 0);
+    signal  i_SPNN_STATUS_reg     : std_logic_vector (31 downto 0);
 
     signal  i_CTRL_rd             : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_LPBK_CNFG_rd        : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -338,6 +346,8 @@ architecture rtl of neuserial_axilite is
     signal  i_SPNN_STOP_KEY_rd    : std_logic_vector (31 downto 0);
     signal  i_SPNN_TX_MASK_rd     : std_logic_vector (31 downto 0);
     signal  i_SPNN_RX_MASK_rd     : std_logic_vector (31 downto 0);
+    signal  i_SPNN_CTRL_rd        : std_logic_vector (31 downto 0);
+    signal  i_SPNN_STATUS_rd      : std_logic_vector (31 downto 0);
     signal  i_TlastCnt_rd         : std_logic_vector (31 downto 0);
     signal  i_TDataCnt_rd         : std_logic_vector (31 downto 0);
     signal  i_TlastTO_rd          : std_logic_vector (31 downto 0);
@@ -664,6 +674,8 @@ begin
                 i_SPNN_STOP_KEY_reg  <= x"40000000";
                 i_SPNN_TX_MASK_reg   <= x"00FFFFFF";
                 i_SPNN_RX_MASK_reg   <= x"00FFFFFF";
+                i_SPNN_CTRL_reg      <= x"00000000";
+                i_SPNN_STATUS_reg    <= x"00000000";                
 
                 WriteTxBuffer_o <= '0';
                 i_cleanTimer  <= '0';
@@ -691,6 +703,8 @@ begin
 				
                 i_TX_CTRL_reg(14) <= '0'; -- TxTSRetrigCmd_o        (Cleared after Write)
 				i_TX_CTRL_reg(15) <= '0'; -- TxTSRearmCmd_o         (Cleared after Write)
+				i_SPNN_CTRL_reg(1) <= '0'; -- Force START Command   (Cleared after Write)
+				i_SPNN_CTRL_reg(2) <= '0'; -- Force STOP Command    (Cleared after Write)
 				
                 -- TlastTO register
                 i_TlastTowritten <= '0';
@@ -936,7 +950,18 @@ begin
                                   i_SPNN_RX_MASK_reg(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
                                end if;
                            end loop;  
-
+                           
+                       -- i_SPNN_CTRL_reg
+                       when 36 =>
+                           for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
+                               if (S_AXI_WSTRB(byte_index) = '1') then
+                                  i_SPNN_CTRL_reg(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
+                               end if;
+                           end loop;  
+                           
+                       -- i_SPNN_STATUS_reg Read Only register
+                       -- when 37 =>
+                                                      
                        -- i_TlastTO_reg
                        when 40 =>
                            for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
@@ -1068,6 +1093,7 @@ begin
                           i_HSSAER_AUX_RX_ERR_rd, i_HSSAER_AUX_RX_MSK_rd,
                           i_readRxErrCnt, i_HSSAER_AUX_RX_ERR_THR_rd, i_HSSAER_AUX_RX_ERR_CNT_rd,
                           i_SPNN_START_KEY_rd, i_SPNN_STOP_KEY_rd, i_SPNN_TX_MASK_rd, i_SPNN_RX_MASK_rd,
+                          i_SPNN_CTRL_rd, i_SPNN_STATUS_rd,
                           i_TlastCnt_rd, i_TDataCnt_rd, i_TlastTO_rd)
     begin
         if (S_AXI_ARESETN = '0') then
@@ -1128,8 +1154,11 @@ begin
                 when 32 => regDataOut  <= i_SPNN_START_KEY_rd;
                 when 33 => regDataOut  <= i_SPNN_STOP_KEY_rd;
                 when 34 => regDataOut  <= i_SPNN_TX_MASK_rd;
-                when 35 => regDataOut  <= i_SPNN_RX_MASK_rd;
-                
+                when 35 => regDataOut  <= i_SPNN_RX_MASK_rd;                
+                when 36 => regDataOut  <= i_SPNN_CTRL_rd;
+                when 37 => regDataOut  <= i_SPNN_STATUS_rd;
+           --   when 38 => Available     
+           --   when 39 => Available   
                 when 40 => regDataOut  <= i_TlastTO_rd;
                 when 41 => regDataOut  <= i_TlastCnt_rd;
                 when 42 => regDataOut  <= i_TDataCnt_rd;
