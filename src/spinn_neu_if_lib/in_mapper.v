@@ -24,13 +24,16 @@ module in_mapper #
 
         // status interface
         output reg         			dump_mode,
+        output reg                  offload,
+        output reg                  link_timeout,
         
         // Commands
-        input wire                  dump_on,
-        input wire                  dump_off,
+        input wire                  offload_on,
+        input wire                  offload_off,
         
         // Controls
         input  wire [31:0]          tx_data_mask,
+        input  wire                 link_timeout_dis,
         
         // input AER device interface
         input  wire [AER_WIDTH-1:0] iaer_data,
@@ -57,22 +60,21 @@ module in_mapper #
     // dump events from AER device if SpiNNaker not responding!
     // dump after 128 cycles without SpiNNaker response
     //---------------------------------------------------------------
-    reg              [7:0] spnnlnk_timeout_cnt;
-    reg                    spnnlnk_timeout;
-
+    reg              [7:0] link_timeout_cnt;
+    
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            spnnlnk_timeout_cnt <= 8'd128;
-            spnnlnk_timeout     <= 1'b0;
+            link_timeout_cnt <= 8'd128;
+            link_timeout     <= 1'b0;
         end else begin
-            spnnlnk_timeout <= 1'b0;
-            if (ipkt_rdy) begin
-                spnnlnk_timeout_cnt <= 8'd128;  // spinn_driver ready resets counter
-            end else if (spnnlnk_timeout_cnt != 8'd0) begin
-                spnnlnk_timeout_cnt <= spnnlnk_timeout_cnt - 1;
+            link_timeout <= 1'b0;
+            if (ipkt_rdy | link_timeout_dis) begin
+                link_timeout_cnt <= 8'd128;  // spinn_driver ready resets counter
+            end else if (link_timeout_cnt != 8'd0) begin
+                link_timeout_cnt <= link_timeout_cnt - 1;
             end else begin
-                spnnlnk_timeout_cnt <= spnnlnk_timeout_cnt;  // no change!
-                spnnlnk_timeout <= 1'b1;
+                link_timeout_cnt <= link_timeout_cnt;  // no change!
+                link_timeout <= 1'b1;
             end
         end
     end
@@ -82,16 +84,15 @@ module in_mapper #
     // a "start" command allow to send data to SpiNNaker
     // a "stop" command stops sending data 
     //---------------------------------------------------------------
-    reg               cmd_dump;
 
     always @(posedge clk or posedge rst) begin
         if (rst) 
-            cmd_dump <= 1'b1;
+            offload <= 1'b1;
         else begin
-            if (dump_off) 
-                cmd_dump <= 1'b0;
-            else if (dump_on) 
-                cmd_dump <= 1'b1;
+            if (offload_off) 
+                offload <= 1'b0;
+            else if (offload_on) 
+                offload <= 1'b1;
             end
         end
     //---------------------------------------------------------------   
@@ -104,7 +105,7 @@ module in_mapper #
         if (rst) 
             dump_mode <= 1'b1;
         else 
-            dump_mode <= cmd_dump | spnnlnk_timeout;
+            dump_mode <= offload | link_timeout;
         end
     //---------------------------------------------------------------       
 

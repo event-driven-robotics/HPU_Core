@@ -410,6 +410,7 @@ component SpiNNaker_Emulator
   		LinAck       : out std_logic;
   		
   		-- Control interface
+  		enable       : in std_logic; 
   		rst          : in std_logic
   		);
 end component ;
@@ -461,7 +462,8 @@ signal data_to_AER_L			: std_logic_vector(23 downto 0);
 signal req_to_AER_L    			: std_logic;
 signal ack_from_AER_L     		: std_logic;
 signal AER_device_enable_L		: std_logic;
-signal SPNN_device_enable_L		: std_logic;
+signal SPNN_device_enable_L     : std_logic;
+signal SPNN_device_reset_L		: std_logic;
 
 signal data_from_AER_R			: std_logic_vector(23 downto 0);
 signal req_from_AER_R			: std_logic;
@@ -470,7 +472,8 @@ signal data_to_AER_R			: std_logic_vector(23 downto 0);
 signal req_to_AER_R    			: std_logic;
 signal ack_from_AER_R     		: std_logic;
 signal AER_device_enable_R		: std_logic;
-signal SPNN_device_enable_R 	: std_logic;
+signal SPNN_device_enable_R     : std_logic;
+signal SPNN_device_reset_R  	: std_logic;
 
 signal data_from_AER_Aux		: std_logic_vector(23 downto 0);
 signal req_from_AER_Aux			: std_logic;
@@ -479,7 +482,8 @@ signal data_to_AER_Aux			: std_logic_vector(23 downto 0);
 signal req_to_AER_Aux    		: std_logic;
 signal ack_from_AER_Aux     	: std_logic;
 signal AER_device_enable_Aux	: std_logic;
-signal SPNN_device_enable_Aux	: std_logic;
+signal SPNN_device_enable_Aux   : std_logic;
+signal SPNN_device_reset_Aux	: std_logic;
  
 signal data_from_AER_Tx			: std_logic_vector(23 downto 0);
 signal req_from_AER_Tx			: std_logic;
@@ -488,7 +492,8 @@ signal data_to_AER_Tx			: std_logic_vector(23 downto 0);
 signal req_to_AER_Tx    		: std_logic;
 signal ack_from_AER_Tx     		: std_logic;
 signal AER_device_enable_Tx		: std_logic;
-signal SPNN_device_enable_Tx	: std_logic;
+signal SPNN_device_enable_Tx    : std_logic;
+signal SPNN_device_reset_Tx	    : std_logic;
 
 -- Clocks
 signal HSSAER_ClkLS_p      		: std_logic;
@@ -645,7 +650,8 @@ R_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => open,
 	
 	-- Control interface
-	rst        => SPNN_device_enable_R -- i_reset
+	enable     => SPNN_device_enable_R,
+	rst        => SPNN_device_reset_R -- i_reset
 	);
 
 L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
@@ -667,7 +673,8 @@ L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => open,
 	
 	-- Control interface
-	rst        => SPNN_device_enable_L -- i_reset
+	enable     => SPNN_device_enable_L,
+	rst        => SPNN_device_reset_L -- i_reset
 	);
 
 AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
@@ -689,7 +696,8 @@ AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => open,
 	
 	-- Control interface
-	rst        => SPNN_device_enable_Aux -- i_reset
+	enable     => SPNN_device_enable_Aux,
+	rst        => SPNN_device_reset_Aux -- i_reset
 	);
 
 
@@ -712,7 +720,8 @@ TX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LinAck     => Tx_ack_from_spinnaker,
 	
 	-- Control interface
-	rst        => SPNN_device_enable_Tx -- i_reset
+	enable     => SPNN_device_enable_Tx,
+	rst        => SPNN_device_reset_Tx -- i_reset
 	);
 
 
@@ -1124,23 +1133,47 @@ end process Enable_AER_Proc;
 
 Enable_SPNN_Proc : process
 	begin
-		SPNN_device_enable_L   <= '1';
-		SPNN_device_enable_R   <= '1';
-		SPNN_device_enable_Aux <= '1';
-		SPNN_device_enable_Tx  <= '1';
+		SPNN_device_reset_L    <= '1';
+		SPNN_device_reset_R    <= '1';
+		SPNN_device_reset_Aux  <= '1';
+		SPNN_device_reset_Tx   <= '1';
+		
+		SPNN_device_enable_L   <= '0';
+        SPNN_device_enable_R   <= '0';
+        SPNN_device_enable_Tx  <= '0';
+        SPNN_device_enable_Aux <= '0';
+		
+		wait for 1 us;
+        SPNN_device_reset_L   <= '0';
+        SPNN_device_reset_R   <= '0';
+        SPNN_device_reset_Tx  <= '0';
+        SPNN_device_reset_Aux <= '0';
 
-		wait for 10 us;
-		SPNN_device_enable_L   <= '1';
-		SPNN_device_enable_R   <= '1';
-		SPNN_device_enable_Tx  <= '0';
-	    SPNN_device_enable_Aux <= '1';
-
-		wait for 990 us;
-		SPNN_device_enable_L   <= '1';
-		SPNN_device_enable_R   <= '1';
-		SPNN_device_enable_Tx  <= '0';
-	    SPNN_device_enable_Aux <= '1';
-
+		wait for 1 us;
+        SPNN_device_reset_L   <= '1';
+        SPNN_device_reset_R   <= '1';
+        SPNN_device_reset_Tx  <= '1';
+        SPNN_device_reset_Aux <= '1';
+        
+        
+		wait for 10 us;		
+        SPNN_device_enable_L   <= '0';
+        SPNN_device_enable_R   <= '0';
+        SPNN_device_enable_Tx  <= '1';
+        SPNN_device_enable_Aux <= '0';        
+        
+        wait for 200 us;        
+        SPNN_device_enable_L   <= '0';
+        SPNN_device_enable_R   <= '0';
+        SPNN_device_enable_Tx  <= '1';
+        SPNN_device_enable_Aux <= '1'; 
+               
+        wait for 600 us;        
+        SPNN_device_enable_L   <= '0';
+        SPNN_device_enable_R   <= '0';
+        SPNN_device_enable_Tx  <= '0';
+        SPNN_device_enable_Aux <= '1'; 
+        
 		wait;
 end process Enable_SPNN_Proc;
 

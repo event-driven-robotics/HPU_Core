@@ -53,6 +53,7 @@ module SpiNNaker_Emulator #
   output reg        LinAck,
   
   // Control interface
+  input wire        enable,
   input wire 		rst
   );
 
@@ -358,85 +359,85 @@ wait (!rst);
 forever 
     begin
   
-    dummy = dummy + 1;
+    if (enable) dummy = dummy + 1;
     
     if (HAS_TX == "true") 
         begin
       
-        dummy = dummy + 1;
+        if (enable) dummy = dummy + 1;
       
-        infile_eof = $feof(infile0);
+        if (enable) infile_eof = $feof(infile0);
       
-        if (! $feof(infile0)) //read if "end of file" is not reached (and TX is enabled).
+        if (enable & ! $feof(infile0)) //read if "end of file" is not reached (and TX is enabled).
             begin
-            $fscanf(infile0,"%h\n",pkt_data);       //scan each line and get the value as an hexadecimal
+            if (enable) $fscanf(infile0,"%h\n",pkt_data);       //scan each line and get the value as an hexadecimal
      
         
             # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[3:0]});
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[3:0]});
             
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
-            
-            # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[7:4]});
-            
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
             
             # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[11:8]});
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[7:4]});
             
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
-            
-            # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[15:12]});
-            
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
             
             # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[19:16]});
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[11:8]});
             
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
-            
-            # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[23:20]});
-            
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
             
             # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[27:24]});
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[15:12]});
             
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
-            
-            # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[31:28]});
-            
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
             
             # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[35:32]});
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[19:16]});
             
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
-            
-            # SPL_HSDLY
-            Lout = Lout ^ encode_2of7 ({01'b0, packet[39:36]});
-            
-            LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
             
             # SPL_HSDLY
-              Lout = Lout ^ encode_2of7 ({01'b1, 4'b0000});
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[23:20]});
+            
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[27:24]});
+            
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[31:28]});
+            
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[35:32]});
             
             LoutAck_r = LoutAck;
-            wait (LoutAck != LoutAck_r);
+            if (enable) wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b0, packet[39:36]});
+            
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
+            
+            # SPL_HSDLY
+            if (enable) Lout = Lout ^ encode_2of7 ({01'b1, 4'b0000});
+            
+            if (enable) LoutAck_r = LoutAck;
+            if (enable) wait (LoutAck != LoutAck_r);
             
             //        if (HAS_ID == "true")  pkt_data[27:0] = pkt_data[27:0] + 1; 
             //        if (HAS_ID == "false") pkt_data = pkt_data + 32'h08000000;
@@ -493,10 +494,10 @@ if (HAS_RX == "true")
 
     forever 
         begin
-        wait (complete_nrz_2of7 (Lin, Lin_r));
+        if (enable) wait (complete_nrz_2of7 (Lin, Lin_r));
         # SPL_HSDLY
-        if (!rec_eop) rec_packet_sr = {rec_packet_sr[35:0],rec_data};
-        if (rec_eop) 
+        if (enable & !rec_eop) rec_packet_sr = {rec_packet_sr[35:0],rec_data};
+        if (enable & rec_eop) 
             begin
             header = {rec_packet_sr[35:32],
                       rec_packet_sr[39:36]};
@@ -510,10 +511,10 @@ if (HAS_RX == "true")
                       rec_packet_sr[31:28]};
                   
             //Write the value into text files.
-            $fdisplay(outfile0,"%h",{header,key}); //write as hexadecimal
+            if (enable) $fdisplay(outfile0,"%h",{header,key}); //write as hexadecimal
             end;
-        LinAck = ~LinAck;
-        Lin_r = Lin;
+        if (enable) LinAck = ~LinAck;
+        if (enable) Lin_r = Lin;
         end
     end
 end

@@ -27,7 +27,10 @@ component spinn_neu_if
 		dump_mode					: out std_logic;
 		parity_err					: out std_logic;
 		rx_err						: out std_logic;
-	
+        offload                     : out std_logic;
+        link_timeout                : out std_logic;
+	    link_timeout_dis            : in  std_logic;
+	    
 		-- input SpiNNaker link interface
 		data_2of7_from_spinnaker 	: in  std_logic_vector(6 downto 0); 
 		ack_to_spinnaker			: out std_logic;
@@ -46,17 +49,20 @@ component spinn_neu_if
 		oaer_vld					: out std_logic;
 		oaer_rdy					: in  std_logic;
 		
-        -- Command from SpiNNaker 
-        cmd_start_key               : in  std_logic_vector(31 downto 0); 
-        cmd_stop_key                : in  std_logic_vector(31 downto 0); 
+        -- Command from SpiNNaker
+        keys_enable                 : in  std_logic;
+        start_key                   : in  std_logic_vector(31 downto 0); 
+        stop_key                    : in  std_logic_vector(31 downto 0); 
         cmd_start                   : out std_logic;
         cmd_stop                    : out std_logic;
+
+        -- Settings
         tx_data_mask                : in  std_logic_vector(31 downto 0);
         rx_data_mask                : in  std_logic_vector(31 downto 0);
 
         -- Controls
-        dump_off                    : in std_logic;
-        dump_on                     : in std_logic;
+        offload_off                 : in std_logic;
+        offload_on                  : in std_logic;
     
         -- Debug ports
 		
@@ -70,8 +76,8 @@ component spinn_neu_if
 end component;
 
 type SpnnCmd_type is record
-    cmd_start_key : std_logic_vector(31 downto 0);
-    cmd_stop_key  : std_logic_vector(31 downto 0);
+    start_key : std_logic_vector(31 downto 0);
+    stop_key  : std_logic_vector(31 downto 0);
 end record SpnnCmd_type;
 
 end package spinn_neu_pkg;

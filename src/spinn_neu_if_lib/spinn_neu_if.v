@@ -67,6 +67,9 @@ module spinn_neu_if #
         output wire        dump_mode,
         output wire        parity_err,
         output wire        rx_err,
+        output wire        offload,
+        output wire        link_timeout,
+        input  wire        link_timeout_dis,
 
         // input SpiNNaker link interface
         input  wire  [6:0] data_2of7_from_spinnaker,
@@ -87,16 +90,19 @@ module spinn_neu_if #
         input  wire        oaer_rdy,
                 
         // Command from SpiNNaker
-        input  wire [31:0] cmd_start_key,
-        input  wire [31:0] cmd_stop_key, 
+        input  wire        keys_enable,
+        input  wire [31:0] start_key,
+        input  wire [31:0] stop_key, 
         output wire        cmd_start,
         output wire        cmd_stop,
+        
+        // Settings
         input  wire [31:0] tx_data_mask,
         input  wire [31:0] rx_data_mask,
         
         // Controls
-        input wire         dump_off,
-        input wire         dump_on,
+        input wire         offload_off,
+        input wire         offload_on,
 
         // Debug Port       
         output wire  [2:0] dbg_rxstate,
@@ -124,6 +130,9 @@ module spinn_neu_if #
 //        dump_mode                     : out std_logic;
 //        parity_err                    : out std_logic;
 //        rx_err                        : out std_logic;
+//        offload                       : out std_logic;
+//        link_timeout                  : out std_logic;
+//        link_timeout_dis              : in  std_logic;
 //    
 //        -- input SpiNNaker link interface
 //        data_2of7_from_spinnaker      : in  std_logic_vector(6 downto 0); 
@@ -144,14 +153,19 @@ module spinn_neu_if #
 //        oaer_rdy                      : in  std_logic;
 //        
 //        -- Command from SpiNNaker
-//        cmd_start_key                 : in  std_logic_vector(6 downto 0); 
-//        cmd_stop_key                  : in  std_logic_vector(6 downto 0); 
+//        keys_enable                   : in  std_logic;
+//        start_key                     : in  std_logic_vector(6 downto 0); 
+//        stop_key                      : in  std_logic_vector(6 downto 0); 
 //        cmd_start                     : out std_logic;
 //        cmd_stop                      : out std_logic;
 //
+//        -- Settings
+//        tx_data_mask                  : in  std_logic_vector(31 downto 0);
+//        rx_data_mask                  : in  std_logic_vector(31 downto 0);
+//
 //        -- Controls
-//        dump_off                      : in std_logic;
-//        dump_on                       : in std_logic;
+//        offload_off                   : in std_logic;
+//        offload_on                    : in std_logic;
 //           
 //        -- Debug ports
 //        
@@ -192,8 +206,8 @@ module spinn_neu_if #
     
     wire        i_cmd_start;
     wire        i_cmd_stop;
-    wire        i_dump_on;
-    wire        i_dump_off;
+    wire        i_offload_on;
+    wire        i_offload_off;
 
 
     assign clk_sync = clk_32;
@@ -268,9 +282,10 @@ generate
     (
         .rst           (rst),
         .clk           (clk_mod),
-        .parity_err    (parity_err),        
-        .cmd_start_key (cmd_start_key),
-        .cmd_stop_key  (cmd_stop_key),
+        .parity_err    (parity_err),
+        .keys_enable   (keys_enable),       
+        .start_key     (start_key),
+        .stop_key      (stop_key),
         .cmd_start     (i_cmd_start),
         .cmd_stop      (i_cmd_stop),
         .rx_data_mask  (rx_data_mask),
@@ -319,19 +334,22 @@ generate
         .AER_WIDTH (C_PSPNNLNK_WIDTH)
     ) im
     (
-        .rst          (rst),
-        .clk          (clk_mod),
-        .enable       (enable),
-        .dump_mode    (dump_mode),
-        .dump_on      (i_dump_on),
-        .dump_off     (i_dump_off),  
-        .tx_data_mask (tx_data_mask), 
-        .iaer_data    (i_iaer_addr),
-        .iaer_vld     (i_iaer_vld),
-        .iaer_rdy     (i_iaer_rdy),
-        .ipkt_data    (i_ipkt_data),
-        .ipkt_vld     (i_ipkt_vld),
-        .ipkt_rdy     (i_ipkt_rdy)
+        .rst              (rst),
+        .clk              (clk_mod),
+        .enable           (enable),
+        .dump_mode        (dump_mode),
+        .offload          (offload),        
+        .link_timeout     (link_timeout),
+        .offload_on       (i_offload_on),
+        .offload_off      (i_offload_off),  
+        .tx_data_mask     (tx_data_mask),
+        .link_timeout_dis (link_timeout_dis),
+        .iaer_data        (i_iaer_addr),
+        .iaer_vld         (i_iaer_vld),
+        .iaer_rdy         (i_iaer_rdy),
+        .ipkt_data        (i_ipkt_data),
+        .ipkt_vld         (i_ipkt_vld),
+        .ipkt_rdy         (i_ipkt_rdy)
     );
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -360,10 +378,10 @@ endgenerate
     assign dbg_opkt_vld = i_opkt_vld;
     assign dbg_opkt_rdy = i_opkt_rdy;
     
-    assign i_dump_off   = ((C_HAS_RX == "true") & i_cmd_start) | ((C_HAS_TX == "true") & dump_off);
-    assign i_dump_on    = ((C_HAS_RX == "true") & i_cmd_stop)  | ((C_HAS_TX == "true") & dump_on );
-    assign cmd_start    = (C_HAS_RX == "true") & i_cmd_start;
-    assign cmd_stop     = (C_HAS_RX == "true") & i_cmd_stop;
+    assign i_offload_off = ((C_HAS_RX == "true") & i_cmd_start) | ((C_HAS_TX == "true") & offload_off);
+    assign i_offload_on  = ((C_HAS_RX == "true") & i_cmd_stop)  | ((C_HAS_TX == "true") & offload_on );
+    assign cmd_start     = (C_HAS_RX == "true") & i_cmd_start;
+    assign cmd_stop      = (C_HAS_RX == "true") & i_cmd_stop;
 
 
 endmodule

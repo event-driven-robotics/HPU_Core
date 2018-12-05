@@ -226,16 +226,21 @@ type time_tick is record
             LRxSaerStat_o           : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
             RRxSaerStat_o           : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
             AUXRxSaerStat_o         : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-        
+            
+            --
+            -- SPiNNaker
+            ---------------------        
             TxSpnnlnkStat_o         : out t_TxSpnnlnkStat;
             LRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
             RRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
             AuxRxSpnnlnkStat_o      : out t_RxSpnnlnkStat;
         
-            Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-            Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+            Spnn_start_key_i        : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command key
+            Spnn_stop_key_i         : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command key
             Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
             Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+            Spnn_ctrl_i             : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+            Spnn_status_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
             
             --
             -- LED drivers
@@ -427,8 +432,8 @@ port (
                                    
     -- Spinnaker                     
     -------------------------
-    Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-    Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+    Spnn_start_key_o               : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+    Spnn_stop_key_o                : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
     Spnn_tx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
     Spnn_rx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
     Spnn_ctrl_o                    : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 

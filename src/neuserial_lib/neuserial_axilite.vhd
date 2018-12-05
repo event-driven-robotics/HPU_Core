@@ -168,8 +168,8 @@ AuxRxSpnnlnkStat_i             : in  t_RxSpnnlnkStat;
                                
 -- Spinnaker                     
 -------------------------
-Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+Spnn_start_key_o               : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+Spnn_stop_key_o                : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
 Spnn_tx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
 Spnn_rx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
 Spnn_ctrl_o                    : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
@@ -310,8 +310,7 @@ architecture rtl of neuserial_axilite is
     signal  i_SPNN_TX_MASK_reg    : std_logic_vector (31 downto 0);
     signal  i_SPNN_RX_MASK_reg    : std_logic_vector (31 downto 0);
     signal  i_SPNN_CTRL_reg       : std_logic_vector (31 downto 0);
-    signal  i_SPNN_STATUS_reg     : std_logic_vector (31 downto 0);
-
+    
     signal  i_CTRL_rd             : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_LPBK_CNFG_rd        : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_RXData_rd           : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -484,10 +483,11 @@ begin
 
     RxFifoThresholdNumData_o <= i_FIFOTHRESH_reg(10 downto 0);
     
-    Spnn_cmd_start_key_o <= i_SPNN_START_KEY_reg;
-    Spnn_cmd_stop_key_o  <= i_SPNN_STOP_KEY_reg;
+    Spnn_start_key_o     <= i_SPNN_START_KEY_reg;
+    Spnn_stop_key_o      <= i_SPNN_STOP_KEY_reg;
     Spnn_tx_mask_o       <= i_SPNN_TX_MASK_reg;
     Spnn_rx_mask_o       <= i_SPNN_RX_MASK_reg;
+    Spnn_ctrl_o          <= i_SPNN_CTRL_reg;
 
     p_hssaer_rx_err : process (LRxSaerStat_i, RRxSaerStat_i)
     begin
@@ -675,7 +675,6 @@ begin
                 i_SPNN_TX_MASK_reg   <= x"00FFFFFF";
                 i_SPNN_RX_MASK_reg   <= x"00FFFFFF";
                 i_SPNN_CTRL_reg      <= x"00000000";
-                i_SPNN_STATUS_reg    <= x"00000000";                
 
                 WriteTxBuffer_o <= '0';
                 i_cleanTimer  <= '0';
@@ -1907,6 +1906,20 @@ begin
     -- i_SPNN_RX_MASK_rd r/w
 
     i_SPNN_RX_MASK_rd <= i_SPNN_RX_MASK_reg;
+
+    -- ------------------------------------------------------------------------
+    -- SpiNNaker Control Register
+    -- ------------------------------------------------------------------------
+    -- i_SPNN_CTRL_rd r/w
+
+    i_SPNN_CTRL_rd <= i_SPNN_CTRL_reg;
+
+    -- ------------------------------------------------------------------------
+    -- SpiNNaker Status Register
+    -- ------------------------------------------------------------------------
+    -- i_SPNN_STATUS_rd r/w
+
+    i_SPNN_STATUS_rd <= SPNN_STATUS_i;
 
     -- ------------------------------------------------------------------------
     -- Tlast TimeOut register
