@@ -32,12 +32,12 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_SET_BLK_RX_THR                |22| W |        unsigned int       |
 |HPU_IOCTL_SET_SPINN_KEYS                |23| W |        spinn_keys_t       |
 | *not supported anymore*                |24|   |                           |
-| *not supported anymore*                |25|   |                           |
+|HPU_IOCTL_SET_SPINN_STARTSTOP           |25| W |        unsigned int       |
 |HPU_IOCTL_SET_RX_INTERFACE              |26| W |  hpu_rx_interface_ioctl_t |
 |HPU_IOCTL_SET_TX_INTERFACE              |27| W |  hpu_tx_interface_ioctl_t |
 |HPU_IOCTL_SET_AXIS_LATENCY              |28| W |        unsigned int       |
 |HPU_IOCTL_GET_RX_PN                     |29| R |        unsigned int       |
-|HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY    |30| W | spinn_start_stop_policy_t |
+| *not supported anymore*                |30| - |                           |
 |HPU_IOCTL_SET_TS_MASK                   |31| W |   hpu_timestamp_mask_t    |
 |HPU_IOCTL_SET_TX_TIMING_MODE            |32| W |   hpu_tx_timing_mode_t    |
 |HPU_IOCTL_SET_TX_RESYNC_TIMER           |33| W |   hpu_tx_resync_time_t    |
@@ -45,7 +45,8 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_FORCE_TX_RESYNC_TIMER         |35| - |                           |
 |HPU_IOCTL_SET_SPINN_TX_MASK             |36| W |        unsigned int       |
 |HPU_IOCTL_SET_SPINN_RX_MASK             |37| W |        unsigned int       |
-|HPU_IOCTL_GET_HW_STATUS                 |28| R |      hpu_hw_status_t      |
+|HPU_IOCTL_GET_HW_STATUS                 |38| R |      hpu_hw_status_t      |
+|HPU_IOCTL_SET_SPINN_KEYS_EN_EX          |39| W |    spinn_keys_enable_t    |
 
 All ioctls have *zero* as magic number.
 
@@ -137,7 +138,7 @@ The caller should check for the *read()* return value to check how many bytes ha
 
 ### HPU_IOCTL_SET_SPINN_KEYS
 Sets both the *start* and *stop* keys to be recognized by the HPU on the SPINN bus.
-Note that the *HPU_IOCTL_SPINN_KEYS_EN* ioctl has to be used in order to *enable* or *disable* the keys
+Note that the *HPU_IOCTL_SPINN_KEYS_EN_EX* ioctl has to be used in order to *enable* or *disable* the keys
 recognization feature. The argument is a pointer to an instance of the following type
 
 ```C
@@ -146,6 +147,21 @@ typedef struct {
 	u32 stop;
 } spinn_keys_t;
 ```
+
+### HPU_IOCTL_SPINN_KEYS_EN_EX
+Disables/Enables the *start* and *stop* keys recognization on the SPINN bus.
+The argument is a pointer to an instance of the following type
+
+```C
+typedef struct {
+	int enable_l;
+	int enable_r;
+	int enable_aux;
+} spinn_keys_enable_t;
+```
+
+### HPU_IOCTL_SET_SPINN_STARTSTOP
+Forces a *start* (argument = 1) or *stop* (argument = 0) trigger for the SPINN interface. Start/stop keys settings will survive this IOCTL (i.e. if you have set and enabled start/stop keys and you force-start the bus, receiving a stop key will stop the bus).
 
 ### HPU_IOCTL_SET_LOOP_CFG
 Allows to enable loopback mode (debug). It wants a pointer to an instance of the follwing type as argument
@@ -241,24 +257,6 @@ MSBs|  dest  |
 Set the maximum time (in mS) after which a data transfer is forced to happen, even if it would contain less data than expected.
 
 This affects only the RX channel, and it allows to limit the latency when few data is received, while still keeping large buffers to be able to handle also high-load situations.
-
-
-### HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY
-Configures the SPINN BUS start/stop policy. It wants a pointer to an instance of the follwing type as argument
-
-``` C
-typedef enum {
-	FORCE_START_KEY_ENABLE,
-	FORCE_STOP_KEY_ENABLE,
-	FORCE_START_KEY_DISABLE,
-	FORCE_STOP_KEY_DISABLE,
-	KEY_ENABLE,
-} spinn_start_stop_policy_t;
-```
-
-The first four enumerators define the START/STOP behavior: the BUS can be force-started or force-stopped and the keys can be enabled or disabled; when keys are enabled the BUS can change the current state (started or stopped) when the key values are received.
-
-Furthermore it is possible to enable the keys without altering the current bus state (started or stopped). Note that it is not possible to disable keys without explicitly stopping or starting the bus. The older IOCTLs that implicitly allowed to do this could cause wrong behavior..
 
 ## HPU_IOCTL_SET_TS_MASK
 Sets the TX timestamp mask. It wants a pointer to an instance of the follwing type as argument.
