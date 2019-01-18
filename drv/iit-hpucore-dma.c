@@ -90,6 +90,7 @@
 #define HPU_SPINN_STOP_KEY_REG	0x84
 #define HPU_SPINN_TX_MASK_REG	0x88
 #define HPU_SPINN_RX_MASK_REG	0x8c
+#define HPU_SPINN_CTRL_REG	0x90
 #define HPU_TLAST_TIMEOUT	0xA0
 #define HPU_TLAST_COUNT		0xA4
 #define HPU_DATA_COUNT		0xA8
@@ -186,9 +187,15 @@
 #define HPU_TXCTRL_REG_SYNCTIME_500S	(14 << 16)
 #define HPU_TXCTRL_REG_SYNCTIME_DISABLE	(15 << 16)
 #define HPU_TXCTRL_REG_SYNCTIME_MASK	(15 << 16)
-
 #define HPU_TXCTRL_REG_FORCE_RESYNC	BIT(14)
 #define HPU_TXCTRL_REG_FORCE_REARM	BIT(15)
+
+#define HPU_SPINN_CTRL_REG_L_KEYEN	BIT(24)
+#define HPU_SPINN_CTRL_REG_R_KEYEN	BIT(16)
+#define HPU_SPINN_CTRL_REG_AUX_KEYEN	BIT(8)
+#define HPU_SPINN_CTRL_REG_STOP		BIT(2)
+#define HPU_SPINN_CTRL_REG_START	BIT(1)
+#define HPU_SPINN_CTRL_REG_TO_DIS	BIT(0)
 
 #define HPU_MSK_INT_RXFIFOFULL		0x004
 #define HPU_MSK_INT_TSTAMPWRAPPED	0x080
@@ -219,13 +226,13 @@
 #define HPU_IOCTL_SET_BLK_TX_THR		21
 #define HPU_IOCTL_SET_BLK_RX_THR		22
 #define HPU_IOCTL_SET_SPINN_KEYS		23
-#define HPU_IOCTL_SET_SPINN_KEYS_EN		24
+/* 24 is not used anymore */
 #define HPU_IOCTL_SET_SPINN_STARTSTOP		25
 #define HPU_IOCTL_SET_RX_INTERFACE		26
 #define HPU_IOCTL_SET_TX_INTERFACE		27
 #define HPU_IOCTL_SET_AXIS_LATENCY		28
 #define HPU_IOCTL_GET_RX_PN			29
-#define HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY	30
+/* 30 is not used anymore */
 #define HPU_IOCTL_SET_TS_MASK			31
 #define HPU_IOCTL_SET_TX_TIMING_MODE		32
 #define HPU_IOCTL_SET_TX_RESYNC_TIMER		33
@@ -234,6 +241,7 @@
 #define HPU_IOCTL_SET_SPINN_TX_MASK		36
 #define HPU_IOCTL_SET_SPINN_RX_MASK		37
 #define HPU_IOCTL_GET_HW_STATUS			38
+#define HPU_IOCTL_SET_SPINN_KEYS_EN_EX		39
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -344,13 +352,11 @@ typedef struct {
 	u32 stop;
 } spinn_keys_t;
 
-typedef enum {
-	FORCE_START_KEY_ENABLE,
-	FORCE_STOP_KEY_ENABLE,
-	FORCE_START_KEY_DISABLE,
-	FORCE_STOP_KEY_DISABLE,
-	KEY_ENABLE,
-} spinn_start_stop_policy_t;
+typedef struct {
+	int enable_l;
+	int enable_r;
+	int enable_aux;
+} spinn_keys_enable_t;
 
 typedef enum {
 	LOOP_NONE,
@@ -465,16 +471,12 @@ struct hpu_priv {
 	uint32_t tx_ctrl_reg;
 	uint32_t rx_aux_ctrl_reg;
 	uint32_t irq_msk;
+	uint32_t spinn_ctrl_reg;
 	struct dentry *debugfsdir;
 	struct clk *clk;
 	unsigned long clk_rate;
 	spinlock_t irq_lock;
 	int rx_suspended;
-
-	/* spinn-related */
-	int spinn_start_key;
-	int spinn_stop_key;
-	int spinn_keys_enable;
 
 	/* dma */
 	struct hpu_dma_pool dma_rx_pool;
@@ -1221,55 +1223,24 @@ static int hpu_rx_dma_submit_pool(struct hpu_priv *priv)
 	return ret;
 }
 
-static void hpu_spinn_do_set_keys(struct hpu_priv *priv)
+static int hpu_spinn_startstop(struct hpu_priv *priv, int start)
 {
-	hpu_reg_write(priv, priv->spinn_start_key, HPU_SPINN_START_KEY_REG);
-	hpu_reg_write(priv, priv->spinn_stop_key, HPU_SPINN_STOP_KEY_REG);
-	dev_dbg(&priv->pdev->dev, "Enabling keys START:0x%x STOP:0x%x\n",
-		priv->spinn_start_key, priv->spinn_stop_key);
-}
-
-static void hpu_spinn_do_startstop(struct hpu_priv *priv, int start)
-{
-	if (start) {
-		dev_dbg(&priv->pdev->dev, "Forcing SPINN start\n");
-		hpu_reg_write(priv, 0x0, HPU_SPINN_START_KEY_REG);
-		hpu_reg_write(priv, 0x0, HPU_SPINN_STOP_KEY_REG);
-	} else {
-		dev_dbg(&priv->pdev->dev, "Forcing SPINN stop\n");
-		hpu_reg_write(priv, 0xFFFFFFFF, HPU_SPINN_START_KEY_REG);
-		hpu_reg_write(priv, 0xFFFFFFFF, HPU_SPINN_STOP_KEY_REG);
-	}
-}
-
-static int hpu_spinn_set_startstop_policy(struct hpu_priv *priv,
-					  spinn_start_stop_policy_t policy)
-{
-	int keys_enable = 0;
-
-	switch (policy) {
-	case FORCE_START_KEY_ENABLE:
-		keys_enable = 1;
-		/* fallthrough */
-	case FORCE_START_KEY_DISABLE:
-		hpu_spinn_do_startstop(priv, 1);
-		break;
-	case FORCE_STOP_KEY_ENABLE:
-		keys_enable = 1;
-		/* fallthrough */
-	case FORCE_STOP_KEY_DISABLE:
-		hpu_spinn_do_startstop(priv, 0);
-		break;
-	case KEY_ENABLE:
-		keys_enable = 1;
-		break;
-	default:
+	if (start != !!start) {
+		dev_notice(&priv->pdev->dev, "Invalid start value\n");
 		return -EINVAL;
 	}
 
-	if (keys_enable)
-		hpu_spinn_do_set_keys(priv);
-	priv->spinn_keys_enable = keys_enable;
+	if (start) {
+		dev_dbg(&priv->pdev->dev, "Forcing SPINN start\n");
+		hpu_reg_write(priv, priv->spinn_ctrl_reg |
+			      HPU_SPINN_CTRL_REG_START,
+			      HPU_SPINN_CTRL_REG);
+	} else {
+		dev_dbg(&priv->pdev->dev, "Forcing SPINN stop\n");
+		hpu_reg_write(priv, priv->spinn_ctrl_reg |
+			      HPU_SPINN_CTRL_REG_STOP,
+			      HPU_SPINN_CTRL_REG);
+	}
 
 	return 0;
 }
@@ -1281,14 +1252,45 @@ static int hpu_spinn_set_keys(struct hpu_priv *priv, u32 start, u32 stop)
 		return -EINVAL;
 	}
 
-	priv->spinn_start_key = start;
-	priv->spinn_stop_key = stop;
+	hpu_reg_write(priv, start, HPU_SPINN_START_KEY_REG);
+	hpu_reg_write(priv, stop, HPU_SPINN_STOP_KEY_REG);
 
 	dev_dbg(&priv->pdev->dev, "Setting keys START:0x%x STOP:0x%x\n",
-		priv->spinn_start_key, priv->spinn_stop_key);
+		start, stop);
 
-	if (priv->spinn_keys_enable)
-		hpu_spinn_do_set_keys(priv);
+	return 0;
+}
+
+static int hpu_spinn_keys_enable(struct hpu_priv *priv,
+				 int enable_l, int enable_r, int enable_aux)
+{
+	if (enable_l != !!enable_l) {
+		dev_notice(&priv->pdev->dev, "Invalid value for enable_l\n");
+		return -EINVAL;
+	}
+	if (enable_r != !!enable_r) {
+		dev_notice(&priv->pdev->dev, "Invalid value for enable_r\n");
+		return -EINVAL;
+	}
+	if (enable_aux != !!enable_aux) {
+		dev_notice(&priv->pdev->dev, "Invalid value for enable_aux\n");
+		return -EINVAL;
+	}
+
+	priv->spinn_ctrl_reg &= ~(HPU_SPINN_CTRL_REG_AUX_KEYEN |
+				  HPU_SPINN_CTRL_REG_L_KEYEN |
+				  HPU_SPINN_CTRL_REG_R_KEYEN);
+	if (enable_aux)
+		priv->spinn_ctrl_reg |= HPU_SPINN_CTRL_REG_AUX_KEYEN;
+	if (enable_l)
+		priv->spinn_ctrl_reg |= HPU_SPINN_CTRL_REG_L_KEYEN;
+	if (enable_r)
+		priv->spinn_ctrl_reg |= HPU_SPINN_CTRL_REG_R_KEYEN;
+
+	hpu_reg_write(priv, priv->spinn_ctrl_reg, HPU_SPINN_CTRL_REG);
+
+	dev_dbg(&priv->pdev->dev, "Key enabled: l:%d, r:%d, aux:%d\n",
+		enable_l, enable_r, enable_aux);
 
 	return 0;
 }
@@ -1797,11 +1799,10 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	}
 	dma_async_issue_pending(priv->dma_rx_chan);
 
-	priv->spinn_start_key = HPU_DEFAULT_START_KEY;
-	priv->spinn_stop_key = HPU_DEFAULT_STOP_KEY;
-	priv->spinn_keys_enable = 1;
-
-	hpu_spinn_do_set_keys(priv);
+	/* as per IP documentation default */
+	priv->spinn_ctrl_reg = HPU_SPINN_CTRL_REG_TO_DIS;
+	hpu_spinn_set_keys(priv, HPU_DEFAULT_START_KEY, HPU_DEFAULT_STOP_KEY);
+	hpu_spinn_keys_enable(priv, 1, 1, 1);
 
 	priv->rx_aux_ctrl_reg = 0;
 	priv->rx_ctrl_reg = 0;
@@ -2044,11 +2045,11 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 	hpu_rx_interface_ioctl_t rxiface;
 	hpu_tx_interface_ioctl_t txiface;
 	ip_regs_t temp_reg;
-	spinn_start_stop_policy_t spinn_policy;
 	hpu_timestamp_mask_t ts_mask;
 	hpu_tx_timing_mode_t timing_mode;
 	hpu_tx_resync_time_t resync_time;
 	hpu_hw_status_t hw_status;
+	spinn_keys_enable_t keys_enable;
 	unsigned int val = 0;
 	int res = 0;
 	struct hpu_priv *priv = fp->private_data;
@@ -2175,6 +2176,12 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		res = hpu_spinn_set_keys(priv, spinn_keys.start, spinn_keys.stop);
 		break;
 
+	case _IOW(0x0, HPU_IOCTL_SET_SPINN_STARTSTOP, unsigned int *):
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
+			goto cfuser_err;
+		res = hpu_spinn_startstop(priv, val);
+		break;
+
 	case _IOW(0x0, HPU_IOCTL_SET_RX_INTERFACE, hpu_rx_interface_ioctl_t *):
 		if (copy_from_user(&rxiface, arg, sizeof(hpu_rx_interface_ioctl_t)))
 			goto cfuser_err;
@@ -2200,13 +2207,6 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		ret = priv->dma_rx_pool.pn;
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
-		break;
-
-	case _IOW(0x0, HPU_IOCTL_SET_SPINN_STARTSTOP_POLICY, spinn_start_stop_policy_t *):
-		if (copy_from_user(&spinn_policy, arg,
-				   sizeof(spinn_start_stop_policy_t)))
-			goto cfuser_err;
-		res = hpu_spinn_set_startstop_policy(priv, spinn_policy);
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_TS_MASK, hpu_timestamp_mask_t *):
@@ -2258,6 +2258,14 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 			goto cfuser_err;
 		break;
 
+	case _IOW(0x0, HPU_IOCTL_SET_SPINN_KEYS_EN_EX, spinn_keys_enable_t *):
+		if (copy_from_user(&keys_enable, arg,
+				   sizeof(spinn_keys_enable_t)))
+			goto cfuser_err;
+		res = hpu_spinn_keys_enable(priv, keys_enable.enable_l,
+					    keys_enable.enable_r,
+					    keys_enable.enable_aux);
+		break;
 
 	default:
 		res = -EINVAL;
