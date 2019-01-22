@@ -394,6 +394,13 @@ architecture str of HPUCore is
     signal i_uP_TxPaerReqActLevel    : std_logic;
     signal i_uP_TxPaerAckActLevel    : std_logic;
     signal i_uP_TxSaerChanEn         : std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
+    signal i_uP_TxTSMode             : std_logic_vector(1 downto 0);
+    signal i_uP_TxTSTimeoutSel       : std_logic_vector(3 downto 0);
+    signal i_uP_TxTSRetrigCmd        : std_logic;
+    signal i_uP_TxTSRearmCmd         : std_logic;
+    signal i_uP_TxTSRetrigStatus     : std_logic;
+    signal i_uP_TxTSTimeoutCounts    : std_logic;
+    signal i_uP_TxTSMaskSel          : std_logic_vector(1 downto 0);    
     signal i_uP_LRxPaerEn            : std_logic;
     signal i_uP_RRxPaerEn            : std_logic;
     signal i_uP_AUXRxPaerEn          : std_logic;
@@ -429,10 +436,12 @@ architecture str of HPUCore is
     signal i_uP_LRxSpnnlnkStat       : t_RxSpnnlnkStat;
     signal i_uP_RRxSpnnlnkStat       : t_RxSpnnlnkStat;
     signal i_uP_AuxRxSpnnlnkStat     : t_RxSpnnlnkStat;
-    signal i_uP_Spnn_cmd_start_key   : std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-    signal i_uP_Spnn_cmd_stop_key    : std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+    signal i_uP_Spnn_start_key       : std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+    signal i_uP_Spnn_stop_key        : std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
     signal i_uP_Spnn_tx_mask         : std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
     signal i_uP_Spnn_rx_mask         : std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+    signal i_uP_Spnn_ctrl            : std_logic_vector(31 downto 0);  -- SpiNNaker Control Register
+    signal i_uP_Spnn_status          : std_logic_vector(31 downto 0);  -- SpiNNaker Status Register 
     
     signal i_rawInterrupt            : std_logic_vector(15 downto 0);
     signal i_interrupt               : std_logic;
@@ -440,6 +449,13 @@ architecture str of HPUCore is
     signal shreg_aux0                : std_logic_vector (3 downto 0);
     signal shreg_aux1                : std_logic_vector (3 downto 0);
     signal shreg_aux2                : std_logic_vector (3 downto 0);
+    
+-- Signals for TimeMachine
+    signal clear_n                   : std_logic;
+    signal resync_clear_n            : std_logic;  
+    signal init_reset                : std_logic; 
+    signal init_reset_n              : std_logic; 
+    signal timing                    : time_tick;	    
 
     signal i_FifoCoreLastData        : std_logic;
     
@@ -462,6 +478,32 @@ begin
     -- Reset generation --
     ----------------------
     nRst    <= S_AXI_ARESETN and nSyncReset;
+
+
+u_time_machine : time_machine 
+generic map( 
+  SIM_TIME_COMPRESSION_g => FALSE, -- Se "TRUE", la simulazione viene "compressa": i clock enable non seguono le tempistiche reali
+  INIT_DELAY             => 32     -- Ritardo dal rilascio del reset all'impulso di "init"
+  )
+port map(
+  -- Clock in port
+  CLK_100M_i           => S_AXI_ACLK,        -- Ingresso 100 MHz
+  -- Enable ports
+  EN100NS_100_o        => timing.en100ns, 	 -- Clock enable a 100 ns
+  EN1US_100_o          => timing.en1us,	     -- Clock enable a 1 us
+  EN10US_100_o         => timing.en10us,	 -- Clock enable a 10 us
+  EN100US_100_o        => timing.en100us,	 -- Clock enable a 100 us
+  EN1MS_100_o          => timing.en1ms,	     -- Clock enable a 1 ms
+  EN10MS_100_o         => timing.en10ms,	 -- Clock enable a 10 ms
+  EN100MS_100_o        => timing.en100ms,	 -- Clock enable a 100 ms
+  EN1S_100_o           => timing.en1s,	     -- Clock enable a 1 s
+  -- Reset output port 
+  RESYNC_CLEAR_N_o     => resync_clear_n,	 -- Clear resincronizzato
+  INIT_RESET_100_o     => init_reset,	 	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica positiva)
+  INIT_RESET_N_100_o   => init_reset_n,	 	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica negativa)
+  -- Status and control signals
+  CLEAR_N_i            => nRst           -- Clear asincrono che reinizializza le macchine di timing
+  );
 
 
     ------------------------------------------------------
@@ -575,6 +617,14 @@ begin
                                TxPaerReqActLevel_o            => i_uP_TxPaerReqActLevel,       -- out std_logic;
                                TxPaerAckActLevel_o            => i_uP_TxPaerAckActLevel,       -- out std_logic;
                                TxSaerChanEn_o                 => i_uP_TxSaerChanEn,            -- out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
+
+                               TxTSMode_o                     => i_uP_TxTSMode,                -- out std_logic_vector(1 downto 0);
+                               TxTSTimeoutSel_o               => i_uP_TxTSTimeoutSel,          -- out std_logic_vector(3 downto 0);
+                               TxTSRetrigCmd_o                => i_uP_TxTSRetrigCmd,           -- out std_logic;
+                               TxTSRearmCmd_o                 => i_uP_TxTSRearmCmd,            -- out std_logic;
+                               TxTSRetrigStatus_i             => i_uP_TxTSRetrigStatus,        -- in  std_logic;
+                               TxTSTimeoutCounts_i            => i_uP_TxTSTimeoutCounts,       -- in  std_logic;
+                               TxTSMaskSel_o                  => i_uP_TxTSMaskSel,             -- out std_logic_vector(1 downto 0);
                    
                                LRxPaerEn_o                    => i_uP_LRxPaerEn,               -- out std_logic;
                                RRxPaerEn_o                    => i_uP_RRxPaerEn,               -- out std_logic;
@@ -611,13 +661,18 @@ begin
                                LRxSpnnlnkStat_i               => i_uP_LRxSpnnlnkStat,          -- in  t_RxSpnnlnkStat;
                                RRxSpnnlnkStat_i               => i_uP_RRxSpnnlnkStat,          -- in  t_RxSpnnlnkStat;
                                AuxRxSpnnlnkStat_i             => i_uP_AuxRxSpnnlnkStat,        -- in  t_RxSpnnlnkStat;
-                               
-                               Spnn_cmd_start_key_o           => i_uP_Spnn_cmd_start_key,      -- out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-                               Spnn_cmd_stop_key_o            => i_uP_Spnn_cmd_stop_key,       -- out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+                                   
+                               -- Spinnaker                     
+                               -------------------------                               
+                               Spnn_start_key_o               => i_uP_Spnn_start_key,          -- out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+                               Spnn_stop_key_o                => i_uP_Spnn_stop_key,           -- out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
                                Spnn_tx_mask_o                 => i_uP_Spnn_tx_mask,            -- out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
-                               Spnn_rx_mask_o                 => i_uP_Spnn_rx_mask,           -- out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
-
-                   
+                               Spnn_rx_mask_o                 => i_uP_Spnn_rx_mask,            -- out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+                               Spnn_ctrl_o                    => i_uP_Spnn_ctrl,               -- out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+                               Spnn_status_i                  => i_uP_Spnn_status,             -- in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
+                                   
+                               -- DEBUG
+                               -------------------------              
                                DBG_CTRL_reg                   => DBG_CTRG_reg,                 -- out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
                                DBG_ctrl_rd                    => DBG_ctrl_rd,                  -- out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
                    
@@ -759,7 +814,12 @@ begin
             ClkLS_n                 => HSSAER_ClkLS_n,               -- in  std_logic;
             ClkHS_p                 => HSSAER_ClkHS_p,               -- in  std_logic;
             ClkHS_n                 => HSSAER_ClkHS_n,               -- in  std_logic;
-
+            
+            --
+            -- Enable per timing
+            ---------------------
+            Timing_i                => timing,
+            
             --
             -- TX DATA PATH
             ---------------------
@@ -875,6 +935,14 @@ begin
             TxSaerChanEn_i          => i_uP_TxSaerChanEn,            -- in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
             --TxSaerChanCfg_i         => ,                             -- in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
 
+            TxTSMode_i              => i_uP_TxTSMode,                -- in  std_logic_vector(1 downto 0);
+            TxTSTimeoutSel_i        => i_uP_TxTSTimeoutSel,          -- in  std_logic_vector(3 downto 0);
+            TxTSRetrigCmd_i         => i_uP_TxTSRetrigCmd,           -- in  std_logic;
+            TxTSRearmCmd_i          => i_uP_TxTSRearmCmd,            -- in  std_logic;
+            TxTSRetrigStatus_o      => i_uP_TxTSRetrigStatus,        -- out std_logic;
+            TxTSTimeoutCounts_o     => i_uP_TxTSTimeoutCounts,       -- out std_logic;
+            TxTSMaskSel_i           => i_uP_TxTSMaskSel,             -- in  std_logic_vector(1 downto 0);
+
             LRxPaerEn_i             => i_uP_LRxPaerEn,               -- in  std_logic;
             RRxPaerEn_i             => i_uP_RRxPaerEn,               -- in  std_logic;
             AuxRxPaerEn_i           => i_uP_AuxRxPaerEn,             -- in  std_logic;
@@ -915,11 +983,13 @@ begin
             RRxSpnnlnkStat_o        => i_uP_RRxSpnnlnkStat,          -- out t_RxSpnnlnkStat;
             AuxRxSpnnlnkStat_o      => i_uP_AuxRxSpnnlnkStat,        -- out t_RxSpnnlnkStat;
         
-            Spnn_cmd_start_key_i    => i_uP_Spnn_cmd_start_key,      -- in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-            Spnn_cmd_stop_key_i     => i_uP_Spnn_cmd_stop_key,       -- in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+            Spnn_start_key_i        => i_uP_Spnn_start_key,          -- in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+            Spnn_stop_key_i         => i_uP_Spnn_stop_key,           -- in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
             Spnn_tx_mask_i          => i_uP_Spnn_tx_mask,            -- in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
             Spnn_rx_mask_i          => i_uP_Spnn_rx_mask,            -- in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
-                        
+            Spnn_ctrl_i             => i_uP_Spnn_ctrl,               -- in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+            Spnn_status_o           => i_uP_Spnn_status,             -- out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register           
+                           
             --
             -- LED drivers
             ---------------------

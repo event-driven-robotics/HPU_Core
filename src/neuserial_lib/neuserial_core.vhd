@@ -16,6 +16,7 @@ library ieee;
 
 library HPU_lib;
     use HPU_lib.aer_pkg.all;
+    use HPU_lib.HPUComponents_pkg.all;
 
 library neuserial_lib;
     use neuserial_lib.NSComponents_pkg.all;
@@ -59,10 +60,14 @@ entity neuserial_core is
         ClkLS_n           : in  std_logic;
         ClkHS_p           : in  std_logic;
         ClkHS_n           : in  std_logic;
-
+            
+        --
+        -- Enable per timing
+        ---------------------
+        timing_i          : in  time_tick;
+        
         --
         -- TX DATA PATH
-        ---------------------
         -- Parallel AER
         Tx_PAER_Addr_o    : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
         Tx_PAER_Req_o     : out std_logic;
@@ -175,6 +180,16 @@ entity neuserial_core is
         TxSaerChanEn_i          : in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
         --TxSaerChanCfg_i         : in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
 
+        -- TX Timestamp
+        TxTSMode_i                     : in  std_logic_vector(1 downto 0);
+        TxTSTimeoutSel_i               : in  std_logic_vector(3 downto 0);
+        TxTSRetrigCmd_i                : in  std_logic;
+        TxTSRearmCmd_i                 : in  std_logic;
+        TxTSRetrigStatus_o             : out std_logic;
+        TxTSTimeoutCounts_o            : out std_logic;
+        TxTSMaskSel_i                  : in  std_logic_vector(1 downto 0);
+        
+        --
         LRxPaerEn_i             : in  std_logic;
         RRxPaerEn_i             : in  std_logic;
         AuxRxPaerEn_i           : in  std_logic;
@@ -208,17 +223,22 @@ entity neuserial_core is
 		AuxRxPaerFifoFull_o     : out std_logic;
         LRxSaerStat_o           : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
         RRxSaerStat_o           : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-        AuxRxSaerStat_o         : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+        AUXRxSaerStat_o         : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
         
+        --
+        -- SPiNNaker
+        ---------------------        
         TxSpnnlnkStat_o         : out t_TxSpnnlnkStat;
         LRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
         RRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
         AuxRxSpnnlnkStat_o      : out t_RxSpnnlnkStat;
-        
-        Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-        Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+    
+        Spnn_start_key_i        : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command key
+        Spnn_stop_key_i         : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command key
         Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
         Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+        Spnn_ctrl_i             : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+        Spnn_status_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
         
         --
         -- LED drivers
@@ -405,12 +425,10 @@ architecture str of neuserial_core is
     signal  i_AuxRx_ack_to_spinnaker         : std_logic;
     signal  i_Tx_data_2of7_to_spinnaker   : std_logic_vector(6 downto 0);
     signal  i_TX_ack_from_spinnaker       : std_logic;
-    
-    signal  i_Spnn_cmd_start              : std_logic;   -- SpiNNaker "START to send data" command 
-    signal  i_Spnn_cmd_stop               : std_logic;   -- SpiNNaker "STOP to send data" command  
-    signal  i_Spnn_tx_mask                : std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
-    signal  i_Spnn_rx_mask                : std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
-
+    signal  i_Spnn_offload_on             : std_logic;
+    signal  i_Spnn_offload_off            : std_logic;
+    signal  i_Spnn_cmd_start              : std_logic;
+    signal  i_Spnn_cmd_stop               : std_logic;
 
 --    for all : neuserial_loopback     use entity neuserial_lib.neuserial_loopback(beh);
 --    for all : hpu_tx_datapath        use entity datapath_lib.hpu_tx_datapath(str);
@@ -538,6 +556,9 @@ begin
     ---------------------
     -- TX path
     ---------------------
+    
+    i_Spnn_offload_on  <= i_Spnn_cmd_stop or  Spnn_ctrl_i(2);
+    i_Spnn_offload_off <= i_Spnn_cmd_start or Spnn_ctrl_i(1);
 
     u_tx_datapath : hpu_tx_datapath
         generic map (
@@ -590,19 +611,22 @@ begin
             HSSaerChanEn_i       => TxSaerChanEn_i,              -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
             --HSSAERChanCfg_i      => TxHSSaerChanCfg_i,           -- in  t_hssaerCfg_array(C_HSSAER_N_CHAN-1 downto 0);
             -- GTP
-
+            --
+            -- SpiNNaker
+            -----------------------------
+            Spnn_offload_on_i       => i_Spnn_offload_on,          -- in  std_logic;
+            Spnn_offload_off_i      => i_Spnn_offload_off,         -- in  std_logic;            
+            Spnn_tx_mask_i          => Spnn_tx_mask_i,             -- in  std_logic_vector(31 downto 0);
+            Spnn_Offload_o          => Spnn_status_o(1),           -- out std_logic;
+            Spnn_Link_Timeout_o     => Spnn_status_o(0),           -- out std_logic;
+            Spnn_Link_Timeout_dis_i => Spnn_ctrl_i(0),             -- in  std_logic;       
+                  
             -----------------------------
             -- Sequencer interface
             -----------------------------
             FromSeqDataIn_i      => i_txSeqData,                 -- in  std_logic_vector(C_INPUT_DSIZE-1 downto 0);
             FromSeqSrcRdy_i      => i_txSeqSrcRdy,               -- in  std_logic;
             FromSeqDstRdy_o      => i_txSeqDstRdy,               -- out std_logic;
-
-            -- SpiNNlink controls
-            -----------------------------
-            Spnn_Dump_on_i      => i_Spnn_cmd_stop,              -- in  std_logic;
-            Spnn_Dump_off_i     => i_Spnn_cmd_start,             -- in  std_logic;            
-            Spnn_tx_mask_i      => Spnn_tx_mask_i,               -- in  std_logic_vector(31 downto 0);
         
             -----------------------------
             -- Destination interfaces
@@ -691,15 +715,16 @@ begin
             HSSaerChanEn_i       => LRxSaerChanEn_i,             -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
             -- GTP
             RxGtpHighbits_i      => c_LRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-
             -- SpiNNlink controls
-            -----------------------------
-            Spnn_cmd_start_key_i => Spnn_cmd_start_key_i,        -- in  std_logic_vector(31 downto 0);
-            Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0);
+            Spnn_start_key_i     => Spnn_start_key_i,            -- in  std_logic_vector(31 downto 0);
+            Spnn_stop_key_i      => Spnn_stop_key_i,             -- in  std_logic_vector(31 downto 0);
             Spnn_cmd_start_o     => open,                        -- out std_logic;
             Spnn_cmd_stop_o      => open,                        -- out std_logic;
             Spnn_rx_mask_i       => Spnn_rx_mask_i,              -- in  std_logic_vector(31 downto 0);
-            
+            Spnn_keys_enable_i   => Spnn_ctrl_i(24),             -- in  std_logic;
+            Spnn_parity_err_o    => Spnn_status_o(25),           -- out std_logic;
+            Spnn_rx_err_o        => Spnn_status_o(24),           -- out std_logic;
+                        
             -----------------------------
             -- Source interfaces
             -----------------------------
@@ -811,12 +836,15 @@ begin
 
             -- SpiNNlink controls
             -----------------------------
-            Spnn_cmd_start_key_i => Spnn_cmd_start_key_i,        -- in  std_logic_vector(31 downto 0);
-            Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0);
+            Spnn_start_key_i     => Spnn_start_key_i,            -- in  std_logic_vector(31 downto 0);
+            Spnn_stop_key_i      => Spnn_stop_key_i,             -- in  std_logic_vector(31 downto 0);
             Spnn_cmd_start_o     => open,                        -- out std_logic;
             Spnn_cmd_stop_o      => open,                        -- out std_logic;
             Spnn_rx_mask_i       => Spnn_rx_mask_i,              -- in  std_logic_vector(31 downto 0);
-            
+            Spnn_keys_enable_i   => Spnn_ctrl_i(16),             -- in  std_logic;
+            Spnn_parity_err_o    => Spnn_status_o(17),           -- out std_logic;
+            Spnn_rx_err_o        => Spnn_status_o(16),           -- out std_logic;
+                                   
             -----------------------------
             -- Source interfaces
             -----------------------------
@@ -927,12 +955,15 @@ begin
 
             -- SpiNNlink controls
             -----------------------------
-            Spnn_cmd_start_key_i => Spnn_cmd_start_key_i,        -- in  std_logic_vector(31 downto 0); -- SpiNNaker "START to send data" command 
-            Spnn_cmd_stop_key_i  => Spnn_cmd_stop_key_i,         -- in  std_logic_vector(31 downto 0); -- SpiNNaker "STOP to send data" command  
+            Spnn_start_key_i     => Spnn_start_key_i,            -- in  std_logic_vector(31 downto 0); -- SpiNNaker "START to send data" command 
+            Spnn_stop_key_i      => Spnn_stop_key_i,             -- in  std_logic_vector(31 downto 0); -- SpiNNaker "STOP to send data" command  
             Spnn_cmd_start_o     => i_Spnn_cmd_start,            -- out std_logic;
             Spnn_cmd_stop_o      => i_Spnn_cmd_stop,             -- out std_logic;
             Spnn_rx_mask_i       => Spnn_rx_mask_i,              -- in  std_logic_vector(31 downto 0);
-
+            Spnn_keys_enable_i   => Spnn_ctrl_i(8),              -- in  std_logic;
+            Spnn_parity_err_o    => Spnn_status_o(9),            -- out std_logic;
+            Spnn_rx_err_o        => Spnn_status_o(8),            -- out std_logic;
+            
             -----------------------------
             -- Source interfaces
             -----------------------------
@@ -1048,6 +1079,8 @@ begin
             --ChipType_xSI            => ChipType,                 -- in  std_logic;
             DmaLength_xDI           => DmaLength_i,              -- in  std_logic_vector(15 downto 0);
             --
+            Timing_xSI              => timing_i,                 -- in  time_tick;
+            --
             MonInAddr_xDI           => i_monData,                -- in  std_logic_vector(31 downto 0);
             MonInSrcRdy_xSI         => i_monSrcRdy,              -- in  std_logic;
             MonInDstRdy_xSO         => i_monDstRdy,              -- out std_logic;
@@ -1062,6 +1095,14 @@ begin
             --
             EnableMonitor_xSI       => '1',                      -- in  std_logic;
             CoreReady_xSI           => '1',                      -- in  std_logic;
+            --
+            TxTSMode_xDI            => TxTSMode_i,               -- in  std_logic_vector(1 downto 0);
+            TxTSTimeoutSel_xDI      => TxTSTimeoutSel_i,         -- in  std_logic_vector(3 downto 0);
+            TxTSRetrigCmd_xSI       => TxTSRetrigCmd_i,          -- in  std_logic;
+            TxTSRearmCmd_xSI        => TxTSRearmCmd_i,           -- in  std_logic;
+            TxTSRetrigStatus_xSO    => TxTSRetrigStatus_o,       -- out std_logic;
+            TxTSTimeoutCounts_xSO   => TxTSTimeoutCounts_o,      -- out std_logic;
+            TxTSMaskSel_xSI         => TxTSMaskSel_i,            -- in  std_logic_vector(1 downto 0);
             --
             FifoCoreDat_xDO         => FifoCoreDat_o,            -- out std_logic_vector(31 downto 0);
             FifoCoreRead_xSI        => FifoCoreRead_i,           -- in  std_logic;

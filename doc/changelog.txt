@@ -1,4 +1,9 @@
 ********************************************
+Version 3.4 Rev 3:  16th, November 2018
+- Absolute Timing Feature for Transmission 
+  (M. Casti - IIT)
+
+****************************************************************************************
 Version 3.3 Rev 3:  30th, October 2018
 - DMA register (DMA_REG) has bit 0 fixed to 0.
   It can be written only with even values.

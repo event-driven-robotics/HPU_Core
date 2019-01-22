@@ -156,9 +156,10 @@ begin
         when "STOPKEY " => address:=x"00000084"; regnum:=33;
         when "SPNTXMSK" => address:=x"00000088"; regnum:=34;
         when "SPNRXMSK" => address:=x"0000008C"; regnum:=35;
-        
-        when "TLASTTO " => address:=x"000000A0"; regnum:=36;
-        when "TLASCNT " => address:=x"000000A4"; regnum:=37;
+        when "SPNCTRL " => address:=x"00000090"; regnum:=36;
+        when "SPNSTAT " => address:=x"00000094"; regnum:=37;
+        when "TLASTTO " => address:=x"000000A0"; regnum:=38;
+        when "TLASCNT " => address:=x"000000A4"; regnum:=39;
 
         when others =>   assert (FALSE) report "In accesing REGISTER" severity ERROR;
     end case;

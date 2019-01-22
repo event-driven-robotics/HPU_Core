@@ -121,6 +121,16 @@ TxPaerReqActLevel_o            : out std_logic;
 TxPaerAckActLevel_o            : out std_logic;
 TxSaerChanEn_o                 : out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
 
+-- TX Timestamp
+TxTSMode_o                     : out std_logic_vector(1 downto 0);
+TxTSTimeoutSel_o               : out std_logic_vector(3 downto 0);
+TxTSRetrigCmd_o                : out std_logic;
+TxTSRearmCmd_o                 : out std_logic;
+TxTSRetrigStatus_i             : in  std_logic;
+TxTSTimeoutCounts_i            : in  std_logic;
+TxTSMaskSel_o                  : out std_logic_vector(1 downto 0);
+
+--
 LRxPaerEn_o                    : out std_logic;
 RRxPaerEn_o                    : out std_logic;
 AUXRxPaerEn_o                  : out std_logic;
@@ -155,12 +165,18 @@ TxSpnnlnkStat_i                : in  t_TxSpnnlnkStat;
 LRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
 RRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
 AuxRxSpnnlnkStat_i             : in  t_RxSpnnlnkStat;
-
-Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+                               
+-- Spinnaker                     
+-------------------------
+Spnn_start_key_o               : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+Spnn_stop_key_o                : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
 Spnn_tx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
 Spnn_rx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+Spnn_ctrl_o                    : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+Spnn_status_i                  : in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
 
+-- DEBUG
+-------------------------
 DBG_CTRL_reg                   : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 DBG_ctrl_rd                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 
@@ -207,9 +223,9 @@ end entity neuserial_axilite;
 
 architecture rtl of neuserial_axilite is
 
-    constant cVer   : string(3 downto 1) := "B05";
+    constant cVer   : string(3 downto 1) := "HPU";
     constant cMAJOR : std_logic_vector(3 downto 0) :="0011";
-    constant cMINOR : std_logic_vector(3 downto 0) :="0011";
+    constant cMINOR : std_logic_vector(3 downto 0) :="0100";
 
     constant c_zero_vect : std_logic_vector(31 downto 0) := (others => '0');
 
@@ -293,7 +309,8 @@ architecture rtl of neuserial_axilite is
     signal  i_SPNN_STOP_KEY_reg   : std_logic_vector (31 downto 0);    
     signal  i_SPNN_TX_MASK_reg    : std_logic_vector (31 downto 0);
     signal  i_SPNN_RX_MASK_reg    : std_logic_vector (31 downto 0);
-
+    signal  i_SPNN_CTRL_reg       : std_logic_vector (31 downto 0);
+    
     signal  i_CTRL_rd             : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_LPBK_CNFG_rd        : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_RXData_rd           : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
@@ -328,6 +345,8 @@ architecture rtl of neuserial_axilite is
     signal  i_SPNN_STOP_KEY_rd    : std_logic_vector (31 downto 0);
     signal  i_SPNN_TX_MASK_rd     : std_logic_vector (31 downto 0);
     signal  i_SPNN_RX_MASK_rd     : std_logic_vector (31 downto 0);
+    signal  i_SPNN_CTRL_rd        : std_logic_vector (31 downto 0);
+    signal  i_SPNN_STATUS_rd      : std_logic_vector (31 downto 0);
     signal  i_TlastCnt_rd         : std_logic_vector (31 downto 0);
     signal  i_TDataCnt_rd         : std_logic_vector (31 downto 0);
     signal  i_TlastTO_rd          : std_logic_vector (31 downto 0);
@@ -420,8 +439,14 @@ architecture rtl of neuserial_axilite is
     signal  i_TxPaerEn      : std_logic;
     signal  i_TxHSSaerEn    : std_logic;
     
+    signal  i_TxTSMode         : std_logic_vector(1 downto 0);
+    signal  i_TxTSTimeoutSel   : std_logic_vector(3 downto 0);
+    signal  i_TxTSRetrigCmd    : std_logic;
+    signal  i_TxTSRearmCmd     : std_logic;
+    signal  i_TxTSRetrigStatus : std_logic;
+    signal  i_TxTSMaskSel      : std_logic_vector(1 downto 0);   
+    
     signal  i_TxDestSwitch  : std_logic_vector(2 downto 0);
-
 
     signal  i_TxPaerAckActLevel    : std_logic;
     signal  i_TxPaerReqActLevel    : std_logic;
@@ -458,10 +483,11 @@ begin
 
     RxFifoThresholdNumData_o <= i_FIFOTHRESH_reg(10 downto 0);
     
-    Spnn_cmd_start_key_o <= i_SPNN_START_KEY_reg;
-    Spnn_cmd_stop_key_o  <= i_SPNN_STOP_KEY_reg;
+    Spnn_start_key_o     <= i_SPNN_START_KEY_reg;
+    Spnn_stop_key_o      <= i_SPNN_STOP_KEY_reg;
     Spnn_tx_mask_o       <= i_SPNN_TX_MASK_reg;
     Spnn_rx_mask_o       <= i_SPNN_RX_MASK_reg;
+    Spnn_ctrl_o          <= i_SPNN_CTRL_reg;
 
     p_hssaer_rx_err : process (LRxSaerStat_i, RRxSaerStat_i)
     begin
@@ -648,6 +674,7 @@ begin
                 i_SPNN_STOP_KEY_reg  <= x"40000000";
                 i_SPNN_TX_MASK_reg   <= x"00FFFFFF";
                 i_SPNN_RX_MASK_reg   <= x"00FFFFFF";
+                i_SPNN_CTRL_reg      <= x"00000000";
 
                 WriteTxBuffer_o <= '0';
                 i_cleanTimer  <= '0';
@@ -672,10 +699,15 @@ begin
                 i_CTRL_reg( 7) <= '0';   -- AuxRxPaerFlushFifos_o   (WO: monostable)
                 i_CTRL_reg( 8) <= '0';   -- FlushTXFifos_o          (WO: monostable)
                 i_CTRL_reg(12) <= '0';   -- ResetStream_o           (WO: monostable)
-                
+				
+                i_TX_CTRL_reg(14) <= '0'; -- TxTSRetrigCmd_o        (Cleared after Write)
+				i_TX_CTRL_reg(15) <= '0'; -- TxTSRearmCmd_o         (Cleared after Write)
+				i_SPNN_CTRL_reg(1) <= '0'; -- Force START Command   (Cleared after Write)
+				i_SPNN_CTRL_reg(2) <= '0'; -- Force STOP Command    (Cleared after Write)
+				
                 -- TlastTO register
                 i_TlastTowritten <= '0';
-                
+
                 -- IRQ Register
                 -- Update the value of the IRQ
                 v_IRQ_reg := i_IRQ_reg;
@@ -917,7 +949,18 @@ begin
                                   i_SPNN_RX_MASK_reg(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
                                end if;
                            end loop;  
-
+                           
+                       -- i_SPNN_CTRL_reg
+                       when 36 =>
+                           for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
+                               if (S_AXI_WSTRB(byte_index) = '1') then
+                                  i_SPNN_CTRL_reg(byte_index*8+7 downto byte_index*8) <= S_AXI_WDATA(byte_index*8+7 downto byte_index*8);
+                               end if;
+                           end loop;  
+                           
+                       -- i_SPNN_STATUS_reg Read Only register
+                       -- when 37 =>
+                                                      
                        -- i_TlastTO_reg
                        when 40 =>
                            for byte_index in 0 to (C_SLV_DWIDTH/8)-1 loop
@@ -1049,6 +1092,7 @@ begin
                           i_HSSAER_AUX_RX_ERR_rd, i_HSSAER_AUX_RX_MSK_rd,
                           i_readRxErrCnt, i_HSSAER_AUX_RX_ERR_THR_rd, i_HSSAER_AUX_RX_ERR_CNT_rd,
                           i_SPNN_START_KEY_rd, i_SPNN_STOP_KEY_rd, i_SPNN_TX_MASK_rd, i_SPNN_RX_MASK_rd,
+                          i_SPNN_CTRL_rd, i_SPNN_STATUS_rd,
                           i_TlastCnt_rd, i_TDataCnt_rd, i_TlastTO_rd)
     begin
         if (S_AXI_ARESETN = '0') then
@@ -1109,8 +1153,11 @@ begin
                 when 32 => regDataOut  <= i_SPNN_START_KEY_rd;
                 when 33 => regDataOut  <= i_SPNN_STOP_KEY_rd;
                 when 34 => regDataOut  <= i_SPNN_TX_MASK_rd;
-                when 35 => regDataOut  <= i_SPNN_RX_MASK_rd;
-                
+                when 35 => regDataOut  <= i_SPNN_RX_MASK_rd;                
+                when 36 => regDataOut  <= i_SPNN_CTRL_rd;
+                when 37 => regDataOut  <= i_SPNN_STATUS_rd;
+           --   when 38 => Available     
+           --   when 39 => Available   
                 when 40 => regDataOut  <= i_TlastTO_rd;
                 when 41 => regDataOut  <= i_TlastCnt_rd;
                 when 42 => regDataOut  <= i_TDataCnt_rd;
@@ -1172,14 +1219,18 @@ begin
     i_LocNearLoopback      <= i_CTRL_reg(25);
     i_RemoteLoopback       <= i_CTRL_reg(24);
     i_LocFarSpnnLnkLoopbackSel <= i_CTRL_reg(23 downto 22) when C_RX_HAS_SPNNLNK and C_TX_HAS_SPNNLNK else "00";
-    
-
+ --                        <= i_CTRL_reg(21);                               -- Available        
+ --                        <= i_CTRL_reg(20);                               -- Available     
+ --                        <= i_CTRL_reg(19);                               -- Available     
+ --                        <= i_CTRL_reg(18);                               -- Available     
+ --                        <= i_CTRL_reg(17);                               -- Available     
  -- i_ChipType             <= i_CTRL_reg(16);                               -- Reserved for back compatibility with neuelab
     i_fulltimestamp        <= i_CTRL_reg(15);
+ --                        <= i_CTRL_reg(14);                               -- Available     
+ --                        <= i_CTRL_reg(13);                               -- Available     
     i_ResetStream          <= i_CTRL_reg(12);
  -- i_TxEnable             <= i_CTRL_reg(11) when C_TX_HAS_PAER else '0';   -- Reserved for future use
  -- i_RRxEnable            <= i_CTRL_reg(10) when C_RX_HAS_PAER else '0';   -- Reserved for future use
-
     i_LatTlast             <= i_CTRL_reg(9);
     i_FlushTXFifos         <= i_CTRL_reg(8);
     i_AuxRxPaerFlushFifos  <= i_CTRL_reg(7)  when C_RX_HAS_PAER else '0';
@@ -1576,23 +1627,32 @@ begin
     -- ------------------------------------------------------------------------
     -- Tx Datapath Control register
     -- ------------------------------------------------------------------------
-    -- TX_CTRL_reg - R/W
+    i_TxTSMaskSel     <= i_TX_CTRL_reg(21 downto 20);
+    i_TxTSTimeoutSel  <= i_TX_CTRL_reg(19 downto 16);
+    i_TxTSRearmCmd    <= i_TX_CTRL_reg(15); -- **** NOTE: Cleared after Write
+    i_TxTSRetrigCmd   <= i_TX_CTRL_reg(14); -- **** NOTE: Cleared after Write
+    i_TxTSMode        <= i_TX_CTRL_reg(13 downto 12);
+    i_TxSaerChanEn    <= i_TX_CTRL_reg(11 downto  8)   when C_TX_HAS_HSSAER  else (others => '0');
+--                    <= i_TX_CTRL_reg(7);               -- Available   
+    i_TxDestSwitch    <= i_TX_CTRL_reg(6 downto 4)     when (C_TX_HAS_HSSAER or C_TX_HAS_SPNNLNK or C_TX_HAS_GTP or C_TX_HAS_PAER) else "000";
+    i_TxSpnnLnkEn     <= i_TX_CTRL_reg(3)              when C_TX_HAS_SPNNLNK else '0';
+    i_TxGtpEn         <= i_TX_CTRL_reg(2)              when C_TX_HAS_GTP     else '0';
+    i_TxPaerEn        <= i_TX_CTRL_reg(1)              when C_TX_HAS_PAER    else '0';
+    i_TxHSSaerEn      <= i_TX_CTRL_reg(0)              when C_TX_HAS_HSSAER  else '0';
 
-    i_TxSaerChanEn  <= i_TX_CTRL_reg(11 downto  8)   when C_TX_HAS_HSSAER  else (others => '0');
-    i_TxDestSwitch  <= i_TX_CTRL_reg(6 downto 4)     when (C_TX_HAS_HSSAER or C_TX_HAS_SPNNLNK or C_TX_HAS_GTP or C_TX_HAS_PAER) else "000";
-    i_TxSpnnLnkEn   <= i_TX_CTRL_reg(3)              when C_TX_HAS_SPNNLNK else '0';
-    i_TxGtpEn       <= i_TX_CTRL_reg(2)              when C_TX_HAS_GTP     else '0';
-    i_TxPaerEn      <= i_TX_CTRL_reg(1)              when C_TX_HAS_PAER    else '0';
-    i_TxHSSaerEn    <= i_TX_CTRL_reg(0)              when C_TX_HAS_HSSAER  else '0';
-
-    i_TX_CTRL_rd <= c_zero_vect(31 downto 12) &
-                    i_TxSaerChanEn            &
-                    c_zero_vect(7)            &
-                    i_TxDestSwitch            &
-                    i_TxSpnnLnkEn             &
-                    i_TxGtpEn                 &
-                    i_TxPaerEn                &
-                    i_TxHSSaerEn              ;
+    i_TX_CTRL_rd <= c_zero_vect(31 downto 22)    &
+                    i_TxTSMaskSel(1 downto 0)    &
+                    i_TxTSTimeoutSel(3 downto 0) &
+                    TxTSTimeoutCounts_i          &
+                    TxTSRetrigStatus_i           &   -- From input
+                    i_TxTSMode                   &
+                    i_TxSaerChanEn               &
+                    c_zero_vect(7)               &
+                    i_TxDestSwitch               &
+                    i_TxSpnnLnkEn                &
+                    i_TxGtpEn                    &
+                    i_TxPaerEn                   &
+                    i_TxHSSaerEn                 ;
 
     TxSaerChanEn_o <= i_TxSaerChanEn(C_TX_HSSAER_N_CHAN-1 downto 0);
     TxDestSwitch_o <= i_TxDestSwitch;
@@ -1600,8 +1660,13 @@ begin
     TxGtpEn_o      <= i_TxGtpEn;
     TxPaerEn_o     <= i_TxPaerEn;
     TxHSSaerEn_o   <= i_TxHSSaerEn;
-
-
+    
+     
+    TxTSTimeoutSel_o <= i_TxTSTimeoutSel;   
+    TxTSRetrigCmd_o  <= i_TxTSRetrigCmd; 
+    TxTSRearmCmd_o   <= i_TxTSRearmCmd;  
+    TxTSMode_o       <= i_TxTSMode;  
+    TxTSMaskSel_o    <= i_TxTSMaskSel;
     -- ------------------------------------------------------------------------
     -- Tx Datapath Configuration register
     -- ------------------------------------------------------------------------
@@ -1841,6 +1906,20 @@ begin
     -- i_SPNN_RX_MASK_rd r/w
 
     i_SPNN_RX_MASK_rd <= i_SPNN_RX_MASK_reg;
+
+    -- ------------------------------------------------------------------------
+    -- SpiNNaker Control Register
+    -- ------------------------------------------------------------------------
+    -- i_SPNN_CTRL_rd r/w
+
+    i_SPNN_CTRL_rd <= i_SPNN_CTRL_reg;
+
+    -- ------------------------------------------------------------------------
+    -- SpiNNaker Status Register
+    -- ------------------------------------------------------------------------
+    -- i_SPNN_STATUS_rd r/w
+
+    i_SPNN_STATUS_rd <= SPNN_STATUS_i;
 
     -- ------------------------------------------------------------------------
     -- Tlast TimeOut register

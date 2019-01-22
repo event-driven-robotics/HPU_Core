@@ -20,6 +20,7 @@ library ieee;
     use ieee.std_logic_1164.all;
 
 library HPU_lib;
+    use HPU_lib.HPUComponents_pkg.all;
     use HPU_lib.aer_pkg.all;
     use HPU_lib.aer_pkg.C_INTERNAL_DSIZE;
 
@@ -79,14 +80,15 @@ package NSComponents_pkg is
             HSSaerChanEn_i          : in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
             -- GTP
             RxGtpHighBits_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    
-            -- SpiNNlink controls
-            -----------------------------
-            Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0);
-            Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);
+            -- SpiNNaker
+            Spnn_start_key_i        : in  std_logic_vector(31 downto 0);
+            Spnn_stop_key_i         : in  std_logic_vector(31 downto 0);
             Spnn_cmd_start_o        : out std_logic;
             Spnn_cmd_stop_o         : out std_logic;
             Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask
+            Spnn_keys_enable_i      : in  std_logic;
+            Spnn_parity_err_o       : out std_logic;
+            Spnn_rx_err_o           : out std_logic;
                     
             -----------------------------
             -- Source Interfaces
@@ -189,20 +191,22 @@ package NSComponents_pkg is
         HSSaerChanEn_i          : in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
         --HSSaerChanCfg_i         : in  t_hssaerCfg_array(C_HSSAER_N_CHAN-1 downto 0);
         -- GTP
-
+        --
+        -- SpiNNaker
+        Spnn_offload_on_i       : in  std_logic;
+        Spnn_offload_off_i      : in  std_logic;
+        Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+        Spnn_Offload_o          : out std_logic;
+        Spnn_Link_Timeout_o     : out std_logic;
+        Spnn_Link_Timeout_dis_i : in  std_logic;
+                    
         -----------------------------
         -- Sequencer Interface
         -----------------------------
         FromSeqDataIn_i         : in  std_logic_vector(C_INPUT_DSIZE-1 downto 0);
         FromSeqSrcRdy_i         : in  std_logic;
         FromSeqDstRdy_o         : out std_logic;
-    
-        -- SpiNNlink controls
-        -----------------------------
-        Spnn_Dump_on_i          : in  std_logic;
-        Spnn_Dump_off_i         : in  std_logic;
-        Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
-            
+          
         -----------------------------
         -- Destination interfaces
         -----------------------------
@@ -232,90 +236,103 @@ package NSComponents_pkg is
 
 
     component CoreMonSeqRR is
-        generic (
-            C_PAER_DSIZE                         : integer;
-            TestEnableSequencerNoWait            : boolean;
-            TestEnableSequencerToMonitorLoopback : boolean;
-            EnableMonitorControlsSequencerToo    : boolean
-        );
-        port (
-            ---------------------------------------------------------------------------
-            -- clock and reset
-            Reset_xRBI          : in  std_logic;
-            CoreClk_xCI         : in  std_logic;
-            FlushRXFifos_xSI    : in  std_logic;
-            FlushTXFifos_xSI    : in  std_logic;
-            --ChipType_xSI        : in  std_logic;
-            DmaLength_xDI       : in  std_logic_vector(15 downto 0);
-            --
-            ---------------------------------------------------------------------------
-            -- Input to Monitor
-            MonInAddr_xDI       : in  std_logic_vector(31 downto 0);
-            MonInSrcRdy_xSI     : in  std_logic;
-            MonInDstRdy_xSO     : out std_logic;
-            --
-            -- Output from Sequencer
-            SeqOutAddr_xDO      : out std_logic_vector(31 downto 0);
-            SeqOutSrcRdy_xSO    : out std_logic;
-            SeqOutDstRdy_xSI    : in  std_logic;
-            --
-            ---------------------------------------------------------------------------
-            -- Time stamper
-            CleanTimer_xSI      : in  std_logic;
-            WrapDetected_xSO    : out std_logic;
-            FullTimestamp_i     : in  std_logic;  
-            ---------------------------------------------------------------------------
-            --
-            EnableMonitor_xSI   : in  std_logic;
-            CoreReady_xSI       : in  std_logic;
-            --
-            -- FIFO -> Core
-            FifoCoreDat_xDO         : out std_logic_vector(31 downto 0);
-            FifoCoreRead_xSI        : in  std_logic;
-            FifoCoreEmpty_xSO       : out std_logic;
-            FifoCoreAlmostEmpty_xSO : out std_logic;
-            FifoCoreBurstReady_xSO  : out std_logic;
-            FifoCoreFull_xSO        : out std_logic;
-            FifoCoreNumData_o       : out std_logic_vector(10 downto 0);
-            
-            --
-            -- Core -> FIFO
-            CoreFifoDat_xDI         : in  std_logic_vector(31 downto 0);
-            CoreFifoWrite_xSI       : in  std_logic;
-            CoreFifoFull_xSO        : out std_logic;
-            CoreFifoAlmostFull_xSO  : out std_logic;
-            CoreFifoEmpty_xSO       : out std_logic;
+    generic (
+        C_PAER_DSIZE                         : integer;
+        TestEnableSequencerNoWait            : boolean;
+        TestEnableSequencerToMonitorLoopback : boolean;
+        EnableMonitorControlsSequencerToo    : boolean
+    );
+    port (
+        ---------------------------------------------------------------------------
+        -- clock and reset
+        Reset_xRBI          : in  std_logic;
+        CoreClk_xCI         : in  std_logic;
+        FlushRXFifos_xSI    : in  std_logic;
+        FlushTXFifos_xSI    : in  std_logic;
+        --ChipType_xSI        : in  std_logic;
+        DmaLength_xDI       : in  std_logic_vector(15 downto 0);
+        --
+        ---------------------------------------------------------------------------
+        -- Enable per timing
+        Timing_xSI          : in  time_tick;
+        --
+        ---------------------------------------------------------------------------
+        -- Input to Monitor
+        MonInAddr_xDI           : in  std_logic_vector(31 downto 0);
+        MonInSrcRdy_xSI         : in  std_logic;
+        MonInDstRdy_xSO         : out std_logic;
+        --
+        -- Output from Sequencer
+        SeqOutAddr_xDO          : out std_logic_vector(31 downto 0);
+        SeqOutSrcRdy_xSO        : out std_logic;
+        SeqOutDstRdy_xSI        : in  std_logic;
+        --
+        ---------------------------------------------------------------------------
+        -- Time stamper
+        CleanTimer_xSI          : in  std_logic;
+        WrapDetected_xSO        : out std_logic;
+        FullTimestamp_i         : in  std_logic;  
+        --
+        EnableMonitor_xSI       : in  std_logic;
+        CoreReady_xSI           : in  std_logic;
+        ---------------------------------------------------------------------------
+        -- TX Timestamp
+        TxTSMode_xDI            : in  std_logic_vector(1 downto 0);
+        TxTSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
+        TxTSRetrigCmd_xSI       : in  std_logic;
+        TxTSRearmCmd_xSI        : in  std_logic;
+        TxTSRetrigStatus_xSO    : out std_logic;
+        TxTSTimeoutCounts_xSO   : out std_logic;
+        TxTSMaskSel_xSI         : in  std_logic_vector(1 downto 0);
+        --
+        ---------------------------------------------------------------------------
+        -- FIFO -> Core
+        FifoCoreDat_xDO         : out std_logic_vector(31 downto 0);
+        FifoCoreRead_xSI        : in  std_logic;
+        FifoCoreEmpty_xSO       : out std_logic;
+        FifoCoreAlmostEmpty_xSO : out std_logic;
+        FifoCoreBurstReady_xSO  : out std_logic;
+        FifoCoreFull_xSO        : out std_logic;
+        FifoCoreNumData_o       : out std_logic_vector(10 downto 0);
+        --
+        -- Core -> FIFO
+        CoreFifoDat_xDI         : in  std_logic_vector(31 downto 0);
+        CoreFifoWrite_xSI       : in  std_logic;
+        CoreFifoFull_xSO        : out std_logic;
+        CoreFifoAlmostFull_xSO  : out std_logic;
+        CoreFifoEmpty_xSO       : out std_logic;
 
-            ---------------------------------------------------------------------------
-            -- BiasGen Controller Output
-            --
-            --BiasFinished_xSO        : out std_logic;
-            --ClockLow_xDI            : in  natural; -- 1   tick
-            --LatchTime_xDI           : in  natural; -- 1   tick
-            --SetupHold_xDI           : in  natural; -- 100 tick
-            --PrescalerValue_xDI      : in  std_logic_vector(31 downto 0);
-            --BiasProgPins_xDO        : out std_logic_vector(7 downto 0);
-            ---------------------------------------------------------------------------
-              -- Output neurons threshold
-            --OutThresholdVal_xDI     : in  std_logic_vector(31 downto 0)
-            DBG_din             : out std_logic_vector(63 downto 0);     
-            DBG_wr_en           : out std_logic;  
-            DBG_rd_en           : out std_logic;     
-            DBG_dout            : out std_logic_vector(63 downto 0);          
-            DBG_full            : out std_logic;    
-            DBG_almost_full     : out std_logic;    
-            DBG_overflow        : out std_logic;       
-            DBG_empty           : out std_logic;           
-            DBG_almost_empty    : out std_logic;    
-            DBG_underflow       : out std_logic;     
-            DBG_data_count      : out std_logic_vector(10 downto 0);
-            DBG_Timestamp_xD    : out std_logic_vector(31 downto 0);    
-            DBG_MonInAddr_xD    : out std_logic_vector(31 downto 0);
-            DBG_MonInSrcRdy_xS  : out std_logic;
-            DBG_MonInDstRdy_xS  : out std_logic;
-            DBG_RESETFIFO       : out std_logic
-            
-        );
+        ---------------------------------------------------------------------------
+        -- BiasGen Controller Output
+        --
+        --BiasFinished_xSO        : out std_logic;
+        --ClockLow_xDI            : in  natural; -- 1   tick
+        --LatchTime_xDI           : in  natural; -- 1   tick
+        --SetupHold_xDI           : in  natural; -- 100 tick
+        --PrescalerValue_xDI      : in  std_logic_vector(31 downto 0);
+        --BiasProgPins_xDO        : out std_logic_vector(7 downto 0);
+        ---------------------------------------------------------------------------
+          -- Output neurons threshold
+        --OutThresholdVal_xDI     : in  std_logic_vector(31 downto 0)
+
+        DBG_din             : out std_logic_vector(63 downto 0);     
+        DBG_wr_en           : out std_logic;  
+        DBG_rd_en           : out std_logic;     
+        DBG_dout            : out std_logic_vector(63 downto 0);          
+        DBG_full            : out std_logic;    
+        DBG_almost_full     : out std_logic;    
+        DBG_overflow        : out std_logic;       
+        DBG_empty           : out std_logic;           
+        DBG_almost_empty    : out std_logic;    
+        DBG_underflow       : out std_logic;     
+        DBG_data_count      : out std_logic_vector(10 downto 0);
+        DBG_Timestamp_xD    : out std_logic_vector(31 downto 0);
+        DBG_MonInAddr_xD    : out std_logic_vector(31 downto 0);
+        DBG_MonInSrcRdy_xS  : out std_logic;
+        DBG_MonInDstRdy_xS  : out std_logic;
+        DBG_RESETFIFO       : out std_logic
+    
+    );
     end component CoreMonSeqRR;
 
     

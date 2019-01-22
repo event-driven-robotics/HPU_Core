@@ -10,7 +10,6 @@
 library ieee;
     use ieee.std_logic_1164.all;
 
-
 package NEComponents_pkg is
 
     component Infifo_64_1024_32 is
@@ -57,6 +56,8 @@ package NEComponents_pkg is
             Clk_xCI        : in  std_logic;
             Zero_xSI       : in  std_logic;
             CleanTimer_xSI : in  std_logic;
+            LoadTimer_xSI  : in  std_logic;
+            LoadValue_xSI  : in std_logic_vector(31 downto 0);
             Timestamp_xDO  : out std_logic_vector(31 downto 0)
         );
     end component Timestamp;
@@ -93,23 +94,32 @@ package NEComponents_pkg is
 
 
     component AEXSsequencerRR is
-        generic (
-            TestEnableSequencerNoWait : boolean
-        );
         port (
-            Rst_xRBI       : in  std_logic;
-            Clk_xCI        : in  std_logic;
-            Enable_xSI     : in  std_logic;
+            Rst_xRBI              : in  std_logic;
+            Clk_xCI               : in  std_logic;
+            Enable_xSI            : in  std_logic;
             --
-            Timestamp_xDI  : in  std_logic_vector(31 downto 0);
+            En100us_xSI           : in  std_logic;
             --
-            InAddrEvt_xDI  : in  std_logic_vector(63 downto 0);
-            InRead_xSO     : out std_logic;
-            InEmpty_xSI    : in  std_logic;
+            TSMode_xDI            : in  std_logic_vector(1 downto 0);
+            TSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
+            TSMaskSel_xDI         : in  std_logic_vector(1 downto 0);
             --
-            OutAddr_xDO    : out std_logic_vector(31 downto 0);
-            OutSrcRdy_xSO  : out std_logic;
-            OutDstRdy_xSI  : in  std_logic
+            Timestamp_xDI         : in  std_logic_vector(31 downto 0);
+            LoadTimer_xSO         : out std_logic;
+            LoadValue_xSO         : out std_logic_vector(31 downto 0);
+            TxTSRetrigCmd_xSI     : in  std_logic;
+            TxTSRearmCmd_xSI      : in  std_logic;
+            TxTSRetrigStatus_xSO  : out std_logic;
+            TxTSTimeoutCounts_xSO : out std_logic;
+            --
+            InAddrEvt_xDI         : in  std_logic_vector(63 downto 0);
+            InRead_xSO            : out std_logic;
+            InEmpty_xSI           : in  std_logic;
+            --
+            OutAddr_xDO           : out std_logic_vector(31 downto 0);
+            OutSrcRdy_xSO         : out std_logic;
+            OutDstRdy_xSI         : in  std_logic
             --
             --ConfigAddr_xDO : out std_logic_vector(31 downto 0);
             --ConfigReq_xSO  : out std_logic;

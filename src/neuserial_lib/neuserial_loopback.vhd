@@ -172,7 +172,7 @@ begin
     CoreTx_ack_from_spinnaker_o         <= ExtTx_ack_from_spinnaker_i      when (RxSpnnLnkLpbkEnSel = "00") else 
                                            CoreRx1_ack_to_spinnaker_i      when (RxSpnnLnkLpbkEnSel = "01") else 
                                            CoreRx2_ack_to_spinnaker_i      when (RxSpnnLnkLpbkEnSel = "10") else     
-                                           CoreRx3_ack_to_spinnaker_i      when (RxSpnnLnkLpbkEnSel = "11");     
+                                           CoreRx3_ack_to_spinnaker_i      when (RxSpnnLnkLpbkEnSel = "11") else '0';     
     
     CoreRx1_data_2of7_from_spinnaker_o  <= CoreTx_data_2of7_to_spinnaker_i when (RxSpnnLnkLpbkEnSel = "01") else ExtRx1_data_2of7_from_spinnaker_i;  
     ExtRx1_ack_to_spinnaker_o           <= '0'                             when (RxSpnnLnkLpbkEnSel = "01") else CoreRx1_ack_to_spinnaker_i;

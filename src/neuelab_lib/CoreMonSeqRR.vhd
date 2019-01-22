@@ -19,7 +19,7 @@ library neuelab_lib;
 
 library HPU_lib;
     use HPU_lib.aer_pkg.all;
-
+    use HPU_lib.HPUComponents_pkg.all;
 
 --****************************
 --   PORT DECLARATION
@@ -43,26 +43,39 @@ entity CoreMonSeqRR is
         DmaLength_xDI       : in  std_logic_vector(15 downto 0);
         --
         ---------------------------------------------------------------------------
+        -- Enable per timing
+        Timing_xSI          : in  time_tick;
+        --
+        ---------------------------------------------------------------------------
         -- Input to Monitor
-        MonInAddr_xDI       : in  std_logic_vector(31 downto 0);
-        MonInSrcRdy_xSI     : in  std_logic;
-        MonInDstRdy_xSO     : out std_logic;
+        MonInAddr_xDI           : in  std_logic_vector(31 downto 0);
+        MonInSrcRdy_xSI         : in  std_logic;
+        MonInDstRdy_xSO         : out std_logic;
         --
         -- Output from Sequencer
-        SeqOutAddr_xDO      : out std_logic_vector(31 downto 0);
-        SeqOutSrcRdy_xSO    : out std_logic;
-        SeqOutDstRdy_xSI    : in  std_logic;
+        SeqOutAddr_xDO          : out std_logic_vector(31 downto 0);
+        SeqOutSrcRdy_xSO        : out std_logic;
+        SeqOutDstRdy_xSI        : in  std_logic;
         --
         ---------------------------------------------------------------------------
         -- Time stamper
-        CleanTimer_xSI      : in  std_logic;
-        WrapDetected_xSO    : out std_logic;
-        FullTimestamp_i     : in  std_logic;  
+        CleanTimer_xSI          : in  std_logic;
+        WrapDetected_xSO        : out std_logic;
+        FullTimestamp_i         : in  std_logic;  
+        --
+        EnableMonitor_xSI       : in  std_logic;
+        CoreReady_xSI           : in  std_logic;
         ---------------------------------------------------------------------------
+        -- TX Timestamp
+        TxTSMode_xDI            : in  std_logic_vector(1 downto 0);
+        TxTSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
+        TxTSRetrigCmd_xSI       : in  std_logic;
+        TxTSRearmCmd_xSI        : in  std_logic;
+        TxTSRetrigStatus_xSO    : out std_logic;
+        TxTSTimeoutCounts_xSO   : out std_logic;
+        TxTSMaskSel_xSI         : in  std_logic_vector(1 downto 0);
         --
-        EnableMonitor_xSI   : in  std_logic;
-        CoreReady_xSI       : in  std_logic;
-        --
+        ---------------------------------------------------------------------------
         -- FIFO -> Core
         FifoCoreDat_xDO         : out std_logic_vector(31 downto 0);
         FifoCoreRead_xSI        : in  std_logic;
@@ -127,10 +140,15 @@ architecture str of CoreMonSeqRR is
     signal EnableSequencer_xS : std_logic;
 
     -- Timestamp Counter
-    signal EnableTimestampCounter_xS  : std_logic;
-    signal EnableTimestampCounter_xSB : std_logic;
-    signal Timestamp_xD               : std_logic_vector(31 downto 0);
-    signal ShortTimestamp_xD          : std_logic_vector(31 downto 0);
+    signal EnableTimestampCounter_RX_xS  : std_logic;
+    signal EnableTimestampCounter_RX_xSB : std_logic;
+    signal EnableTimestampCounter_TX_xS  : std_logic;
+    signal EnableTimestampCounter_TX_xSB : std_logic;    
+    signal Timestamp_RX_xD            : std_logic_vector(31 downto 0);
+    signal Timestamp_TX_xD            : std_logic_vector(31 downto 0);
+    signal ShortTimestamp_TX_xD       : std_logic_vector(31 downto 0);
+    signal LoadTimer_xS               : std_logic;
+    signal LoadValue_xS               : std_logic_vector(31 downto 0);
 
     -- Monitor -> Core
     signal MonOutAddrEvt_xD     : std_logic_vector(63 downto 0);
@@ -197,14 +215,14 @@ begin
     ResetTX_xR <=  not(Reset_xRBI) or FlushTXFifos_xSI;
 
     -----------------------------------------------------------------------------
-    -- CoreReady_xSI, EnableMonitor_xSI, EnableTimestampCounter_xS
+    -- CoreReady_xSI, EnableMonitor_xSI, EnableTimestampCounter_RX_xS, EnableTimestampCounter_TX_xS
     -----------------------------------------------------------------------------
 
     -- timestamp counter -- run timestamp counter only if MonEn is active or
     -- the sequencer has pending data. otherwise we reset the counter to zero.
-    EnableTimestampCounter_xS  <= (EnableMonitor_xSI and CoreReady_xSI) or not SeqInEmpty_xS;
-    EnableTimestampCounter_xSB <= not EnableTimestampCounter_xS;
-
+    EnableTimestampCounter_RX_xS  <= (EnableMonitor_xSI and CoreReady_xSI) or not SeqInEmpty_xS;
+    EnableTimestampCounter_RX_xSB <= not EnableTimestampCounter_RX_xS;
+    
     -----------------------------------------------------------------------------
     -- enable sequencer controled by monitor:
     g_enseq : if EnableMonitorControlsSequencerToo generate
@@ -221,16 +239,30 @@ begin
   -- Timestamp, Monitor, Sequencer
   -----------------------------------------------------------------------------
 
-    u_Timestamp : Timestamp
+
+    u_Timestamp_TX : Timestamp
         port map (
             Rst_xRBI       => Reset_xRBI,
             Clk_xCI        => CoreClk_xCI,
-            Zero_xSI       => EnableTimestampCounter_xSB,
+            Zero_xSI       => '0',
+            LoadTimer_xSI  => LoadTimer_xS,
+            LoadValue_xSI  => LoadValue_xS,
+            CleanTimer_xSI => '0',
+            Timestamp_xDO  => Timestamp_TX_xD
+        );
+        
+    u_Timestamp_RX : Timestamp
+        port map (
+            Rst_xRBI       => Reset_xRBI,
+            Clk_xCI        => CoreClk_xCI,
+            Zero_xSI       => EnableTimestampCounter_RX_xSB,
+            LoadTimer_xSI  => '0',
+            LoadValue_xSI  => (others => '0'),
             CleanTimer_xSI => CleanTimer_xSI,
-            Timestamp_xDO  => Timestamp_xD
+            Timestamp_xDO  => Timestamp_RX_xD
         );
 
-    u_TimestampWrapDetector: TimestampWrapDetector
+    u_TimestampWrapDetector_RX: TimestampWrapDetector
         port map (
             Resetn         => Reset_xRBI,
             Clk            => CoreClk_xCI,
@@ -238,15 +270,15 @@ begin
             WrapDetected   => WrapDetected_xSO
         );
         
-    MSB <= Timestamp_xD(23) when FullTimestamp_i='0' else
-           Timestamp_xD(31);
+    MSB <= Timestamp_RX_xD(23) when FullTimestamp_i='0' else
+           Timestamp_RX_xD(31);
 
     u_MonitorRR : MonitorRR
         port map (
             Rst_xRBI       => Reset_xRBI,
             Clk_xCI        => CoreClk_xCI,
             FullTimestamp_i=> FullTimestamp_i,
-            Timestamp_xDI  => Timestamp_xD,
+            Timestamp_xDI  => Timestamp_RX_xD,
             MonEn_xSAI     => EnableMonitor_xSI,
             --
             InAddr_xDI     => MonInAddr_xD,
@@ -258,23 +290,36 @@ begin
             OutFull_xSI    => MonOutFull_xS
         );
 
+ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
+
+
     u_AEXSsequencerRR : AEXSsequencerRR
-        generic map (
-            TestEnableSequencerNoWait => TestEnableSequencerNoWait
-        )
         port map (
-            Rst_xRBI       => Reset_xRBI,
-            Clk_xCI        => CoreClk_xCI,
-            Enable_xSI     => EnableSequencer_xS,
-            Timestamp_xDI  => Timestamp_xD,
+            Rst_xRBI               => Reset_xRBI,
+            Clk_xCI                => CoreClk_xCI,
+            Enable_xSI             => EnableSequencer_xS,
             --
-            InAddrEvt_xDI  => SeqInAddrEvt_xD,
-            InRead_xSO     => SeqInRead_xS,
-            InEmpty_xSI    => SeqInEmpty_xS,
+            En100us_xSI            => Timing_xSI.en100us,
+            -- 
+            TSMode_xDI             => TxTSMode_xDI,
+            TSTimeoutSel_xDI       => TxTSTimeoutSel_xDI,
+            TSMaskSel_xDI          => TxTSMaskSel_xSI,
             --
-            OutAddr_xDO    => SeqOutAddr_xD,
-            OutSrcRdy_xSO  => SeqOutSrcRdy_xS,
-            OutDstRdy_xSI  => SeqOutDstRdy_xS
+            Timestamp_xDI          => Timestamp_TX_xD,  
+            LoadTimer_xSO          => LoadTimer_xS,        
+            LoadValue_xSO          => LoadValue_xS,        
+            TxTSRetrigCmd_xSI      => TxTSRetrigCmd_xSI,   
+            TxTSRearmCmd_xSI       => TxTSRearmCmd_xSI,
+            TxTSRetrigStatus_xSO   => TxTSRetrigStatus_xSO,
+            TxTSTimeoutCounts_xSO  => TxTSTimeoutCounts_xSO,  
+            --
+            InAddrEvt_xDI          => SeqInAddrEvt_xD,
+            InRead_xSO             => SeqInRead_xS,
+            InEmpty_xSI            => SeqInEmpty_xS,
+            --
+            OutAddr_xDO            => SeqOutAddr_xD,
+            OutSrcRdy_xSO          => SeqOutSrcRdy_xS,
+            OutDstRdy_xSI          => SeqOutDstRdy_xS
             --
             --ConfigAddr_xDO => ConfigAddr_xD,
             --ConfigReq_xSO  => ConfigReq_xS,
@@ -494,7 +539,7 @@ FifoCoreAlmostEmpty_xSO <= i_FifoCoreAlmostEmpty_xSO;
 
 --DBG_underflow       <= DBG_underflow;   
 DBG_data_count      <= fifoWrDataCount_xD;
-DBG_Timestamp_xD   <= Timestamp_xD;
+DBG_Timestamp_xD   <= Timestamp_RX_xD;
 DBG_MonInAddr_xD   <= MonInAddr_xD;
 DBG_MonInSrcRdy_xS <= MonInSrcRdy_xS;
 DBG_MonInDstRdy_xS <= MonInDstRdy_xS;

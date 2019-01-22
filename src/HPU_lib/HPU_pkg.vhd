@@ -26,6 +26,17 @@ library HPU_lib;
 
 package HPUComponents_pkg is
 
+type time_tick is record
+    en100ns               : std_logic;
+    en1us                 : std_logic;
+    en10us                : std_logic;
+    en100us               : std_logic;
+    en1ms                 : std_logic;
+    en10ms                : std_logic;
+    en100ms               : std_logic;
+    en1s                  : std_logic;
+    end record time_tick;
+
     component neuserial_core is
         generic (
             C_PAER_DSIZE            : natural range 1 to 29;
@@ -51,7 +62,12 @@ package HPUComponents_pkg is
             ClkLS_n           : in  std_logic;
             ClkHS_p           : in  std_logic;
             ClkHS_n           : in  std_logic;
-
+            
+            --
+            -- Enable per timing
+            ---------------------
+            Timing_i          : in  time_tick;
+            
             --
             -- TX DATA PATH
             ---------------------
@@ -166,6 +182,16 @@ package HPUComponents_pkg is
             TxSaerChanEn_i          : in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
             --TxSaerChanCfg_i         : in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
 
+            -- TX Timestamp
+            TxTSMode_i                     : in  std_logic_vector(1 downto 0);
+            TxTSTimeoutSel_i               : in  std_logic_vector(3 downto 0);
+            TxTSRetrigCmd_i                : in  std_logic;
+            TxTSRearmCmd_i                 : in  std_logic;
+            TxTSRetrigStatus_o             : out std_logic;
+            TxTSTimeoutCounts_o            : out std_logic;
+            TxTSMaskSel_i                  : in  std_logic_vector(1 downto 0);
+            
+            --
             LRxPaerEn_i             : in  std_logic;
             RRxPaerEn_i             : in  std_logic;
             AuxRxPaerEn_i           : in  std_logic;
@@ -200,16 +226,21 @@ package HPUComponents_pkg is
             LRxSaerStat_o           : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
             RRxSaerStat_o           : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
             AUXRxSaerStat_o         : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-        
+            
+            --
+            -- SPiNNaker
+            ---------------------        
             TxSpnnlnkStat_o         : out t_TxSpnnlnkStat;
             LRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
             RRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
             AuxRxSpnnlnkStat_o      : out t_RxSpnnlnkStat;
         
-            Spnn_cmd_start_key_i    : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-            Spnn_cmd_stop_key_i     : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+            Spnn_start_key_i        : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command key
+            Spnn_stop_key_i         : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command key
             Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
             Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+            Spnn_ctrl_i             : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+            Spnn_status_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
             
             --
             -- LED drivers
@@ -354,6 +385,16 @@ port (
     TxPaerAckActLevel_o            : out std_logic;
     TxSaerChanEn_o                 : out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
 
+-- TX Timestamp
+    TxTSMode_o                     : out std_logic_vector(1 downto 0);
+    TxTSTimeoutSel_o               : out std_logic_vector(3 downto 0);
+    TxTSRetrigCmd_o                : out std_logic;
+    TxTSRearmCmd_o                 : out std_logic;
+    TxTSRetrigStatus_i             : in  std_logic;
+    TxTSTimeoutCounts_i            : in  std_logic;
+    TxTSMaskSel_o                  : out std_logic_vector(1 downto 0);
+
+--
     LRxPaerEn_o                    : out std_logic;
     RRxPaerEn_o                    : out std_logic;
     AUXRxPaerEn_o                  : out std_logic;
@@ -388,12 +429,18 @@ port (
     LRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
     RRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
     AuxRxSpnnlnkStat_i             : in  t_RxSpnnlnkStat;
-
-    Spnn_cmd_start_key_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-    Spnn_cmd_stop_key_o            : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+                                   
+    -- Spinnaker                     
+    -------------------------
+    Spnn_start_key_o               : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+    Spnn_stop_key_o                : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
     Spnn_tx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
     Spnn_rx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
-
+    Spnn_ctrl_o                    : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+    Spnn_status_i                  : in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
+    
+    -- DEBUG
+    -------------------------
     DBG_CTRL_reg                   : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     DBG_ctrl_rd                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 
@@ -469,4 +516,31 @@ port (
     end component neuserial_axistream;
 
 
+    component time_machine is
+       generic ( 
+            SIM_TIME_COMPRESSION_g : boolean := FALSE; -- Se "TRUE", la simulazione viene "compressa": i clock enable non seguono le tempistiche reali
+            INIT_DELAY             : natural := 32     -- Ritardo dal rilascio del reset all'impulso di "init"
+            );
+       port (
+            -- Clock in port
+            CLK_100M_i           : in  std_logic;  -- Ingresso 100 MHz
+            -- Enable ports
+            EN100NS_100_o        : out std_logic;	-- Clock enable a 100 ns
+            EN1US_100_o          : out std_logic;	-- Clock enable a 1 us
+            EN10US_100_o         : out std_logic;	-- Clock enable a 10 us
+            EN100US_100_o        : out std_logic;	-- Clock enable a 100 us
+            EN1MS_100_o          : out std_logic;	-- Clock enable a 1 ms
+            EN10MS_100_o         : out std_logic;	-- Clock enable a 10 ms
+            EN100MS_100_o        : out std_logic;	-- Clock enable a 100 ms
+            EN1S_100_o           : out std_logic;	-- Clock enable a 1 s
+            -- Reset output port 
+            RESYNC_CLEAR_N_o     : out std_logic; -- Clear resincronizzato
+            INIT_RESET_100_o     : out std_logic;	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica positiva)
+            INIT_RESET_N_100_o   : out std_logic;	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica negativa)
+            -- Status and control signals
+            CLEAR_N_i            : in  std_logic   -- Clear asincrono che reinizializza le macchine di timing
+            );
+       end component;
+       
+       
 end package HPUComponents_pkg;

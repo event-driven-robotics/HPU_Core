@@ -23,93 +23,95 @@ library spinn_neu_if_lib;
 
 entity hpu_tx_datapath is
     generic (
-        C_INPUT_DSIZE    : natural range 1 to 32 := 32;
-        C_PAER_DSIZE     : positive              := 24;
-        C_HAS_PAER       : boolean               := true;
-        C_HAS_GTP        : boolean               := true;
-        C_HAS_SPNNLNK    : boolean               := true;
-        C_PSPNNLNK_WIDTH : natural range 1 to 32 := 32;
-        C_HAS_HSSAER     : boolean               := true;
-        C_HSSAER_N_CHAN  : natural range 1 to 4  := 3
-    );
-    port (
-        -- Clocks & Reset
-        nRst                    : in  std_logic;
-        Clk_core                : in  std_logic;
-        Clk_ls_p                : in  std_logic;
-        Clk_ls_n                : in  std_logic;
+    C_INPUT_DSIZE    : natural range 1 to 32 := 32;
+    C_PAER_DSIZE     : positive              := 20;
+    C_HAS_PAER       : boolean               := true;
+    C_HAS_GTP        : boolean               := true;
+    C_HAS_SPNNLNK    : boolean;
+    C_PSPNNLNK_WIDTH : natural range 1 to 32 := 32;
+    C_HAS_HSSAER     : boolean               := true;
+    C_HSSAER_N_CHAN  : natural range 1 to 4  := 4
+);
+port (
+    -- Clocks & Reset
+    nRst                    : in  std_logic;
+    Clk_core                : in  std_logic;
+    Clk_ls_p                : in  std_logic;
+    Clk_ls_n                : in  std_logic;
 
-        -----------------------------
-        -- uController Interface
-        -----------------------------
+    -----------------------------
+    -- uController Interface
+    -----------------------------
 
-        -- Control signals
-        -----------------------------
-        --EnableIP_i              : in  std_logic;
-        --PaerFlushFifos_i        : in  std_logic;
+    -- Control signals
+    -----------------------------
+    --EnableIP_i              : in  std_logic;
+    --PaerFlushFifos_i        : in  std_logic;
 
-        -- Status signals
-        -----------------------------
-        --PaerFifoFull_o          : out std_logic;
-        TxSaerStat_o            : out t_TxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
-        TxSpnnlnkStat_o         : out t_TxSpnnlnkStat;
-        
-        -- Configuration signals
-        -----------------------------
-        --
-        -- Destination I/F configurations
-        EnablePAER_i            : in  std_logic;
-        EnableHSSAER_i          : in  std_logic;
-        EnableGTP_i             : in  std_logic;
-        EnableSPNNLNK_i         : in  std_logic;
-        DestinationSwitch_i     : in  std_logic_vector(2 downto 0);
-        -- PAER
-        --PaerIgnoreFifoFull_i    : in  std_logic;
-        PaerReqActLevel_i       : in  std_logic;
-        PaerAckActLevel_i       : in  std_logic;
-        -- HSSAER
-        HSSaerChanEn_i          : in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
-        --HSSaerChanCfg_i         : in  t_hssaerCfg_array(C_HSSAER_N_CHAN-1 downto 0);
-        -- GTP
+    -- Status signals
+    -----------------------------
+    --PaerFifoFull_o          : out std_logic;
+    TxSaerStat_o            : out t_TxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+    TxSpnnlnkStat_o         : out t_TxSpnnlnkStat;
+    
+    -- Configuration signals
+    -----------------------------
+    --
+    -- Destination I/F configurations
+    EnablePAER_i            : in  std_logic;
+    EnableHSSAER_i          : in  std_logic;
+    EnableGTP_i             : in  std_logic;
+    EnableSPNNLNK_i         : in  std_logic;
+    DestinationSwitch_i     : in  std_logic_vector(2 downto 0);
+    -- PAER
+    --PaerIgnoreFifoFull_i    : in  std_logic;
+    PaerReqActLevel_i       : in  std_logic;
+    PaerAckActLevel_i       : in  std_logic;
+    -- HSSAER
+    HSSaerChanEn_i          : in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+    --HSSaerChanCfg_i         : in  t_hssaerCfg_array(C_HSSAER_N_CHAN-1 downto 0);
+    -- GTP
+    --
+    -- SpiNNaker
+    Spnn_offload_on_i       : in  std_logic;
+    Spnn_offload_off_i      : in  std_logic;
+    Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+    Spnn_Offload_o          : out std_logic;
+    Spnn_Link_Timeout_o     : out std_logic;
+    Spnn_Link_Timeout_dis_i : in  std_logic;
+    
+    -----------------------------
+    -- Sequencer Interface
+    -----------------------------
+    FromSeqDataIn_i         : in  std_logic_vector(C_INPUT_DSIZE-1 downto 0);
+    FromSeqSrcRdy_i         : in  std_logic;
+    FromSeqDstRdy_o         : out std_logic;
+      
+    -----------------------------
+    -- Destination interfaces
+    -----------------------------
+    -- Parallel AER
+    PAER_Addr_o             : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    PAER_Req_o              : out std_logic;
+    PAER_Ack_i              : in  std_logic;
 
-        -----------------------------
-        -- Sequencer Interface
-        -----------------------------
-        FromSeqDataIn_i         : in  std_logic_vector(C_INPUT_DSIZE-1 downto 0);
-        FromSeqSrcRdy_i         : in  std_logic;
-        FromSeqDstRdy_o         : out std_logic;
+    -- HSSAER
+    HSSAER_Tx_o             : out std_logic_vector(0 to C_HSSAER_N_CHAN-1);
 
-        -- SpiNNlink controls
-        -----------------------------
-        Spnn_Dump_on_i          : in  std_logic;
-        Spnn_Dump_off_i         : in  std_logic;
-        Spnn_tx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
-     
-        -----------------------------
-        -- Destination interfaces
-        -----------------------------
-        -- Parallel AER
-        PAER_Addr_o             : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
-        PAER_Req_o              : out std_logic;
-        PAER_Ack_i              : in  std_logic;
+    -- GTP interface
+    --
+    -- TBD signals to drive the GTP
+    --
 
-        -- HSSAER
-        HSSAER_Tx_o             : out std_logic_vector(0 to C_HSSAER_N_CHAN-1);
+    -- SpiNNlink 
+    data_2of7_to_spinnaker_o    : out std_logic_vector(6 downto 0);
+    ack_from_spinnaker_i        : in  std_logic
 
-        -- GTP interface
-        --
-        -- TBD signals to drive the GTP
-        --
+    -----------------------------
+    -- Debug signals
+    -----------------------------
 
-		-- SpiNNlink 
-		data_2of7_to_spinnaker_o	: out std_logic_vector(6 downto 0);
-		ack_from_spinnaker_i        : in  std_logic
-
-        -----------------------------
-        -- Debug signals
-        -----------------------------
-
-    );
+);
 end entity hpu_tx_datapath;
 
 
@@ -142,7 +144,7 @@ architecture str of hpu_tx_datapath is
     signal i_iaer_vld                  : std_logic;
     signal i_iaer_rdy                  : std_logic;
 
-
+    
 begin
 
 
@@ -376,6 +378,9 @@ begin
             dump_mode                    => TxSpnnlnkStat_o.dump_mode,   
             parity_err                   => open,
             rx_err                       => open,
+            offload                      => Spnn_Offload_o,
+            link_timeout                 => Spnn_Link_Timeout_o,
+            link_timeout_dis             => Spnn_Link_Timeout_dis_i,
     
         -- input SpiNNaker link interface
             data_2of7_from_spinnaker     => (others => '0'), 
@@ -395,25 +400,28 @@ begin
             oaer_vld                     => open,           -- out std_logic;                                  
             oaer_rdy                     => '0',            -- in  std_logic;                                  
 
-        -- Command from SpiNNaker 
-            cmd_start_key              => (others => '0'),  -- in  std_logic_vector(31 downto 0);
-            cmd_stop_key               => (others => '0'),  -- in  std_logic_vector(31 downto 0);
+        -- Command from SpiNNaker
+            keys_enable                => '0',              -- in  std_logic;
+            start_key                  => (others => '0'),  -- in  std_logic_vector(31 downto 0);
+            stop_key                   => (others => '0'),  -- in  std_logic_vector(31 downto 0);
             cmd_start                  => open,             -- out std_logic;
             cmd_stop                   => open,             -- out std_logic;
+            		   
+            -- Settings
             tx_data_mask               => Spnn_tx_mask_i,   -- in  std_logic_vector(31 downto 0);
             rx_data_mask               => (others => '0'),  -- in  std_logic_vector(31 downto 0);
         
         -- Controls
-            dump_off                   => Spnn_Dump_off_i,  -- in  std_logic;
-            dump_on                    => Spnn_Dump_on_i,   -- in  std_logic;
+            offload_off                => Spnn_offload_off_i,  -- in  std_logic;
+            offload_on                 => Spnn_offload_on_i,   -- in  std_logic;
 
         -- Debug Port           
-            dbg_rxstate                  => open,
-            dbg_txstate                  => open,
-            dbg_ipkt_vld                 => open,
-            dbg_ipkt_rdy                 => open,
-            dbg_opkt_vld                 => open,
-            dbg_opkt_rdy                 => open
+            dbg_rxstate                => open,
+            dbg_txstate                => open,
+            dbg_ipkt_vld               => open,
+            dbg_ipkt_rdy               => open,
+            dbg_opkt_vld               => open,
+            dbg_opkt_rdy               => open
             ); 
             
     end generate g_spinnlnk_true;
@@ -423,6 +431,9 @@ begin
         data_2of7_to_spinnaker_o <= (others => '0');
         -- Internal signals grounding
         i_spnnlnk_DstRdy <= '0';
+        TxSpnnlnkStat_o.dump_mode <= '0';
+        Spnn_Offload_o <= '0';
+        Spnn_Link_Timeout_o <= '0';
 
     end generate g_spinnlnk_false;
     
