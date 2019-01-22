@@ -141,22 +141,9 @@ module out_mapper #
             cmd_stop  <= 0;
             end 
         else 
-            if ({start_key, stop_key} == 64'h0000000000000000)
-                begin
-                cmd_start <= 1'b1;
-                cmd_stop <= 1'b0;
-                end
-            else if ({start_key, stop_key} == 64'hFFFFFFFFFFFFFFFF)
-                begin
-                cmd_start <= 1'b0;
-                cmd_stop <= 1'b1;
-                end
-            else
-                begin 
-                cmd_start <= (opkt_data[39:8] == start_key) & cmd_vld & keys_enable;
-                cmd_stop  <= (opkt_data[39:8] == stop_key) & cmd_vld & keys_enable;
-                end
-            end
+            cmd_start <= (opkt_data[39:8] == start_key) & cmd_vld & keys_enable;
+            cmd_stop  <= (opkt_data[39:8] == stop_key) & cmd_vld & keys_enable;
+        end
             
 
     //---------------------------------------------------------------
