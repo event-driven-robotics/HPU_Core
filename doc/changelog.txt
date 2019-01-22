@@ -1,9 +1,15 @@
 ********************************************
-Version 3.4 Rev 3:  16th, November 2018
+Version 3.4 Rev 15:  22th, January 2019
+- Added SpiNNlink Control Register and Status Register
+- Changed some feature about START/STOP Command
+  (M. Casti - IIT)
+
+********************************************
+Version 3.4 Rev 3 BETA:  16th, November 2018
 - Absolute Timing Feature for Transmission 
   (M. Casti - IIT)
 
-****************************************************************************************
+********************************************  
 Version 3.3 Rev 3:  30th, October 2018
 - DMA register (DMA_REG) has bit 0 fixed to 0.
   It can be written only with even values.
