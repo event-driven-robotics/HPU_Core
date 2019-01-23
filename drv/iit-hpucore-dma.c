@@ -96,7 +96,7 @@
 #define HPU_DATA_COUNT		0xA8
 
 /* magic constants */
-#define HPU_VER_MAGIC			0x42303130
+#define HPU_VER_MAGIC			0x48505534
 
 #define HPU_CTRL_DMA_RUNNING		0x0001
 #define HPU_CTRL_ENDMA			0x0002
