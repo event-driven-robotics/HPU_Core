@@ -8,6 +8,7 @@ library ieee;
 library datapath_lib;
     use datapath_lib.DPComponents_pkg.all;
 
+library HPU_lib;
 
 --****************************
 --   PORT DECLARATION
@@ -53,7 +54,7 @@ architecture rtl of ShiftRegFifoRROut is
 
 begin
 
-    u_ShiftRegFifo : ShiftRegFifo
+    u_ShiftRegFifo : entity HPU_lib.ShiftRegFifo
         generic map (
             width           => width,
             depth           => depth,
