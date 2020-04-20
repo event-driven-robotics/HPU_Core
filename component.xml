@@ -3,7 +3,7 @@
   <spirit:vendor>IIT</spirit:vendor>
   <spirit:library>IIT_lib</spirit:library>
   <spirit:name>HPU_Core</spirit:name>
-  <spirit:version>3.4</spirit:version>
+  <spirit:version>3.5</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
       <spirit:name>M_AXIS</spirit:name>
@@ -279,6 +279,82 @@
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>LowSpeedClock</spirit:name>
+      <spirit:displayName>LowSpeedClock</spirit:displayName>
+      <spirit:description>LowSpeedClock</spirit:description>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="diff_clock" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="diff_clock_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>CLK_P</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>HSSAER_ClkLS_p</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>CLK_N</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>HSSAER_ClkLS_n</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>HighSpeedClock</spirit:name>
+      <spirit:displayName>HighSpeedClock</spirit:displayName>
+      <spirit:description>HighSpeedClock</spirit:description>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="diff_clock" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="diff_clock_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>CLK_P</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>HSSAER_ClkHS_p</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>CLK_N</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>HSSAER_ClkHS_n</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>nSyncReset</spirit:name>
+      <spirit:displayName>nSyncReset</spirit:displayName>
+      <spirit:description>nSyncReset</spirit:description>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>RST</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>nSyncReset</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
+      <spirit:parameters>
+        <spirit:parameter>
+          <spirit:name>POLARITY</spirit:name>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.NSYNCRESET.POLARITY">ACTIVE_LOW</spirit:value>
+        </spirit:parameter>
+      </spirit:parameters>
+    </spirit:busInterface>
   </spirit:busInterfaces>
   <spirit:memoryMaps>
     <spirit:memoryMap>
@@ -309,7 +385,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>804d38ae</spirit:value>
+            <spirit:value>ebc67a74</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -328,7 +404,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>804d38ae</spirit:value>
+            <spirit:value>ebc67a74</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -343,7 +419,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>91cc8b55</spirit:value>
+            <spirit:value>4980ee26</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -357,7 +433,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>817aec71</spirit:value>
+            <spirit:value>957cc4d4</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -371,7 +447,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>9ebb2967</spirit:value>
+            <spirit:value>38b97564</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -385,7 +461,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ac2a79a9</spirit:value>
+            <spirit:value>079fd8f4</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -396,20 +472,6 @@
         <spirit:fileSetRef>
           <spirit:localName>xilinx_versioninformation_view_fileset</spirit:localName>
         </spirit:fileSetRef>
-      </spirit:view>
-      <spirit:view>
-        <spirit:name>xilinx_readme</spirit:name>
-        <spirit:displayName>Readme</spirit:displayName>
-        <spirit:envIdentifier>:vivado.xilinx.com:docs.readme</spirit:envIdentifier>
-        <spirit:fileSetRef>
-          <spirit:localName>xilinx_readme_view_fileset</spirit:localName>
-        </spirit:fileSetRef>
-        <spirit:parameters>
-          <spirit:parameter>
-            <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>80c04498</spirit:value>
-          </spirit:parameter>
-        </spirit:parameters>
       </spirit:view>
     </spirit:views>
     <spirit:ports>
@@ -2928,50 +2990,6 @@
         <spirit:displayName>C S Axi Addr Width</spirit:displayName>
         <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_S_AXI_ADDR_WIDTH">8</spirit:value>
       </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="std_logic_vector">
-        <spirit:name>C_S_AXI_MIN_SIZE</spirit:name>
-        <spirit:displayName>C S Axi Min Size</spirit:displayName>
-        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_S_AXI_MIN_SIZE" spirit:bitStringLength="32">0x000001FF</spirit:value>
-      </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="integer">
-        <spirit:name>C_USE_WSTRB</spirit:name>
-        <spirit:displayName>C Use Wstrb</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_USE_WSTRB">1</spirit:value>
-      </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="integer">
-        <spirit:name>C_DPHASE_TIMEOUT</spirit:name>
-        <spirit:displayName>C Dphase Timeout</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_DPHASE_TIMEOUT">8</spirit:value>
-      </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="std_logic_vector">
-        <spirit:name>C_BASEADDR</spirit:name>
-        <spirit:displayName>C Baseaddr</spirit:displayName>
-        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_BASEADDR" spirit:bitStringLength="32">0xFFFFFFFF</spirit:value>
-      </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="std_logic_vector">
-        <spirit:name>C_HIGHADDR</spirit:name>
-        <spirit:displayName>C Highaddr</spirit:displayName>
-        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_HIGHADDR" spirit:bitStringLength="32">0x00000000</spirit:value>
-      </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="string">
-        <spirit:name>C_FAMILY</spirit:name>
-        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_FAMILY">virtex7</spirit:value>
-      </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="integer">
-        <spirit:name>C_NUM_REG</spirit:name>
-        <spirit:displayName>C Num Reg</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_NUM_REG">24</spirit:value>
-      </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="integer">
-        <spirit:name>C_NUM_MEM</spirit:name>
-        <spirit:displayName>C Num Mem</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_NUM_MEM">1</spirit:value>
-      </spirit:modelParameter>
-      <spirit:modelParameter spirit:dataType="integer">
-        <spirit:name>C_SLV_AWIDTH</spirit:name>
-        <spirit:displayName>C Slv Awidth</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_SLV_AWIDTH">32</spirit:value>
-      </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_SLV_DWIDTH</spirit:name>
         <spirit:displayName>C Slv Dwidth</spirit:displayName>
@@ -3287,9 +3305,14 @@
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
+        <spirit:name>src/IP/Vivado/synch_fifo/synch_fifo.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>src/HPU_lib/HPUCore.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_07ff764a</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_4ba6b59e</spirit:userFileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
@@ -3604,6 +3627,11 @@
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
+        <spirit:name>src/IP/Vivado/synch_fifo/synch_fifo.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>src/HPU_lib/HPUCore.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
@@ -3662,9 +3690,9 @@
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/HPU_Core_v3_4.tcl</spirit:name>
+        <spirit:name>xgui/HPU_Core_v3_5.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_817aec71</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_957cc4d4</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -3683,7 +3711,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_productguide_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>doc/HPU Core 3.4 Rev15 - User Guide.pdf</spirit:name>
+        <spirit:name>doc/HPU Core 3.5 Rev0 - User Guide.pdf</spirit:name>
         <spirit:userFileType>pdf</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -3691,13 +3719,6 @@
       <spirit:name>xilinx_versioninformation_view_fileset</spirit:name>
       <spirit:file>
         <spirit:name>doc/changelog.txt</spirit:name>
-        <spirit:userFileType>text</spirit:userFileType>
-      </spirit:file>
-    </spirit:fileSet>
-    <spirit:fileSet>
-      <spirit:name>xilinx_readme_view_fileset</spirit:name>
-      <spirit:file>
-        <spirit:name>doc/readme.txt</spirit:name>
         <spirit:userFileType>text</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -3729,7 +3750,7 @@
     <spirit:parameter>
       <spirit:name>C_RX_HSSAER_N_CHAN</spirit:name>
       <spirit:displayName>HSSAER RX Channels</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_HSSAER_N_CHAN">3</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_HSSAER_N_CHAN" spirit:minimum="1" spirit:maximum="4" spirit:rangeType="long">3</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
           <xilinx:enablement>
@@ -3836,53 +3857,13 @@
       </spirit:vendorExtensions>
     </spirit:parameter>
     <spirit:parameter>
-      <spirit:name>C_S_AXI_MIN_SIZE</spirit:name>
-      <spirit:displayName>C S Axi Min Size</spirit:displayName>
-      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_S_AXI_MIN_SIZE" spirit:bitStringLength="32">0x000001FF</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
-      <spirit:name>C_USE_WSTRB</spirit:name>
-      <spirit:displayName>C Use Wstrb</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_USE_WSTRB">1</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
-      <spirit:name>C_DPHASE_TIMEOUT</spirit:name>
-      <spirit:displayName>C Dphase Timeout</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_DPHASE_TIMEOUT">8</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
-      <spirit:name>C_BASEADDR</spirit:name>
-      <spirit:displayName>C Baseaddr</spirit:displayName>
-      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_BASEADDR" spirit:bitStringLength="32">0xFFFFFFFF</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
-      <spirit:name>C_HIGHADDR</spirit:name>
-      <spirit:displayName>C Highaddr</spirit:displayName>
-      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_HIGHADDR" spirit:bitStringLength="32">0x00000000</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
-      <spirit:name>C_NUM_REG</spirit:name>
-      <spirit:displayName>C Num Reg</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_NUM_REG">24</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
-      <spirit:name>C_NUM_MEM</spirit:name>
-      <spirit:displayName>C Num Mem</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_NUM_MEM">1</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
-      <spirit:name>C_SLV_AWIDTH</spirit:name>
-      <spirit:displayName>C Slv Awidth</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_SLV_AWIDTH">32</spirit:value>
-    </spirit:parameter>
-    <spirit:parameter>
       <spirit:name>C_SLV_DWIDTH</spirit:name>
       <spirit:displayName>C Slv Dwidth</spirit:displayName>
       <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_SLV_DWIDTH">32</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">HPU_Core_v3_4</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">HPU_Core_v3_5</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -3921,8 +3902,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>15</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2019-01-22T16:07:16Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>18</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2020-04-20T12:45:47Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
@@ -3933,17 +3914,18 @@
         <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.1_ARCHIVE_LOCATION">d:/Projects/Repository/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.2_ARCHIVE_LOCATION">/mnt/design/WORK/GIT/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.3_ARCHIVE_LOCATION">d:/Projects/Repository/HPU_Core</xilinx:tag>
-        <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.4_ARCHIVE_LOCATION">d:/Projects/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.4_ARCHIVE_LOCATION">/home/fdiotalevi/design/EventDrivenDesigns/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.5_ARCHIVE_LOCATION">/home/fdiotalevi/design/EventDrivenDesigns/HPU_Core</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2017.4.1</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="84870c4e"/>
+      <xilinx:xilinxVersion>2017.4</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="3042bd80"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="5d406896"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="992c065a"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="d8c0bfec"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="05152ba2"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="bacf13cd"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="5c8b6173"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="76d292fc"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

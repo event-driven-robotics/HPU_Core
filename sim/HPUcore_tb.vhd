@@ -102,15 +102,6 @@ component HPUCore
     -- Bus protocol parameters, do not add to or delete
     C_S_AXI_DATA_WIDTH             : integer              := 32;
     C_S_AXI_ADDR_WIDTH             : integer              := 7;
-    C_S_AXI_MIN_SIZE               : std_logic_vector     := X"000001FF";
-    C_USE_WSTRB                    : integer              := 1;
-    C_DPHASE_TIMEOUT               : integer              := 8;
-    C_BASEADDR                     : std_logic_vector     := X"FFFFFFFF";
-    C_HIGHADDR                     : std_logic_vector     := X"00000000";
-    C_FAMILY                       : string               := "virtex7";
-    C_NUM_REG                      : integer              := 24;
-    C_NUM_MEM                      : integer              := 1;
-    C_SLV_AWIDTH                   : integer              := 32;
     C_SLV_DWIDTH                   : integer              := 32
     -- DO NOT EDIT ABOVE THIS LINE ---------------------
 );
@@ -891,15 +882,6 @@ HPUCORE_i : HPUCore
         -- Bus protocol parameters, do not add to or delete
         C_S_AXI_DATA_WIDTH          => C_S_AXI_DATA_WIDTH,				--	: integer              := 32;
         C_S_AXI_ADDR_WIDTH          => C_S_AXI_ADDR_WIDTH,				--	: integer              := 7;
-        C_S_AXI_MIN_SIZE            => X"000001FF",		--	: std_logic_vector     := X"000001FF";
-        C_USE_WSTRB                 => 1,				--	: integer              := 1;
-        C_DPHASE_TIMEOUT            => 8,				--	: integer              := 8;
-        C_BASEADDR                  => X"FFFFFFFF",		--	: std_logic_vector     := X"FFFFFFFF";
-        C_HIGHADDR                  => X"00000000",		--	: std_logic_vector     := X"00000000";
-        C_FAMILY                    => "virtex7",		--	: string               := "virtex7";
-        C_NUM_REG                   => 24,				--	: integer              := 24;
-        C_NUM_MEM                   => 1,				--	: integer              := 1;
-        C_SLV_AWIDTH                => 32,				--	: integer              := 32;
         C_SLV_DWIDTH                => 32				--	: integer              := 32
         -- DO NOT EDIT ABOVE THIS LINE ---------------------
     )

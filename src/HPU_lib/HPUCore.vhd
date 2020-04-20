@@ -28,18 +28,7 @@ library neuserial_lib;
 -- Definition of Generics:
 --   C_S_AXI_DATA_WIDTH           -- AXI4LITE slave: Data width
 --   C_S_AXI_ADDR_WIDTH           -- AXI4LITE slave: Address Width
---   C_S_AXI_MIN_SIZE             -- AXI4LITE slave: Min Size
---   C_USE_WSTRB                  -- AXI4LITE slave: Write Strobe
---   C_DPHASE_TIMEOUT             -- AXI4LITE slave: Data Phase Timeout
---   C_BASEADDR                   -- AXI4LITE slave: base address
---   C_HIGHADDR                   -- AXI4LITE slave: high address
---   C_FAMILY                     -- FPGA Family
---   C_NUM_REG                    -- Number of software accessible registers
---   C_NUM_MEM                    -- Number of address-ranges
---   C_SLV_AWIDTH                 -- Slave interface address bus width
 --   C_SLV_DWIDTH                 -- Slave interface data bus width
---   C_M_AXI_LITE_ADDR_WIDTH      -- Master-Intf address bus width
---   C_M_AXI_LITE_DATA_WIDTH      -- Master-Intf data bus width
 --
 -- Definition of Ports:
 --   S_AXI_ACLK                   -- AXI4LITE slave: Clock
@@ -96,15 +85,6 @@ entity HPUCore is
         -- Bus protocol parameters, do not add to or delete
         C_S_AXI_ADDR_WIDTH             : integer              := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
         C_S_AXI_DATA_WIDTH             : integer              := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
-        C_S_AXI_MIN_SIZE               : std_logic_vector     := X"000001FF";
-        C_USE_WSTRB                    : integer              := 1;
-        C_DPHASE_TIMEOUT               : integer              := 8;
-        C_BASEADDR                     : std_logic_vector     := X"FFFFFFFF";
-        C_HIGHADDR                     : std_logic_vector     := X"00000000";
-        C_FAMILY                       : string               := "virtex7";
-        C_NUM_REG                      : integer              := 24;
-        C_NUM_MEM                      : integer              := 1;
-        C_SLV_AWIDTH                   : integer              := 32;
         C_SLV_DWIDTH                   : integer              := 32
         -- DO NOT EDIT ABOVE THIS LINE ---------------------
     );

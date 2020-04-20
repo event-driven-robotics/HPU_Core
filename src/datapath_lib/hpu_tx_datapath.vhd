@@ -263,8 +263,15 @@ begin
 
         signal ii_hssaer_nrst : std_logic;
         signal ii_tx_toSaerSrc : t_PaerSrc_array(0 to C_HSSAER_N_CHAN-1);
+        signal ii_tx_toSaerSrc_synched : t_PaerSrc_array(0 to C_HSSAER_N_CHAN-1);
         signal ii_tx_toSaerDst : t_PaerDst_array(0 to C_HSSAER_N_CHAN-1);
+        signal ii_tx_toSaerDst_synched : t_PaerDst_array(0 to C_HSSAER_N_CHAN-1);
         signal keep_alive : std_logic := '1'; -- As suggested by P.M.R.
+        signal reset_sych_fifo : std_logic;
+        signal synch_fifo_full :std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+        signal synch_fifo_empty :std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+        signal synch_fifo_wr_en : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+        signal synch_fifo_rd_en : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
 
     begin
 
@@ -287,13 +294,34 @@ begin
                 PaerDstRdy_o       => i_hssaer_DstRdy,           -- out std_logic;
                 --
                 SplittedPaerSrc_o  => ii_tx_toSaerSrc,           -- out t_PaerSrc_array(0 to C_NUM_CHAN-1);
-                SplittedPaerDst_i  => ii_tx_toSaerDst            -- in  t_PaerDst_array(0 to C_NUM_CHAN-1)
+                SplittedPaerDst_i  => ii_tx_toSaerDst_synched    -- in  t_PaerDst_array(0 to C_NUM_CHAN-1)
             );
 
 
         g_hssaer_tx : for i in 0 to C_HSSAER_N_CHAN-1 generate
             --for all : hssaer_paer_tx use entity hssaer_lib.hssaer_paer_tx(module);
         begin
+ 
+        reset_sych_fifo <= not(ii_hssaer_nrst);
+        ii_tx_toSaerDst_synched(i).rdy <= not(synch_fifo_full(i));
+        
+        i_synch_fifo : synch_fifo
+          PORT MAP (
+            rst => reset_sych_fifo,
+            wr_clk => Clk_core,
+            rd_clk => Clk_ls_p,
+            din => ii_tx_toSaerSrc(i).idx,
+            wr_en => synch_fifo_wr_en(i),
+            rd_en => synch_fifo_rd_en(i),
+            dout => ii_tx_toSaerSrc_synched(i).idx,
+            full => synch_fifo_full(i),
+            empty => synch_fifo_empty(i)
+          );
+        synch_fifo_wr_en(i) <= ii_tx_toSaerSrc(i).vld and not(synch_fifo_full(i));
+        synch_fifo_rd_en(i) <= ii_tx_toSaerDst(i).rdy and not(synch_fifo_empty(i));
+        
+        ii_tx_toSaerSrc_synched(i).vld <= not(synch_fifo_empty(i));
+       
             u_paer2hssaer_tx : hssaer_paer_tx_wrapper
                 generic map (
                     dsize       => C_PAER_DSIZE,        -- positive;
@@ -305,8 +333,8 @@ begin
                     clkn        => Clk_ls_n,                              -- in  std_logic;
                     keep_alive  => keep_alive,                            -- in  std_logic;
 
-                    ae          => ii_tx_toSaerSrc(i).idx,                -- in  std_logic_vector(int_dsize-1 downto 0);
-                    src_rdy     => ii_tx_toSaerSrc(i).vld,                -- in  std_logic;
+                    ae          => ii_tx_toSaerSrc_synched(i).idx,                -- in  std_logic_vector(int_dsize-1 downto 0);
+                    src_rdy     => ii_tx_toSaerSrc_synched(i).vld,                -- in  std_logic;
                     dst_rdy     => ii_tx_toSaerDst(i).rdy,                -- out std_logic;
 
                     tx          => HSSAER_Tx_o(i),                        -- out std_logic;

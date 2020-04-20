@@ -128,9 +128,21 @@ port (
 end entity hpu_rx_datapath;
 
 
-
-
 architecture str of hpu_rx_datapath is
+
+COMPONENT synch_fifo
+  PORT (
+    rst : IN STD_LOGIC;
+    wr_clk : IN STD_LOGIC;
+    rd_clk : IN STD_LOGIC;
+    din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    wr_en : IN STD_LOGIC;
+    rd_en : IN STD_LOGIC;
+    dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    full : OUT STD_LOGIC;
+    empty : OUT STD_LOGIC
+  );
+END COMPONENT;
 
     signal i_InPaerSrc : t_PaerSrc_array(0 to 3);
     signal i_InPaerDst : t_PaerDst_array(0 to 3);
@@ -225,12 +237,20 @@ begin
 
         signal ii_hssaer_nrst : std_logic;
         signal ii_rx_fromSaerSrc : t_PaerSrc_array(0 to C_HSSAER_N_CHAN-1);
+        signal ii_rx_fromSaerSrc_synched : t_PaerSrc_array(0 to C_HSSAER_N_CHAN-1);
         signal ii_rx_fromSaerDst : t_PaerDst_array(0 to C_HSSAER_N_CHAN-1);
+        signal ii_rx_fromSaerDst_synched : t_PaerDst_array(0 to C_HSSAER_N_CHAN-1);
         signal i_HSSAER_Rx : std_logic_vector(0 to C_HSSAER_N_CHAN-1);
+        signal synch_fifo_wr_en : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+        signal synch_fifo_rd_en : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+        signal synch_fifo_full : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+        signal synch_fifo_empty : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+        signal i_reset_synch_fifos : std_logic;
 
     begin
 
         ii_hssaer_nrst <= nRst and EnableHSSAER_i;
+        i_reset_synch_fifos <= not(ii_hssaer_nrst);
 
         g_hssaer_rx : for i in 0 to C_HSSAER_N_CHAN-1 generate
             --for all : hssaer_paer_rx use entity hssaer_lib.hssaer_paer_rx(module);
@@ -254,7 +274,7 @@ begin
 
                     ae          => ii_rx_fromSaerSrc(i).idx, -- out std_logic_vector(int_dsize-1 downto 0);
                     src_rdy     => ii_rx_fromSaerSrc(i).vld, -- out std_logic;
-                    dst_rdy     => ii_rx_fromSaerDst(i).rdy, -- in  std_logic;
+                    dst_rdy     => ii_rx_fromSaerDst_synched(i).rdy, -- in  std_logic;
 
                     err_ko      => i_RxSaerStat(i).err_ko,   -- out std_logic;
                     err_rx      => i_RxSaerStat(i).err_rx,   -- out std_logic;
@@ -265,6 +285,24 @@ begin
 
                     aux_channel => Aux_Channel_i             -- in  std_logic;
                 );
+             
+             i_synch_fifo : synch_fifo
+                  PORT MAP (
+                    rst => i_reset_synch_fifos,
+                    wr_clk => Clk_ls_p,
+                    rd_clk => Clk_core,
+                    din => ii_rx_fromSaerSrc(i).idx,
+                    wr_en => synch_fifo_wr_en(i),
+                    rd_en => synch_fifo_rd_en(i),
+                    dout => ii_rx_fromSaerSrc_synched(i).idx,
+                    full => synch_fifo_full(i),
+                    empty => synch_fifo_empty(i)
+                  );
+            
+            synch_fifo_wr_en(i) <= ii_rx_fromSaerSrc(i).vld and not(synch_fifo_full(i));
+            synch_fifo_rd_en(i) <= ii_rx_fromSaerDst(i).rdy and not(synch_fifo_empty(i));
+            ii_rx_fromSaerSrc_synched(i).vld <= not(synch_fifo_empty(i));
+            ii_rx_fromSaerDst_synched(i).rdy <= not(synch_fifo_full(i));
 
    p_debug_check : process (Clk_ls_p)
     begin
@@ -309,7 +347,7 @@ RxSaerStat_o(i) <= i_RxSaerStat(i);
 
                 --ArbCfg_i           =>                     -- in  t_ArbiterCfg;
 
-                SplittedPaerSrc_i  => ii_rx_fromSaerSrc,  -- in  t_PaerSrc_array(0 to C_NUM_CHAN-1);
+                SplittedPaerSrc_i  => ii_rx_fromSaerSrc_synched,  -- in  t_PaerSrc_array(0 to C_NUM_CHAN-1);
                 SplittedPaerDst_o  => ii_rx_fromSaerDst,  -- out t_PaerDst_array(0 to C_NUM_CHAN-1);
 
                 PaerData_o         => i_InPaerSrc(1).idx, -- out std_logic_vector(C_ODATA_WIDTH-1 downto 0);
