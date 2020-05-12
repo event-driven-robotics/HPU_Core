@@ -1,6 +1,7 @@
 # HPU_Core
 The **Head Processor Unit Core (HPU Core)** is an AXI peripheral used to manage different input AER or SpiNNlink streaming and transfer the acquired data into memory through DMA interface or by reading registers with Host CPU.
 It is also Transmission capable, and permits to send AER or SpiNNlink streaming to external devices.
+
 ![HPUmodule](./doc/Pics/HPUCore_module.png)
 
 ## Block Diagram
