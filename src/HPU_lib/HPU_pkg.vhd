@@ -50,8 +50,24 @@ type time_tick is record
             C_TX_HSSAER_N_CHAN      : natural range 1 to 4;
             C_TX_HAS_GTP            : boolean;
 			C_TX_HAS_SPNNLNK        : boolean;
-            C_PSPNNLNK_WIDTH        : natural range 1 to 32
-        );
+            C_PSPNNLNK_WIDTH        : natural range 1 to 32;
+		
+            C_RX_PAER_L_SENS_ID     : std_logic_vector(2 downto 0);
+            C_RX_SAER0_L_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_SAER1_L_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_SAER2_L_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_SAER3_L_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_PAER_R_SENS_ID     : std_logic_vector(2 downto 0);
+            C_RX_SAER0_R_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_SAER1_R_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_SAER2_R_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_SAER3_R_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_PAER_A_SENS_ID     : std_logic_vector(2 downto 0);
+            C_RX_SAER0_A_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_SAER1_A_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_SAER2_A_SENS_ID    : std_logic_vector(2 downto 0);
+            C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0)
+            );
         port (
             --
             -- Clocks & Reset

@@ -37,18 +37,34 @@ library spinn_neu_if_lib;
 
 entity neuserial_core is
     generic (
-        C_PAER_DSIZE            : natural range 1 to 29   := 24;
-        C_RX_HAS_PAER           : boolean                 := true;
-        C_RX_HAS_HSSAER         : boolean                 := true;
-        C_RX_HSSAER_N_CHAN      : natural range 1 to 4    := 3;
-        C_RX_HAS_GTP            : boolean                 := true;
-        C_RX_HAS_SPNNLNK        : boolean                 := true;
-        C_TX_HAS_PAER           : boolean                 := true;
-        C_TX_HAS_HSSAER         : boolean                 := true;
-        C_TX_HSSAER_N_CHAN      : natural range 1 to 4    := 2;
-        C_TX_HAS_GTP            : boolean                 := true;
-        C_TX_HAS_SPNNLNK        : boolean                 := true;
-		C_PSPNNLNK_WIDTH      	: natural range 1 to 32   := 32
+        C_PAER_DSIZE            : natural range 1 to 29         := 24;
+        C_RX_HAS_PAER           : boolean                       := true;
+        C_RX_HAS_HSSAER         : boolean                       := true;
+        C_RX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;
+        C_RX_HAS_GTP            : boolean                       := true;
+        C_RX_HAS_SPNNLNK        : boolean                       := true;
+        C_TX_HAS_PAER           : boolean                       := true;
+        C_TX_HAS_HSSAER         : boolean                       := true;
+        C_TX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;
+        C_TX_HAS_GTP            : boolean                       := true;
+        C_TX_HAS_SPNNLNK        : boolean                       := true;
+		C_PSPNNLNK_WIDTH      	: natural range 1 to 32         := 32;
+		
+        C_RX_PAER_L_SENS_ID     : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER0_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER1_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER2_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER3_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";
+        C_RX_PAER_R_SENS_ID     : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER0_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER1_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER2_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER3_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";
+        C_RX_PAER_A_SENS_ID     : std_logic_vector(2 downto 0)  := "001";
+        C_RX_SAER0_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";
+        C_RX_SAER1_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";
+        C_RX_SAER2_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";
+        C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001"
     );
     port (
         --
@@ -348,15 +364,24 @@ architecture str of neuserial_core is
     constant C_SRC_ID_OTHER_SENS    : std_logic_vector(2 downto 0) := "X1X";
     constant c_zero_vect : std_logic_vector(C_INTERNAL_DSIZE-C_PAER_DSIZE-4-1 downto 0) := (others => '0');
 
-    constant c_LRxPaerHighBits : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_SRC_ID_CAMERA;
-    constant c_LRxSaerHighBits : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_SRC_ID_CAMERA;
-    constant c_LRxGtpHighBits  : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_SRC_ID_CAMERA;
-    constant c_RRxPaerHighBits : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_SRC_ID_CAMERA;
-    constant c_RRxSaerHighBits : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_SRC_ID_CAMERA;
-    constant c_RRxGtpHighBits  : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_SRC_ID_CAMERA;
-    constant c_AuxRxPaerHighBits : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_SRC_ID_AUX_SKIN_SENS;
-    constant c_AuxRxSaerHighBits : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_SRC_ID_AUX_SKIN_SENS;
-    constant c_AuxRxGtpHighBits  : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_SRC_ID_AUX_SKIN_SENS;
+    constant c_LRxPaerHighBits    : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_PAER_L_SENS_ID;
+    constant c_LRxSaerHighBits0   : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER0_L_SENS_ID;
+    constant c_LRxSaerHighBits1   : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER1_L_SENS_ID;
+    constant c_LRxSaerHighBits2   : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER2_L_SENS_ID;
+    constant c_LRxSaerHighBits3   : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER3_L_SENS_ID;
+    constant c_LRxGtpHighBits     : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & "111";                
+    constant c_RRxPaerHighBits    : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_PAER_R_SENS_ID; 
+    constant c_RRxSaerHighBits0   : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER0_R_SENS_ID;
+    constant c_RRxSaerHighBits1   : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER1_R_SENS_ID;
+    constant c_RRxSaerHighBits2   : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER2_R_SENS_ID;
+    constant c_RRxSaerHighBits3   : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER3_R_SENS_ID;
+    constant c_RRxGtpHighBits     : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & "111";               
+    constant c_AuxRxPaerHighBits  : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_PAER_A_SENS_ID; 
+    constant c_AuxRxSaerHighBits0 : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER0_A_SENS_ID;
+    constant c_AuxRxSaerHighBits1 : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER1_A_SENS_ID;
+    constant c_AuxRxSaerHighBits2 : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER2_A_SENS_ID;
+    constant c_AuxRxSaerHighBits3 : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & C_RX_SAER3_A_SENS_ID;
+    constant c_AuxRxGtpHighBits   : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  C_EVENT_TYPE_ADDRESS & c_zero_vect & "111";               
 
 
     -----------------------------------------------------------------------------
@@ -711,7 +736,10 @@ begin
             PaerSampleDelay_i    => RxPaerSampleDelay_i,         -- in  std_logic_vector(7 downto 0);
             PaerAckRelDelay_i    => RxPaerAckRelDelay_i,         -- in  std_logic_vector(7 downto 0);
             -- HSSAER
-            RxSaerHighbits_i     => c_LRxSaerHighBits,           -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits0_i    => c_LRxSaerHighBits0,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits1_i    => c_LRxSaerHighBits1,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits2_i    => c_LRxSaerHighBits2,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits3_i    => c_LRxSaerHighBits3,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
             HSSaerChanEn_i       => LRxSaerChanEn_i,             -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
             -- GTP
             RxGtpHighbits_i      => c_LRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
@@ -829,7 +857,10 @@ begin
             PaerSampleDelay_i    => RxPaerSampleDelay_i,         -- in  std_logic_vector(7 downto 0);
             PaerAckRelDelay_i    => RxPaerAckRelDelay_i,         -- in  std_logic_vector(7 downto 0);
             -- HSSAER
-            RxSaerHighbits_i     => c_RRxSaerHighBits,           -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits0_i    => c_RRxSaerHighBits0,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits1_i    => c_RRxSaerHighBits1,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits2_i    => c_RRxSaerHighBits2,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits3_i    => c_RRxSaerHighBits3,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
             HSSaerChanEn_i       => RRxSaerChanEn_i,             -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
             -- GTP
             RxGtpHighbits_i      => c_RRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
@@ -948,7 +979,10 @@ begin
             PaerSampleDelay_i    => RxPaerSampleDelay_i,         -- in  std_logic_vector(7 downto 0);
             PaerAckRelDelay_i    => RxPaerAckRelDelay_i,         -- in  std_logic_vector(7 downto 0);
             -- HSSAER
-            RxSaerHighbits_i     => c_AuxRxSaerHighBits,         -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits0_i    => c_AuxRxSaerHighBits0,        -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits1_i    => c_AuxRxSaerHighBits1,        -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits2_i    => c_AuxRxSaerHighBits2,        -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighbits3_i    => c_AuxRxSaerHighBits3,        -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
             HSSaerChanEn_i       => AuxRxSaerChanEn_i,           -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
             -- GTP
             RxGtpHighbits_i      => c_AuxRxGtpHighBits,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);

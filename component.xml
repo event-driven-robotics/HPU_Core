@@ -3,7 +3,7 @@
   <spirit:vendor>IIT</spirit:vendor>
   <spirit:library>IIT_lib</spirit:library>
   <spirit:name>HPU_Core</spirit:name>
-  <spirit:version>3.5</spirit:version>
+  <spirit:version>3.6</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
       <spirit:name>M_AXIS</spirit:name>
@@ -331,30 +331,6 @@
         </spirit:portMap>
       </spirit:portMaps>
     </spirit:busInterface>
-    <spirit:busInterface>
-      <spirit:name>nSyncReset</spirit:name>
-      <spirit:displayName>nSyncReset</spirit:displayName>
-      <spirit:description>nSyncReset</spirit:description>
-      <spirit:busType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset" spirit:version="1.0"/>
-      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset_rtl" spirit:version="1.0"/>
-      <spirit:slave/>
-      <spirit:portMaps>
-        <spirit:portMap>
-          <spirit:logicalPort>
-            <spirit:name>RST</spirit:name>
-          </spirit:logicalPort>
-          <spirit:physicalPort>
-            <spirit:name>nSyncReset</spirit:name>
-          </spirit:physicalPort>
-        </spirit:portMap>
-      </spirit:portMaps>
-      <spirit:parameters>
-        <spirit:parameter>
-          <spirit:name>POLARITY</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.NSYNCRESET.POLARITY">ACTIVE_LOW</spirit:value>
-        </spirit:parameter>
-      </spirit:parameters>
-    </spirit:busInterface>
   </spirit:busInterfaces>
   <spirit:memoryMaps>
     <spirit:memoryMap>
@@ -385,7 +361,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>fe1d6abb</spirit:value>
+            <spirit:value>4fa06ebd</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -404,7 +380,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>fe1d6abb</spirit:value>
+            <spirit:value>4fa06ebd</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -419,7 +395,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>4980ee26</spirit:value>
+            <spirit:value>bd5a2d40</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -433,7 +409,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>957cc4d4</spirit:value>
+            <spirit:value>a9201570</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -447,7 +423,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>38b97564</spirit:value>
+            <spirit:value>164132c2</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -902,7 +878,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_data_2of7_from_spinnaker_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;))">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_data_2of7_from_spinnaker_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;)) = true">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -925,7 +901,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_ack_to_spinnaker_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;))">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_ack_to_spinnaker_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;)) = true">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -952,7 +928,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_data_2of7_from_spinnaker_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;))">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_data_2of7_from_spinnaker_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;)) = true">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -975,7 +951,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_ack_to_spinnaker_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;))">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_ack_to_spinnaker_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;)) = true">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -1002,7 +978,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_data_2of7_from_spinnaker_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;))">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_data_2of7_from_spinnaker_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;)) = true">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -1025,7 +1001,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_ack_to_spinnaker_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;))">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_ack_to_spinnaker_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_HAS_SPNNLNK&apos;)) = true">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2995,6 +2971,102 @@
         <spirit:displayName>C Slv Dwidth</spirit:displayName>
         <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_SLV_DWIDTH">32</spirit:value>
       </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_PAER_L_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Paer L Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_PAER_L_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER0_L_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer0 L Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER0_L_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER1_L_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer1 L Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER1_L_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER2_L_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer2 L Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER2_L_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER3_L_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer3 L Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER3_L_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+        <spirit:vendorExtensions>
+          <xilinx:parameterInfo>
+            <xilinx:enablement>
+              <xilinx:isEnabled xilinx:id="MODELPARAM_ENABLEMENT.C_RX_SAER3_L_SENS_ID">false</xilinx:isEnabled>
+            </xilinx:enablement>
+          </xilinx:parameterInfo>
+        </spirit:vendorExtensions>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_PAER_R_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Paer R Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_PAER_R_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER0_R_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer0 R Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER0_R_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER1_R_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer1 R Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER1_R_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER2_R_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer2 R Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER2_R_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER3_R_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer3 R Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER3_R_SENS_ID" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+        <spirit:vendorExtensions>
+          <xilinx:parameterInfo>
+            <xilinx:enablement>
+              <xilinx:isEnabled xilinx:id="MODELPARAM_ENABLEMENT.C_RX_SAER3_R_SENS_ID">false</xilinx:isEnabled>
+            </xilinx:enablement>
+          </xilinx:parameterInfo>
+        </spirit:vendorExtensions>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_PAER_A_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Paer A Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_PAER_A_SENS_ID" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER0_A_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer0 A Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER0_A_SENS_ID" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER1_A_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer1 A Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER1_A_SENS_ID" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER2_A_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer2 A Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER2_A_SENS_ID" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="std_logic_vector(2 downto 0)">
+        <spirit:name>C_RX_SAER3_A_SENS_ID</spirit:name>
+        <spirit:displayName>C Rx Saer3 A Sens Id</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_RX_SAER3_A_SENS_ID" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+        <spirit:vendorExtensions>
+          <xilinx:parameterInfo>
+            <xilinx:enablement>
+              <xilinx:isEnabled xilinx:id="MODELPARAM_ENABLEMENT.C_RX_SAER3_A_SENS_ID">false</xilinx:isEnabled>
+            </xilinx:enablement>
+          </xilinx:parameterInfo>
+        </spirit:vendorExtensions>
+      </spirit:modelParameter>
     </spirit:modelParameters>
   </spirit:model>
   <spirit:choices>
@@ -3002,6 +3074,14 @@
       <spirit:name>choice_list_9d8b0d81</spirit:name>
       <spirit:enumeration>ACTIVE_HIGH</spirit:enumeration>
       <spirit:enumeration>ACTIVE_LOW</spirit:enumeration>
+    </spirit:choice>
+    <spirit:choice>
+      <spirit:name>choice_pairs_4c98ecdc</spirit:name>
+      <spirit:enumeration spirit:text="Eye">&quot;000&quot;</spirit:enumeration>
+      <spirit:enumeration spirit:text="Skin">&quot;001&quot;</spirit:enumeration>
+      <spirit:enumeration spirit:text="Ear">&quot;100&quot;</spirit:enumeration>
+      <spirit:enumeration spirit:text="IMU">&quot;010&quot;</spirit:enumeration>
+      <spirit:enumeration spirit:text="Generic">&quot;111&quot;</spirit:enumeration>
     </spirit:choice>
   </spirit:choices>
   <spirit:fileSets>
@@ -3284,13 +3364,15 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/HPU_lib/time_machine.vhd</spirit:name>
+        <spirit:name>src/HPU_lib/timestamp.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/HPU_lib/timestamp.vhd</spirit:name>
+        <spirit:name>src/HPU_lib/HPUCore.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_4ba6b59e</spirit:userFileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
@@ -3310,10 +3392,9 @@
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/HPU_lib/HPUCore.vhd</spirit:name>
+        <spirit:name>src/HPU_lib/time_machine.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_4ba6b59e</spirit:userFileType>
-        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_48d0bb97</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
@@ -3606,12 +3687,13 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/HPU_lib/time_machine.vhd</spirit:name>
+        <spirit:name>src/HPU_lib/timestamp.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/HPU_lib/timestamp.vhd</spirit:name>
+        <spirit:name>src/HPU_lib/HPUCore.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
@@ -3632,9 +3714,8 @@
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/HPU_lib/HPUCore.vhd</spirit:name>
+        <spirit:name>src/HPU_lib/time_machine.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
@@ -3654,45 +3735,57 @@
         <spirit:name>sim/AER_Device_Emulator.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+        <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>sim/SpiNNaker_emulator.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+        <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>sim/AXI4LiteMasterBFM_pkg.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>sim/axi4lite_bfm_v00.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>sim/HPUcore_tb.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>sim/HPUcore_tb_behav.wcfg</spirit:name>
         <spirit:fileType>unknown</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/HPU_Core_v3_5.tcl</spirit:name>
+        <spirit:name>xgui/HPU_Core_v3_6.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_957cc4d4</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_a9201570</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -3865,6 +3958,186 @@
       <spirit:name>Component_Name</spirit:name>
       <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">HPU_Core_v3_5</spirit:value>
     </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_PAER_L_SENS_ID</spirit:name>
+      <spirit:displayName>Left port</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_PAER_L_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_PAER_L_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER0_L_SENS_ID</spirit:name>
+      <spirit:displayName>Ch0</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER0_L_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER0_L_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER1_L_SENS_ID</spirit:name>
+      <spirit:displayName>Ch1</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER1_L_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER1_L_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER2_L_SENS_ID</spirit:name>
+      <spirit:displayName>Ch2</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER2_L_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER2_L_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER3_L_SENS_ID</spirit:name>
+      <spirit:displayName>Ch3</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER3_L_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER3_L_SENS_ID">false</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_PAER_R_SENS_ID</spirit:name>
+      <spirit:displayName>Right port</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_PAER_R_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_PAER_R_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER0_R_SENS_ID</spirit:name>
+      <spirit:displayName>Ch0</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER0_R_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER0_R_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER1_R_SENS_ID</spirit:name>
+      <spirit:displayName>Ch1</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER1_R_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER1_R_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER2_R_SENS_ID</spirit:name>
+      <spirit:displayName>Ch2</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER2_R_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER2_R_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER3_R_SENS_ID</spirit:name>
+      <spirit:displayName>Ch3</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER3_R_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;000&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER3_R_SENS_ID">false</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_PAER_A_SENS_ID</spirit:name>
+      <spirit:displayName>Aux port</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_PAER_A_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_PAER_A_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER0_A_SENS_ID</spirit:name>
+      <spirit:displayName>Ch0</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER0_A_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER0_A_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER1_A_SENS_ID</spirit:name>
+      <spirit:displayName>Ch1</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER1_A_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER1_A_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER2_A_SENS_ID</spirit:name>
+      <spirit:displayName>Ch2</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER2_A_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER2_A_SENS_ID">true</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>C_RX_SAER3_A_SENS_ID</spirit:name>
+      <spirit:displayName>Ch3</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_SAER3_A_SENS_ID" spirit:choiceRef="choice_pairs_4c98ecdc" spirit:bitStringLength="3">&quot;001&quot;</spirit:value>
+      <spirit:vendorExtensions>
+        <xilinx:parameterInfo>
+          <xilinx:enablement>
+            <xilinx:isEnabled xilinx:resolve="generated" xilinx:id="PARAM_ENABLEMENT.C_RX_SAER3_A_SENS_ID">false</xilinx:isEnabled>
+          </xilinx:enablement>
+        </xilinx:parameterInfo>
+      </spirit:vendorExtensions>
+    </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
     <xilinx:coreExtensions>
@@ -3902,8 +4175,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>20</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2020-05-12T15:29:52Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>23</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2020-10-22T08:22:10Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
@@ -3916,16 +4189,486 @@
         <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.3_ARCHIVE_LOCATION">d:/Projects/Repository/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.4_ARCHIVE_LOCATION">/home/fdiotalevi/design/EventDrivenDesigns/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:IIT_lib:HPU_Core:3.5_ARCHIVE_LOCATION">/home/fdiotalevi/design/EventDrivenDesigns/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@465c3749_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@79f203bc_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7bc2d66f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@41d08eda_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2c5c6ff6_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5086ede2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@60163f72_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@58f45d74_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@51e48a8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f71195b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@65c592b8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@49947b72_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2675308c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@244dd5c2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c19a546_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7420dbac_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3fea7370_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@73b0e264_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7a0b0b0b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6411d284_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77ab5a2e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2ebc9b74_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3858770c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@db40577_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5fb8d82d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54dba9cd_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2acf1035_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2535a685_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4376abdb_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75bcdad4_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a14bb7c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61502335_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@475893ed_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c4553e4_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@104f8e61_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@789697de_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@62c71f77_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@609b6298_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3155e328_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e004c2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c3ac350_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6434775d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77cda96e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c79ed93_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f2f3885_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@662baffa_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1af475ed_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5eaa054_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5322a58b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@24082f84_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1245434d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4bd024ae_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f6617be_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2db048aa_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@179d1cee_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1976de2c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69c563f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bf7984a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@fa93b84_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4deb2bfc_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d65be5c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4bcaf716_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70f033a5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2c772b2e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@41fa11d2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3d8d5110_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@71483011_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69cfa471_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30465421_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1e913445_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@582fc5a8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@60e52d9e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@219e4341_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@544a3824_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@609f91d3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5d448ba_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@270ba4be_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e1600c3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@52ea3ec1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@633d124b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bfb4421_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@443e6760_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44abe1b5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@ab1b263_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ccd1056_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5377949a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@13e9088b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6f2bd0b1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bf27a91_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6cf2b5e1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7397d409_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@742433da_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3317e89b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2686e500_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@746bf8b6_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5abcb111_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d74dd3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6504f6da_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@398b435_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2b3ceb11_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@334c86ce_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@13f60cc8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@404a4cfd_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d5adfba_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7cb17041_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7f9dc573_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2bf8a5ad_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e54effb_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@43f75e6b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1046e533_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7379533b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@738e5748_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2a237187_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@602a465c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@729e5b37_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@62b7a86a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@270eacdb_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b9765d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2379cdd0_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14a6f98_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3de72507_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@68162aed_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@156f59a2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@984efc_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@48b15faa_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1bcc2b84_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1c4530d6_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@689ed24_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@471de9e5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3154c6bd_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@448349f5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2e72fa05_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@51f8a6_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6fae25ab_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75ea06bf_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3266365a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@68fc1119_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@53379893_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c00e5ec_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@27a60c77_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2ff85bfe_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@272319f0_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@62ef1ae8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@439e6f10_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a7221ef_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5374f188_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@273c0b4d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@78d37964_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@389ea0e9_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14276314_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7f804f73_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@446a8086_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d41aab5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6e4f20e2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f225fb2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39ebc063_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@76991ac7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3daf9d9d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1a0fe57f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3051ddc9_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5bd062ec_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f8bc10_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30b6d93a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b86d889_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6604facd_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4046114_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1531f40b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1ed16b11_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@45c57df_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2947350_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@498f9c25_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@52d842f7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@700bc4d3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5d9c80f0_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@59206af7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@239fe164_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@488997cb_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@998694f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30789c5e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30826c6b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@537dc4de_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2032d095_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@13d734a8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1b85f503_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4440af8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@145ce4a1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@579c7a1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d22cf41_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@25394f2a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7ad2499d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@787eb836_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@42d8e76c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14281089_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ca5cae7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b501d5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44008d53_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@74d10eb2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@18ee974c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@53f3adef_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@8dfca5e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@877274c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36c92366_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3221ab4b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7233cd7e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@51e6dfc_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4c2e828d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@c7b2ce4_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f45fcfb_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d4d4841_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1785cd41_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@363a3acb_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d32b0ad_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@56215831_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@664ec617_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@51010aeb_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39981c27_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6044fd32_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d084812_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e7de77d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@45affbb1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a387d0c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bcca952_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1fd98eda_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@683e4c88_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16762f6d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20170e5c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1601aec_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61174b01_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@287f9d04_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39d28d7c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5e3c2334_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1eed196a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7398f745_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2376f4d0_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@555519a8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7c68722c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69878975_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11a34d94_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d56f519_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d7dc4db_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6fe950ff_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2cf26307_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@12e9ed30_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2baeb6db_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@58516aee_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@480a7ea2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@49995119_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@15dc98a6_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f47125d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d58addf_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5988c8e0_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@45285180_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4967e02_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4fe8b718_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b59041e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7164bb43_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14379c71_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ce0ce1a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3049e403_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@45a33c98_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@42124f0a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1f397397_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c083bb_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2c49bc17_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@fac2b42_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@264c5b88_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3df5c07d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2c524d68_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1e7fa60_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4d4429_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b957a81_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d6316b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@615f88c9_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7f96a641_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e3c4515_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@685f52c5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b8a6a0f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57f3f448_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f3f7655_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@46c2b166_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@602012f6_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@617047d3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1eef12a3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3fa1bacd_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4b560f27_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@692c070_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f889814_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7a962530_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@12fba0bb_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@727a673b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75cb64d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9e6412d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5c2c7520_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@181ef947_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@694583b3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e12e430_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75ccec27_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e60937a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@59d9ea59_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1aff7de3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@a9f5113_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4eda2940_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@419c6b73_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44a5f197_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@ae2da01_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7a3eaa06_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f1366a3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5e82a1a9_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7ec84968_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7cdecf68_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7dafbb4a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5b9065a7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d13838b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6dcd39a3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e6e0a0c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@53369d38_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@18e1763b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5988c98e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3d35c4b3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@353eff70_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1f31e059_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@705f893e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3949d10_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3eaca021_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@213991f7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@196749de_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c052ddf_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4be259e4_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@482fed81_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@55497c95_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@23a6d2f9_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@373c1f31_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6290d4b2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@66f0b8ea_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@709f77ac_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1ebb9111_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@177ed52d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ff2e20d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4682ad67_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@212f79ee_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3eaa25da_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@584e7c56_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4941_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@34ed67ab_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@247bd030_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@57f1a826_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20642023_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d63f923_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7550b2d9_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3be83663_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@568c3b32_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ccb7b22_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5edef90_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7f8eb26d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@545bc351_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2db38eb7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7bf1ea37_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@656d4610_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@267c9d8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@358ff611_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c48edfe_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@124f602a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3da04e54_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5a4814fa_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b1b26fc_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5e4f7757_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@288ba179_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3abe43c8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7adb8371_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d1c74b7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3383bc66_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6cbd2303_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5866f17f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f8a8aad_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6bc81ec7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e6b571c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5da18316_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a68fe36_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5dd38910_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1ae89241_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11fe2815_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1629d4f3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b32fa19_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@717af8a6_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20ea6a04_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3bb4532f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@176afc26_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3fc8561a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@374e606c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a96a203_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@f52b283_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@613fdba4_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7774520d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5c49b677_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@370fe33a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@22aae643_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@26d2930e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2b166d8a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@67f29fe7_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@47a968a4_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75af78be_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@71c32aed_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36a7c163_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2046af2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c4472c3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54145725_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1d8f8516_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5dd07f8c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@45068c47_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1acbc077_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1cbf5683_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2bcea64_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@75a45759_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@a8114be_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1b846204_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@67458c1f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@51dd03f5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@41752524_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20177fd8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bd138cd_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4cdae4d0_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4441555d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@a624783_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@643a2b61_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@56a97135_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d51b49b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20ae3baf_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3432cff1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@73e624f5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d75e621_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2678de9b_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@264792e3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@63c68fde_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@267fb785_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6bb31741_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e6ed58a_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@152d05f8_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2ac5f937_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ff9db12_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@834d0fc_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7425b01c_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7febff09_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4da8098_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72ad634_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@29cacc2d_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@686b7e1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@ae4ed3e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1f55e6cc_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5f024063_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@8d97a84_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@293131df_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bd8dc54_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1698eda3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6e78033_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69bfdb1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30907250_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d3d600f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2a2ee9d2_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e31213f_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@15a0f30e_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6f2d5c43_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a6a8854_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@30fa76a5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39adb3e1_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4a5affc4_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ac16c75_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@444d4bd3_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@ecf9692_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ccdb850_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@674652c5_ARCHIVE_LOCATION">c:/Progetti/Repository/HPU_Core</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2017.4</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="3042bd80"/>
+      <xilinx:xilinxVersion>2019.1</xilinx:xilinxVersion>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="0a8614a2"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="6e18ba83"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="d8c0bfec"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="5c8b6173"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="76d292fc"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="20a668bb"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="61673f8b"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="ba38fac6"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="f2289afd"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

@@ -1,4 +1,4 @@
-// (c) Copyright 1995-2018 Xilinx, Inc. All rights reserved.
+// (c) Copyright 1995-2020 Xilinx, Inc. All rights reserved.
 // 
 // This file contains confidential and proprietary information
 // of Xilinx, Inc. and is protected under U.S. and
@@ -48,7 +48,7 @@
 
 
 // IP VLNV: xilinx.com:ip:fifo_generator:13.2
-// IP Revision: 1
+// IP Revision: 4
 
 `timescale 1ns/1ps
 
@@ -69,7 +69,7 @@ module Infifo_64_1024_32 (
   data_count
 );
 
-(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME core_clk, FREQ_HZ 100000000, PHASE 0.000" *)
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME core_clk, FREQ_HZ 100000000, PHASE 0.000, INSERT_VIP 0" *)
 (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 core_clk CLK" *)
 input wire clk;
 input wire srst;
@@ -93,7 +93,7 @@ output wire almost_empty;
 output wire underflow;
 output wire [10 : 0] data_count;
 
-  fifo_generator_v13_2_1 #(
+  fifo_generator_v13_2_4 #(
     .C_COMMON_CLOCK(1),
     .C_SELECT_XPM(0),
     .C_COUNT_TYPE(0),

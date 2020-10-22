@@ -1,3 +1,30 @@
+2019.1:
+ * Version 13.2 (Rev. 4)
+ * Bug Fix: Destination Clock not connected properly for some XPM_CDC instances when in common clock mode. Conditions added to connect the correct clock
+ * Other: IP Waivers added in constraint files. No functional changes
+ * Revision change in one or more subcores
+
+2018.3.1:
+ * Version 13.2 (Rev. 3)
+ * No changes
+
+2018.3:
+ * Version 13.2 (Rev. 3)
+ * Feature Enhancement: None
+ * Other: Reduced simulation warnings in Behavioral model. No functional changes
+ * Revision change in one or more subcores
+
+2018.2:
+ * Version 13.2 (Rev. 2)
+ * No changes
+
+2018.1:
+ * Version 13.2 (Rev. 2)
+ * Bug Fix: Enable Safety Circuit option was unintentionally made available for user selection when Enable Reset Synchronization is not selected. This unintentional enablement is corrected and Enable Safety Circuit is available for user selection only if Enable Reset Synchronization option is selected
+ * Bug Fix: REQP-1839 DRC warning removed from example test bench
+ * Bug Fix: Read Data Count in behavioral model is updated to start with a valid value when Enable Reset Synchronization option is not selected
+ * Other: As FIFO Generator core uses XPM_CDC module, user must ensure that the wr_rst and rd_rst overlap for at least C_SYNCHRONIZER_STAGE+1 slowest clock cycles if Enable Reset Synchronization option is disabled
+
 2017.4:
  * Version 13.2 (Rev. 1)
  * Revision change in one or more subcores
@@ -11,33 +38,36 @@
  * Feature Enhancement: The outputs of FIFO Generator may be Xs for initial few clock cycles if the core is configured without reset. It is recommended to wait for 15 slowest clock cycles at the beginning of behavioral simulation (from time 0) before accessing the FIFO
 
 2017.2:
- * Version 13.1 (Rev. 3)
+ * Version 13.1 (Rev. 4)
  * No changes
 
 2017.1:
- * Version 13.1 (Rev. 3)
+ * Version 13.1 (Rev. 4)
  * Bug Fix: FIFO Generator core was constructing the buit-in FIFO sub-optimally for 2K-deep and 36-bit wide configuration. This is corrected to use the optimal FIFO structure
  * Bug Fix: In order to enable the tool to perform the recovery check on the reset, set_false_path for reset is kept only from the input port to the first flop where it connects to
  * Feature Enhancement: Updated the FIFO Generator's constraints to improve tool performance processing its XDC
  * Other: Internal device family change, no functional changes
+ * Revision change in one or more subcores
 
 2016.4:
- * Version 13.1 (Rev. 2)
+ * Version 13.1 (Rev. 3)
  * Port Change: None
  * Bug Fix: Supported features table in the first page of GUI updated to reflect the asymmetry support for common clock BRAM FIFO
  * Feature Enhancement: None
+ * Revision change in one or more subcores
 
 2016.3:
- * Version 13.1 (Rev. 1)
+ * Version 13.1 (Rev. 2)
  * Port Change: wr_rst_busy and rd_rst_busy ports made available if safety circuit is enabled
  * Bug Fix: Fixed issue which was causing the m_axis_tvalid to go high after the reset is released and no valid data written to the FIFO
  * Feature Enhancement: Safety circuit is made independent of Output Register and Enable Reset Synchronization options
  * Other: Added support for future devices
  * Other: Source HDL files are concatenated into a single file to speed up synthesis and simulation. No changes required by the user
+ * Revision change in one or more subcores
 
 2016.2:
- * Version 13.1
- * No changes
+ * Version 13.1 (Rev. 1)
+ * Revision change in one or more subcores
 
 2016.1:
  * Version 13.1
@@ -47,6 +77,7 @@
  * Updated the FIFO Generator GUI to provide Embedded Register option for Built-in FIFO when ECC mode in selected.
  * Programmable Full and Programmable Empty Threshold range has been reduced for UltraScale and UltraScale+ Built-in FIFO configurations. For more information on the exact threshold range change, refer the PG(057)
  * Programmable Full and Programmable Empty Threshold values were reset to its default values when the previous version of the core is upgraded to the latest version. This has been corrected
+ * Revision change in one or more subcores
 
 2015.4.2:
  * Version 13.0 (Rev. 1)
@@ -59,6 +90,7 @@
 2015.4:
  * Version 13.0 (Rev. 1)
  * Fixed safety circuit related warnings in Behavioral model
+ * Revision change in one or more subcores
 
 2015.3:
  * Version 13.0
@@ -138,7 +170,7 @@
  * Native Vivado Release
  * There have been no functional or interface changes to this IP.  The version number has changed to support unique versioning in Vivado starting with 2013.1.
 
-(c) Copyright 2002 - 2018 Xilinx, Inc. All rights reserved.
+(c) Copyright 2002 - 2019 Xilinx, Inc. All rights reserved.
 
 This file contains confidential and proprietary information
 of Xilinx, Inc. and is protected under U.S. and

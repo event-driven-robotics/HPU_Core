@@ -1,10 +1,10 @@
--- Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.
+-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
--- Tool Version: Vivado v.2017.4.1 (win64) Build 2117270 Tue Jan 30 15:32:00 MST 2018
--- Date        : Thu Aug  2 10:22:57 2018
--- Host        : IITICUBWS052 running 64-bit major release  (build 9200)
+-- Tool Version: Vivado v.2019.1 (win64) Build 2552052 Fri May 24 14:49:42 MDT 2019
+-- Date        : Wed Oct 21 15:47:36 2020
+-- Host        : IITICUBLAP127 running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode synth_stub
---               D:/Projects/Repository/SHPUCore_1.0/IP_Vivado/Outfifo_32_2048_64/Outfifo_32_2048_64_stub.vhdl
+--               C:/Progetti/Repository/HPU_Core/src/IP/Vivado/Outfifo_32_2048_64/Outfifo_32_2048_64_stub.vhdl
 -- Design      : Outfifo_32_2048_64
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7z015clg485-2
@@ -37,6 +37,6 @@ attribute black_box_pad_pin : string;
 attribute syn_black_box of stub : architecture is true;
 attribute black_box_pad_pin of stub : architecture is "rst,wr_clk,rd_clk,din[31:0],wr_en,rd_en,dout[63:0],full,almost_full,overflow,empty,almost_empty,underflow";
 attribute x_core_info : string;
-attribute x_core_info of stub : architecture is "fifo_generator_v13_2_1,Vivado 2017.4.1";
+attribute x_core_info of stub : architecture is "fifo_generator_v13_2_4,Vivado 2019.1";
 begin
 end;

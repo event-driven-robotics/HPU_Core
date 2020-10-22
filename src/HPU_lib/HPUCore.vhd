@@ -65,27 +65,44 @@ entity HPUCore is
         -- ADD USER GENERICS BELOW THIS LINE ---------------
 
 
-        C_RX_HAS_PAER              : boolean                 := true;           -- PAER RX Interface:	          if true the RX PAER interface is exposed
-        C_TX_HAS_PAER              : boolean                 := true;           -- PAER TX Interface:	          if true the TX PAER interface is exposed
-        C_PAER_DSIZE               : natural range 1 to 29   := 24;             -- PAER Data Width:	              size of PAER address
-        C_RX_HAS_HSSAER            : boolean                 := true;           -- HSSAER RX Interface:	          if true the RX HSSAER interface is exposed
-        C_RX_HSSAER_N_CHAN         : natural range 1 to 4    := 3;              -- HSSAER RX Channels:	          the number of RX HSSAER channels
-        C_TX_HAS_HSSAER            : boolean                 := true;           -- HSSAER TX Interface:	          if true the TX HSSAER interface is exposed
-        C_TX_HSSAER_N_CHAN         : natural range 1 to 4    := 3;              -- HSSAER TX Channels:	          the number of TX HSSAER channels
-        C_RX_HAS_GTP               : boolean                 := false;           -- GTP RX Interface:              if true the RX GTP interface is exposed
-        C_TX_HAS_GTP               : boolean                 := false;          -- GTP TX Interface:	          if true the TX GTP interface is exposed
-        C_RX_HAS_SPNNLNK           : boolean                 := true;           -- SpiNNlink RX Interface:        if true the RX SpiNNlink interface is exposed  
-        C_TX_HAS_SPNNLNK           : boolean                 := true;           -- SpiNNlink TX Interface:	      if true the TX SpiNNlink interface is exposed
-        C_PSPNNLNK_WIDTH		   : natural range 1 to 32   := 32;             -- SpiNNaker Parallel Data Width: size of SpiNNaker parallel data interface
-        C_DEBUG                    : boolean                 := false;          -- Debug Ports:                   if true the debug ports are exposed
+        C_RX_HAS_PAER           : boolean                       := true;           -- PAER RX Interface:	          if true the RX PAER interface is exposed
+        C_TX_HAS_PAER           : boolean                       := true;           -- PAER TX Interface:	          if true the TX PAER interface is exposed
+        C_PAER_DSIZE            : natural range 1 to 29         := 24;             -- PAER Data Width:	              size of PAER address
+        C_RX_HAS_HSSAER         : boolean                       := true;           -- HSSAER RX Interface:	          if true the RX HSSAER interface is exposed
+        C_RX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER RX Channels:	          the number of RX HSSAER channels
+        C_TX_HAS_HSSAER         : boolean                       := true;           -- HSSAER TX Interface:	          if true the TX HSSAER interface is exposed
+        C_TX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER TX Channels:	          the number of TX HSSAER channels
+        C_RX_HAS_GTP            : boolean                       := false;          -- GTP RX Interface:               if true the RX GTP interface is exposed
+        C_TX_HAS_GTP            : boolean                       := false;          -- GTP TX Interface:	              if true the TX GTP interface is exposed
+        C_RX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink RX Interface:         if true the RX SpiNNlink interface is exposed  
+        C_TX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink TX Interface:	      if true the TX SpiNNlink interface is exposed
+        C_PSPNNLNK_WIDTH		: natural range 1 to 32         := 32;             -- SpiNNaker Parallel Data Width: size of SpiNNaker parallel data interface
+        C_DEBUG                 : boolean                       := false;          -- Debug Ports:                    if true the debug ports are exposed
+
+        C_RX_PAER_L_SENS_ID     : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER0_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER1_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER2_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER3_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_PAER_R_SENS_ID     : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER0_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER1_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER2_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER3_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_PAER_A_SENS_ID     : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER0_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER1_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER2_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
+
 		
         -- ADD USER GENERICS ABOVE THIS LINE ---------------
 
         -- DO NOT EDIT BELOW THIS LINE ---------------------
         -- Bus protocol parameters, do not add to or delete
-        C_S_AXI_ADDR_WIDTH             : integer              := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
-        C_S_AXI_DATA_WIDTH             : integer              := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
-        C_SLV_DWIDTH                   : integer              := 32
+        C_S_AXI_ADDR_WIDTH             : integer                := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
+        C_S_AXI_DATA_WIDTH             : integer                := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
+        C_SLV_DWIDTH                   : integer                := 32
         -- DO NOT EDIT ABOVE THIS LINE ---------------------
     );
     port (
@@ -782,8 +799,24 @@ port map(
             C_TX_HAS_HSSAER         => C_TX_HAS_HSSAER,       -- boolean;
             C_TX_HSSAER_N_CHAN      => C_TX_HSSAER_N_CHAN,    -- natural range 1 to 4
             C_TX_HAS_SPNNLNK        => C_TX_HAS_SPNNLNK,      -- boolean;
-			C_PSPNNLNK_WIDTH	    => C_PSPNNLNK_WIDTH       -- natural range 1 to 32
-        )
+			C_PSPNNLNK_WIDTH	    => C_PSPNNLNK_WIDTH,      -- natural range 1 to 32
+		
+            C_RX_PAER_L_SENS_ID     => C_RX_PAER_L_SENS_ID,     -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_SAER0_L_SENS_ID    => C_RX_SAER0_L_SENS_ID,    -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_SAER1_L_SENS_ID    => C_RX_SAER1_L_SENS_ID,    -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_SAER2_L_SENS_ID    => C_RX_SAER2_L_SENS_ID,    -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_SAER3_L_SENS_ID    => C_RX_SAER3_L_SENS_ID,    -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_PAER_R_SENS_ID     => C_RX_PAER_R_SENS_ID,     -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_SAER0_R_SENS_ID    => C_RX_SAER0_R_SENS_ID,    -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_SAER1_R_SENS_ID    => C_RX_SAER1_R_SENS_ID,    -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_SAER2_R_SENS_ID    => C_RX_SAER2_R_SENS_ID,    -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_SAER3_R_SENS_ID    => C_RX_SAER3_R_SENS_ID,    -- std_logic_vector(2 downto 0)  := "000";
+            C_RX_PAER_A_SENS_ID     => C_RX_PAER_A_SENS_ID,     -- std_logic_vector(2 downto 0)  := "001";
+            C_RX_SAER0_A_SENS_ID    => C_RX_SAER0_A_SENS_ID,    -- std_logic_vector(2 downto 0)  := "001";
+            C_RX_SAER1_A_SENS_ID    => C_RX_SAER1_A_SENS_ID,    -- std_logic_vector(2 downto 0)  := "001";
+            C_RX_SAER2_A_SENS_ID    => C_RX_SAER2_A_SENS_ID,    -- std_logic_vector(2 downto 0)  := "001";
+            C_RX_SAER3_A_SENS_ID    => C_RX_SAER3_A_SENS_ID     -- std_logic_vector(2 downto 0)  := "001"
+            )
         port map (
             --
             -- Clocks & Reset

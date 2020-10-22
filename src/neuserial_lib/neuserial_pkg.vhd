@@ -76,7 +76,10 @@ package NSComponents_pkg is
             PaerSampleDelay_i       : in  std_logic_vector(7 downto 0);
             PaerAckRelDelay_i       : in  std_logic_vector(7 downto 0);
             -- HSSAER
-            RxSaerHighBits_i        : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighBits0_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighBits1_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighBits2_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+            RxSaerHighBits3_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
             HSSaerChanEn_i          : in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
             -- GTP
             RxGtpHighBits_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);

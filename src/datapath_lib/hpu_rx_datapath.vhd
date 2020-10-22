@@ -63,7 +63,10 @@ port (
     PaerSampleDelay_i       : in  std_logic_vector(7 downto 0);
     PaerAckRelDelay_i       : in  std_logic_vector(7 downto 0);
     -- HSSAER
-    RxSaerHighBits_i        : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighBits0_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighBits1_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighBits2_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighBits3_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
     HSSaerChanEn_i          : in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
     -- GTP
     RxGtpHighBits_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
@@ -246,8 +249,16 @@ begin
         signal synch_fifo_full : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
         signal synch_fifo_empty : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
         signal i_reset_synch_fifos : std_logic;
+        
+        type RxSaerHighBits_t is array (0 to 3) of std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+        signal RxSaerHighBits : RxSaerHighBits_t;
 
     begin
+    
+        RxSaerHighBits(0) <= RxSaerHighBits0_i;
+        RxSaerHighBits(1) <= RxSaerHighBits1_i;
+        RxSaerHighBits(2) <= RxSaerHighBits2_i;
+        RxSaerHighBits(3) <= RxSaerHighBits3_i;
 
         ii_hssaer_nrst <= nRst and EnableHSSAER_i;
         i_reset_synch_fifos <= not(ii_hssaer_nrst);
@@ -270,7 +281,7 @@ begin
 
                     rx          => i_HSSAER_Rx(i),           -- in  std_logic;
 
-                    higher_bits => RxSaerHighBits_i,         -- in  std_logic_vector(int_dsize-1 downto dsize);
+                    higher_bits => RxSaerHighBits(i),         -- in  std_logic_vector(int_dsize-1 downto dsize);
 
                     ae          => ii_rx_fromSaerSrc(i).idx, -- out std_logic_vector(int_dsize-1 downto 0);
                     src_rdy     => ii_rx_fromSaerSrc(i).vld, -- out std_logic;
