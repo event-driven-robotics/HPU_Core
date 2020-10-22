@@ -456,6 +456,11 @@ architecture str of HPUCore is
 
     signal i_FifoCoreLastData        : std_logic;
     
+    signal rrx_hssaer                : std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
+    signal lrx_hssaer                : std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
+    signal auxrx_hssaer              : std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
+    signal tx_hssaer                 : std_logic_vector(0 to C_TX_HSSAER_N_CHAN-1);
+    
  --   for all : neuserial_axilite  use entity neuserial_lib.neuserial_axilite(rtl);
  --   for all : neuserial_axistream  use entity neuserial_lib.neuserial_axistream(rtl);
  --   for all : neuserial_core  use entity neuserial_lib.neuserial_core(str);
@@ -786,6 +791,19 @@ port map(
     -- -----------------------------------------------------------------------------
     -- NeuSerial core instantiation
     -- -----------------------------------------------------------------------------
+    
+    -- Explixciting HSSAER bus tap connection (due to different definitions TO, DOWNTO)
+    
+    rx_hssaer_bus : for i in 0 to C_RX_HSSAER_N_CHAN-1 generate
+      rrx_hssaer(i)    <= RRx_HSSAER_i(i);
+      lrx_hssaer(i)    <= LRx_HSSAER_i(i);
+      auxrx_hssaer(i)  <= AuxRx_HSSAER_i(i);
+    end generate;
+    
+    tx_hssaer_bus : for i in 0 to C_TX_HSSAER_N_CHAN-1 generate
+      Tx_HSSAER_o(i)   <= tx_hssaer(i);    
+    end generate;
+    
     u_neuserial_core : neuserial_core
         generic map (
             C_PAER_DSIZE            => C_PAER_DSIZE,          -- natural range 1 to 29;
@@ -841,7 +859,7 @@ port map(
             Tx_PAER_Req_o           => Tx_PAER_Req_o,                -- out std_logic;
             Tx_PAER_Ack_i           => Tx_PAER_Ack_i,                -- in  std_logic;
             -- HSSAER channels
-            Tx_HSSAER_o             => Tx_HSSAER_o,                  -- out std_logic_vector(0 to C_TX_HSSAER_N_CHAN-1);
+            Tx_HSSAER_o             => tx_hssaer,                    -- out std_logic_vector(0 to C_TX_HSSAER_N_CHAN-1);
             -- GTP lines
 
             --
@@ -852,7 +870,7 @@ port map(
             LRx_PAER_Req_i          => LRx_PAER_Req_i,               -- in  std_logic;
             LRx_PAER_Ack_o          => LRx_PAER_Ack_o,               -- out std_logic;
             -- HSSAER channels
-            LRx_HSSAER_i            => LRx_HSSAER_i,                 -- in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
+            LRx_HSSAER_i            => lrx_hssaer,                   -- in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
             -- GTP lines
 
             --
@@ -863,7 +881,7 @@ port map(
             RRx_PAER_Req_i          => RRx_PAER_Req_i,               -- in  std_logic;
             RRx_PAER_Ack_o          => RRx_PAER_Ack_o,               -- out std_logic;
             -- HSSAER channels
-            RRx_HSSAER_i            => RRx_HSSAER_i,                 -- in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
+            RRx_HSSAER_i            => rrx_hssaer,                   -- in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
             -- GTP lines
 
             --
@@ -874,7 +892,7 @@ port map(
             AuxRx_PAER_Req_i        => AuxRx_PAER_Req_i,               -- in  std_logic;
             AuxRx_PAER_Ack_o        => AuxRx_PAER_Ack_o,               -- out std_logic;
             -- HSSAER channels
-            AuxRx_HSSAER_i          => AuxRx_HSSAER_i,                 -- in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+            AuxRx_HSSAER_i          => auxrx_hssaer,                   -- in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
  
         --
             -- SpiNNlink DATA PATH
