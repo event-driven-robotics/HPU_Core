@@ -6,13 +6,15 @@ source [file join [file dirname [file dirname [info script]]] gui/HPUCore_v3_0.g
 proc init_gui { IPINST } {
   ipgui::add_param $IPINST -name "Component_Name"
   #Adding Page
-  set Page_0 [ipgui::add_page $IPINST -name "Page 0" -display_name {Interface Definitions}]
+  set PippoPAER [ipgui::add_page $IPINST -name "PippoPAER" -display_name {PAER / SAER}]
+  set_property tooltip {PAER Interface} ${PippoPAER}
   #Adding Group
-  set Interfaces [ipgui::add_group $IPINST -name "Interfaces" -parent ${Page_0}]
-  #Adding Group
-  set PAER [ipgui::add_group $IPINST -name "PAER" -parent ${Interfaces}]
-  set C_PAER_DSIZE [ipgui::add_param $IPINST -name "C_PAER_DSIZE" -parent ${PAER}]
+  set Common [ipgui::add_group $IPINST -name "Common" -parent ${PippoPAER}]
+  set C_PAER_DSIZE [ipgui::add_param $IPINST -name "C_PAER_DSIZE" -parent ${Common}]
   set_property tooltip {Size of PAER address} ${C_PAER_DSIZE}
+
+  #Adding Group
+  set PAER [ipgui::add_group $IPINST -name "PAER" -parent ${PippoPAER}]
   #Adding Group
   set TX [ipgui::add_group $IPINST -name "TX" -parent ${PAER} -display_name {PAER TX}]
   set C_TX_HAS_PAER [ipgui::add_param $IPINST -name "C_TX_HAS_PAER" -parent ${TX}]
@@ -35,7 +37,7 @@ proc init_gui { IPINST } {
 
 
   #Adding Group
-  set TX_Interfaces [ipgui::add_group $IPINST -name "TX Interfaces" -parent ${Interfaces} -display_name {HSSAER}]
+  set TX_Interfaces [ipgui::add_group $IPINST -name "TX Interfaces" -parent ${PippoPAER} -display_name {HSSAER}]
   #Adding Group
   set HSSAER_TX [ipgui::add_group $IPINST -name "HSSAER TX" -parent ${TX_Interfaces}]
   set C_TX_HSSAER_N_CHAN [ipgui::add_param $IPINST -name "C_TX_HSSAER_N_CHAN" -parent ${HSSAER_TX}]
@@ -76,25 +78,31 @@ proc init_gui { IPINST } {
 
 
   #Adding Group
-  set GTP [ipgui::add_group $IPINST -name "GTP" -parent ${Interfaces} -display_name {GTP (To Be Developed)}]
+  ipgui::add_group $IPINST -name "General" -parent ${PippoPAER}
+
+
+  #Adding Page
+  set ToponilnoGTP [ipgui::add_page $IPINST -name "ToponilnoGTP" -display_name {GTP}]
+  set_property tooltip {GTP Interface} ${ToponilnoGTP}
+  #Adding Group
+  set GTP [ipgui::add_group $IPINST -name "GTP" -parent ${ToponilnoGTP} -display_name {GTP (To Be Developed)}]
   set C_RX_HAS_GTP [ipgui::add_param $IPINST -name "C_RX_HAS_GTP" -parent ${GTP}]
   set_property tooltip {If checked, the RX GTP interface is exposed} ${C_RX_HAS_GTP}
   set C_TX_HAS_GTP [ipgui::add_param $IPINST -name "C_TX_HAS_GTP" -parent ${GTP}]
   set_property tooltip {If checked, the TX GTP interface is exposed} ${C_TX_HAS_GTP}
 
+
+  #Adding Page
+  set MinnieSpiNNlink [ipgui::add_page $IPINST -name "MinnieSpiNNlink" -display_name {SpiNNlink}]
+  set_property tooltip {SpiNNaker Interface} ${MinnieSpiNNlink}
   #Adding Group
-  set SpiNNlink [ipgui::add_group $IPINST -name "SpiNNlink" -parent ${Interfaces}]
+  set SpiNNlink [ipgui::add_group $IPINST -name "SpiNNlink" -parent ${MinnieSpiNNlink}]
+  set C_PSPNNLNK_WIDTH [ipgui::add_param $IPINST -name "C_PSPNNLNK_WIDTH" -parent ${SpiNNlink}]
+  set_property tooltip {Size of SpiNNaker parallel data interface} ${C_PSPNNLNK_WIDTH}
   set C_RX_HAS_SPNNLNK [ipgui::add_param $IPINST -name "C_RX_HAS_SPNNLNK" -parent ${SpiNNlink}]
   set_property tooltip {If checked, the RX SpiNNlink interface is exposed} ${C_RX_HAS_SPNNLNK}
   set C_TX_HAS_SPNNLNK [ipgui::add_param $IPINST -name "C_TX_HAS_SPNNLNK" -parent ${SpiNNlink}]
   set_property tooltip {If checked, the TX SpiNNlink interface is exposed} ${C_TX_HAS_SPNNLNK}
-  set C_PSPNNLNK_WIDTH [ipgui::add_param $IPINST -name "C_PSPNNLNK_WIDTH" -parent ${SpiNNlink}]
-  set_property tooltip {Size of SpiNNaker parallel data interface} ${C_PSPNNLNK_WIDTH}
-
-  #Adding Group
-  set Debug [ipgui::add_group $IPINST -name "Debug" -parent ${Interfaces}]
-  ipgui::add_param $IPINST -name "C_DEBUG" -parent ${Debug}
-
 
 
   #Adding Page
@@ -104,6 +112,23 @@ proc init_gui { IPINST } {
   set_property tooltip {AXI4 Lite Parameters (should not be edited)} ${AXI4_Lite_Parameters}
   ipgui::add_param $IPINST -name "C_S_AXI_ADDR_WIDTH" -parent ${AXI4_Lite_Parameters}
   ipgui::add_param $IPINST -name "C_S_AXI_DATA_WIDTH" -parent ${AXI4_Lite_Parameters}
+
+
+  #Adding Page
+  set Interception_and_Debug [ipgui::add_page $IPINST -name "Interception and Debug" -display_name {Loopback, Interception and Debug}]
+  #Adding Group
+  set Loopback [ipgui::add_group $IPINST -name "Loopback" -parent ${Interception_and_Debug}]
+  ipgui::add_param $IPINST -name "C_HAS_DEFAULT_LOOPBACK" -parent ${Loopback}
+
+  #Adding Group
+  set Interceptions [ipgui::add_group $IPINST -name "Interceptions" -parent ${Interception_and_Debug} -layout horizontal]
+  ipgui::add_param $IPINST -name "C_RX_LEFT_INTERCEPTION" -parent ${Interceptions}
+  ipgui::add_param $IPINST -name "C_RX_RIGHT_INTERCEPTION" -parent ${Interceptions}
+  ipgui::add_param $IPINST -name "C_RX_AUX_INTERCEPTION" -parent ${Interceptions}
+
+  #Adding Group
+  set Debug [ipgui::add_group $IPINST -name "Debug" -parent ${Interception_and_Debug}]
+  ipgui::add_param $IPINST -name "C_DEBUG" -parent ${Debug}
 
 
 
@@ -468,12 +493,30 @@ proc validate_PARAM_VALUE.C_DEBUG { PARAM_VALUE.C_DEBUG } {
 	return true
 }
 
+proc update_PARAM_VALUE.C_HAS_DEFAULT_LOOPBACK { PARAM_VALUE.C_HAS_DEFAULT_LOOPBACK } {
+	# Procedure called to update C_HAS_DEFAULT_LOOPBACK when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.C_HAS_DEFAULT_LOOPBACK { PARAM_VALUE.C_HAS_DEFAULT_LOOPBACK } {
+	# Procedure called to validate C_HAS_DEFAULT_LOOPBACK
+	return true
+}
+
 proc update_PARAM_VALUE.C_PSPNNLNK_WIDTH { PARAM_VALUE.C_PSPNNLNK_WIDTH } {
 	# Procedure called to update C_PSPNNLNK_WIDTH when any of the dependent parameters in the arguments change
 }
 
 proc validate_PARAM_VALUE.C_PSPNNLNK_WIDTH { PARAM_VALUE.C_PSPNNLNK_WIDTH } {
 	# Procedure called to validate C_PSPNNLNK_WIDTH
+	return true
+}
+
+proc update_PARAM_VALUE.C_RX_AUX_INTERCEPTION { PARAM_VALUE.C_RX_AUX_INTERCEPTION } {
+	# Procedure called to update C_RX_AUX_INTERCEPTION when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.C_RX_AUX_INTERCEPTION { PARAM_VALUE.C_RX_AUX_INTERCEPTION } {
+	# Procedure called to validate C_RX_AUX_INTERCEPTION
 	return true
 }
 
@@ -510,6 +553,24 @@ proc update_PARAM_VALUE.C_RX_HAS_SPNNLNK { PARAM_VALUE.C_RX_HAS_SPNNLNK } {
 
 proc validate_PARAM_VALUE.C_RX_HAS_SPNNLNK { PARAM_VALUE.C_RX_HAS_SPNNLNK } {
 	# Procedure called to validate C_RX_HAS_SPNNLNK
+	return true
+}
+
+proc update_PARAM_VALUE.C_RX_LEFT_INTERCEPTION { PARAM_VALUE.C_RX_LEFT_INTERCEPTION } {
+	# Procedure called to update C_RX_LEFT_INTERCEPTION when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.C_RX_LEFT_INTERCEPTION { PARAM_VALUE.C_RX_LEFT_INTERCEPTION } {
+	# Procedure called to validate C_RX_LEFT_INTERCEPTION
+	return true
+}
+
+proc update_PARAM_VALUE.C_RX_RIGHT_INTERCEPTION { PARAM_VALUE.C_RX_RIGHT_INTERCEPTION } {
+	# Procedure called to update C_RX_RIGHT_INTERCEPTION when any of the dependent parameters in the arguments change
+}
+
+proc validate_PARAM_VALUE.C_RX_RIGHT_INTERCEPTION { PARAM_VALUE.C_RX_RIGHT_INTERCEPTION } {
+	# Procedure called to validate C_RX_RIGHT_INTERCEPTION
 	return true
 }
 
@@ -730,5 +791,25 @@ proc update_MODELPARAM_VALUE.C_RX_SAER2_A_SENS_ID { MODELPARAM_VALUE.C_RX_SAER2_
 proc update_MODELPARAM_VALUE.C_RX_SAER3_A_SENS_ID { MODELPARAM_VALUE.C_RX_SAER3_A_SENS_ID PARAM_VALUE.C_RX_SAER3_A_SENS_ID } {
 	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
 	set_property value [get_property value ${PARAM_VALUE.C_RX_SAER3_A_SENS_ID}] ${MODELPARAM_VALUE.C_RX_SAER3_A_SENS_ID}
+}
+
+proc update_MODELPARAM_VALUE.C_RX_LEFT_INTERCEPTION { MODELPARAM_VALUE.C_RX_LEFT_INTERCEPTION PARAM_VALUE.C_RX_LEFT_INTERCEPTION } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.C_RX_LEFT_INTERCEPTION}] ${MODELPARAM_VALUE.C_RX_LEFT_INTERCEPTION}
+}
+
+proc update_MODELPARAM_VALUE.C_RX_RIGHT_INTERCEPTION { MODELPARAM_VALUE.C_RX_RIGHT_INTERCEPTION PARAM_VALUE.C_RX_RIGHT_INTERCEPTION } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.C_RX_RIGHT_INTERCEPTION}] ${MODELPARAM_VALUE.C_RX_RIGHT_INTERCEPTION}
+}
+
+proc update_MODELPARAM_VALUE.C_RX_AUX_INTERCEPTION { MODELPARAM_VALUE.C_RX_AUX_INTERCEPTION PARAM_VALUE.C_RX_AUX_INTERCEPTION } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.C_RX_AUX_INTERCEPTION}] ${MODELPARAM_VALUE.C_RX_AUX_INTERCEPTION}
+}
+
+proc update_MODELPARAM_VALUE.C_HAS_DEFAULT_LOOPBACK { MODELPARAM_VALUE.C_HAS_DEFAULT_LOOPBACK PARAM_VALUE.C_HAS_DEFAULT_LOOPBACK } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.C_HAS_DEFAULT_LOOPBACK}] ${MODELPARAM_VALUE.C_HAS_DEFAULT_LOOPBACK}
 }
 

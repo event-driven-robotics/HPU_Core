@@ -64,7 +64,11 @@ entity neuserial_core is
         C_RX_SAER0_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";
         C_RX_SAER1_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";
         C_RX_SAER2_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";
-        C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001"
+        C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";
+        
+        C_RX_LEFT_INTERCEPTION  : boolean                       := false;
+        C_RX_RIGHT_INTERCEPTION : boolean                       := false;
+        C_RX_AUX_INTERCEPTION   : boolean                       := false
     );
     port (
         --
@@ -255,6 +259,30 @@ entity neuserial_core is
         Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
         Spnn_ctrl_i             : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
         Spnn_status_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
+
+        --
+        -- INTERCEPTION
+        ---------------------
+        RRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        RRxSrcRdy_o             : out std_logic;
+        RRxDstRdy_i             : in  std_logic;
+        RRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        RRxBypassSrcRdy_i       : in  std_logic;
+        RRxBypassDstRdy_o       : out std_logic;
+        --
+        LRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        LRxSrcRdy_o             : out std_logic;
+        LRxDstRdy_i             : in  std_logic;
+        LRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        LRxBypassSrcRdy_i       : in  std_logic;
+        LRxBypassDstRdy_o       : out std_logic;
+        --
+        AuxRxData_o             : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        AuxRxSrcRdy_o           : out std_logic;
+        AuxRxDstRdy_i           : in  std_logic;
+        AuxRxBypassData_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        AuxRxBypassSrcRdy_i     : in  std_logic;
+        AuxRxBypassDstRdy_o     : out std_logic;        
         
         --
         -- LED drivers
@@ -442,18 +470,30 @@ architecture str of neuserial_core is
     signal  i_RRx_HSSAER     : std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
     signal  i_AuxRx_HSSAER   : std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
     
-    signal  i_LRx_data_2of7_from_spinnaker : std_logic_vector(6 downto 0);
-    signal  i_LRx_ack_to_spinnaker         : std_logic;
-    signal  i_RRx_data_2of7_from_spinnaker : std_logic_vector(6 downto 0);
-    signal  i_RRx_ack_to_spinnaker         : std_logic;
-    signal  i_AuxRx_data_2of7_from_spinnaker : std_logic_vector(6 downto 0);
-    signal  i_AuxRx_ack_to_spinnaker         : std_logic;
-    signal  i_Tx_data_2of7_to_spinnaker   : std_logic_vector(6 downto 0);
-    signal  i_TX_ack_from_spinnaker       : std_logic;
-    signal  i_Spnn_offload_on             : std_logic;
-    signal  i_Spnn_offload_off            : std_logic;
-    signal  i_Spnn_cmd_start              : std_logic;
-    signal  i_Spnn_cmd_stop               : std_logic;
+    signal  i_LRx_data_2of7_from_spinnaker      : std_logic_vector(6 downto 0);
+    signal  i_LRx_ack_to_spinnaker              : std_logic;
+    signal  i_RRx_data_2of7_from_spinnaker      : std_logic_vector(6 downto 0);
+    signal  i_RRx_ack_to_spinnaker              : std_logic;
+    signal  i_AuxRx_data_2of7_from_spinnaker    : std_logic_vector(6 downto 0);
+    signal  i_AuxRx_ack_to_spinnaker            : std_logic;
+    signal  i_Tx_data_2of7_to_spinnaker         : std_logic_vector(6 downto 0);
+    signal  i_TX_ack_from_spinnaker             : std_logic;
+    signal  i_Spnn_offload_on                   : std_logic;
+    signal  i_Spnn_offload_off                  : std_logic;
+    signal  i_Spnn_cmd_start                    : std_logic;
+    signal  i_Spnn_cmd_stop                     : std_logic;
+
+    signal  RRxData                             : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    signal  RRxSrcRdy                           : std_logic;
+    signal  RRxDstRdy                           : std_logic;
+
+    signal  LRxData                             : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    signal  LRxSrcRdy                           : std_logic;
+    signal  LRxDstRdy                           : std_logic;
+
+    signal  AuxRxData                           : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    signal  AuxRxSrcRdy                         : std_logic;
+    signal  AuxRxDstRdy                         : std_logic;
 
 --    for all : neuserial_loopback     use entity neuserial_lib.neuserial_loopback(beh);
 --    for all : hpu_tx_datapath        use entity datapath_lib.hpu_tx_datapath(str);
@@ -778,9 +818,9 @@ begin
             -----------------------------
             -- Monitor Interface
             -----------------------------
-            ToMonDataIn_o        => i_rxMonSrc(0).idx,           -- out std_logic_vector(C_OUTPUT_DSIZE-1 downto 0);
-            ToMonSrcRdy_o        => i_rxMonSrc(0).vld,           -- out std_logic;
-            ToMonDstRdy_i        => i_rxMonDst(0).rdy,           -- in  std_logic;
+            ToMonDataIn_o        => LRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(0).idx,      
+            ToMonSrcRdy_o        => LRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(0).vld,      
+            ToMonDstRdy_i        => LRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(0).rdy,      
         
             -----------------------------
             -- In case of aux channel the HPU header is adapted to what received
@@ -901,9 +941,9 @@ begin
             -----------------------------
             -- Destination Interface
             -----------------------------
-            ToMonDataIn_o        => i_rxMonSrc(1).idx,           -- out std_logic_vector(C_OUTPUT_DSIZE-1 downto 0);
-            ToMonSrcRdy_o        => i_rxMonSrc(1).vld,           -- out std_logic;
-            ToMonDstRdy_i        => i_rxMonDst(1).rdy,           -- in  std_logic;
+            ToMonDataIn_o        => RRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(1).idx, 
+            ToMonSrcRdy_o        => RRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(1).vld, 
+            ToMonDstRdy_i        => RRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(1).rdy, 
 
             -----------------------------
             -- In case of aux channel the HPU header is adapted to what received
@@ -1023,9 +1063,9 @@ begin
             -----------------------------
             -- Destination Interface
             -----------------------------
-            ToMonDataIn_o        => i_rxMonSrc(2).idx,           -- out std_logic_vector(C_OUTPUT_DSIZE-1 downto 0);
-            ToMonSrcRdy_o        => i_rxMonSrc(2).vld,           -- out std_logic;
-            ToMonDstRdy_i        => i_rxMonDst(2).rdy,           -- in  std_logic;
+            ToMonDataIn_o        => AuxRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(2).idx,
+            ToMonSrcRdy_o        => AuxRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(2).vld,
+            ToMonDstRdy_i        => AuxRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(2).rdy,
 
             -----------------------------
             -- In case of aux channel the HPU header is adapted to what received
@@ -1048,6 +1088,86 @@ begin
         	DBG_FIFO_4           => DBG_FIFO_4
 
         );
+        
+
+--Interceptions
+---------------------
+
+LEFT_INTERCEPTION_TRUE_gen: if C_RX_LEFT_INTERCEPTION = true generate
+begin
+    LRxData_o           <= LRxData;
+    LRxSrcRdy_o         <= LRxSrcRdy;
+    LRxDstRdy           <= LRxDstRdy_i;
+    i_rxMonSrc(0).idx   <= LRxBypassData_i;
+    i_rxMonSrc(0).vld   <= LRxBypassSrcRdy_i; 
+    LRxBypassDstRdy_o   <= i_rxMonDst(0).rdy;
+end generate;
+LEFT_INTERCEPTION_FALSE_gen: if C_RX_LEFT_INTERCEPTION = false generate
+begin
+    i_rxMonSrc(0).idx   <= LRxData;
+    i_rxMonSrc(0).vld   <= LRxSrcRdy; 
+    LRxDstRdy           <= i_rxMonDst(0).rdy;
+end generate;
+
+
+RIGHT_INTERCEPTION_TRUE_gen: if C_RX_RIGHT_INTERCEPTION = true generate
+begin
+    RRxData_o           <= RRxData;
+    RRxSrcRdy_o         <= RRxSrcRdy;
+    RRxDstRdy           <= RRxDstRdy_i;
+    i_rxMonSrc(1).idx   <= RRxBypassData_i;
+    i_rxMonSrc(1).vld   <= RRxBypassSrcRdy_i; 
+    RRxBypassDstRdy_o   <= i_rxMonDst(1).rdy;  
+end generate;
+RIGHT_INTERCEPTION_FALSE_gen: if C_RX_RIGHT_INTERCEPTION = false generate
+begin
+    i_rxMonSrc(1).idx   <= RRxData;
+    i_rxMonSrc(1).vld   <= RRxSrcRdy; 
+    RRxDstRdy           <= i_rxMonDst(1).rdy;
+end generate;
+
+
+AUX_INTERCEPTION_TRUE_gen: if C_RX_AUX_INTERCEPTION = true generate
+begin
+    AuxRxData_o         <= AuxRxData;
+    AuxRxSrcRdy_o       <= AuxRxSrcRdy;
+    AuxRxDstRdy         <= AuxRxDstRdy_i;
+    i_rxMonSrc(2).idx   <= AuxRxBypassData_i;
+    i_rxMonSrc(2).vld   <= AuxRxBypassSrcRdy_i; 
+    AuxRxBypassDstRdy_o <= i_rxMonDst(2).rdy;  
+end generate;
+AUX_INTERCEPTION_FALSE_gen: if C_RX_AUX_INTERCEPTION = false generate
+begin
+    i_rxMonSrc(2).idx   <= AuxRxData;
+    i_rxMonSrc(2).vld   <= AuxRxSrcRdy; 
+    AuxRxDstRdy         <= i_rxMonDst(2).rdy;
+end generate;
+
+--        ToMonDataIn_o        => RRxData_o,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(1).idx, 
+--        ToMonSrcRdy_o        => RRxSrcRdy_o,             -- : out std_logic;                                      i_rxMonSrc(1).vld, 
+--        ToMonDstRdy_i        => RRxDstRdy_i,             -- : in  std_logic;                                      i_rxMonDst(1).rdy, 
+       
+--        RRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+--        RRxSrcRdy_o             : out std_logic;
+--        RRxDstRdy_i             : in  std_logic;
+--        RRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+--        RRxBypassSrcRdy_i       : in  std_logic;
+--        RRxBypassDstRdy_o       : out std_logic;
+--        --
+--        LRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+--        LRxSrcRdy_o             : out std_logic;
+--        LRxDstRdy_i             : in  std_logic;
+--        LRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+--        LRxBypassSrcRdy_i       : in  std_logic;
+--        LRxBypassDstRdy_o       : out std_logic;
+--        --
+--        AuxRxData_o             : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+--        AuxRxSrcRdy_o           : out std_logic;
+--        AuxRxDstRdy_i           : in  std_logic;
+--        AuxRxBypassData_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+--        AuxRxBypassSrcRdy_i     : in  std_logic;
+--        AuxRxBypassDstRdy_o     : out std_logic;            
+        
 
     u_RxArbiter : neuserial_PAER_arbiter
         generic map (

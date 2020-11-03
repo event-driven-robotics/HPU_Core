@@ -66,7 +66,11 @@ type time_tick is record
             C_RX_SAER0_A_SENS_ID    : std_logic_vector(2 downto 0);
             C_RX_SAER1_A_SENS_ID    : std_logic_vector(2 downto 0);
             C_RX_SAER2_A_SENS_ID    : std_logic_vector(2 downto 0);
-            C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0)
+            C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0);
+            
+            C_RX_LEFT_INTERCEPTION  : boolean;
+            C_RX_RIGHT_INTERCEPTION : boolean;
+            C_RX_AUX_INTERCEPTION   : boolean
             );
         port (
             --
@@ -257,6 +261,30 @@ type time_tick is record
             Spnn_rx_mask_i          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
             Spnn_ctrl_i             : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
             Spnn_status_o           : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
+
+            --
+            -- INTERCEPTION
+            ---------------------
+            RRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            RRxSrcRdy_o             : out std_logic;
+            RRxDstRdy_i             : in  std_logic;
+            RRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            RRxBypassSrcRdy_i       : in  std_logic;
+            RRxBypassDstRdy_o       : out std_logic;
+            --
+            LRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            LRxSrcRdy_o             : out std_logic;
+            LRxDstRdy_i             : in  std_logic;
+            LRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            LRxBypassSrcRdy_i       : in  std_logic;
+            LRxBypassDstRdy_o       : out std_logic;
+            --
+            AuxRxData_o             : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            AuxRxSrcRdy_o           : out std_logic;
+            AuxRxDstRdy_i           : in  std_logic;
+            AuxRxBypassData_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            AuxRxBypassSrcRdy_i     : in  std_logic;
+            AuxRxBypassDstRdy_o     : out std_logic;        
             
             --
             -- LED drivers

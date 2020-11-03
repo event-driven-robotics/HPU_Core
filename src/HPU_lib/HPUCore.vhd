@@ -95,6 +95,11 @@ entity HPUCore is
         C_RX_SAER2_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
         C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
 
+        C_RX_LEFT_INTERCEPTION  : boolean                       := false;
+        C_RX_RIGHT_INTERCEPTION : boolean                       := false;
+        C_RX_AUX_INTERCEPTION   : boolean                       := false;
+        
+        C_HAS_DEFAULT_LOOPBACK  : boolean                       := false;
 		
         -- ADD USER GENERICS ABOVE THIS LINE ---------------
 
@@ -184,12 +189,36 @@ entity HPUCore is
         -- SpiNNlink interface
         Tx_data_2of7_to_spinnaker_o      : out std_logic_vector(6 downto 0);
         Tx_ack_from_spinnaker_i          : in  std_logic := '0';
+        
+        --============================================
+        -- Interception
+        --============================================
+        RRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        RRxSrcRdy_o             : out std_logic;
+        RRxDstRdy_i             : in  std_logic;
+        RRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        RRxBypassSrcRdy_i       : in  std_logic;
+        RRxBypassDstRdy_o       : out std_logic;
+        --
+        LRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        LRxSrcRdy_o             : out std_logic;
+        LRxDstRdy_i             : in  std_logic;
+        LRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        LRxBypassSrcRdy_i       : in  std_logic;
+        LRxBypassDstRdy_o       : out std_logic;
+        --
+        AuxRxData_o             : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        AuxRxSrcRdy_o           : out std_logic;
+        AuxRxDstRdy_i           : in  std_logic;
+        AuxRxBypassData_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        AuxRxBypassSrcRdy_i     : in  std_logic;
+        AuxRxBypassDstRdy_o     : out std_logic;               
             
         --============================================
         -- Configuration interface
         --============================================
-        DefLocFarLpbk_i   : in  std_logic := '0';
-        DefLocNearLpbk_i  : in  std_logic := '0';
+        DefLocFarLpbk_i   : in  std_logic;
+        DefLocNearLpbk_i  : in  std_logic;
 
         --============================================
         -- Processor interface
@@ -461,6 +490,9 @@ architecture str of HPUCore is
     signal auxrx_hssaer              : std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
     signal tx_hssaer                 : std_logic_vector(0 to C_TX_HSSAER_N_CHAN-1);
     
+    signal DefLocFarLpbk             : std_logic := '0';
+    signal DefLocNearLpbk            : std_logic := '0';
+    
  --   for all : neuserial_axilite  use entity neuserial_lib.neuserial_axilite(rtl);
  --   for all : neuserial_axistream  use entity neuserial_lib.neuserial_axistream(rtl);
  --   for all : neuserial_core  use entity neuserial_lib.neuserial_core(str);
@@ -530,6 +562,16 @@ port map(
                        i_uP_rxBufferAlmostEmpty      &
                        i_uP_rxBufferEmpty            ;
 
+    DEFAULT_LOOPBACK_TRUE_gen: if C_HAS_DEFAULT_LOOPBACK = true generate
+    begin
+        DefLocFarLpbk  <= DefLocFarLpbk_i;
+        DefLocNearLpbk <= DefLocNearLpbk_i;
+    end generate;
+    DEFAULT_LOOPBACK_FALSE_gen: if C_HAS_DEFAULT_LOOPBACK = false generate
+    begin
+        DefLocFarLpbk  <= '0';
+        DefLocNearLpbk <= '0';
+    end generate;
 
     u_neuserial_axilite : neuserial_axilite
                            generic map (
@@ -590,13 +632,13 @@ port map(
                                --RRxEnable_o                    => ,                             -- out std_logic;
                                LRxPaerFlushFifos_o            => i_uP_LRxFlushFifos,           -- out std_logic;
                                RRxPaerFlushFifos_o            => i_uP_RRxFlushFifos,           -- out std_logic;
-                               AuxRxPaerFlushFifos_o          => i_uP_AuxRxPaerFlushFifos,        -- out std_logic;
+                               AuxRxPaerFlushFifos_o          => i_uP_AuxRxPaerFlushFifos,     -- out std_logic;
                    
                                -- Configurations
                                -------------------------
-                               DefLocFarLpbk_i                => DefLocFarLpbk_i,              -- in  std_logic;
-                               DefLocNearLpbk_i               => DefLocNearLpbk_i,             -- in  std_logic;
-                               --EnableLoopBack_o               => i_uP_enableLoopBack,          -- out std_logic;
+                               DefLocFarLpbk_i                => DefLocFarLpbk,                -- in  std_logic;
+                               DefLocNearLpbk_i               => DefLocNearLpbk,               -- in  std_logic;
+                               --EnableLoopBack_o               => i_uP_enableLoopBack,        -- out std_logic;
                                RemoteLoopback_o               => i_uP_RemoteLpbk,              -- out std_logic;
                                LocNearLoopback_o              => i_uP_LocalNearLpbk,           -- out std_logic;
                                LocFarLPaerLoopback_o          => i_uP_LocalFarLPaerLpbk,       -- out std_logic;
@@ -806,18 +848,18 @@ port map(
     
     u_neuserial_core : neuserial_core
         generic map (
-            C_PAER_DSIZE            => C_PAER_DSIZE,          -- natural range 1 to 29;
-            C_RX_HAS_PAER           => C_RX_HAS_PAER,         -- boolean;
-            C_RX_HAS_GTP            => C_RX_HAS_GTP,          -- boolean;
-            C_RX_HAS_HSSAER         => C_RX_HAS_HSSAER,       -- boolean;
-            C_RX_HSSAER_N_CHAN      => C_RX_HSSAER_N_CHAN,    -- natural range 1 to 4;
-            C_RX_HAS_SPNNLNK        => C_RX_HAS_SPNNLNK,      -- boolean;
-            C_TX_HAS_PAER           => C_TX_HAS_PAER,         -- boolean;
-            C_TX_HAS_GTP            => C_TX_HAS_GTP,          -- boolean;
-            C_TX_HAS_HSSAER         => C_TX_HAS_HSSAER,       -- boolean;
-            C_TX_HSSAER_N_CHAN      => C_TX_HSSAER_N_CHAN,    -- natural range 1 to 4
-            C_TX_HAS_SPNNLNK        => C_TX_HAS_SPNNLNK,      -- boolean;
-			C_PSPNNLNK_WIDTH	    => C_PSPNNLNK_WIDTH,      -- natural range 1 to 32
+            C_PAER_DSIZE            => C_PAER_DSIZE,            -- natural range 1 to 29;
+            C_RX_HAS_PAER           => C_RX_HAS_PAER,           -- boolean;
+            C_RX_HAS_GTP            => C_RX_HAS_GTP,            -- boolean;
+            C_RX_HAS_HSSAER         => C_RX_HAS_HSSAER,         -- boolean;
+            C_RX_HSSAER_N_CHAN      => C_RX_HSSAER_N_CHAN,      -- natural range 1 to 4;
+            C_RX_HAS_SPNNLNK        => C_RX_HAS_SPNNLNK,        -- boolean;
+            C_TX_HAS_PAER           => C_TX_HAS_PAER,           -- boolean;
+            C_TX_HAS_GTP            => C_TX_HAS_GTP,            -- boolean;
+            C_TX_HAS_HSSAER         => C_TX_HAS_HSSAER,         -- boolean;
+            C_TX_HSSAER_N_CHAN      => C_TX_HSSAER_N_CHAN,      -- natural range 1 to 4
+            C_TX_HAS_SPNNLNK        => C_TX_HAS_SPNNLNK,        -- boolean;
+			C_PSPNNLNK_WIDTH	    => C_PSPNNLNK_WIDTH,        -- natural range 1 to 32
 		
             C_RX_PAER_L_SENS_ID     => C_RX_PAER_L_SENS_ID,     -- std_logic_vector(2 downto 0)  := "000";
             C_RX_SAER0_L_SENS_ID    => C_RX_SAER0_L_SENS_ID,    -- std_logic_vector(2 downto 0)  := "000";
@@ -833,7 +875,11 @@ port map(
             C_RX_SAER0_A_SENS_ID    => C_RX_SAER0_A_SENS_ID,    -- std_logic_vector(2 downto 0)  := "001";
             C_RX_SAER1_A_SENS_ID    => C_RX_SAER1_A_SENS_ID,    -- std_logic_vector(2 downto 0)  := "001";
             C_RX_SAER2_A_SENS_ID    => C_RX_SAER2_A_SENS_ID,    -- std_logic_vector(2 downto 0)  := "001";
-            C_RX_SAER3_A_SENS_ID    => C_RX_SAER3_A_SENS_ID     -- std_logic_vector(2 downto 0)  := "001"
+            C_RX_SAER3_A_SENS_ID    => C_RX_SAER3_A_SENS_ID,    -- std_logic_vector(2 downto 0)  := "001";
+        
+            C_RX_LEFT_INTERCEPTION  => C_RX_LEFT_INTERCEPTION,  -- : boolean                     := false;
+            C_RX_RIGHT_INTERCEPTION => C_RX_RIGHT_INTERCEPTION, -- : boolean                     := false;
+            C_RX_AUX_INTERCEPTION   => C_RX_AUX_INTERCEPTION    -- : boolean                     := false
             )
         port map (
             --
@@ -1020,7 +1066,31 @@ port map(
             Spnn_rx_mask_i          => i_uP_Spnn_rx_mask,            -- in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
             Spnn_ctrl_i             => i_uP_Spnn_ctrl,               -- in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
             Spnn_status_o           => i_uP_Spnn_status,             -- out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register           
-                           
+ 
+            --
+            -- INTERCEPTION
+            ---------------------
+            RRxData_o               => RRxData_o,                   -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            RRxSrcRdy_o             => RRxSrcRdy_o,                 -- : out std_logic;
+            RRxDstRdy_i             => RRxDstRdy_i,                 -- : in  std_logic;
+            RRxBypassData_i         => RRxBypassData_i,             -- : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            RRxBypassSrcRdy_i       => RRxBypassSrcRdy_i,           -- : in  std_logic;
+            RRxBypassDstRdy_o       => RRxBypassDstRdy_o,           -- : out std_logic;
+            --
+            LRxData_o               => LRxData_o,                   -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            LRxSrcRdy_o             => LRxSrcRdy_o,                 -- : out std_logic;
+            LRxDstRdy_i             => LRxDstRdy_i,                 -- : in  std_logic;
+            LRxBypassData_i         => LRxBypassData_i,             -- : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            LRxBypassSrcRdy_i       => LRxBypassSrcRdy_i,           -- : in  std_logic;
+            LRxBypassDstRdy_o       => LRxBypassDstRdy_o,           -- : out std_logic;
+            --
+            AuxRxData_o             => AuxRxData_o,                 -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            AuxRxSrcRdy_o           => AuxRxSrcRdy_o,               -- : out std_logic;
+            AuxRxDstRdy_i           => AuxRxDstRdy_i,               -- : in  std_logic;
+            AuxRxBypassData_i       => AuxRxBypassData_i,           -- : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+            AuxRxBypassSrcRdy_i     => AuxRxBypassSrcRdy_i,         -- : in  std_logic;
+            AuxRxBypassDstRdy_o     => AuxRxBypassDstRdy_o,         -- : out std_logic;        
+            
             --
             -- LED drivers
             ---------------------
