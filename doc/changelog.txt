@@ -1,12 +1,20 @@
 ********************************************
-Version 3.4 Rev 15:  22th, January 2019
-- Added SpiNNlink Control Register and Status Register
-- Changed some feature about START/STOP Command
+Version 3.6 Rev 0:  28th, January 2021
+- Added interception ports (for algorythm insertion)
+- Updated the list of tags for externale sensor (IMU and Cochlea) - see AERSensorsMap.xlxs
+- GUI renewed
   (M. Casti - IIT)
 
 ********************************************
-Version 3.4 Rev 3 BETA:  16th, November 2018
+Version 3.5 Rev 20:  20th, May 2020
+- Added Synchronization Fifos to make independent the differential clocks with the Core clock
+  (F. Diotalevi - IIT)
+
+********************************************
+Version 3.4 Rev 15:  22th, January 2019
 - Absolute Timing Feature for Transmission 
+- Changed some feature about START/STOP Command
+- Added SpiNNlink Control Register and Status Register
   (M. Casti - IIT)
 
 ********************************************  
@@ -16,7 +24,7 @@ Version 3.3 Rev 3:  30th, October 2018
   (F. Diotalevi - IIT)
 
 ********************************************
-Version 3.2 Rev 3:  24th, October 2018
+Version 3.2 Rev 3 - October 24th 2018
 - Splitted FlushFifos in FlushRXFifo and FlushTXFifos. 
 - Modifications in axistream module to premature end a burst transfer. 
 - Added register that counts data in AXI stream bus. 
@@ -25,32 +33,36 @@ Version 3.2 Rev 3:  24th, October 2018
   (F. Diotalevi - IIT)
 
 ********************************************
-Version 3.1 Rev 7:  17th, October 2018
-- START/STOP command bypass feature
-- Unwanted reset of SpiNNlink section when disabled 
+Version 3.1 Rev 5 - August 24th 2018
+- Added the START/STOP and Data Mask Feature to SpiNNlink
   (M. Casti - IIT)
 
 ********************************************
-Version 3.1 Rev 6:  9th, October 2018
-- *** Don't use that release ***
+Version 3.0 - August 9th 2018
+- Added the SpiNNlink interface capability
   (M. Casti - IIT)
 
 ********************************************
-Version 3.1 Rev 5:  9th, October 2018
-- Added the Data Mask feature to SpiNNlink
-  (M. Casti - IIT)
-
-********************************************
-Version 3.1 Rev 4:  27th, August 2018
-- Added the START/STOP Feature to SpiNNlink
-  (M. Casti - IIT)
-
-********************************************
-Version 3.0:  9th, August 2018
-- Added SpiNNlink capabilities
-  (M. Casti - IIT)
-
-********************************************
-Version 2.2
-- Original HPU Core functions (AER/HSSAER interfaces)
+Version 2.1 - June 15th 2018
+- Enlarged to 24 the SSAER data transfer. 
+- Different header coding.
   (F. Diotalevi - IIT)
+
+********************************************
+Version 2.0 - November 15th 2017
+- Bug fixed for the HSSAER Channel Enable. 
+- Added AUX Threshold Error register and AUX Rx Counter registers. 
+- Some Fixes in HDL code.
+  (F. Diotalevi - IIT)
+
+********************************************
+Version 1.1 - June 14th 2017
+- Modified the AXIstream module and added some debug ports. Added Reset_DMA_stream bit into CTRL_REG.
+  (F. Diotalevi - IIT)
+
+********************************************
+Version 1.0 - September 19th 2016
+- First Release (DRAFT)
+  (F. Diotalevi - IIT)
+
+********************************************

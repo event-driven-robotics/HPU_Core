@@ -225,7 +225,7 @@ architecture rtl of neuserial_axilite is
 
     constant cVer   : string(3 downto 1) := "HPU";
     constant cMAJOR : std_logic_vector(3 downto 0) :="0011";
-    constant cMINOR : std_logic_vector(3 downto 0) :="0101";
+    constant cMINOR : std_logic_vector(3 downto 0) :="0110";
 
     constant c_zero_vect : std_logic_vector(31 downto 0) := (others => '0');
 
