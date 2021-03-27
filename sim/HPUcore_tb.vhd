@@ -80,213 +80,271 @@ constant T_LSCLK : time := ((1.0/F_LSCLK)/2.0) * (1 us);
 -- --------------------------------------------------
 component HPUCore
     generic (
-    -- ADD USER GENERICS BELOW THIS LINE ---------------
-
-    C_PAER_DSIZE               : natural range 1 to 29   := 24;
-    C_RX_HAS_PAER              : boolean                 := true;
-    C_RX_HAS_HSSAER            : boolean                 := true;
-    C_RX_HSSAER_N_CHAN         : natural range 1 to 4    := 3;
-    C_RX_HAS_GTP               : boolean                 := true;
-    C_RX_HAS_SPNNLNK           : boolean                 := true;
-    C_TX_HAS_PAER              : boolean                 := true;
-    C_TX_HAS_HSSAER            : boolean                 := true;
-    C_TX_HSSAER_N_CHAN         : natural range 1 to 4    := 2;
-    C_TX_HAS_GTP               : boolean                 := true;
-    C_TX_HAS_SPNNLNK           : boolean                 := true;
-    C_PSPNNLNK_WIDTH           : natural range 1 to 32   := 32;
-    C_DEBUG                    : boolean                 := false;
-    
-    -- ADD USER GENERICS ABOVE THIS LINE ---------------
-
-    -- DO NOT EDIT BELOW THIS LINE ---------------------
-    -- Bus protocol parameters, do not add to or delete
-    C_S_AXI_DATA_WIDTH             : integer              := 32;
-    C_S_AXI_ADDR_WIDTH             : integer              := 7;
-    C_SLV_DWIDTH                   : integer              := 32
-    -- DO NOT EDIT ABOVE THIS LINE ---------------------
-);
-port (
-    -- ADD USER PORTS BELOW THIS LINE ------------------
-
-    -- SYNC Resetn
-    nSyncReset        : in  std_logic;
-
-    -- Clocks for HSSAER interface
-    HSSAER_ClkLS_p    : in  std_logic; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-    HSSAER_ClkLS_n    : in  std_logic; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-    HSSAER_ClkHS_p    : in  std_logic; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
-    HSSAER_ClkHS_n    : in  std_logic; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
-
-    --============================================
-    -- Rx Interface from Vision Sensor Controllers
-    --============================================
-
-    -- Left Sensor
-    ------------------
-    -- Parallel AER
-    LRx_PAER_Addr_i           : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    LRx_PAER_Req_i            : in  std_logic;
-    LRx_PAER_Ack_o            : out std_logic;
-
-    -- HSSAER interface
-    LRx_HSSAER_i              : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-
-    -- GTP interface
+        -- ADD USER GENERICS BELOW THIS LINE ---------------
 
 
-    -- Right Sensor
-    ------------------
-    -- Parallel AER
-    RRx_PAER_Addr_i           : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    RRx_PAER_Req_i            : in  std_logic;
-    RRx_PAER_Ack_o            : out std_logic;
+        C_RX_HAS_PAER           : boolean                       := true;           -- PAER RX Interface: if true the RX PAER interface is exposed
+        C_TX_HAS_PAER           : boolean                       := true;           -- PAER TX Interface: if true the TX PAER interface is exposed
+        C_PAER_DSIZE            : natural range 1 to 29         := 24;             -- PAER Data Width: size of PAER address
+        C_RX_HAS_HSSAER         : boolean                       := true;           -- HSSAER RX Interface: if true the RX HSSAER interface is exposed
+        C_RX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER RX Channels: the number of RX HSSAER channels
+        C_TX_HAS_HSSAER         : boolean                       := true;           -- HSSAER TX Interface: if true the TX HSSAER interface is exposed
+        C_TX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER TX Channels: the number of TX HSSAER channels
+        C_RX_HAS_GTP            : boolean                       := false;          -- GTP RX Interface: if true the RX GTP interface is exposed
+        C_TX_HAS_GTP            : boolean                       := false;          -- GTP TX Interface: if true the TX GTP interface is exposed
+        C_RX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink RX Interface: if true the RX SpiNNlink interface is exposed  
+        C_TX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink TX Interface: if true the TX SpiNNlink interface is exposed
+        C_PSPNNLNK_WIDTH		    : natural range 1 to 32         := 32;             -- SpiNNaker Parallel Data Width: size of SpiNNaker parallel data interface
+        C_SYSCLK_PERIOD_NS      : real                          := 10.0;           -- System Clock period
+        C_DEBUG                 : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
 
-    -- HSSAER interface
-    RRx_HSSAER_i              : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+        C_RX_PAER_L_SENS_ID     : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER0_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER1_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER2_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER3_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_PAER_R_SENS_ID     : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER0_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER1_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER2_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER3_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_PAER_A_SENS_ID     : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER0_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER1_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER2_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
 
-    -- GTP interface
-
-    -- Aux Sensor
-    ------------------
-    -- Parallel AER
-    AuxRx_PAER_Addr_i         : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    AuxRx_PAER_Req_i          : in  std_logic;
-    AuxRx_PAER_Ack_o          : out std_logic;
-
-    -- HSSAER interface
-    AuxRx_HSSAER_i            : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-
-    -- GTP interface
-    ---------------------
-
-    -- SpiNNlink interface
-    LRx_data_2of7_from_spinnaker_i   : in  std_logic_vector(6 downto 0); 
-    LRx_ack_to_spinnaker_o           : out std_logic;
-    RRx_data_2of7_from_spinnaker_i   : in  std_logic_vector(6 downto 0); 
-    RRx_ack_to_spinnaker_o           : out std_logic;
-    AuxRx_data_2of7_from_spinnaker_i : in  std_logic_vector(6 downto 0); 
-    AuxRx_ack_to_spinnaker_o         : out std_logic;
-    
-    --============================================
-    -- Tx Interface
-    --============================================
-
-    -- Parallel AER
-    Tx_PAER_Addr_o            : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    Tx_PAER_Req_o             : out std_logic;
-    Tx_PAER_Ack_i             : in  std_logic;
-
-    -- HSSAER interface
-    Tx_HSSAER_o               : out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
-
-    -- GTP interface
-    
-    -- SpiNNlink interface
-    Tx_data_2of7_to_spinnaker_o      : out std_logic_vector(6 downto 0);
-    Tx_ack_from_spinnaker_i          : in  std_logic;
+        C_RX_LEFT_INTERCEPTION  : boolean                       := false;
+        C_RX_RIGHT_INTERCEPTION : boolean                       := false;
+        C_RX_AUX_INTERCEPTION   : boolean                       := false;
         
-    --============================================
-    -- Configuration interface
-    --============================================
-    DefLocFarLpbk_i   : in  std_logic;
-    DefLocNearLpbk_i  : in  std_logic;
+        C_HAS_DEFAULT_LOOPBACK  : boolean                       := false;
+		
+        -- ADD USER GENERICS ABOVE THIS LINE ---------------
 
-    --============================================
-    -- Processor interface
-    --============================================
-    Interrupt_o       : out std_logic;
+        -- DO NOT EDIT BELOW THIS LINE ---------------------
+        -- Bus protocol parameters, do not add to or delete
+        C_S_AXI_ADDR_WIDTH             : integer                := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
+        C_S_AXI_DATA_WIDTH             : integer                := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
+        C_SLV_DWIDTH                   : integer                := 32
+        -- DO NOT EDIT ABOVE THIS LINE ---------------------
+    );
+    port (
+        -- ADD USER PORTS BELOW THIS LINE ------------------
 
-    -- Debug signals interface
-    DBG_dataOk        : out std_logic;
-    DBG_rawi          : out std_logic_vector(15 downto 0);
-    DBG_data_written  : out std_logic;
-    DBG_dma_burst_counter : out std_logic_vector(10 downto 0);
-    DBG_dma_test_mode      : out std_logic;
-    DBG_dma_EnableDma      : out std_logic;
-    DBG_dma_is_running     : out std_logic;
-    DBG_dma_Length         : out std_logic_vector(10 downto 0);
-    DBG_dma_nedge_run      : out std_logic;
+        -- SYNC Resetn
+        nSyncReset        : in  std_logic := 'X';
+
+        -- Clocks for HSSAER interface
+        HSSAER_ClkLS_p    : in  std_logic := '0'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+        HSSAER_ClkLS_n    : in  std_logic := '1'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+        HSSAER_ClkHS_p    : in  std_logic := '0'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+        HSSAER_ClkHS_n    : in  std_logic := '1'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+
+        --============================================
+        -- Rx Interface from Vision Sensor Controllers
+        --============================================
+
+        -- Left Sensor
+        ------------------
+        -- Parallel AER
+        LRx_PAER_Addr_i           : in  std_logic_vector(C_PAER_DSIZE-1 downto 0) := (others => '0');
+        LRx_PAER_Req_i            : in  std_logic := '0';
+        LRx_PAER_Ack_o            : out std_logic;
+
+        -- HSSAER interface
+        LRx_HSSAER_i              : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0) := (others => '0');
+
+        -- GTP interface
 
 
-    -- ADD USER PORTS ABOVE THIS LINE ------------------
+        -- Right Sensor
+        ------------------
+        -- Parallel AER
+        RRx_PAER_Addr_i           : in  std_logic_vector(C_PAER_DSIZE-1 downto 0) := (others => '0');
+        RRx_PAER_Req_i            : in  std_logic := '0';
+        RRx_PAER_Ack_o            : out std_logic;
 
-    -- DO NOT EDIT BELOW THIS LINE ---------------------
-    -- Bus protocol ports, do not add to or delete
-    -- Axi lite I/f
-    S_AXI_ACLK        : in  std_logic;
-    S_AXI_ARESETN     : in  std_logic;
-    S_AXI_AWADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
-    S_AXI_AWVALID     : in  std_logic;
-    S_AXI_WDATA       : in  std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-    S_AXI_WSTRB       : in  std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
-    S_AXI_WVALID      : in  std_logic;
-    S_AXI_BREADY      : in  std_logic;
-    S_AXI_ARADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
-    S_AXI_ARVALID     : in  std_logic;
-    S_AXI_RREADY      : in  std_logic;
-    S_AXI_ARREADY     : out std_logic;
-    S_AXI_RDATA       : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-    S_AXI_RRESP       : out std_logic_vector(1 downto 0);
-    S_AXI_RVALID      : out std_logic;
-    S_AXI_WREADY      : out std_logic;
-    S_AXI_BRESP       : out std_logic_vector(1 downto 0);
-    S_AXI_BVALID      : out std_logic;
-    S_AXI_AWREADY     : out std_logic;
-    -- Axi Stream I/f
-    S_AXIS_TREADY     : out std_logic;
-    S_AXIS_TDATA      : in  std_logic_vector(31 downto 0);
-    S_AXIS_TLAST      : in  std_logic;
-    S_AXIS_TVALID     : in  std_logic;
-    M_AXIS_TVALID     : out std_logic;
-    M_AXIS_TDATA      : out std_logic_vector(31 downto 0);
-    M_AXIS_TLAST      : out std_logic;
-    M_AXIS_TREADY     : in  std_logic;
-    -- DO NOT EDIT ABOVE THIS LINE ---------------------
+        -- HSSAER interface
+        RRx_HSSAER_i              : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0) := (others => '0');
 
-    DBG_din             : out std_logic_vector(63 downto 0);     
-    DBG_wr_en           : out std_logic;  
-    DBG_rd_en           : out std_logic;     
-    DBG_dout            : out std_logic_vector(63 downto 0);          
-    DBG_full            : out std_logic;    
-    DBG_almost_full     : out std_logic;    
-    DBG_overflow        : out std_logic;       
-    DBG_empty           : out std_logic;           
-    DBG_almost_empty    : out std_logic;    
-    DBG_underflow       : out std_logic;     
-    DBG_data_count      : out std_logic_vector(10 downto 0);
-    DBG_CH0_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH0_SRDY        : out std_logic;   
-    DBG_CH0_DRDY        : out std_logic;        
-    DBG_CH1_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH1_SRDY        : out std_logic;   
-    DBG_CH1_DRDY        : out std_logic;        
-    DBG_CH2_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH2_SRDY        : out std_logic;   
-    DBG_CH2_DRDY        : out std_logic;
-    DBG_Timestamp_xD    : out std_logic_vector(31 downto 0);       
-    DBG_MonInAddr_xD    : out std_logic_vector(31 downto 0); 
-    DBG_MonInSrcRdy_xS  : out std_logic;
-    DBG_MonInDstRdy_xS  : out std_logic;
-    DBG_RESETFIFO       : out std_logic;
-    DBG_CTRG_reg        : out std_logic_vector(C_SLV_DWIDTH-1 downto 0); 
-    DBG_ctrl_rd         : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    DBG_src_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_dst_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_err             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);  
-    DBG_run             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_RX              : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_AUXRxSaerChanEn : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+        -- GTP interface
 
-    DBG_shreg_aux0      : out std_logic_vector(3 downto 0);
-    DBG_shreg_aux1      : out std_logic_vector(3 downto 0);
-    DBG_shreg_aux2      : out std_logic_vector(3 downto 0);
-    DBG_FIFO_0          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_1          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_2          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_3          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_4          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0)
-);
-end component;	
+        -- Aux Sensor
+        ------------------
+        -- Parallel AER
+        AuxRx_PAER_Addr_i         : in  std_logic_vector(C_PAER_DSIZE-1 downto 0) := (others => '0');
+        AuxRx_PAER_Req_i          : in  std_logic := '0';
+        AuxRx_PAER_Ack_o          : out std_logic;
+
+        -- HSSAER interface
+        AuxRx_HSSAER_i            : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0) := (others => '0');
+
+        -- GTP interface
+        ---------------------
+
+        -- SpiNNlink interface
+        LRx_data_2of7_from_spinnaker_i   : in  std_logic_vector(6 downto 0) := (others => '0'); 
+        LRx_ack_to_spinnaker_o           : out std_logic;
+        RRx_data_2of7_from_spinnaker_i   : in  std_logic_vector(6 downto 0) := (others => '0'); 
+        RRx_ack_to_spinnaker_o           : out std_logic;
+        AuxRx_data_2of7_from_spinnaker_i : in  std_logic_vector(6 downto 0) := (others => '0'); 
+        AuxRx_ack_to_spinnaker_o         : out std_logic;
+        
+        --============================================
+        -- Tx Interface
+        --============================================
+
+        -- Parallel AER
+        Tx_PAER_Addr_o            : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
+        Tx_PAER_Req_o             : out std_logic;
+        Tx_PAER_Ack_i             : in  std_logic := '0';
+
+        -- HSSAER interface
+        Tx_HSSAER_o               : out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
+
+        -- GTP interface
+        
+        -- SpiNNlink interface
+        Tx_data_2of7_to_spinnaker_o      : out std_logic_vector(6 downto 0);
+        Tx_ack_from_spinnaker_i          : in  std_logic := '0';
+        
+        --============================================
+        -- Interception
+        --============================================
+        RRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        RRxSrcRdy_o             : out std_logic;
+        RRxDstRdy_i             : in  std_logic;
+        RRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        RRxBypassSrcRdy_i       : in  std_logic;
+        RRxBypassDstRdy_o       : out std_logic;
+        --
+        LRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        LRxSrcRdy_o             : out std_logic;
+        LRxDstRdy_i             : in  std_logic;
+        LRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        LRxBypassSrcRdy_i       : in  std_logic;
+        LRxBypassDstRdy_o       : out std_logic;
+        --
+        AuxRxData_o             : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        AuxRxSrcRdy_o           : out std_logic;
+        AuxRxDstRdy_i           : in  std_logic;
+        AuxRxBypassData_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        AuxRxBypassSrcRdy_i     : in  std_logic;
+        AuxRxBypassDstRdy_o     : out std_logic;               
+            
+        --============================================
+        -- Configuration interface
+        --============================================
+        DefLocFarLpbk_i   : in  std_logic;
+        DefLocNearLpbk_i  : in  std_logic;
+
+        --============================================
+        -- Processor interface
+        --============================================
+        Interrupt_o       : out std_logic;
+
+        -- Debug signals interface
+        DBG_dataOk        : out std_logic;
+        DBG_rawi          : out std_logic_vector(15 downto 0);
+        DBG_data_written  : out std_logic;
+        DBG_dma_burst_counter : out std_logic_vector(10 downto 0);
+        DBG_dma_test_mode      : out std_logic;
+        DBG_dma_EnableDma      : out std_logic;
+        DBG_dma_is_running     : out std_logic;
+        DBG_dma_Length         : out std_logic_vector(10 downto 0);
+        DBG_dma_nedge_run      : out std_logic;
+
+
+        -- ADD USER PORTS ABOVE THIS LINE ------------------
+
+        -- DO NOT EDIT BELOW THIS LINE ---------------------
+        -- Bus protocol ports, do not add to or delete
+        -- Axi lite I/f
+        S_AXI_ACLK        : in  std_logic;
+        S_AXI_ARESETN     : in  std_logic;
+        S_AXI_AWADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
+        S_AXI_AWVALID     : in  std_logic;
+        S_AXI_WDATA       : in  std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+        S_AXI_WSTRB       : in  std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
+        S_AXI_WVALID      : in  std_logic;
+        S_AXI_BREADY      : in  std_logic;
+        S_AXI_ARADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
+        S_AXI_ARVALID     : in  std_logic;
+        S_AXI_RREADY      : in  std_logic;
+        S_AXI_ARREADY     : out std_logic;
+        S_AXI_RDATA       : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+        S_AXI_RRESP       : out std_logic_vector(1 downto 0);
+        S_AXI_RVALID      : out std_logic;
+        S_AXI_WREADY      : out std_logic;
+        S_AXI_BRESP       : out std_logic_vector(1 downto 0);
+        S_AXI_BVALID      : out std_logic;
+        S_AXI_AWREADY     : out std_logic;
+        -- Axi Stream I/f
+        S_AXIS_TREADY     : out std_logic;
+        S_AXIS_TDATA      : in  std_logic_vector(31 downto 0);
+        S_AXIS_TLAST      : in  std_logic;
+        S_AXIS_TVALID     : in  std_logic;
+        M_AXIS_TVALID     : out std_logic;
+        M_AXIS_TDATA      : out std_logic_vector(31 downto 0);
+        M_AXIS_TLAST      : out std_logic;
+        M_AXIS_TREADY     : in  std_logic;
+        -- DO NOT EDIT ABOVE THIS LINE ---------------------
+
+        DBG_din             : out std_logic_vector(63 downto 0);     
+        DBG_wr_en           : out std_logic;  
+        DBG_rd_en           : out std_logic;     
+        DBG_dout            : out std_logic_vector(63 downto 0);          
+        DBG_full            : out std_logic;    
+        DBG_almost_full     : out std_logic;    
+        DBG_overflow        : out std_logic;       
+        DBG_empty           : out std_logic;           
+        DBG_almost_empty    : out std_logic;    
+        DBG_underflow       : out std_logic;     
+        DBG_data_count      : out std_logic_vector(10 downto 0);
+        DBG_CH0_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        DBG_CH0_SRDY        : out std_logic;   
+        DBG_CH0_DRDY        : out std_logic;        
+        DBG_CH1_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        DBG_CH1_SRDY        : out std_logic;   
+        DBG_CH1_DRDY        : out std_logic;        
+        DBG_CH2_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        DBG_CH2_SRDY        : out std_logic;   
+        DBG_CH2_DRDY        : out std_logic;
+        DBG_Timestamp_xD    : out std_logic_vector(31 downto 0);       
+        DBG_MonInAddr_xD    : out std_logic_vector(31 downto 0); 
+        DBG_MonInSrcRdy_xS  : out std_logic;
+        DBG_MonInDstRdy_xS  : out std_logic;
+        DBG_RESETFIFO       : out std_logic;
+        DBG_CTRG_reg        : out std_logic_vector(C_SLV_DWIDTH-1 downto 0); 
+        DBG_ctrl_rd         : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+        DBG_src_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+        DBG_dst_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+        DBG_err             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);  
+        DBG_run             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+        DBG_RX              : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+        DBG_AUXRxSaerChanEn : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+
+        DBG_shreg_aux0      : out std_logic_vector(3 downto 0);
+        DBG_shreg_aux1      : out std_logic_vector(3 downto 0);
+        DBG_shreg_aux2      : out std_logic_vector(3 downto 0);
+        DBG_FIFO_0          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        DBG_FIFO_1          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        DBG_FIFO_2          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        DBG_FIFO_3          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        DBG_FIFO_4          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0)
+    );
+
+--    attribute MAX_FANOUT  : string;
+--    attribute SIGIS       : string;
+--
+--    attribute MAX_FANOUT of S_AXI_ACLK     : signal is "10000";
+--    attribute MAX_FANOUT of S_AXI_ARESETN  : signal is "10000";
+--    attribute SIGIS      of S_AXI_ACLK     : signal is "Clk";
+--    attribute SIGIS      of S_AXI_ARESETN  : signal is "Rst";
+--    attribute SIGIS      of Interrupt_o    : signal is "Interrupt";
+
+end component;
 
 -- --------------------------------------------------
 --  AXI Lite Emulator
@@ -861,41 +919,59 @@ AER_DEVICE_EMULATOR_Tx_i : AER_Device_Emulator
 -- --------------------------------------------------
 HPUCORE_i : HPUCore
     generic map (
-        -- ADD USER GENERICS BELOW THIS LINE ---------------
+        C_RX_HAS_PAER               => false,               -- : boolean                       := true;           -- PAER RX Interface: if true the RX PAER interface is exposed
+        C_TX_HAS_PAER               => false,               -- : boolean                       := true;           -- PAER TX Interface: if true the TX PAER interface is exposed
+        C_PAER_DSIZE                => 24,               -- : natural range 1 to 29         := 24;             -- PAER Data Width: size of PAER address
+        C_RX_HAS_HSSAER             => false,               -- : boolean                       := true;           -- HSSAER RX Interface: if true the RX HSSAER interface is exposed
+        C_RX_HSSAER_N_CHAN          => 3,               -- : natural range 1 to 4          := 3;              -- HSSAER RX Channels: the number of RX HSSAER channels
+        C_TX_HAS_HSSAER             => false,               -- : boolean                       := true;           -- HSSAER TX Interface: if true the TX HSSAER interface is exposed
+        C_TX_HSSAER_N_CHAN          => 2,               -- : natural range 1 to 4          := 3;              -- HSSAER TX Channels: the number of TX HSSAER channels
+        C_RX_HAS_GTP                => false,               -- : boolean                       := false;          -- GTP RX Interface: if true the RX GTP interface is exposed
+        C_TX_HAS_GTP                => false,               -- : boolean                       := false;          -- GTP TX Interface: if true the TX GTP interface is exposed
+        C_RX_HAS_SPNNLNK            => true,               -- : boolean                       := true;           -- SpiNNlink RX Interface: if true the RX SpiNNlink interface is exposed  
+        C_TX_HAS_SPNNLNK            => true,               -- : boolean                       := true;           -- SpiNNlink TX Interface: if true the TX SpiNNlink interface is exposed
+        C_PSPNNLNK_WIDTH		        => 32,               -- : natural range 1 to 32         := 32;             -- SpiNNaker Parallel Data Width: size of SpiNNaker parallel data interface
+        C_SYSCLK_PERIOD_NS          => 10.0,               -- : real                          := 10.0;           -- System Clock period
+        C_DEBUG                     => false,                 -- : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
 
-        C_PAER_DSIZE               	=> 24,				--	: natural range 1 to 29   := 24;
-        C_RX_HAS_PAER              	=> false,			--	: boolean                 := true;
-        C_RX_HAS_HSSAER            	=> false,			--	: boolean                 := true;
-        C_RX_HSSAER_N_CHAN         	=> 3,				--	: natural range 1 to 4    := 3;
-        C_RX_HAS_GTP               	=> false,			--	: boolean                 := true;
-        C_RX_HAS_SPNNLNK          	=> true,			--	: boolean                 := true;
-        C_TX_HAS_PAER              	=> false,			--	: boolean                 := true;
-        C_TX_HAS_HSSAER            	=> false,			--	: boolean                 := true;
-        C_TX_HSSAER_N_CHAN         	=> 2,				--	: natural range 1 to 4    := 2;
-        C_TX_HAS_GTP               	=> false,			--	: boolean                 := true;
-        C_TX_HAS_SPNNLNK          	=> true,			--	: boolean                 := true;
-        C_DEBUG                    	=> false,			--	: boolean                 := false;
 
-        -- ADD USER GENERICS ABOVE THIS LINE ---------------
+        C_RX_PAER_L_SENS_ID         =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER0_L_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER1_L_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER2_L_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER3_L_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_PAER_R_SENS_ID         =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER0_R_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER1_R_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER2_R_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER3_R_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_PAER_A_SENS_ID         =>  "001",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER0_A_SENS_ID        =>  "001",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER1_A_SENS_ID        =>  "001",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER2_A_SENS_ID        =>  "001",          -- Sensor ID - See AERsensorsMap.xls
+        C_RX_SAER3_A_SENS_ID        =>  "001",          -- Sensor ID - See AERsensorsMap.xls
 
-        -- DO NOT EDIT BELOW THIS LINE ---------------------
-        -- Bus protocol parameters, do not add to or delete
-        C_S_AXI_DATA_WIDTH          => C_S_AXI_DATA_WIDTH,				--	: integer              := 32;
-        C_S_AXI_ADDR_WIDTH          => C_S_AXI_ADDR_WIDTH,				--	: integer              := 7;
-        C_SLV_DWIDTH                => 32				--	: integer              := 32
-        -- DO NOT EDIT ABOVE THIS LINE ---------------------
+        C_RX_LEFT_INTERCEPTION      =>  false,
+        C_RX_RIGHT_INTERCEPTION     =>  false,
+        C_RX_AUX_INTERCEPTION       =>  false,
+        
+        C_HAS_DEFAULT_LOOPBACK      => false,
+
+        C_S_AXI_DATA_WIDTH          => C_S_AXI_DATA_WIDTH,		--	: integer              := 32;
+        C_S_AXI_ADDR_WIDTH          => C_S_AXI_ADDR_WIDTH,		--	: integer              := 7;
+        C_SLV_DWIDTH                => 32                     -- : integer              := 32
     )
     port map(
         -- ADD USER PORTS BELOW THIS LINE ------------------
 
         -- SYNC Resetn
-        nSyncReset        			=> i_resetn,
+        nSyncReset        			    => i_resetn,
 
         -- Clocks for HSSAER interface
-        HSSAER_ClkLS_p   			=> HSSAER_ClkLS_p, -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-        HSSAER_ClkLS_n   			=> HSSAER_ClkLS_n, -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-        HSSAER_ClkHS_p   			=> HSSAER_ClkHS_p, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
-        HSSAER_ClkHS_n   			=> HSSAER_ClkHS_n, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+        HSSAER_ClkLS_p   			      => HSSAER_ClkLS_p, -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+        HSSAER_ClkLS_n   			      => HSSAER_ClkLS_n, -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+        HSSAER_ClkHS_p   			      => HSSAER_ClkHS_p, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+        HSSAER_ClkHS_n   			      => HSSAER_ClkHS_n, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
 
         --============================================
         -- Rx Interface from Vision Sensor Controllers
@@ -964,6 +1040,30 @@ HPUCORE_i : HPUCore
         Tx_data_2of7_to_spinnaker_o  => Tx_data_2of7_to_spinnaker,  --   : out std_logic_vector(6 downto 0);
         Tx_ack_from_spinnaker_i      => Tx_ack_from_spinnaker,      --   : in  std_logic;
         
+        --============================================
+        -- Interception
+        --============================================
+        RRxData_o                    => open, -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        RRxSrcRdy_o                  => open, -- : out std_logic;
+        RRxDstRdy_i                  => '0', -- : in  std_logic;
+        RRxBypassData_i              => (others => '0'), -- : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        RRxBypassSrcRdy_i            => '0' , -- : in  std_logic;
+        RRxBypassDstRdy_o            => open, -- : out std_logic;
+        -- 
+        LRxData_o                    => open, -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        LRxSrcRdy_o                  => open, -- : out std_logic;
+        LRxDstRdy_i                  => '0', -- : in  std_logic;
+        LRxBypassData_i              => (others => '0'), -- : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        LRxBypassSrcRdy_i            => '0', -- : in  std_logic;
+        LRxBypassDstRdy_o            => open, -- : out std_logic;
+        -- 
+        AuxRxData_o                  => open, -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        AuxRxSrcRdy_o                => open, -- : out std_logic;
+        AuxRxDstRdy_i                => '0', -- : in  std_logic;
+        AuxRxBypassData_i            => (others => '0'), -- : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+        AuxRxBypassSrcRdy_i          => '0', -- : in  std_logic;
+        AuxRxBypassDstRdy_o          => open, -- : out std_logic;               
+            
         --============================================
         -- Configuration interface
         --============================================

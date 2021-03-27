@@ -1,13 +1,71 @@
--- ------------------------------------------------------------------------------
+-- ********************************************
+-- Version 3.6 Rev 0:  28th, January 2021
+-- - Added interception ports (for algorythm insertion)
+-- - Updated the list of tags for externale sensor (IMU and Cochlea) - see AERSensorsMap.xlxs
+-- - GUI renewed
+--   (M. Casti - IIT)
 -- 
---  Version 3.0:  07/25/2018
---  - Added SpiNNlink capabilities
---    (M. Casti - IIT)
---    
---  Version 3.1:  03/10/2018
---  - START/STOP Commands for SpiNNlink
---    (M. Casti - IIT)
--- ------------------------------------------------------------------------------
+-- ********************************************
+-- Version 3.5 Rev 20:  20th, May 2020
+-- - Added Synchronization Fifos to make independent the differential clocks with the Core clock
+--   (F. Diotalevi - IIT)
+-- 
+-- ********************************************
+-- Version 3.4 Rev 15:  22th, January 2019
+-- - Absolute Timing Feature for Transmission 
+-- - Changed some feature about START/STOP Command
+-- - Added SpiNNlink Control Register and Status Register
+--   (M. Casti - IIT)
+-- 
+-- ********************************************  
+-- Version 3.3 Rev 3:  30th, October 2018
+-- - DMA register (DMA_REG) has bit 0 fixed to 0.
+--   It can be written only with even values.
+--   (F. Diotalevi - IIT)
+-- 
+-- ********************************************
+-- Version 3.2 Rev 3 - October 24th 2018
+-- - Splitted FlushFifos in FlushRXFifo and FlushTXFifos. 
+-- - Modifications in axistream module to premature end a burst transfer. 
+-- - Added register that counts data in AXI stream bus. 
+-- - Modified reset value of RX PAER Configuration register (RX_PAER_CFNG_REG). 
+-- - Enlarged DMA length field to 16 bits.
+--   (F. Diotalevi - IIT)
+-- 
+-- ********************************************
+-- Version 3.1 Rev 5 - August 24th 2018
+-- - Added the START/STOP and Data Mask Feature to SpiNNlink
+--   (M. Casti - IIT)
+-- 
+-- ********************************************
+-- Version 3.0 - August 9th 2018
+-- - Added the SpiNNlink interface capability
+--   (M. Casti - IIT)
+-- 
+-- ********************************************
+-- Version 2.1 - June 15th 2018
+-- - Enlarged to 24 the SSAER data transfer. 
+-- - Different header coding.
+--   (F. Diotalevi - IIT)
+-- 
+-- ********************************************
+-- Version 2.0 - November 15th 2017
+-- - Bug fixed for the HSSAER Channel Enable. 
+-- - Added AUX Threshold Error register and AUX Rx Counter registers. 
+-- - Some Fixes in HDL code.
+--   (F. Diotalevi - IIT)
+-- 
+-- ********************************************
+-- Version 1.1 - June 14th 2017
+-- - Modified the AXIstream module and added some debug ports. Added Reset_DMA_stream bit into CTRL_REG.
+--   (F. Diotalevi - IIT)
+-- 
+-- ********************************************
+-- Version 1.0 - September 19th 2016
+-- - First Release (DRAFT)
+--   (F. Diotalevi - IIT)
+-- 
+-- ********************************************
 
 
 library ieee;
@@ -65,19 +123,20 @@ entity HPUCore is
         -- ADD USER GENERICS BELOW THIS LINE ---------------
 
 
-        C_RX_HAS_PAER           : boolean                       := true;           -- PAER RX Interface:	          if true the RX PAER interface is exposed
-        C_TX_HAS_PAER           : boolean                       := true;           -- PAER TX Interface:	          if true the TX PAER interface is exposed
-        C_PAER_DSIZE            : natural range 1 to 29         := 24;             -- PAER Data Width:	              size of PAER address
-        C_RX_HAS_HSSAER         : boolean                       := true;           -- HSSAER RX Interface:	          if true the RX HSSAER interface is exposed
-        C_RX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER RX Channels:	          the number of RX HSSAER channels
-        C_TX_HAS_HSSAER         : boolean                       := true;           -- HSSAER TX Interface:	          if true the TX HSSAER interface is exposed
-        C_TX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER TX Channels:	          the number of TX HSSAER channels
-        C_RX_HAS_GTP            : boolean                       := false;          -- GTP RX Interface:               if true the RX GTP interface is exposed
-        C_TX_HAS_GTP            : boolean                       := false;          -- GTP TX Interface:	              if true the TX GTP interface is exposed
-        C_RX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink RX Interface:         if true the RX SpiNNlink interface is exposed  
-        C_TX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink TX Interface:	      if true the TX SpiNNlink interface is exposed
-        C_PSPNNLNK_WIDTH		: natural range 1 to 32         := 32;             -- SpiNNaker Parallel Data Width: size of SpiNNaker parallel data interface
-        C_DEBUG                 : boolean                       := false;          -- Debug Ports:                    if true the debug ports are exposed
+        C_RX_HAS_PAER           : boolean                       := true;           -- PAER RX Interface: if true the RX PAER interface is exposed
+        C_TX_HAS_PAER           : boolean                       := true;           -- PAER TX Interface: if true the TX PAER interface is exposed
+        C_PAER_DSIZE            : natural range 1 to 29         := 24;             -- PAER Data Width: size of PAER address
+        C_RX_HAS_HSSAER         : boolean                       := true;           -- HSSAER RX Interface: if true the RX HSSAER interface is exposed
+        C_RX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER RX Channels: the number of RX HSSAER channels
+        C_TX_HAS_HSSAER         : boolean                       := true;           -- HSSAER TX Interface: if true the TX HSSAER interface is exposed
+        C_TX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER TX Channels: the number of TX HSSAER channels
+        C_RX_HAS_GTP            : boolean                       := false;          -- GTP RX Interface: if true the RX GTP interface is exposed
+        C_TX_HAS_GTP            : boolean                       := false;          -- GTP TX Interface: if true the TX GTP interface is exposed
+        C_RX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink RX Interface: if true the RX SpiNNlink interface is exposed  
+        C_TX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink TX Interface: if true the TX SpiNNlink interface is exposed
+        C_PSPNNLNK_WIDTH		    : natural range 1 to 32         := 32;             -- SpiNNaker Parallel Data Width: size of SpiNNaker parallel data interface
+        C_SYSCLK_PERIOD_NS      : real                          := 10.0;           -- System Clock period
+        C_DEBUG                 : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
 
         C_RX_PAER_L_SENS_ID     : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
         C_RX_SAER0_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
@@ -337,6 +396,7 @@ end entity HPUCore;
 
 architecture str of HPUCore is
 
+    signal nClear                    : std_logic;
     signal nRst                      : std_logic;
 
     signal i_dma_rxDataBuffer        : std_logic_vector(31 downto 0);
@@ -511,35 +571,37 @@ begin
 
     -- Reset generation --
     ----------------------
-    nRst    <= S_AXI_ARESETN and nSyncReset;
-
+    nClear  <= S_AXI_ARESETN and nSyncReset;
 
 u_time_machine : time_machine 
-generic map( 
-  SIM_TIME_COMPRESSION_g => FALSE, -- Se "TRUE", la simulazione viene "compressa": i clock enable non seguono le tempistiche reali
-  INIT_DELAY             => 32     -- Ritardo dal rilascio del reset all'impulso di "init"
-  )
-port map(
-  -- Clock in port
-  CLK_100M_i           => S_AXI_ACLK,        -- Ingresso 100 MHz
-  -- Enable ports
-  EN100NS_100_o        => timing.en100ns, 	 -- Clock enable a 100 ns
-  EN1US_100_o          => timing.en1us,	     -- Clock enable a 1 us
-  EN10US_100_o         => timing.en10us,	 -- Clock enable a 10 us
-  EN100US_100_o        => timing.en100us,	 -- Clock enable a 100 us
-  EN1MS_100_o          => timing.en1ms,	     -- Clock enable a 1 ms
-  EN10MS_100_o         => timing.en10ms,	 -- Clock enable a 10 ms
-  EN100MS_100_o        => timing.en100ms,	 -- Clock enable a 100 ms
-  EN1S_100_o           => timing.en1s,	     -- Clock enable a 1 s
-  -- Reset output port 
-  RESYNC_CLEAR_N_o     => resync_clear_n,	 -- Clear resincronizzato
-  INIT_RESET_100_o     => init_reset,	 	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica positiva)
-  INIT_RESET_N_100_o   => init_reset_n,	 	-- Reset sincrono a 32 colpi di clock dal Clear resincronizzato (logica negativa)
-  -- Status and control signals
-  CLEAR_N_i            => nRst           -- Clear asincrono che reinizializza le macchine di timing
-  );
-
-
+  generic map( 
+    CLK_PERIOD_NS_g         => C_SYSCLK_PERIOD_NS, -- Main Clock period
+    CLEAR_POLARITY_g        => "LOW",              -- Active "HIGH" or "LOW"
+    PON_RESET_DURATION_MS_g => 10,                 -- Duration of Power-On reset (ms)
+    SIM_TIME_COMPRESSION_g  => false               -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+    )
+  port map(
+    -- Clock in port
+    CLK_i                   => S_AXI_ACLK,      -- Input clock @ 50 MHz,
+    CLEAR_i                 => nClear,          -- Asynchronous active low reset
+  
+    -- Output reset
+    RESET_o                 => open,            -- Reset out (active high)
+    RESET_N_o               => nRst,            -- Reset out (active low)
+    PON_RESET_OUT_o         => open,            -- Power on Reset out (active high)
+    PON_RESET_N_OUT_o       => open,            -- Power on Reset out (active low)
+    
+    -- Output ports for generated clock enables
+    EN200NS_o               => timing.en200ns,  -- Clock enable every 200 ns
+    EN1US_o                 => timing.en1us,	  -- Clock enable every 1 us
+    EN10US_o                => timing.en10us,	  -- Clock enable every 10 us
+    EN100US_o               => timing.en100us,	-- Clock enable every 100 us
+    EN1MS_o                 => timing.en1ms,	  -- Clock enable every 1 ms
+    EN10MS_o                => timing.en10ms,	  -- Clock enable every 10 ms
+    EN100MS_o               => timing.en100ms,	-- Clock enable every 100 ms
+    EN1S_o                  => timing.en1s 	    -- Clock enable every 1 s
+    );
+    
     ------------------------------------------------------
     -- NeuSerial AXI interfaces instantiation
     ------------------------------------------------------

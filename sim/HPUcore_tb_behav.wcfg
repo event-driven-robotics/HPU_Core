@@ -19,15 +19,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="116313789192fs"></ZoomStartTime>
-      <ZoomEndTime time="116942716852fs"></ZoomEndTime>
-      <Cursor1Time time="116487538000fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="1252465256001fs"></ZoomEndTime>
+      <Cursor1Time time="1106937148000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="292"></NameColumnWidth>
-      <ValueColumnWidth column_width="134"></ValueColumnWidth>
+      <ValueColumnWidth column_width="130"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="14" />
+   <WVObjectSize size="13" />
    <wave_markers>
       <marker time="529052925000" label="" />
    </wave_markers>
@@ -38,10 +38,6 @@
    <wvobject fp_name="/HPUcore_tb/HSSAER_ClkHS_p" type="logic">
       <obj_property name="ElementShortName">HSSAER_ClkHS_p</obj_property>
       <obj_property name="ObjectShortName">HSSAER_ClkHS_p</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/i_clk" type="logic">
-      <obj_property name="ElementShortName">i_clk</obj_property>
-      <obj_property name="ObjectShortName">i_clk</obj_property>
    </wvobject>
    <wvobject fp_name="/HPUcore_tb/i_resetn" type="logic">
       <obj_property name="ElementShortName">i_resetn</obj_property>
@@ -355,10 +351,6 @@
                <obj_property name="ElementShortName">LoutAck_r</obj_property>
                <obj_property name="ObjectShortName">LoutAck_r</obj_property>
             </wvobject>
-            <wvobject fp_name="/HPUcore_tb/R_SPINNAKER_EMULATOR_i/i" type="array">
-               <obj_property name="ElementShortName">i[31:0]</obj_property>
-               <obj_property name="ObjectShortName">i[31:0]</obj_property>
-            </wvobject>
             <wvobject fp_name="/HPUcore_tb/R_SPINNAKER_EMULATOR_i/Lin_r" type="array">
                <obj_property name="ElementShortName">Lin_r[6:0]</obj_property>
                <obj_property name="ObjectShortName">Lin_r[6:0]</obj_property>
@@ -406,10 +398,6 @@
             <wvobject fp_name="/HPUcore_tb/L_SPINNAKER_EMULATOR_i/LoutAck_r" type="logic">
                <obj_property name="ElementShortName">LoutAck_r</obj_property>
                <obj_property name="ObjectShortName">LoutAck_r</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/L_SPINNAKER_EMULATOR_i/i" type="array">
-               <obj_property name="ElementShortName">i[31:0]</obj_property>
-               <obj_property name="ObjectShortName">i[31:0]</obj_property>
             </wvobject>
             <wvobject fp_name="/HPUcore_tb/L_SPINNAKER_EMULATOR_i/Lin_r" type="array">
                <obj_property name="ElementShortName">Lin_r[6:0]</obj_property>
@@ -459,10 +447,6 @@
             <wvobject fp_name="/HPUcore_tb/AUX_SPINNAKER_EMULATOR_i/LoutAck_r" type="logic">
                <obj_property name="ElementShortName">LoutAck_r</obj_property>
                <obj_property name="ObjectShortName">LoutAck_r</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AUX_SPINNAKER_EMULATOR_i/i" type="array">
-               <obj_property name="ElementShortName">i[31:0]</obj_property>
-               <obj_property name="ObjectShortName">i[31:0]</obj_property>
             </wvobject>
             <wvobject fp_name="/HPUcore_tb/AUX_SPINNAKER_EMULATOR_i/Lin_r" type="array">
                <obj_property name="ElementShortName">Lin_r[6:0]</obj_property>

@@ -331,7 +331,7 @@ reg [7:0]     dummy;
 assign parity = ~(^pkt_data);
 assign packet = {pkt_data, 7'b0000000, parity};
 
-integer i;
+// integer i;
 
 always @*
     begin
