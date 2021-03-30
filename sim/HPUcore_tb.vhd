@@ -78,59 +78,64 @@ constant T_LSCLK : time := ((1.0/F_LSCLK)/2.0) * (1 us);
 -- --------------------------------------------------
 --  Unit Under Test: HPUcore
 -- --------------------------------------------------
-component HPUCore
+
+component HPUCore is
     generic (
-        -- ADD USER GENERICS BELOW THIS LINE ---------------
-
-
-        C_RX_HAS_PAER           : boolean                       := true;           -- PAER RX Interface: if true the RX PAER interface is exposed
-        C_TX_HAS_PAER           : boolean                       := true;           -- PAER TX Interface: if true the TX PAER interface is exposed
-        C_PAER_DSIZE            : natural range 1 to 29         := 24;             -- PAER Data Width: size of PAER address
-        C_RX_HAS_HSSAER         : boolean                       := true;           -- HSSAER RX Interface: if true the RX HSSAER interface is exposed
-        C_RX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER RX Channels: the number of RX HSSAER channels
-        C_TX_HAS_HSSAER         : boolean                       := true;           -- HSSAER TX Interface: if true the TX HSSAER interface is exposed
-        C_TX_HSSAER_N_CHAN      : natural range 1 to 4          := 3;              -- HSSAER TX Channels: the number of TX HSSAER channels
-        C_RX_HAS_GTP            : boolean                       := false;          -- GTP RX Interface: if true the RX GTP interface is exposed
-        C_TX_HAS_GTP            : boolean                       := false;          -- GTP TX Interface: if true the TX GTP interface is exposed
-        C_RX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink RX Interface: if true the RX SpiNNlink interface is exposed  
-        C_TX_HAS_SPNNLNK        : boolean                       := true;           -- SpiNNlink TX Interface: if true the TX SpiNNlink interface is exposed
-        C_PSPNNLNK_WIDTH		    : natural range 1 to 32         := 32;             -- SpiNNaker Parallel Data Width: size of SpiNNaker parallel data interface
-        C_SYSCLK_PERIOD_NS      : real                          := 10.0;           -- System Clock period
-        C_DEBUG                 : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
-
-        C_RX_PAER_L_SENS_ID     : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER0_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER1_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER2_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER3_L_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_PAER_R_SENS_ID     : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER0_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER1_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER2_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER3_R_SENS_ID    : std_logic_vector(2 downto 0)  := "000";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_PAER_A_SENS_ID     : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER0_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER1_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER2_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER3_A_SENS_ID    : std_logic_vector(2 downto 0)  := "001";          -- Sensor ID - See AERsensorsMap.xls
-
-        C_RX_LEFT_INTERCEPTION  : boolean                       := false;
-        C_RX_RIGHT_INTERCEPTION : boolean                       := false;
-        C_RX_AUX_INTERCEPTION   : boolean                       := false;
-        
-        C_HAS_DEFAULT_LOOPBACK  : boolean                       := false;
-		
-        -- ADD USER GENERICS ABOVE THIS LINE ---------------
-
-        -- DO NOT EDIT BELOW THIS LINE ---------------------
-        -- Bus protocol parameters, do not add to or delete
-        C_S_AXI_ADDR_WIDTH             : integer                := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
-        C_S_AXI_DATA_WIDTH             : integer                := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
-        C_SLV_DWIDTH                   : integer                := 32
-        -- DO NOT EDIT ABOVE THIS LINE ---------------------
+        -- -----------------------    
+        -- PAER        
+        C_RX_HAS_PAER             : boolean                       := true;
+        C_RX_PAER_L_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
+        C_RX_PAER_R_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
+        C_RX_PAER_A_SENS_ID       : std_logic_vector(2 downto 0)  := "001";
+        C_TX_HAS_PAER             : boolean                       := true;
+        C_PAER_DSIZE              : natural range 1 to 29         := 24;
+        -- -----------------------        
+        -- HSSAER
+        C_RX_HAS_HSSAER           : boolean                       := true;
+        C_RX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
+        C_RX_SAER0_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER1_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER2_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER3_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";        
+        C_RX_SAER0_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER1_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER2_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+        C_RX_SAER3_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";        
+        C_RX_SAER0_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
+        C_RX_SAER1_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
+        C_RX_SAER2_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
+        C_RX_SAER3_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
+        C_TX_HAS_HSSAER           : boolean                       := true;
+        C_TX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
+        -- -----------------------        
+        -- GTP
+        C_RX_HAS_GTP              : boolean                       := true;
+        C_GTP_RXUSRCLK2_PERIOD_NS : real                          := 6.4;        
+        C_TX_HAS_GTP              : boolean                       := true;
+        C_GTP_TXUSRCLK2_PERIOD_NS : real                          := 6.4;  
+        C_GTP_DSIZE               : positive                      := 16;
+        -- -----------------------                
+        -- SPINNLINK
+        C_RX_HAS_SPNNLNK          : boolean                       := true;
+        C_TX_HAS_SPNNLNK          : boolean                       := true;
+        C_PSPNNLNK_WIDTH      	  : natural range 1 to 32         := 32;
+        -- -----------------------
+        -- INTERCEPTION
+        C_RX_LEFT_INTERCEPTION    : boolean                       := false;
+        C_RX_RIGHT_INTERCEPTION   : boolean                       := false;
+        C_RX_AUX_INTERCEPTION     : boolean                       := false;
+        -- -----------------------
+        -- CORE
+        C_SYSCLK_PERIOD_NS        : real                          := 10.0;           -- System Clock period
+        C_DEBUG                   : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
+        C_HAS_DEFAULT_LOOPBACK    : boolean                       := false;
+        -- -----------------------
+        -- BUS PROTOCOL PARAMETERS
+        C_S_AXI_ADDR_WIDTH        : integer                       := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
+        C_S_AXI_DATA_WIDTH        : integer                       := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
+        C_SLV_DWIDTH              : integer                       := 32
     );
     port (
-        -- ADD USER PORTS BELOW THIS LINE ------------------
 
         -- SYNC Resetn
         nSyncReset        : in  std_logic := 'X';
@@ -156,7 +161,20 @@ component HPUCore
         LRx_HSSAER_i              : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0) := (others => '0');
 
         -- GTP interface
-
+        LRx_RXGTP_AlignRequest_o   : out std_logic;
+        LRx_GTP_RxUsrClk2_i        : in  std_logic;                                      
+        LRx_GTP_SoftResetRx_o      : out  std_logic;                                     
+        LRx_GTP_DataValid_o        : out std_logic;                                      
+        LRx_GTP_Rxuserrdy_o        : out std_logic;                                      
+        LRx_GTP_Rxdata_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);       
+        LRx_GTP_Rxchariscomma_i    : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        LRx_GTP_Rxcharisk_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        LRx_GTP_Rxdisperr_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        LRx_GTP_Rxnotintable_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        LRx_GTP_Rxbyteisaligned_i  : in  std_logic;                                      
+        LRx_GTP_Rxbyterealign_i    : in  std_logic;                                      
+        LRx_GTP_PllLock_i          : in  std_logic;                                      
+        LRx_GTP_PllRefclklost_i    : in  std_logic;                                      
 
         -- Right Sensor
         ------------------
@@ -169,6 +187,20 @@ component HPUCore
         RRx_HSSAER_i              : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0) := (others => '0');
 
         -- GTP interface
+        RRx_RXGTP_AlignRequest_o   : out std_logic;
+        RRx_GTP_RxUsrClk2_i        : in  std_logic;                                      
+        RRx_GTP_SoftResetRx_o      : out  std_logic;                                     
+        RRx_GTP_DataValid_o        : out std_logic;                                      
+        RRx_GTP_Rxuserrdy_o        : out std_logic;                                      
+        RRx_GTP_Rxdata_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);       
+        RRx_GTP_Rxchariscomma_i    : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        RRx_GTP_Rxcharisk_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        RRx_GTP_Rxdisperr_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        RRx_GTP_Rxnotintable_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        RRx_GTP_Rxbyteisaligned_i  : in  std_logic;                                      
+        RRx_GTP_Rxbyterealign_i    : in  std_logic;                                      
+        RRx_GTP_PllLock_i          : in  std_logic;                                      
+        RRx_GTP_PllRefclklost_i    : in  std_logic;  
 
         -- Aux Sensor
         ------------------
@@ -181,7 +213,20 @@ component HPUCore
         AuxRx_HSSAER_i            : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0) := (others => '0');
 
         -- GTP interface
-        ---------------------
+        AuxRx_RXGTP_AlignRequest_o   : out std_logic;
+        AuxRx_GTP_RxUsrClk2_i        : in  std_logic;                                      
+        AuxRx_GTP_SoftResetRx_o      : out  std_logic;                                     
+        AuxRx_GTP_DataValid_o        : out std_logic;                                      
+        AuxRx_GTP_Rxuserrdy_o        : out std_logic;                                      
+        AuxRx_GTP_Rxdata_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);       
+        AuxRx_GTP_Rxchariscomma_i    : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        AuxRx_GTP_Rxcharisk_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        AuxRx_GTP_Rxdisperr_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        AuxRx_GTP_Rxnotintable_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+        AuxRx_GTP_Rxbyteisaligned_i  : in  std_logic;                                      
+        AuxRx_GTP_Rxbyterealign_i    : in  std_logic;                                      
+        AuxRx_GTP_PllLock_i          : in  std_logic;                                      
+        AuxRx_GTP_PllRefclklost_i    : in  std_logic;  
 
         -- SpiNNlink interface
         LRx_data_2of7_from_spinnaker_i   : in  std_logic_vector(6 downto 0) := (others => '0'); 
@@ -919,47 +964,60 @@ AER_DEVICE_EMULATOR_Tx_i : AER_Device_Emulator
 -- --------------------------------------------------
 HPUCORE_i : HPUCore
     generic map (
-        C_RX_HAS_PAER               => false,               -- : boolean                       := true;           -- PAER RX Interface: if true the RX PAER interface is exposed
-        C_TX_HAS_PAER               => false,               -- : boolean                       := true;           -- PAER TX Interface: if true the TX PAER interface is exposed
-        C_PAER_DSIZE                => 24,               -- : natural range 1 to 29         := 24;             -- PAER Data Width: size of PAER address
-        C_RX_HAS_HSSAER             => false,               -- : boolean                       := true;           -- HSSAER RX Interface: if true the RX HSSAER interface is exposed
-        C_RX_HSSAER_N_CHAN          => 3,               -- : natural range 1 to 4          := 3;              -- HSSAER RX Channels: the number of RX HSSAER channels
-        C_TX_HAS_HSSAER             => false,               -- : boolean                       := true;           -- HSSAER TX Interface: if true the TX HSSAER interface is exposed
-        C_TX_HSSAER_N_CHAN          => 2,               -- : natural range 1 to 4          := 3;              -- HSSAER TX Channels: the number of TX HSSAER channels
-        C_RX_HAS_GTP                => false,               -- : boolean                       := false;          -- GTP RX Interface: if true the RX GTP interface is exposed
-        C_TX_HAS_GTP                => false,               -- : boolean                       := false;          -- GTP TX Interface: if true the TX GTP interface is exposed
-        C_RX_HAS_SPNNLNK            => true,               -- : boolean                       := true;           -- SpiNNlink RX Interface: if true the RX SpiNNlink interface is exposed  
-        C_TX_HAS_SPNNLNK            => true,               -- : boolean                       := true;           -- SpiNNlink TX Interface: if true the TX SpiNNlink interface is exposed
-        C_PSPNNLNK_WIDTH		        => 32,               -- : natural range 1 to 32         := 32;             -- SpiNNaker Parallel Data Width: size of SpiNNaker parallel data interface
-        C_SYSCLK_PERIOD_NS          => 10.0,               -- : real                          := 10.0;           -- System Clock period
-        C_DEBUG                     => false,                 -- : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
-
-
-        C_RX_PAER_L_SENS_ID         =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER0_L_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER1_L_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER2_L_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER3_L_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_PAER_R_SENS_ID         =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER0_R_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER1_R_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER2_R_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER3_R_SENS_ID        =>  "000",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_PAER_A_SENS_ID         =>  "001",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER0_A_SENS_ID        =>  "001",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER1_A_SENS_ID        =>  "001",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER2_A_SENS_ID        =>  "001",          -- Sensor ID - See AERsensorsMap.xls
-        C_RX_SAER3_A_SENS_ID        =>  "001",          -- Sensor ID - See AERsensorsMap.xls
-
+    
+        -- -----------------------    
+        -- PAER        
+        C_RX_HAS_PAER               => true, 
+        C_RX_PAER_L_SENS_ID         =>  "000",
+        C_RX_PAER_R_SENS_ID         =>  "000",
+        C_RX_PAER_A_SENS_ID         =>  "001",
+        C_TX_HAS_PAER               => false,
+        C_PAER_DSIZE                => 24,   
+        -- -----------------------        
+        -- HSSAER
+        C_RX_HAS_HSSAER             => false, 
+        C_RX_HSSAER_N_CHAN          => 3
+        C_RX_SAER0_L_SENS_ID        => "000",
+        C_RX_SAER1_L_SENS_ID        => "000",
+        C_RX_SAER2_L_SENS_ID        => "000",
+        C_RX_SAER3_L_SENS_ID        => "000",        
+        C_RX_SAER0_R_SENS_ID        => "000",
+        C_RX_SAER1_R_SENS_ID        => "000",
+        C_RX_SAER2_R_SENS_ID        => "000",
+        C_RX_SAER3_R_SENS_ID        => "000",        
+        C_RX_SAER0_A_SENS_ID        => "001",
+        C_RX_SAER1_A_SENS_ID        => "001",
+        C_RX_SAER2_A_SENS_ID        => "001",
+        C_RX_SAER3_A_SENS_ID        => "001",
+        C_TX_HAS_HSSAER             => false,
+        C_TX_HSSAER_N_CHAN          => 3,
+        -- -----------------------        
+        -- GTP
+        C_RX_HAS_GTP                => true,
+        C_GTP_RXUSRCLK2_PERIOD_NS   => 6.4,     
+        C_TX_HAS_GTP                => false,
+        C_GTP_TXUSRCLK2_PERIOD_NS   => 6.4,  
+        C_GTP_DSIZE                 => 16,
+        -- -----------------------                
+        -- SPINNLINK
+        C_RX_HAS_SPNNLNK            => false, 
+        C_TX_HAS_SPNNLNK            => false,
+        C_PSPNNLNK_WIDTH		        => 32,
+        -- -----------------------
+        -- INTERCEPTION
         C_RX_LEFT_INTERCEPTION      =>  false,
         C_RX_RIGHT_INTERCEPTION     =>  false,
         C_RX_AUX_INTERCEPTION       =>  false,
-        
+        -- -----------------------
+        -- CORE
+        C_SYSCLK_PERIOD_NS          => 10.0,               
+        C_DEBUG                     => false,                
         C_HAS_DEFAULT_LOOPBACK      => false,
-
-        C_S_AXI_DATA_WIDTH          => C_S_AXI_DATA_WIDTH,		--	: integer              := 32;
-        C_S_AXI_ADDR_WIDTH          => C_S_AXI_ADDR_WIDTH,		--	: integer              := 7;
-        C_SLV_DWIDTH                => 32                     -- : integer              := 32
+        -- -----------------------
+        -- BUS PROTOCOL PARAMETERS
+        C_S_AXI_DATA_WIDTH          => C_S_AXI_DATA_WIDTH,		
+        C_S_AXI_ADDR_WIDTH          => C_S_AXI_ADDR_WIDTH,		
+        C_SLV_DWIDTH                => 32                     
     )
     port map(
         -- ADD USER PORTS BELOW THIS LINE ------------------
@@ -988,7 +1046,20 @@ HPUCORE_i : HPUCore
         LRx_HSSAER_i              	=> (others=> '0'),
 
         -- GTP interface
-
+        LRx_RXGTP_AlignRequest_o    => ,
+        LRx_GTP_RxUsrClk2_i         => ,
+        LRx_GTP_SoftResetRx_o       => ,
+        LRx_GTP_DataValid_o         => ,
+        LRx_GTP_Rxuserrdy_o         => ,
+        LRx_GTP_Rxdata_i            => ,
+        LRx_GTP_Rxchariscomma_i     => ,
+        LRx_GTP_Rxcharisk_i         => ,
+        LRx_GTP_Rxdisperr_i         => ,
+        LRx_GTP_Rxnotintable_i      => ,
+        LRx_GTP_Rxbyteisaligned_i   => ,
+        LRx_GTP_Rxbyterealign_i     => ,
+        LRx_GTP_PllLock_i           => ,
+        LRx_GTP_PllRefclklost_i     => ,
 
         -- Right Sensor
         ------------------
@@ -1001,6 +1072,20 @@ HPUCORE_i : HPUCore
         RRx_HSSAER_i              	=> (others=> '0'),
 
         -- GTP interface
+        RRx_RXGTP_AlignRequest_o    => ,
+        RRx_GTP_RxUsrClk2_i         => ,
+        RRx_GTP_SoftResetRx_o       => ,
+        RRx_GTP_DataValid_o         => ,
+        RRx_GTP_Rxuserrdy_o         => ,
+        RRx_GTP_Rxdata_i            => ,
+        RRx_GTP_Rxchariscomma_i     => ,
+        RRx_GTP_Rxcharisk_i         => ,
+        RRx_GTP_Rxdisperr_i         => ,
+        RRx_GTP_Rxnotintable_i      => ,
+        RRx_GTP_Rxbyteisaligned_i   => ,
+        RRx_GTP_Rxbyterealign_i     => ,
+        RRx_GTP_PllLock_i           => ,
+        RRx_GTP_PllRefclklost_i     => ,
 
         -- Aux Sensor
         ------------------
@@ -1013,6 +1098,20 @@ HPUCORE_i : HPUCore
         AuxRx_HSSAER_i            	=> (others=> '0'),
 
         -- GTP interface
+        AuxRx_RXGTP_AlignRequest_o  => ,
+        AuxRx_GTP_RxUsrClk2_i       => ,  
+        AuxRx_GTP_SoftResetRx_o     => ,  
+        AuxRx_GTP_DataValid_o       => ,  
+        AuxRx_GTP_Rxuserrdy_o       => ,  
+        AuxRx_GTP_Rxdata_i          => ,  
+        AuxRx_GTP_Rxchariscomma_i   => ,  
+        AuxRx_GTP_Rxcharisk_i       => ,  
+        AuxRx_GTP_Rxdisperr_i       => ,  
+        AuxRx_GTP_Rxnotintable_i    => ,  
+        AuxRx_GTP_Rxbyteisaligned_i => ,  
+        AuxRx_GTP_Rxbyterealign_i   => ,  
+        AuxRx_GTP_PllLock_i         => ,  
+        AuxRx_GTP_PllRefclklost_i   => ,
 
         -- SpiNNlink interface
         LRx_data_2of7_from_spinnaker_i   => LRx_data_2of7_from_spinnaker,   -- in  std_logic_vector(6 downto 0); 
@@ -1205,8 +1304,8 @@ Enable_AER_Proc : process
 		AER_device_enable_Aux <= '0';
 		AER_device_enable_Tx  <= '0';
 
-		wait for 10 us;
-		AER_device_enable_L   <= '0';
+		wait for 30 us;
+		AER_device_enable_L   <= '1';
 		AER_device_enable_R   <= '0';
 		AER_device_enable_Aux <= '0';
 		AER_device_enable_Tx  <= '0';
@@ -1221,40 +1320,40 @@ Enable_SPNN_Proc : process
 		SPNN_device_reset_Tx   <= '1';
 		
 		SPNN_device_enable_L   <= '0';
-        SPNN_device_enable_R   <= '0';
-        SPNN_device_enable_Tx  <= '0';
-        SPNN_device_enable_Aux <= '0';
+    SPNN_device_enable_R   <= '0';
+    SPNN_device_enable_Tx  <= '0';
+    SPNN_device_enable_Aux <= '0';
 		
 		wait for 1 us;
-        SPNN_device_reset_L   <= '0';
-        SPNN_device_reset_R   <= '0';
-        SPNN_device_reset_Tx  <= '0';
-        SPNN_device_reset_Aux <= '0';
+    SPNN_device_reset_L   <= '0';
+    SPNN_device_reset_R   <= '0';
+    SPNN_device_reset_Tx  <= '0';
+    SPNN_device_reset_Aux <= '0';
 
 		wait for 1 us;
-        SPNN_device_reset_L   <= '1';
-        SPNN_device_reset_R   <= '1';
-        SPNN_device_reset_Tx  <= '1';
-        SPNN_device_reset_Aux <= '1';
+    SPNN_device_reset_L   <= '1';
+    SPNN_device_reset_R   <= '1';
+    SPNN_device_reset_Tx  <= '1';
+    SPNN_device_reset_Aux <= '1';
         
         
 		wait for 10 us;		
-        SPNN_device_enable_L   <= '0';
-        SPNN_device_enable_R   <= '0';
-        SPNN_device_enable_Tx  <= '1';
-        SPNN_device_enable_Aux <= '0';        
-        
-        wait for 200 us;        
-        SPNN_device_enable_L   <= '0';
-        SPNN_device_enable_R   <= '0';
-        SPNN_device_enable_Tx  <= '1';
-        SPNN_device_enable_Aux <= '1'; 
-               
-        wait for 600 us;        
-        SPNN_device_enable_L   <= '0';
-        SPNN_device_enable_R   <= '0';
-        SPNN_device_enable_Tx  <= '0';
-        SPNN_device_enable_Aux <= '1'; 
+    SPNN_device_enable_L   <= '0';
+    SPNN_device_enable_R   <= '0';
+    SPNN_device_enable_Tx  <= '1';
+    SPNN_device_enable_Aux <= '0';        
+    
+    wait for 200 us;        
+    SPNN_device_enable_L   <= '0';
+    SPNN_device_enable_R   <= '0';
+    SPNN_device_enable_Tx  <= '1';
+    SPNN_device_enable_Aux <= '1'; 
+           
+    wait for 600 us;        
+    SPNN_device_enable_L   <= '0';
+    SPNN_device_enable_R   <= '0';
+    SPNN_device_enable_Tx  <= '0';
+    SPNN_device_enable_Aux <= '1'; 
         
 		wait;
 end process Enable_SPNN_Proc;

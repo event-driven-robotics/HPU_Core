@@ -20,12 +20,12 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="1252465256001fs"></ZoomEndTime>
-      <Cursor1Time time="1106937148000fs"></Cursor1Time>
+      <ZoomEndTime time="1157329620774fs"></ZoomEndTime>
+      <Cursor1Time time="1000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="292"></NameColumnWidth>
-      <ValueColumnWidth column_width="130"></ValueColumnWidth>
+      <ValueColumnWidth column_width="126"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="13" />
    <wave_markers>
@@ -254,22 +254,167 @@
       <wvobject fp_name="group425" type="group">
          <obj_property name="label">AER Emulator</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="group394" type="group">
             <obj_property name="label">AER Emulator - Left</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERout" type="array">
+               <obj_property name="ElementShortName">AERout[23:0]</obj_property>
+               <obj_property name="ObjectShortName">AERout[23:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERoutReq" type="logic">
+               <obj_property name="ElementShortName">AERoutReq</obj_property>
+               <obj_property name="ObjectShortName">AERoutReq</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERoutAck" type="logic">
+               <obj_property name="ElementShortName">AERoutAck</obj_property>
+               <obj_property name="ObjectShortName">AERoutAck</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERin" type="array">
+               <obj_property name="ElementShortName">AERin[23:0]</obj_property>
+               <obj_property name="ObjectShortName">AERin[23:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERinReq" type="logic">
+               <obj_property name="ElementShortName">AERinReq</obj_property>
+               <obj_property name="ObjectShortName">AERinReq</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERinAck" type="logic">
+               <obj_property name="ElementShortName">AERinAck</obj_property>
+               <obj_property name="ObjectShortName">AERinAck</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/enable" type="logic">
+               <obj_property name="ElementShortName">enable</obj_property>
+               <obj_property name="ObjectShortName">enable</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/rst" type="logic">
+               <obj_property name="ElementShortName">rst</obj_property>
+               <obj_property name="ObjectShortName">rst</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AER_HSDLY" type="array">
+               <obj_property name="ElementShortName">AER_HSDLY[31:0]</obj_property>
+               <obj_property name="ObjectShortName">AER_HSDLY[31:0]</obj_property>
+            </wvobject>
          </wvobject>
          <wvobject fp_name="group404" type="group">
             <obj_property name="label">AER Emulator - Right</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AERout" type="array">
+               <obj_property name="ElementShortName">AERout[23:0]</obj_property>
+               <obj_property name="ObjectShortName">AERout[23:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AERoutReq" type="logic">
+               <obj_property name="ElementShortName">AERoutReq</obj_property>
+               <obj_property name="ObjectShortName">AERoutReq</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AERoutAck" type="logic">
+               <obj_property name="ElementShortName">AERoutAck</obj_property>
+               <obj_property name="ObjectShortName">AERoutAck</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AERin" type="array">
+               <obj_property name="ElementShortName">AERin[23:0]</obj_property>
+               <obj_property name="ObjectShortName">AERin[23:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AERinReq" type="logic">
+               <obj_property name="ElementShortName">AERinReq</obj_property>
+               <obj_property name="ObjectShortName">AERinReq</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AERinAck" type="logic">
+               <obj_property name="ElementShortName">AERinAck</obj_property>
+               <obj_property name="ObjectShortName">AERinAck</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/enable" type="logic">
+               <obj_property name="ElementShortName">enable</obj_property>
+               <obj_property name="ObjectShortName">enable</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/rst" type="logic">
+               <obj_property name="ElementShortName">rst</obj_property>
+               <obj_property name="ObjectShortName">rst</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AER_HSDLY" type="array">
+               <obj_property name="ElementShortName">AER_HSDLY[31:0]</obj_property>
+               <obj_property name="ObjectShortName">AER_HSDLY[31:0]</obj_property>
+            </wvobject>
          </wvobject>
          <wvobject fp_name="group414" type="group">
             <obj_property name="label">AER Emulator - Aux</obj_property>
             <obj_property name="DisplayName">label</obj_property>
+            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AERout" type="array">
+               <obj_property name="ElementShortName">AERout[23:0]</obj_property>
+               <obj_property name="ObjectShortName">AERout[23:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AERoutReq" type="logic">
+               <obj_property name="ElementShortName">AERoutReq</obj_property>
+               <obj_property name="ObjectShortName">AERoutReq</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AERoutAck" type="logic">
+               <obj_property name="ElementShortName">AERoutAck</obj_property>
+               <obj_property name="ObjectShortName">AERoutAck</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AERin" type="array">
+               <obj_property name="ElementShortName">AERin[23:0]</obj_property>
+               <obj_property name="ObjectShortName">AERin[23:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AERinReq" type="logic">
+               <obj_property name="ElementShortName">AERinReq</obj_property>
+               <obj_property name="ObjectShortName">AERinReq</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AERinAck" type="logic">
+               <obj_property name="ElementShortName">AERinAck</obj_property>
+               <obj_property name="ObjectShortName">AERinAck</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/enable" type="logic">
+               <obj_property name="ElementShortName">enable</obj_property>
+               <obj_property name="ObjectShortName">enable</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/rst" type="logic">
+               <obj_property name="ElementShortName">rst</obj_property>
+               <obj_property name="ObjectShortName">rst</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AER_HSDLY" type="array">
+               <obj_property name="ElementShortName">AER_HSDLY[31:0]</obj_property>
+               <obj_property name="ObjectShortName">AER_HSDLY[31:0]</obj_property>
+            </wvobject>
          </wvobject>
          <wvobject fp_name="group424" type="group">
             <obj_property name="label">AER Emulator - TX</obj_property>
             <obj_property name="DisplayName">label</obj_property>
-            <obj_property name="isExpanded"></obj_property>
+            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERout" type="array">
+               <obj_property name="ElementShortName">AERout[23:0]</obj_property>
+               <obj_property name="ObjectShortName">AERout[23:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERoutReq" type="logic">
+               <obj_property name="ElementShortName">AERoutReq</obj_property>
+               <obj_property name="ObjectShortName">AERoutReq</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERoutAck" type="logic">
+               <obj_property name="ElementShortName">AERoutAck</obj_property>
+               <obj_property name="ObjectShortName">AERoutAck</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERin" type="array">
+               <obj_property name="ElementShortName">AERin[23:0]</obj_property>
+               <obj_property name="ObjectShortName">AERin[23:0]</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERinReq" type="logic">
+               <obj_property name="ElementShortName">AERinReq</obj_property>
+               <obj_property name="ObjectShortName">AERinReq</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERinAck" type="logic">
+               <obj_property name="ElementShortName">AERinAck</obj_property>
+               <obj_property name="ObjectShortName">AERinAck</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/enable" type="logic">
+               <obj_property name="ElementShortName">enable</obj_property>
+               <obj_property name="ObjectShortName">enable</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/rst" type="logic">
+               <obj_property name="ElementShortName">rst</obj_property>
+               <obj_property name="ObjectShortName">rst</obj_property>
+            </wvobject>
+            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AER_HSDLY" type="array">
+               <obj_property name="ElementShortName">AER_HSDLY[31:0]</obj_property>
+               <obj_property name="ObjectShortName">AER_HSDLY[31:0]</obj_property>
+            </wvobject>
             <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERout" type="array">
                <obj_property name="ElementShortName">AERout[23:0]</obj_property>
                <obj_property name="ObjectShortName">AERout[23:0]</obj_property>
@@ -311,7 +456,6 @@
       <wvobject fp_name="group426" type="group">
          <obj_property name="label">SpiNNlink Emulator</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="group439" type="group">
             <obj_property name="label">SpiNNlink Emulator - Right</obj_property>
             <obj_property name="DisplayName">label</obj_property>
@@ -411,7 +555,6 @@
          <wvobject fp_name="group465" type="group">
             <obj_property name="label">SpiNNlink Emulator - Aux</obj_property>
             <obj_property name="DisplayName">label</obj_property>
-            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/HPUcore_tb/AUX_SPINNAKER_EMULATOR_i/Lout" type="array">
                <obj_property name="ElementShortName">Lout[6:0]</obj_property>
                <obj_property name="ObjectShortName">Lout[6:0]</obj_property>
@@ -1117,10 +1260,6 @@
    <wvobject fp_name="group306" type="group">
       <obj_property name="label">AUX RX</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/u_spinnlink_rx/\genblk1.om /rx_data_mask" type="array">
-         <obj_property name="ElementShortName">rx_data_mask[31:0]</obj_property>
-         <obj_property name="ObjectShortName">rx_data_mask[31:0]</obj_property>
-      </wvobject>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/Spnn_parity_err_o" type="logic">
          <obj_property name="ElementShortName">Spnn_parity_err_o</obj_property>
          <obj_property name="ObjectShortName">Spnn_parity_err_o</obj_property>
@@ -1129,69 +1268,9 @@
          <obj_property name="ElementShortName">Spnn_rx_err_o</obj_property>
          <obj_property name="ObjectShortName">Spnn_rx_err_o</obj_property>
       </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/u_spinnlink_rx/\genblk1.om /keys_enable" type="logic">
-         <obj_property name="ElementShortName">keys_enable</obj_property>
-         <obj_property name="ObjectShortName">keys_enable</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/u_spinnlink_rx/\genblk1.om /start_key" type="array">
-         <obj_property name="ElementShortName">start_key[31:0]</obj_property>
-         <obj_property name="ObjectShortName">start_key[31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/u_spinnlink_rx/\genblk1.om /stop_key" type="array">
-         <obj_property name="ElementShortName">stop_key[31:0]</obj_property>
-         <obj_property name="ObjectShortName">stop_key[31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/u_spinnlink_rx/\genblk1.om /cmd_start" type="logic">
-         <obj_property name="ElementShortName">cmd_start</obj_property>
-         <obj_property name="ObjectShortName">cmd_start</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/u_spinnlink_rx/\genblk1.om /cmd_stop" type="logic">
-         <obj_property name="ElementShortName">cmd_stop</obj_property>
-         <obj_property name="ObjectShortName">cmd_stop</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/u_spinnlink_rx/\genblk1.om /cmd_vld" type="logic">
-         <obj_property name="ElementShortName">cmd_vld</obj_property>
-         <obj_property name="ObjectShortName">cmd_vld</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_rx_aux_datapath/u_spinnlink_rx/\genblk1.om /cmd_flag" type="logic">
-         <obj_property name="ElementShortName">cmd_flag</obj_property>
-         <obj_property name="ObjectShortName">cmd_flag</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject fp_name="group336" type="group">
       <obj_property name="label">TX</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/u_tx_spinnlink_datapath/\genblk2.im /tx_data_mask" type="array">
-         <obj_property name="ElementShortName">tx_data_mask[31:0]</obj_property>
-         <obj_property name="ObjectShortName">tx_data_mask[31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/u_tx_spinnlink_datapath/\genblk2.im /dump_mode" type="logic">
-         <obj_property name="ElementShortName">dump_mode</obj_property>
-         <obj_property name="ObjectShortName">dump_mode</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/u_tx_spinnlink_datapath/\genblk2.im /offload" type="logic">
-         <obj_property name="ElementShortName">offload</obj_property>
-         <obj_property name="ObjectShortName">offload</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/u_tx_spinnlink_datapath/\genblk2.im /offload_on" type="logic">
-         <obj_property name="ElementShortName">offload_on</obj_property>
-         <obj_property name="ObjectShortName">offload_on</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/u_tx_spinnlink_datapath/\genblk2.im /offload_off" type="logic">
-         <obj_property name="ElementShortName">offload_off</obj_property>
-         <obj_property name="ObjectShortName">offload_off</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/u_tx_spinnlink_datapath/\genblk2.im /link_timeout" type="logic">
-         <obj_property name="ElementShortName">link_timeout</obj_property>
-         <obj_property name="ObjectShortName">link_timeout</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/u_tx_spinnlink_datapath/\genblk2.im /link_timeout_dis" type="logic">
-         <obj_property name="ElementShortName">link_timeout_dis</obj_property>
-         <obj_property name="ObjectShortName">link_timeout_dis</obj_property>
-      </wvobject>
-      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/u_tx_spinnlink_datapath/\genblk2.im /link_timeout_cnt" type="array">
-         <obj_property name="ElementShortName">link_timeout_cnt[7:0]</obj_property>
-         <obj_property name="ObjectShortName">link_timeout_cnt[7:0]</obj_property>
-      </wvobject>
    </wvobject>
 </wave_config>

@@ -10,71 +10,81 @@ WAT 1000
 ## WRD CTRL    00E01002   ## Con Loopback
 WRD CTRL    00001002   ## Senza Loopback
 
-##  Abilitazione SpiNNlink AUX
-WRD RX_CTRL 00000008
-WRD AUX_CTRL 00000008
-  
-## Configurazione TX
-WRD TX_CTRL 00001068
-
-
-
-WAT 1000
-
-##  Modifica START/STOP Key 
-## WRD STARTKEY 00000000
-## RDD STARTKEY
-## WAT 100
-## WRD STOPKEY  00000000
-## RDD STOPKEY
-
-WRD STARTKEY 80000000
-RDD STARTKEY
+##  Abilitazione e configurazione PAER Left
+WRD RXPAERCF 02000103
 WAT 100
-WRD STOPKEY  50000000
-RDD STOPKEY
+WRD RX_CTRL 00000002
 
 
 
-## Abilitazione cheavi 
-WRD SPNCTRL  00000101
-RDD SPNCTRL 
-
-## Comando START
-WRD SPNCTRL  00000101
-RDD SPNCTRL 
-
-WAT 1000
-## Comando STOP
-WRD SPNCTRL  00000101
-RDD SPNCTRL  
 
 
-WAT 1000
 
-##  Modifica START/STOP Key 
-## WRD STARTKEY FFFFFFFF
-## RDD STARTKEY
-## WAT 100
-## WRD STOPKEY  FFFFFFFF
-## RDD STOPKEY
-## 
-## WRD STARTKEY 50000000
-## RDD STARTKEY
-## WAT 100
-## WRD STOPKEY  40000000
-## RDD STOPKEY
 
-##  Modifica TX/RX Mask 
-WAT 1000
-RDD SPNTXMSK
-RDD SPNRXMSK
-WAT 100
-WRD SPNTXMSK FFFFFFFF
-WRD SPNRXMSK FFFFFFFF
-WAT 100
-RDD SPNTXMSK
-RDD SPNRXMSK 
+
+##    wat 10000
+##    
+##    ## Configurazione TX
+##    WRD TX_CTRL 00001068
+##    
+##    ##  Abilitazione SpiNNlink AUX
+##    WRD RX_CTRL 0000000A
+##    WRD AUX_CTRL 00000008
+##    
+##    ##  Modifica START/STOP Key 
+##    ## WRD STARTKEY 00000000
+##    ## RDD STARTKEY
+##    ## WAT 100
+##    ## WRD STOPKEY  00000000
+##    ## RDD STOPKEY
+##    
+##    WRD STARTKEY 80000000
+##    RDD STARTKEY
+##    WAT 100
+##    WRD STOPKEY  50000000
+##    RDD STOPKEY
+##    
+##    
+##    
+##    ## Abilitazione cheavi 
+##    WRD SPNCTRL  00000101
+##    RDD SPNCTRL 
+##    
+##    ## Comando START
+##    WRD SPNCTRL  00000101
+##    RDD SPNCTRL 
+##    
+##    WAT 1000
+##    ## Comando STOP
+##    WRD SPNCTRL  00000101
+##    RDD SPNCTRL  
+##    
+##    
+##    WAT 1000
+##    
+##    ##  Modifica START/STOP Key 
+##    ## WRD STARTKEY FFFFFFFF
+##    ## RDD STARTKEY
+##    ## WAT 100
+##    ## WRD STOPKEY  FFFFFFFF
+##    ## RDD STOPKEY
+##    ## 
+##    ## WRD STARTKEY 50000000
+##    ## RDD STARTKEY
+##    ## WAT 100
+##    ## WRD STOPKEY  40000000
+##    ## RDD STOPKEY
+##    
+##    ##  Modifica TX/RX Mask 
+##    WAT 1000
+##    RDD SPNTXMSK
+##    RDD SPNRXMSK
+##    WAT 100
+##    WRD SPNTXMSK FFFFFFFF
+##    WRD SPNRXMSK FFFFFFFF
+##    WAT 100
+##    RDD SPNTXMSK
+##    RDD SPNRXMSK 
 
 
 ##  Scrittura dati AXIStream

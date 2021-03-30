@@ -1,7 +1,7 @@
 // Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2019.1 (win64) Build 2552052 Fri May 24 14:49:42 MDT 2019
-// Date        : Wed Oct 21 15:46:49 2020
+// Date        : Tue Mar 30 15:26:31 2021
 // Host        : IITICUBLAP127 running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode synth_stub
 //               C:/Progetti/Repository/HPU_Core/src/IP/Vivado/synch_fifo/synch_fifo_stub.v
