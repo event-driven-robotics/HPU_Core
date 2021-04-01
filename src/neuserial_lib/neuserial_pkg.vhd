@@ -38,7 +38,8 @@ component hpu_rx_datapath is
     C_GTP_TXUSRCLK2_PERIOD_NS  : real                  := 6.4; 
     C_GTP_RXUSRCLK2_PERIOD_NS  : real                  := 6.4; 
     C_HAS_SPNNLNK              : boolean               := true;
-    C_PSPNNLNK_WIDTH           : natural range 1 to 32 := 32
+    C_PSPNNLNK_WIDTH           : natural range 1 to 32 := 32;
+    C_SIM_TIME_COMPRESSION     : boolean               := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up
     );
 port (
 

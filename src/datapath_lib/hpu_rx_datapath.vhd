@@ -28,7 +28,8 @@ entity hpu_rx_datapath is
     C_GTP_TXUSRCLK2_PERIOD_NS  : real                  := 6.4; 
     C_GTP_RXUSRCLK2_PERIOD_NS  : real                  := 6.4; 
     C_HAS_SPNNLNK              : boolean               := true;
-    C_PSPNNLNK_WIDTH           : natural range 1 to 32 := 32
+    C_PSPNNLNK_WIDTH           : natural range 1 to 32 := 32;
+    C_SIM_TIME_COMPRESSION     : boolean               := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
 port (
 
@@ -497,7 +498,7 @@ g_gtp_true : if C_HAS_GTP = true generate
       GTP_DATA_WIDTH_g          =>  C_GTP_DSIZE,                  -- Width of Data - GTP side
       GTP_TXUSRCLK2_PERIOD_NS_g =>  C_GTP_TXUSRCLK2_PERIOD_NS,    -- TX GTP User clock period
       GTP_RXUSRCLK2_PERIOD_NS_g =>  C_GTP_RXUSRCLK2_PERIOD_NS,    -- RX GTP User clock period
-      SIM_TIME_COMPRESSION_g    => false    -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+      SIM_TIME_COMPRESSION_g    =>  C_SIM_TIME_COMPRESSION    -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
       )
     port map(
       
@@ -607,9 +608,11 @@ g_gtp_true : if C_HAS_GTP = true generate
       GTP_PLL_REFCLKLOST_i     => GtpPllRefclklost_i                              -- SYS_CLK      -- 
       );
      
-  i_InPaerSrc(2).idx <= i_GtpData;
-  i_InPaerSrc(2).vld <= i_GtpDataSrcRdy; 
-  i_GtpDataDstRdy    <= i_InPaerDst(2).rdy;
+  i_InPaerSrc(2).idx  <= i_GtpData;
+  i_InPaerSrc(2).vld  <= i_GtpDataSrcRdy; 
+  i_GtpDataDstRdy     <= i_InPaerDst(2).rdy;
+  
+  i_GtpMsgDstRdy      <= '0';
   
   GtpRxDataRate_o     <= i_GtpRxDataRate; 
   GtpRxAlignRate_o    <= i_GtpRxAlignRate; 
@@ -653,83 +656,95 @@ end generate g_gtp_false;
     -- SpiNNlink receiver
     ----------------------------------
 
-    g_spinnlnk_true : if C_HAS_SPNNLNK = true generate
+g_spinnlnk_true : if C_HAS_SPNNLNK = true generate
     
-    begin
+begin
        
-       spnn_parity_err_o <= i_spnn_parity_err;
-       spnn_rx_err_o <= i_spnn_rx_err;
-       
-       RxSpnnlnkStat_o.parity_err <= i_spnn_parity_err;
-       RxSpnnlnkStat_o.rx_err <= i_spnn_rx_err;
-       
-       u_spinnlink_rx : spinn_neu_if
-           generic map (
-               C_PSPNNLNK_WIDTH       => C_PSPNNLNK_WIDTH,
-               C_HAS_TX               => "false",
-               C_HAS_RX               => "true"
-               )
-           port map (
-           rst                        => Rst,
-           clk_32                     => Clk_i, -- 100 MHz Clock
-           enable                     => EnableSPNNLNK_i,
-           
-           dump_mode                  => open,    
-           parity_err                 => i_spnn_parity_err,
-           rx_err                     => i_spnn_rx_err,
-           offload                    => open,
-           link_timeout               => open,
-           link_timeout_dis           => '1',
-       
-           -- input SpiNNaker link interface
-           data_2of7_from_spinnaker   => data_2of7_from_spinnaker_i, 
-           ack_to_spinnaker           => ack_to_spinnaker_o,
-       
-           -- output SpiNNaker link interface
-           data_2of7_to_spinnaker     => open,
-           ack_from_spinnaker         => '0',
-       
-           -- input AER device interface
-           iaer_addr                  => (others => '0'),
-           iaer_vld                   => '0',
-           iaer_rdy                   => open,
-       
-           -- output AER device interface
-           oaer_addr                  => i_InPaerSrc(3).idx,           -- out std_logic_vector(C_OUTPUT_DSIZE-1 downto 0);
-           oaer_vld                   => i_InPaerSrc(3).vld,           -- out std_logic;                                  
-           oaer_rdy                   => i_InPaerDst(3).rdy,           -- in  std_logic;                                  
+  spnn_parity_err_o <= i_spnn_parity_err;
+  spnn_rx_err_o <= i_spnn_rx_err;
+  
+  RxSpnnlnkStat_o.parity_err <= i_spnn_parity_err;
+  RxSpnnlnkStat_o.rx_err <= i_spnn_rx_err;
+  
+  u_spinnlink_rx : spinn_neu_if
+    generic map (
+      C_PSPNNLNK_WIDTH       => C_PSPNNLNK_WIDTH,
+      C_HAS_TX               => "false",
+      C_HAS_RX               => "true"
+      )
+    port map (
+      rst                        => Rst,
+      clk_32                     => Clk_i, -- 100 MHz Clock
+      enable                     => EnableSPNNLNK_i,
+      
+      dump_mode                  => open,    
+      parity_err                 => i_spnn_parity_err,
+      rx_err                     => i_spnn_rx_err,
+      offload                    => open,
+      link_timeout               => open,
+      link_timeout_dis           => '1',
+  
+      -- input SpiNNaker link interface
+      data_2of7_from_spinnaker   => data_2of7_from_spinnaker_i, 
+      ack_to_spinnaker           => ack_to_spinnaker_o,
+  
+      -- output SpiNNaker link interface
+      data_2of7_to_spinnaker     => open,
+      ack_from_spinnaker         => '0',
+  
+      -- input AER device interface
+      iaer_addr                  => (others => '0'),
+      iaer_vld                   => '0',
+      iaer_rdy                   => open,
+  
+      -- output AER device interface
+      oaer_addr                  => i_InPaerSrc(3).idx,           -- out std_logic_vector(C_OUTPUT_DSIZE-1 downto 0);
+      oaer_vld                   => i_InPaerSrc(3).vld,           -- out std_logic;                                  
+      oaer_rdy                   => i_InPaerDst(3).rdy,           -- in  std_logic;                                  
+  
+      -- Command from SpiNNaker
+      keys_enable                => Spnn_keys_enable_i,           -- in  std_logic;
+      start_key                  => Spnn_start_key_i,             -- in  std_logic_vector(31 downto 0);
+      stop_key                   => Spnn_stop_key_i,              -- in  std_logic_vector(31 downto 0);
+      cmd_start                  => Spnn_cmd_start_o,             -- out std_logic;
+      cmd_stop                   => Spnn_cmd_stop_o,              -- out std_logic;
+  
+      -- Settings
+      tx_data_mask               => (others => '0'),              -- in  std_logic_vector(31 downto 0);
+      rx_data_mask               => Spnn_rx_mask_i,               -- in  std_logic_vector(31 downto 0);
+      
+      -- Controls
+      offload_off                => '0',                          -- in  std_logic;
+      offload_on                 => '0',                          -- in  std_logic;
+  
+      -- Debug Port                
+      dbg_rxstate                => open,
+      dbg_txstate                => open,
+      dbg_ipkt_vld               => open,
+      dbg_ipkt_rdy               => open,
+      dbg_opkt_vld               => open,
+      dbg_opkt_rdy               => open
+      ); 
+     
+ end generate g_spinnlnk_true;
 
-           -- Command from SpiNNaker
-           keys_enable                => Spnn_keys_enable_i,           -- in  std_logic;
-           start_key                  => Spnn_start_key_i,             -- in  std_logic_vector(31 downto 0);
-           stop_key                   => Spnn_stop_key_i,              -- in  std_logic_vector(31 downto 0);
-           cmd_start                  => Spnn_cmd_start_o,             -- out std_logic;
-           cmd_stop                   => Spnn_cmd_stop_o,              -- out std_logic;
-		   
-		   -- Settings
-           tx_data_mask               => (others => '0'),              -- in  std_logic_vector(31 downto 0);
-           rx_data_mask               => Spnn_rx_mask_i,               -- in  std_logic_vector(31 downto 0);
-           
-           -- Controls
-           offload_off                => '0',                          -- in  std_logic;
-           offload_on                 => '0',                          -- in  std_logic;
+g_spinnlnk_false : if C_HAS_SPNNLNK = FALSE generate
+begin    
 
-           -- Debug Port                
-           dbg_rxstate                => open,
-           dbg_txstate                => open,
-           dbg_ipkt_vld               => open,
-           dbg_ipkt_rdy               => open,
-           dbg_opkt_vld               => open,
-           dbg_opkt_rdy               => open
-               ); 
+   spnn_parity_err_o <= '0';
+   spnn_rx_err_o     <= '0';
    
-    end generate g_spinnlnk_true;
+   RxSpnnlnkStat_o.parity_err <= '0';
+   RxSpnnlnkStat_o.rx_err     <= '0';
 
-    g_spinnlnk_false : if C_HAS_SPNNLNK = false generate
-    
-    begin
+   i_InPaerSrc(3).idx <= (others => '0'); 
+   i_InPaerSrc(3).vld <= '0'; 
+   
+   Spnn_cmd_start_o <= '0';
+   Spnn_cmd_stop_o <= '0';
+
+end generate g_spinnlnk_false;
        
-    end generate g_spinnlnk_false;   
     --===========================================================
     -- ARBITER amongst all the possible channel
     --===========================================================

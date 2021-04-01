@@ -79,7 +79,11 @@ entity neuserial_core is
         -- INTERCEPTION
         C_RX_LEFT_INTERCEPTION    : boolean                       := false;
         C_RX_RIGHT_INTERCEPTION   : boolean                       := false;
-        C_RX_AUX_INTERCEPTION     : boolean                       := false
+        C_RX_AUX_INTERCEPTION     : boolean                       := false;
+        -- -----------------------
+        -- SIMULATION
+        C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+        
     );
     port (
         --
@@ -820,7 +824,8 @@ u_rx_left_datapath : hpu_rx_datapath
     C_GTP_TXUSRCLK2_PERIOD_NS => C_GTP_TXUSRCLK2_PERIOD_NS,
     C_GTP_RXUSRCLK2_PERIOD_NS => C_GTP_RXUSRCLK2_PERIOD_NS,
     C_HAS_SPNNLNK             => C_RX_HAS_SPNNLNK,
-    C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH
+    C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH,
+    C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION
     )
   port map (
 
@@ -996,7 +1001,8 @@ u_rx_right_datapath : hpu_rx_datapath
     C_GTP_TXUSRCLK2_PERIOD_NS => C_GTP_TXUSRCLK2_PERIOD_NS,
     C_GTP_RXUSRCLK2_PERIOD_NS => C_GTP_RXUSRCLK2_PERIOD_NS,
     C_HAS_SPNNLNK             => C_RX_HAS_SPNNLNK,
-    C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH
+    C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH,
+    C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION
     )
   port map (
 
@@ -1077,9 +1083,9 @@ u_rx_right_datapath : hpu_rx_datapath
     Spnn_cmd_start_o     => open,                        -- out std_logic;
     Spnn_cmd_stop_o      => open,                        -- out std_logic;
     Spnn_rx_mask_i       => Spnn_rx_mask_i,              -- in  std_logic_vector(31 downto 0);
-    Spnn_keys_enable_i   => Spnn_ctrl_i(24),             -- in  std_logic;
-    Spnn_parity_err_o    => Spnn_status_o(25),           -- out std_logic;
-    Spnn_rx_err_o        => Spnn_status_o(24),           -- out std_logic;
+    Spnn_keys_enable_i   => Spnn_ctrl_i(16),             -- in  std_logic;
+    Spnn_parity_err_o    => Spnn_status_o(17),           -- out std_logic;
+    Spnn_rx_err_o        => Spnn_status_o(16),           -- out std_logic;
                         
     -- **********************************************
     -- Source Interfaces
@@ -1137,9 +1143,9 @@ u_rx_right_datapath : hpu_rx_datapath
     -- **********************************************
     -- Monitor interface
     -- **********************************************
-    ToMonDataIn_o        => RRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(0).idx,      
-    ToMonSrcRdy_o        => RRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(0).vld,      
-    ToMonDstRdy_i        => RRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(0).rdy,      
+    ToMonDataIn_o        => RRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(1).idx,      
+    ToMonSrcRdy_o        => RRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(1).vld,      
+    ToMonDstRdy_i        => RRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(1).rdy,      
         
         
     -- **********************************************
@@ -1160,7 +1166,6 @@ u_rx_right_datapath : hpu_rx_datapath
     );
 
 
-
 u_rx_aux_datapath : hpu_rx_datapath
   generic map (
     C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
@@ -1173,7 +1178,8 @@ u_rx_aux_datapath : hpu_rx_datapath
     C_GTP_TXUSRCLK2_PERIOD_NS => C_GTP_TXUSRCLK2_PERIOD_NS,
     C_GTP_RXUSRCLK2_PERIOD_NS => C_GTP_RXUSRCLK2_PERIOD_NS,
     C_HAS_SPNNLNK             => C_RX_HAS_SPNNLNK,
-    C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH
+    C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH,
+    C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION
     )
   port map (
 
@@ -1314,9 +1320,9 @@ u_rx_aux_datapath : hpu_rx_datapath
     -- **********************************************
     -- Monitor interface
     -- **********************************************
-    ToMonDataIn_o        => AuxRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(0).idx,      
-    ToMonSrcRdy_o        => AuxRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(0).vld,      
-    ToMonDstRdy_i        => AuxRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(0).rdy,      
+    ToMonDataIn_o        => AuxRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(2).idx,      
+    ToMonSrcRdy_o        => AuxRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(2).vld,      
+    ToMonDstRdy_i        => AuxRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(2).rdy,      
         
         
     -- **********************************************

@@ -61,7 +61,7 @@ entity HPUcore_tb is
         NUM_OF_TRANSMITTER          : integer := 32;
         NUM_OF_RECEIVER             : natural := 32;
         SPI_ADC_RES                 : natural := 12;
-        
+        C_GTP_DSIZE                 : natural := 16;
         NORANDOM_DMA                : natural := 0
         );
 end HPUcore_tb;
@@ -133,7 +133,10 @@ component HPUCore is
         -- BUS PROTOCOL PARAMETERS
         C_S_AXI_ADDR_WIDTH        : integer                       := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
         C_S_AXI_DATA_WIDTH        : integer                       := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
-        C_SLV_DWIDTH              : integer                       := 32
+        C_SLV_DWIDTH              : integer                       := 32;
+        -- -----------------------
+        -- SIMULATION
+        C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
     port (
 
@@ -531,6 +534,34 @@ component AER_Device_Emulator
   );
 end component ;
 
+component GTP_Emulator is
+  generic (
+    C_GTP_RXUSRCLK2_PERIOD_NS : real                          := 6.4;        
+    C_GTP_TXUSRCLK2_PERIOD_NS : real                          := 6.4;  
+    C_GTP_DSIZE               : positive                      := 16 
+    );
+  port (
+    -- GTP interface
+    RXGTP_AlignRequest_i   : in  std_logic;
+    -- 
+    GTP_RxUsrClk2_o        : out std_logic;                                      
+    GTP_SoftResetRx_i      : in  std_logic;                                     
+    GTP_DataValid_i        : in  std_logic;                                      
+    GTP_Rxuserrdy_i        : in  std_logic;                                      
+    GTP_Rxdata_o           : out std_logic_vector(C_GTP_DSIZE-1 downto 0);       
+    GTP_Rxchariscomma_o    : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+    GTP_Rxcharisk_o        : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+    GTP_Rxdisperr_o        : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+    GTP_Rxnotintable_o     : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+    GTP_Rxbyteisaligned_o  : out std_logic;                                      
+    GTP_Rxbyterealign_o    : out std_logic;                                      
+    GTP_PllLock_o          : out std_logic;                                      
+    GTP_PllRefclklost_o    : out std_logic
+    );
+end component;
+
+
+
 signal i_clk                    : std_logic;
 signal i_resetn, i_reset        : std_logic;
 
@@ -693,6 +724,55 @@ signal i_ext_fault              : std_logic;
 -- VDClink
 signal i_vdclink_data_sd        : std_logic;
 signal i_vdclink_clk_sd         : std_logic;
+
+-- GTP
+-- Left
+signal LRx_RXGTP_AlignRequest     : std_logic;
+signal LRx_GTP_RxUsrClk2          : std_logic;                                      
+signal LRx_GTP_SoftResetRx        : std_logic;                                     
+signal LRx_GTP_DataValid          : std_logic;                                      
+signal LRx_GTP_Rxuserrdy          : std_logic;                                      
+signal LRx_GTP_Rxdata             : std_logic_vector(C_GTP_DSIZE-1 downto 0);       
+signal LRx_GTP_Rxchariscomma      : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal LRx_GTP_Rxcharisk          : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal LRx_GTP_Rxdisperr          : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal LRx_GTP_Rxnotintable       : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal LRx_GTP_Rxbyteisaligned    : std_logic;                                      
+signal LRx_GTP_Rxbyterealign      : std_logic;                                      
+signal LRx_GTP_PllLock            : std_logic;                                      
+signal LRx_GTP_PllRefclklost      : std_logic; 
+
+-- Right
+signal RRx_RXGTP_AlignRequest     : std_logic;
+signal RRx_GTP_RxUsrClk2          : std_logic;                                      
+signal RRx_GTP_SoftResetRx        : std_logic;                                     
+signal RRx_GTP_DataValid          : std_logic;                                      
+signal RRx_GTP_Rxuserrdy          : std_logic;                                      
+signal RRx_GTP_Rxdata             : std_logic_vector(C_GTP_DSIZE-1 downto 0);       
+signal RRx_GTP_Rxchariscomma      : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal RRx_GTP_Rxcharisk          : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal RRx_GTP_Rxdisperr          : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal RRx_GTP_Rxnotintable       : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal RRx_GTP_Rxbyteisaligned    : std_logic;                                      
+signal RRx_GTP_Rxbyterealign      : std_logic;                                      
+signal RRx_GTP_PllLock            : std_logic;                                      
+signal RRx_GTP_PllRefclklost      : std_logic; 
+
+-- Aux
+signal AuxRx_RXGTP_AlignRequest   : std_logic;
+signal AuxRx_GTP_RxUsrClk2        : std_logic;                                      
+signal AuxRx_GTP_SoftResetRx      : std_logic;                                     
+signal AuxRx_GTP_DataValid        : std_logic;                                      
+signal AuxRx_GTP_Rxuserrdy        : std_logic;                                      
+signal AuxRx_GTP_Rxdata           : std_logic_vector(C_GTP_DSIZE-1 downto 0);       
+signal AuxRx_GTP_Rxchariscomma    : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal AuxRx_GTP_Rxcharisk        : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal AuxRx_GTP_Rxdisperr        : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal AuxRx_GTP_Rxnotintable     : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal AuxRx_GTP_Rxbyteisaligned  : std_logic;                                      
+signal AuxRx_GTP_Rxbyterealign    : std_logic;                                      
+signal AuxRx_GTP_PllLock          : std_logic;                                      
+signal AuxRx_GTP_PllRefclklost    : std_logic; 
 
 
 -- 
@@ -959,24 +1039,51 @@ AER_DEVICE_EMULATOR_Tx_i : AER_Device_Emulator
 		enable		=> AER_device_enable_Tx,
 		rst			=> i_reset
 ); 
+
+GTP_DEVICE_EMULATOR_i : GTP_Emulator 
+  generic map(
+    C_GTP_RXUSRCLK2_PERIOD_NS => 6.4,        
+    C_GTP_TXUSRCLK2_PERIOD_NS => 6.4,  
+    C_GTP_DSIZE               => 16 
+    )
+  port map(
+    -- GTP interface
+    RXGTP_AlignRequest_i   => LRx_RXGTP_AlignRequest,  -- : in  std_logic;
+    -- 
+    GTP_RxUsrClk2_o        => LRx_GTP_RxUsrClk2,       -- : out std_logic;                                      
+    GTP_SoftResetRx_i      => LRx_GTP_SoftResetRx,     -- : in  std_logic;                                     
+    GTP_DataValid_i        => LRx_GTP_DataValid,       -- : in  std_logic;                                      
+    GTP_Rxuserrdy_i        => LRx_GTP_Rxuserrdy,       -- : in  std_logic;                                      
+    GTP_Rxdata_o           => LRx_GTP_Rxdata,          -- : out std_logic_vector(C_GTP_DSIZE-1 downto 0);       
+    GTP_Rxchariscomma_o    => LRx_GTP_Rxchariscomma,   -- : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+    GTP_Rxcharisk_o        => LRx_GTP_Rxcharisk,       -- : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+    GTP_Rxdisperr_o        => LRx_GTP_Rxdisperr,       -- : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+    GTP_Rxnotintable_o     => LRx_GTP_Rxnotintable,    -- : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+    GTP_Rxbyteisaligned_o  => LRx_GTP_Rxbyteisaligned, -- : out std_logic;                                      
+    GTP_Rxbyterealign_o    => LRx_GTP_Rxbyterealign,   -- : out std_logic;                                      
+    GTP_PllLock_o          => LRx_GTP_PllLock,         -- : out std_logic;                                      
+    GTP_PllRefclklost_o    => LRx_GTP_PllRefclklost    -- : out std_logic
+    );
+
+
 -- --------------------------------------------------
 --  Unit Under Test: HPUcore
 -- --------------------------------------------------
-HPUCORE_i : HPUCore
+HPUCORE_i : HPUCore  
     generic map (
     
         -- -----------------------    
         -- PAER        
-        C_RX_HAS_PAER               => true, 
-        C_RX_PAER_L_SENS_ID         =>  "000",
-        C_RX_PAER_R_SENS_ID         =>  "000",
-        C_RX_PAER_A_SENS_ID         =>  "001",
+        C_RX_HAS_PAER               => false, 
+        C_RX_PAER_L_SENS_ID         => "000",
+        C_RX_PAER_R_SENS_ID         => "000",
+        C_RX_PAER_A_SENS_ID         => "001",
         C_TX_HAS_PAER               => false,
         C_PAER_DSIZE                => 24,   
         -- -----------------------        
         -- HSSAER
         C_RX_HAS_HSSAER             => false, 
-        C_RX_HSSAER_N_CHAN          => 3
+        C_RX_HSSAER_N_CHAN          => 3,
         C_RX_SAER0_L_SENS_ID        => "000",
         C_RX_SAER1_L_SENS_ID        => "000",
         C_RX_SAER2_L_SENS_ID        => "000",
@@ -997,7 +1104,7 @@ HPUCORE_i : HPUCore
         C_GTP_RXUSRCLK2_PERIOD_NS   => 6.4,     
         C_TX_HAS_GTP                => false,
         C_GTP_TXUSRCLK2_PERIOD_NS   => 6.4,  
-        C_GTP_DSIZE                 => 16,
+        C_GTP_DSIZE                 => C_GTP_DSIZE,
         -- -----------------------                
         -- SPINNLINK
         C_RX_HAS_SPNNLNK            => false, 
@@ -1005,9 +1112,9 @@ HPUCORE_i : HPUCore
         C_PSPNNLNK_WIDTH		        => 32,
         -- -----------------------
         -- INTERCEPTION
-        C_RX_LEFT_INTERCEPTION      =>  false,
-        C_RX_RIGHT_INTERCEPTION     =>  false,
-        C_RX_AUX_INTERCEPTION       =>  false,
+        C_RX_LEFT_INTERCEPTION      => false,
+        C_RX_RIGHT_INTERCEPTION     => false,
+        C_RX_AUX_INTERCEPTION       => false,
         -- -----------------------
         -- CORE
         C_SYSCLK_PERIOD_NS          => 10.0,               
@@ -1017,7 +1124,10 @@ HPUCORE_i : HPUCore
         -- BUS PROTOCOL PARAMETERS
         C_S_AXI_DATA_WIDTH          => C_S_AXI_DATA_WIDTH,		
         C_S_AXI_ADDR_WIDTH          => C_S_AXI_ADDR_WIDTH,		
-        C_SLV_DWIDTH                => 32                     
+        C_SLV_DWIDTH                => 32,
+        -- -----------------------
+        -- SIMULATION
+        C_SIM_TIME_COMPRESSION      => true
     )
     port map(
         -- ADD USER PORTS BELOW THIS LINE ------------------
@@ -1046,20 +1156,20 @@ HPUCORE_i : HPUCore
         LRx_HSSAER_i              	=> (others=> '0'),
 
         -- GTP interface
-        LRx_RXGTP_AlignRequest_o    => ,
-        LRx_GTP_RxUsrClk2_i         => ,
-        LRx_GTP_SoftResetRx_o       => ,
-        LRx_GTP_DataValid_o         => ,
-        LRx_GTP_Rxuserrdy_o         => ,
-        LRx_GTP_Rxdata_i            => ,
-        LRx_GTP_Rxchariscomma_i     => ,
-        LRx_GTP_Rxcharisk_i         => ,
-        LRx_GTP_Rxdisperr_i         => ,
-        LRx_GTP_Rxnotintable_i      => ,
-        LRx_GTP_Rxbyteisaligned_i   => ,
-        LRx_GTP_Rxbyterealign_i     => ,
-        LRx_GTP_PllLock_i           => ,
-        LRx_GTP_PllRefclklost_i     => ,
+        LRx_RXGTP_AlignRequest_o    => LRx_RXGTP_AlignRequest,
+        LRx_GTP_RxUsrClk2_i         => LRx_GTP_RxUsrClk2,
+        LRx_GTP_SoftResetRx_o       => LRx_GTP_SoftResetRx,
+        LRx_GTP_DataValid_o         => LRx_GTP_DataValid,
+        LRx_GTP_Rxuserrdy_o         => LRx_GTP_Rxuserrdy,
+        LRx_GTP_Rxdata_i            => LRx_GTP_Rxdata,
+        LRx_GTP_Rxchariscomma_i     => LRx_GTP_Rxchariscomma,
+        LRx_GTP_Rxcharisk_i         => LRx_GTP_Rxcharisk,
+        LRx_GTP_Rxdisperr_i         => LRx_GTP_Rxdisperr,
+        LRx_GTP_Rxnotintable_i      => LRx_GTP_Rxnotintable,
+        LRx_GTP_Rxbyteisaligned_i   => LRx_GTP_Rxbyteisaligned,
+        LRx_GTP_Rxbyterealign_i     => LRx_GTP_Rxbyterealign,
+        LRx_GTP_PllLock_i           => LRx_GTP_PllLock,
+        LRx_GTP_PllRefclklost_i     => LRx_GTP_PllRefclklost,
 
         -- Right Sensor
         ------------------
@@ -1072,20 +1182,20 @@ HPUCORE_i : HPUCore
         RRx_HSSAER_i              	=> (others=> '0'),
 
         -- GTP interface
-        RRx_RXGTP_AlignRequest_o    => ,
-        RRx_GTP_RxUsrClk2_i         => ,
-        RRx_GTP_SoftResetRx_o       => ,
-        RRx_GTP_DataValid_o         => ,
-        RRx_GTP_Rxuserrdy_o         => ,
-        RRx_GTP_Rxdata_i            => ,
-        RRx_GTP_Rxchariscomma_i     => ,
-        RRx_GTP_Rxcharisk_i         => ,
-        RRx_GTP_Rxdisperr_i         => ,
-        RRx_GTP_Rxnotintable_i      => ,
-        RRx_GTP_Rxbyteisaligned_i   => ,
-        RRx_GTP_Rxbyterealign_i     => ,
-        RRx_GTP_PllLock_i           => ,
-        RRx_GTP_PllRefclklost_i     => ,
+        RRx_RXGTP_AlignRequest_o    => RRx_RXGTP_AlignRequest,
+        RRx_GTP_RxUsrClk2_i         => RRx_GTP_RxUsrClk2,
+        RRx_GTP_SoftResetRx_o       => RRx_GTP_SoftResetRx,
+        RRx_GTP_DataValid_o         => RRx_GTP_DataValid,
+        RRx_GTP_Rxuserrdy_o         => RRx_GTP_Rxuserrdy,
+        RRx_GTP_Rxdata_i            => RRx_GTP_Rxdata,
+        RRx_GTP_Rxchariscomma_i     => RRx_GTP_Rxchariscomma,
+        RRx_GTP_Rxcharisk_i         => RRx_GTP_Rxcharisk,
+        RRx_GTP_Rxdisperr_i         => RRx_GTP_Rxdisperr,
+        RRx_GTP_Rxnotintable_i      => RRx_GTP_Rxnotintable,
+        RRx_GTP_Rxbyteisaligned_i   => RRx_GTP_Rxbyteisaligned,
+        RRx_GTP_Rxbyterealign_i     => RRx_GTP_Rxbyterealign,
+        RRx_GTP_PllLock_i           => RRx_GTP_PllLock,
+        RRx_GTP_PllRefclklost_i     => RRx_GTP_PllRefclklost,
 
         -- Aux Sensor
         ------------------
@@ -1098,20 +1208,20 @@ HPUCORE_i : HPUCore
         AuxRx_HSSAER_i            	=> (others=> '0'),
 
         -- GTP interface
-        AuxRx_RXGTP_AlignRequest_o  => ,
-        AuxRx_GTP_RxUsrClk2_i       => ,  
-        AuxRx_GTP_SoftResetRx_o     => ,  
-        AuxRx_GTP_DataValid_o       => ,  
-        AuxRx_GTP_Rxuserrdy_o       => ,  
-        AuxRx_GTP_Rxdata_i          => ,  
-        AuxRx_GTP_Rxchariscomma_i   => ,  
-        AuxRx_GTP_Rxcharisk_i       => ,  
-        AuxRx_GTP_Rxdisperr_i       => ,  
-        AuxRx_GTP_Rxnotintable_i    => ,  
-        AuxRx_GTP_Rxbyteisaligned_i => ,  
-        AuxRx_GTP_Rxbyterealign_i   => ,  
-        AuxRx_GTP_PllLock_i         => ,  
-        AuxRx_GTP_PllRefclklost_i   => ,
+        AuxRx_RXGTP_AlignRequest_o  => AuxRx_RXGTP_AlignRequest,
+        AuxRx_GTP_RxUsrClk2_i       => AuxRx_GTP_RxUsrClk2,  
+        AuxRx_GTP_SoftResetRx_o     => AuxRx_GTP_SoftResetRx,  
+        AuxRx_GTP_DataValid_o       => AuxRx_GTP_DataValid,  
+        AuxRx_GTP_Rxuserrdy_o       => AuxRx_GTP_Rxuserrdy,  
+        AuxRx_GTP_Rxdata_i          => AuxRx_GTP_Rxdata,  
+        AuxRx_GTP_Rxchariscomma_i   => AuxRx_GTP_Rxchariscomma,  
+        AuxRx_GTP_Rxcharisk_i       => AuxRx_GTP_Rxcharisk,  
+        AuxRx_GTP_Rxdisperr_i       => AuxRx_GTP_Rxdisperr,  
+        AuxRx_GTP_Rxnotintable_i    => AuxRx_GTP_Rxnotintable,  
+        AuxRx_GTP_Rxbyteisaligned_i => AuxRx_GTP_Rxbyteisaligned,  
+        AuxRx_GTP_Rxbyterealign_i   => AuxRx_GTP_Rxbyterealign,  
+        AuxRx_GTP_PllLock_i         => AuxRx_GTP_PllLock,  
+        AuxRx_GTP_PllRefclklost_i   => AuxRx_GTP_PllRefclklost,
 
         -- SpiNNlink interface
         LRx_data_2of7_from_spinnaker_i   => LRx_data_2of7_from_spinnaker,   -- in  std_logic_vector(6 downto 0); 
@@ -1305,7 +1415,7 @@ Enable_AER_Proc : process
 		AER_device_enable_Tx  <= '0';
 
 		wait for 30 us;
-		AER_device_enable_L   <= '1';
+		AER_device_enable_L   <= '0';
 		AER_device_enable_R   <= '0';
 		AER_device_enable_Aux <= '0';
 		AER_device_enable_Tx  <= '0';
@@ -1325,10 +1435,10 @@ Enable_SPNN_Proc : process
     SPNN_device_enable_Aux <= '0';
 		
 		wait for 1 us;
-    SPNN_device_reset_L   <= '0';
-    SPNN_device_reset_R   <= '0';
-    SPNN_device_reset_Tx  <= '0';
-    SPNN_device_reset_Aux <= '0';
+    SPNN_device_reset_L   <= '1';
+    SPNN_device_reset_R   <= '1';
+    SPNN_device_reset_Tx  <= '1';
+    SPNN_device_reset_Aux <= '1';
 
 		wait for 1 us;
     SPNN_device_reset_L   <= '1';
@@ -1340,20 +1450,20 @@ Enable_SPNN_Proc : process
 		wait for 10 us;		
     SPNN_device_enable_L   <= '0';
     SPNN_device_enable_R   <= '0';
-    SPNN_device_enable_Tx  <= '1';
+    SPNN_device_enable_Tx  <= '0';
     SPNN_device_enable_Aux <= '0';        
     
     wait for 200 us;        
     SPNN_device_enable_L   <= '0';
     SPNN_device_enable_R   <= '0';
-    SPNN_device_enable_Tx  <= '1';
-    SPNN_device_enable_Aux <= '1'; 
+    SPNN_device_enable_Tx  <= '0';
+    SPNN_device_enable_Aux <= '0'; 
            
     wait for 600 us;        
     SPNN_device_enable_L   <= '0';
     SPNN_device_enable_R   <= '0';
     SPNN_device_enable_Tx  <= '0';
-    SPNN_device_enable_Aux <= '1'; 
+    SPNN_device_enable_Aux <= '0'; 
         
 		wait;
 end process Enable_SPNN_Proc;

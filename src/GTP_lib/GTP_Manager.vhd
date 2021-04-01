@@ -154,7 +154,7 @@ architecture Behavioral of GTP_Manager is
 
 attribute ASYNC_REG : string;
 
-component DATA_SYNC_FIFO
+component GTP_DATA_SYNC_FIFO
   port (
     rst : in std_logic;
     wr_clk : in std_logic;
@@ -170,7 +170,7 @@ component DATA_SYNC_FIFO
   );
 end component;
 
-component MSG_SYNC_FIFO
+component GTP_MSG_SYNC_FIFO
   port (
     rst : in std_logic;
     wr_clk : in std_logic;
@@ -186,7 +186,7 @@ component MSG_SYNC_FIFO
   );
 end component;
 
-component time_machine is
+component GTP_time_machine is
   generic ( 
     CLK_PERIOD_NS_g         : real := 10.0;                   -- Main Clock period
     CLEAR_POLARITY_g        : string := "LOW";                -- Active "HIGH" or "LOW"
@@ -216,7 +216,7 @@ component time_machine is
     );
 end component;
 
-component enable_signal_cdc is
+component GTP_enable_signal_cdc is
  port (
   CLEAR_N_i           : in     std_logic;                      -- System Reset 
   CLK_SOURCE_i        : in     std_logic;                      -- Origin Clock 
@@ -563,7 +563,7 @@ PLL_ALARM_o       <= cm_pll_alarm;
 
 tx_clear <= cm_pll_alarm or not RST_N_i;
 
-TIME_MACHINE_GCKTX_i : time_machine
+TIME_MACHINE_GCKTX_i : GTP_time_machine
   generic map( 
     CLK_PERIOD_NS_g         =>  GTP_TXUSRCLK2_PERIOD_NS_g,  -- Main Clock period
     CLEAR_POLARITY_g        => "HIGH",                      -- Active "HIGH" or "LOW"
@@ -592,7 +592,7 @@ TIME_MACHINE_GCKTX_i : time_machine
     EN1S_o                  => open
     );
 
-ENABLE_SIGNAL_CDC_TX_i : enable_signal_cdc
+ENABLE_SIGNAL_CDC_TX_i : GTP_enable_signal_cdc
  port map(
   CLEAR_N_i           => tx_rst_n_gcktx,
   CLK_SOURCE_i        => GTP_TXUSRCLK2_i,
@@ -632,7 +632,7 @@ tx_data_fifo_wr_en       <= not tx_data_fifo_full and TX_DATA_SRC_RDY_i;
 tx_data_fifo_rd_en_gcktx <= tx_data_w0_flag_gcktx and not tx_data_fifo_empty_gcktx;
 tx_data_fifo_rst         <= tx_rst_gcktx;
 
-TX_DATA_SYNC_FIFO_i :  DATA_SYNC_FIFO
+TX_DATA_SYNC_FIFO_i :  GTP_DATA_SYNC_FIFO
   port map (
     rst       => tx_data_fifo_rst,               
     wr_clk    => CLK_i,         
@@ -655,7 +655,7 @@ tx_msg_fifo_wr_en       <= not tx_msg_fifo_full and TX_MSG_SRC_RDY_i;
 tx_msg_fifo_rd_en_gcktx <= tx_msg_flag_gcktx and not tx_msg_fifo_empty_gcktx;
 tx_msg_fifo_rst         <= tx_rst_gcktx;
 
-TX_MSG_SYNC_FIFO_i :  MSG_SYNC_FIFO
+TX_MSG_SYNC_FIFO_i :  GTP_MSG_SYNC_FIFO
   port map (
     rst       => tx_msg_fifo_rst,               
     wr_clk    => CLK_i,        
@@ -870,7 +870,7 @@ GTP_TXCHARISK_o               <= tx_char_is_k_gcktx;       -- TXUSRCLK2 --
 
 rx_clear <= cm_pll_alarm or not RST_N_i;
 
-TIME_MACHINE_GCKRX_i : time_machine
+TIME_MACHINE_GCKRX_i : GTP_time_machine
   generic map( 
     CLK_PERIOD_NS_g         =>  GTP_RXUSRCLK2_PERIOD_NS_g,  -- Main Clock period
     CLEAR_POLARITY_g        => "HIGH",                      -- Active "HIGH" or "LOW"
@@ -899,7 +899,7 @@ TIME_MACHINE_GCKRX_i : time_machine
     EN1S_o                  => open
     );
 
-ENABLE_SIGNAL_CDC_i : enable_signal_cdc
+ENABLE_SIGNAL_CDC_i : GTP_enable_signal_cdc
  port map(
   CLEAR_N_i           => rx_rst_n_gckrx,
   CLK_SOURCE_i        => GTP_RXUSRCLK2_i,
@@ -1119,7 +1119,7 @@ rx_data_fifo_wr_en_gckrx <= rx_data_w0_exp_gckrx and not rx_data_fifo_full_gckrx
 rx_data_fifo_rd_en       <= not rx_data_fifo_empty and RX_DATA_DST_RDY_i;
 rx_data_fifo_rst         <= rx_rst_gckrx;
 
-DATA_FIFO_RX_i :  DATA_SYNC_FIFO
+DATA_FIFO_RX_i :  GTP_DATA_SYNC_FIFO
   port map (
     rst       => rx_data_fifo_rst,               
     wr_clk    => GTP_RXUSRCLK2_i,        
@@ -1140,7 +1140,7 @@ rx_msg_fifo_wr_en_gckrx <= rx_msg_flag_gckrx and not rx_msg_fifo_full_gckrx;
 rx_msg_fifo_rd_en <= not rx_msg_fifo_empty and RX_MSG_DST_RDY_i;
 rx_msg_fifo_rst   <= rx_rst_gckrx;
 
-MSG_FIFO_RX_i :  MSG_SYNC_FIFO
+MSG_FIFO_RX_i :  GTP_MSG_SYNC_FIFO
   port map (
     rst       => rx_msg_fifo_rst,               
     wr_clk    => GTP_RXUSRCLK2_i,        

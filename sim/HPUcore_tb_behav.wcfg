@@ -10,6 +10,7 @@
             <top_module name="axi4litemasterbfm_pkg" />
             <top_module name="dpcomponents_pkg" />
             <top_module name="glbl" />
+            <top_module name="gtp_pkg" />
             <top_module name="hpucomponents_pkg" />
             <top_module name="necomponents_pkg" />
             <top_module name="nscomponents_pkg" />
@@ -20,12 +21,12 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="1157329620774fs"></ZoomEndTime>
-      <Cursor1Time time="1000000000fs"></Cursor1Time>
+      <ZoomEndTime time="212215080001fs"></ZoomEndTime>
+      <Cursor1Time time="11910886000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="292"></NameColumnWidth>
-      <ValueColumnWidth column_width="126"></ValueColumnWidth>
+      <ValueColumnWidth column_width="114"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="13" />
    <wave_markers>
@@ -50,7 +51,6 @@
    <wvobject fp_name="group479" type="group">
       <obj_property name="label">Emulators</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="group109" type="group">
          <obj_property name="label">AXI Emulator</obj_property>
          <obj_property name="DisplayName">label</obj_property>
@@ -254,7 +254,6 @@
       <wvobject fp_name="group425" type="group">
          <obj_property name="label">AER Emulator</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="group394" type="group">
             <obj_property name="label">AER Emulator - Left</obj_property>
             <obj_property name="DisplayName">label</obj_property>
@@ -622,6 +621,66 @@
             </wvobject>
          </wvobject>
       </wvobject>
+      <wvobject fp_name="group324" type="group">
+         <obj_property name="label">GTP Emulator</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/RXGTP_AlignRequest_i" type="logic">
+            <obj_property name="ElementShortName">RXGTP_AlignRequest_i</obj_property>
+            <obj_property name="ObjectShortName">RXGTP_AlignRequest_i</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_RxUsrClk2_o" type="logic">
+            <obj_property name="ElementShortName">GTP_RxUsrClk2_o</obj_property>
+            <obj_property name="ObjectShortName">GTP_RxUsrClk2_o</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_SoftResetRx_i" type="logic">
+            <obj_property name="ElementShortName">GTP_SoftResetRx_i</obj_property>
+            <obj_property name="ObjectShortName">GTP_SoftResetRx_i</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_DataValid_i" type="logic">
+            <obj_property name="ElementShortName">GTP_DataValid_i</obj_property>
+            <obj_property name="ObjectShortName">GTP_DataValid_i</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_Rxuserrdy_i" type="logic">
+            <obj_property name="ElementShortName">GTP_Rxuserrdy_i</obj_property>
+            <obj_property name="ObjectShortName">GTP_Rxuserrdy_i</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_Rxdata_o" type="array">
+            <obj_property name="ElementShortName">GTP_Rxdata_o[15:0]</obj_property>
+            <obj_property name="ObjectShortName">GTP_Rxdata_o[15:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_Rxcharisk_o" type="array">
+            <obj_property name="ElementShortName">GTP_Rxcharisk_o[1:0]</obj_property>
+            <obj_property name="ObjectShortName">GTP_Rxcharisk_o[1:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_Rxchariscomma_o" type="array">
+            <obj_property name="ElementShortName">GTP_Rxchariscomma_o[1:0]</obj_property>
+            <obj_property name="ObjectShortName">GTP_Rxchariscomma_o[1:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_Rxdisperr_o" type="array">
+            <obj_property name="ElementShortName">GTP_Rxdisperr_o[1:0]</obj_property>
+            <obj_property name="ObjectShortName">GTP_Rxdisperr_o[1:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_Rxnotintable_o" type="array">
+            <obj_property name="ElementShortName">GTP_Rxnotintable_o[1:0]</obj_property>
+            <obj_property name="ObjectShortName">GTP_Rxnotintable_o[1:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_Rxbyteisaligned_o" type="logic">
+            <obj_property name="ElementShortName">GTP_Rxbyteisaligned_o</obj_property>
+            <obj_property name="ObjectShortName">GTP_Rxbyteisaligned_o</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_Rxbyterealign_o" type="logic">
+            <obj_property name="ElementShortName">GTP_Rxbyterealign_o</obj_property>
+            <obj_property name="ObjectShortName">GTP_Rxbyterealign_o</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_PllLock_o" type="logic">
+            <obj_property name="ElementShortName">GTP_PllLock_o</obj_property>
+            <obj_property name="ObjectShortName">GTP_PllLock_o</obj_property>
+         </wvobject>
+         <wvobject fp_name="/HPUcore_tb/GTP_DEVICE_EMULATOR_i/GTP_PllRefclklost_o" type="logic">
+            <obj_property name="ElementShortName">GTP_PllRefclklost_o</obj_property>
+            <obj_property name="ObjectShortName">GTP_PllRefclklost_o</obj_property>
+         </wvobject>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="group384" type="group">
       <obj_property name="label">PAER</obj_property>
@@ -896,8 +955,8 @@
             <obj_property name="ObjectShortName">Clk_ls_n</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/TxSaerStat_o" type="array">
-            <obj_property name="ElementShortName">TxSaerStat_o[1:0]</obj_property>
-            <obj_property name="ObjectShortName">TxSaerStat_o[1:0]</obj_property>
+            <obj_property name="ElementShortName">TxSaerStat_o[2:0]</obj_property>
+            <obj_property name="ObjectShortName">TxSaerStat_o[2:0]</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/TxSpnnlnkStat_o" type="array">
             <obj_property name="ElementShortName">TxSpnnlnkStat_o</obj_property>
@@ -928,8 +987,8 @@
             <obj_property name="ObjectShortName">PaerAckActLevel_i</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/HSSaerChanEn_i" type="array">
-            <obj_property name="ElementShortName">HSSaerChanEn_i[1:0]</obj_property>
-            <obj_property name="ObjectShortName">HSSaerChanEn_i[1:0]</obj_property>
+            <obj_property name="ElementShortName">HSSaerChanEn_i[2:0]</obj_property>
+            <obj_property name="ObjectShortName">HSSaerChanEn_i[2:0]</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/FromSeqDataIn_i" type="array">
             <obj_property name="ElementShortName">FromSeqDataIn_i[31:0]</obj_property>
@@ -956,8 +1015,8 @@
             <obj_property name="ObjectShortName">PAER_Ack_i</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/HSSAER_Tx_o" type="array">
-            <obj_property name="ElementShortName">HSSAER_Tx_o[0:1]</obj_property>
-            <obj_property name="ObjectShortName">HSSAER_Tx_o[0:1]</obj_property>
+            <obj_property name="ElementShortName">HSSAER_Tx_o[0:2]</obj_property>
+            <obj_property name="ObjectShortName">HSSAER_Tx_o[0:2]</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_tx_datapath/data_2of7_to_spinnaker_o" type="array">
             <obj_property name="ElementShortName">data_2of7_to_spinnaker_o[6:0]</obj_property>

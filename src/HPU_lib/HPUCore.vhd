@@ -172,7 +172,10 @@ entity HPUCore is
         -- BUS PROTOCOL PARAMETERS
         C_S_AXI_ADDR_WIDTH        : integer                       := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
         C_S_AXI_DATA_WIDTH        : integer                       := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
-        C_SLV_DWIDTH              : integer                       := 32
+        C_SLV_DWIDTH              : integer                       := 32;
+        -- -----------------------
+        -- SIMULATION
+        C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
     port (
 
@@ -619,10 +622,10 @@ begin
 
 u_time_machine : time_machine 
   generic map( 
-    CLK_PERIOD_NS_g         => C_SYSCLK_PERIOD_NS, -- Main Clock period
-    CLEAR_POLARITY_g        => "LOW",              -- Active "HIGH" or "LOW"
-    PON_RESET_DURATION_MS_g => 10,                 -- Duration of Power-On reset (ms)
-    SIM_TIME_COMPRESSION_g  => false               -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+    CLK_PERIOD_NS_g         => C_SYSCLK_PERIOD_NS,    -- Main Clock period
+    CLEAR_POLARITY_g        => "LOW",                 -- Active "HIGH" or "LOW"
+    PON_RESET_DURATION_MS_g => 10,                    -- Duration of Power-On reset (ms)
+    SIM_TIME_COMPRESSION_g  => C_SIM_TIME_COMPRESSION -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     )
   port map(
     -- Clock in port
@@ -996,7 +999,10 @@ u_time_machine : time_machine
             -- INTERCEPTION            
             C_RX_LEFT_INTERCEPTION    => C_RX_LEFT_INTERCEPTION,    -- : boolean                       := false;
             C_RX_RIGHT_INTERCEPTION   => C_RX_RIGHT_INTERCEPTION,   -- : boolean                       := false;
-            C_RX_AUX_INTERCEPTION     => C_RX_AUX_INTERCEPTION      -- : boolean                       := false        
+            C_RX_AUX_INTERCEPTION     => C_RX_AUX_INTERCEPTION,     -- : boolean                       := false;
+            -- -----------------------
+            -- SIMULATION
+            C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION     -- : boolean                       := false;   
             )
         port map (
             --

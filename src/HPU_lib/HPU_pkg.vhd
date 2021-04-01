@@ -81,7 +81,10 @@ component neuserial_core is
         -- INTERCEPTION
         C_RX_LEFT_INTERCEPTION    : boolean                       := false;
         C_RX_RIGHT_INTERCEPTION   : boolean                       := false;
-        C_RX_AUX_INTERCEPTION     : boolean                       := false
+        C_RX_AUX_INTERCEPTION     : boolean                       := false;
+        -- -----------------------
+        -- SIMULATION
+        C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
     port (
         --
