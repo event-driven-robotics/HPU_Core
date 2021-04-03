@@ -1,20 +1,36 @@
+-- ------------------------------------------------------------------------------
+-- 
+--  Revision 1.1:  01/04/2021
+--  - Added GTP capabilities
+--    (M. Casti - IIT)
+--    
+-- ------------------------------------------------------------------------------
+-- 
+--  Revision 1.1:  25/07/2018
+--  - Added SpiNNlink capabilities
+--    (M. Casti - IIT)
+--    
+-- ------------------------------------------------------------------------------
+
 library ieee;
-    use ieee.std_logic_1164.all;
+  use ieee.std_logic_1164.all;
+  use ieee.std_logic_arith.all;
+  use ieee.std_logic_unsigned.all;
 
 library HPU_lib;
-    use HPU_lib.aer_pkg.all;
+  use HPU_lib.aer_pkg.all;
 
 library datapath_lib;
-    use datapath_lib.DPComponents_pkg.all;
+  use datapath_lib.DPComponents_pkg.all;
 
-library HPU_lib;
-    use HPU_lib.aer_pkg.C_INTERNAL_DSIZE;
+-- library HPU_lib;
+--   use HPU_lib.aer_pkg.C_INTERNAL_DSIZE;
     	
 library spinn_neu_if_lib;
-    use spinn_neu_if_lib.spinn_neu_pkg.all;
+  use spinn_neu_if_lib.spinn_neu_pkg.all;
     
 library GTP_lib;
-    use GTP_lib.GTP_pkg.all;
+  use GTP_lib.GTP_pkg.all;
 
 entity hpu_rx_datapath is
   generic (
@@ -32,7 +48,6 @@ entity hpu_rx_datapath is
     C_SIM_TIME_COMPRESSION     : boolean               := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
 port (
-
     -- **********************************************
     -- Barecontrol
     -- **********************************************
@@ -70,6 +85,7 @@ port (
     -- ----------------------------------------------
     PaerFifoFull_o             : out std_logic;
     RxSaerStat_o               : out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+    RxGtpStat_o                : out t_RxGtpStat;
     RxSpnnlnkStat_o            : out t_RxSpnnlnkStat;
     
     -- GTP Statistics        
@@ -197,7 +213,7 @@ end entity hpu_rx_datapath;
 
 architecture str of hpu_rx_datapath is
 
-COMPONENT synch_fifo
+component synch_fifo
   PORT (
     rst : IN STD_LOGIC;
     wr_clk : IN STD_LOGIC;
@@ -209,274 +225,272 @@ COMPONENT synch_fifo
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC
   );
-END COMPONENT;
+end component;
 
-    signal i_InPaerSrc : t_PaerSrc_array(0 to 3);
-    signal i_InPaerDst : t_PaerDst_array(0 to 3);
-    signal i_RxSaerStat: t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
-    signal DBG_FIFO0 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    signal DBG_FIFO1 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    signal DBG_FIFO2 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    signal DBG_FIFO3 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    signal DBG_FIFO4 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    
-    signal i_spnn_parity_err : std_logic;
-    signal i_spnn_rx_err     : std_logic;
-    
-    signal	Rst	     : std_logic;
+signal i_InPaerSrc : t_PaerSrc_array(0 to 3);
+signal i_InPaerDst : t_PaerDst_array(0 to 3);
+signal i_RxSaerStat: t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+signal DBG_FIFO0 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+signal DBG_FIFO1 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+signal DBG_FIFO2 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+signal DBG_FIFO3 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+signal DBG_FIFO4 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
 
-    -- GTP     
-    signal i_PllAlarm          : std_logic;
-    signal i_RxGtpAlignRequest : std_logic;
-    signal i_GtpRxDataRate     : std_logic_vector(15 downto 0); -- Count per millisecond 
-    signal i_GtpRxAlignRate    : std_logic_vector( 7 downto 0); -- Count per millisecond 
-    signal i_GtpRxMsgRate      : std_logic_vector(15 downto 0); -- Count per millisecond 
-    signal i_GtpRxIdleRate     : std_logic_vector(15 downto 0); -- Count per millisecond 
-    signal i_GtpRxEventRate    : std_logic_vector(15 downto 0); -- Count per millisecond 
-    signal i_GtpRxMessageRate  : std_logic_vector( 7 downto 0); -- Count per millisecond     
+signal i_spnn_parity_err : std_logic;
+signal i_spnn_rx_err     : std_logic;
 
-    signal i_GtpData           : std_logic_vector(C_OUTPUT_DSIZE-1 downto 0);
-    signal i_GtpDataSrcRdy     : std_logic;
-    signal i_GtpDataDstRdy     : std_logic;
-    signal i_GtpMsg            : std_logic_vector( 7 downto 0);
-    signal i_GtpMsgSrcRdy      : std_logic;
-    signal i_GtpMsgDstRdy      : std_logic;  
-    
-    signal i_SoftResetRx       : std_logic;
-    signal i_GtpDataValid      : std_logic;
-    signal i_GtpRxuserrdy      : std_logic;
+signal	Rst	     : std_logic;
+
+-- GTP     
+signal i_RxGtpPllAlarm          : std_logic;
+signal i_RxGtpAlignRequest : std_logic;
+signal i_GtpRxDataRate     : std_logic_vector(15 downto 0); -- Count per millisecond 
+signal i_GtpRxAlignRate    : std_logic_vector( 7 downto 0); -- Count per millisecond 
+signal i_GtpRxMsgRate      : std_logic_vector(15 downto 0); -- Count per millisecond 
+signal i_GtpRxIdleRate     : std_logic_vector(15 downto 0); -- Count per millisecond 
+signal i_GtpRxEventRate    : std_logic_vector(15 downto 0); -- Count per millisecond 
+signal i_GtpRxMessageRate  : std_logic_vector( 7 downto 0); -- Count per millisecond     
+
+signal i_GtpRxData         : std_logic_vector(C_OUTPUT_DSIZE-1 downto 0);
+signal i_GtpRxDataSrcRdy   : std_logic;
+signal i_GtpRxDataDstRdy   : std_logic;
+signal i_GtpRxMsg          : std_logic_vector( 7 downto 0);
+signal i_GtpRxMsgSrcRdy    : std_logic;
+signal i_GtpRxMsgDstRdy    : std_logic;  
+
+signal i_SoftResetRx       : std_logic;
+signal i_GtpDataValid      : std_logic;
+signal i_GtpRxuserrdy      : std_logic;
     
 
 begin
 
-    Rst <= not nRst;
+Rst <= not nRst;
+
+-------------------------------------------------------------
+-- PAER Receiver
+-------------------------------------------------------------
+
+g_paer_true : if C_HAS_PAER = true generate
+
+signal ii_paer_nrst : std_logic;
+
+begin
+
+  ii_paer_nrst <= nRst and EnablePAER_i;
+
+  u_simplePAERInput : SimplePAERInputRRv2
+    generic map (
+      paer_width           => C_PAER_DSIZE,           -- positive := 16;
+      internal_width       => C_INTERNAL_DSIZE,       -- positive := 32;
+      --data_on_req_release  => c_DVS_SCX,              -- boolean  := false;
+      input_fifo_depth     => 4                       -- positive := 1
+      )
+    port map (
+      -- clk rst
+      ClkxCI               => Clk_i,               -- in  std_logic;
+      RstxRBI              => ii_paer_nrst,           -- in  std_logic;
+      EnableIp             => EnablePAER_i,           -- in  std_logic;
+      FlushFifo            => PaerFlushFifos_i,       -- in  std_logic;
+      IgnoreFifoFull_i     => PaerIgnoreFifoFull_i,   -- in  std_logic;
+      aux_channel          => Aux_Channel_i,          -- in  std_logic;
+      
+      -- parallel AER
+      AerReqxAI            => PAER_Req_i,             -- in  std_logic;
+      AerAckxSO            => PAER_Ack_o,             -- out std_logic;
+      AerDataxADI          => PAER_Addr_i,            -- in  std_logic_vector(paer_width-1 downto 0);
+      
+      -- configuration
+      AerHighBitsxDI       => RxPaerHighBits_i,       -- in  std_logic_vector(internal_width-1-paer_width downto 0);
+      CfgAckSetDelay_i     => PaerAckSetDelay_i,      -- in  std_logic_vector(7 downto 0);
+      CfgSampleDelay_i     => PaerSampleDelay_i,      -- in  std_logic_vector(7 downto 0);
+      CfgAckRelDelay_i     => PaerAckRelDelay_i,      -- in  std_logic_vector(7 downto 0);
+      
+      -- output
+      OutDataxDO           => i_InPaerSrc(0).idx,     -- out std_logic_vector(internal_width-1 downto 0);
+      OutSrcRdyxSO         => i_InPaerSrc(0).vld,     -- out std_logic;
+      OutDstRdyxSI         => i_InPaerDst(0).rdy,     -- in  std_logic;
+      -- Fifo Full signal
+      FifoFullxSO          => PaerFifoFull_o,         -- out std_logic;
+      -- dbg
+      dbg_dataOk           => dbg_PaerDataOk          -- out std_logic 
+      );
+end generate g_paer_true;
+
+g_paer_false : if C_HAS_PAER = false generate
+  -- Output signals passivation
+  
+  PAER_Ack_o <= PaerAckActLevel_i;
+  
+  i_InPaerSrc(0).idx <= (others => '0');
+  i_InPaerSrc(0).vld <= '0';
+  
+  PaerFifoFull_o <= '0';
+  dbg_PaerDataOk <= '0';
+
+end generate g_paer_false;
+
+
+-------------------------------------------------------------
+-- HSSAER Receiver
+-------------------------------------------------------------
+
+g_hssaer_true : if C_HAS_HSSAER = true generate
+
+signal ii_hssaer_nrst : std_logic;
+signal ii_rx_fromSaerSrc : t_PaerSrc_array(0 to C_HSSAER_N_CHAN-1);
+signal ii_rx_fromSaerSrc_synched : t_PaerSrc_array(0 to C_HSSAER_N_CHAN-1);
+signal ii_rx_fromSaerDst : t_PaerDst_array(0 to C_HSSAER_N_CHAN-1);
+signal ii_rx_fromSaerDst_synched : t_PaerDst_array(0 to C_HSSAER_N_CHAN-1);
+signal i_HSSAER_Rx : std_logic_vector(0 to C_HSSAER_N_CHAN-1);
+signal synch_fifo_wr_en : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+signal synch_fifo_rd_en : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+signal synch_fifo_full : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+signal synch_fifo_empty : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+signal i_reset_synch_fifos : std_logic;
+
+type RxSaerHighBits_t is array (0 to 3) of std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+signal RxSaerHighBits : RxSaerHighBits_t;
+
+begin
     
-    -------------------------------------------------------------
-    -- PAER Receiver
-    -------------------------------------------------------------
-
-    g_paer_true : if C_HAS_PAER = true generate
-
-        signal ii_paer_nrst : std_logic;
-
-    begin
-
-        ii_paer_nrst <= nRst and EnablePAER_i;
-
-
-        u_simplePAERInput : SimplePAERInputRRv2
-            generic map (
-                paer_width           => C_PAER_DSIZE,           -- positive := 16;
-                internal_width       => C_INTERNAL_DSIZE,       -- positive := 32;
-                --data_on_req_release  => c_DVS_SCX,              -- boolean  := false;
-                input_fifo_depth     => 4                       -- positive := 1
-            )
-            port map (
-                -- clk rst
-                ClkxCI               => Clk_i,               -- in  std_logic;
-                RstxRBI              => ii_paer_nrst,           -- in  std_logic;
-                EnableIp             => EnablePAER_i,           -- in  std_logic;
-                FlushFifo            => PaerFlushFifos_i,       -- in  std_logic;
-                IgnoreFifoFull_i     => PaerIgnoreFifoFull_i,   -- in  std_logic;
-                aux_channel          => Aux_Channel_i,          -- in  std_logic;
-
-                -- parallel AER
-                AerReqxAI            => PAER_Req_i,             -- in  std_logic;
-                AerAckxSO            => PAER_Ack_o,             -- out std_logic;
-                AerDataxADI          => PAER_Addr_i,            -- in  std_logic_vector(paer_width-1 downto 0);
-
-                -- configuration
-                AerHighBitsxDI       => RxPaerHighBits_i,       -- in  std_logic_vector(internal_width-1-paer_width downto 0);
-                CfgAckSetDelay_i     => PaerAckSetDelay_i,      -- in  std_logic_vector(7 downto 0);
-                CfgSampleDelay_i     => PaerSampleDelay_i,      -- in  std_logic_vector(7 downto 0);
-                CfgAckRelDelay_i     => PaerAckRelDelay_i,      -- in  std_logic_vector(7 downto 0);
-
-                -- output
-                OutDataxDO           => i_InPaerSrc(0).idx,     -- out std_logic_vector(internal_width-1 downto 0);
-                OutSrcRdyxSO         => i_InPaerSrc(0).vld,     -- out std_logic;
-                OutDstRdyxSI         => i_InPaerDst(0).rdy,     -- in  std_logic;
-                -- Fifo Full signal
-                FifoFullxSO          => PaerFifoFull_o,         -- out std_logic;
-                -- dbg
-                dbg_dataOk           => dbg_PaerDataOk          -- out std_logic 
-            );
-
-    end generate g_paer_true;
-
-
-    g_paer_false : if C_HAS_PAER = false generate
-        -- Output signals passivation
-
-        PAER_Ack_o <= PaerAckActLevel_i;
-
-        i_InPaerSrc(0).idx <= (others => '0');
-        i_InPaerSrc(0).vld <= '0';
-
-        PaerFifoFull_o <= '0';
-        dbg_PaerDataOk <= '0';
-
-    end generate g_paer_false;
-
-
-    -------------------------------------------------------------
-    -- HSSAER Receiver
-    -------------------------------------------------------------
-
-    g_hssaer_true : if C_HAS_HSSAER = true generate
-
-        signal ii_hssaer_nrst : std_logic;
-        signal ii_rx_fromSaerSrc : t_PaerSrc_array(0 to C_HSSAER_N_CHAN-1);
-        signal ii_rx_fromSaerSrc_synched : t_PaerSrc_array(0 to C_HSSAER_N_CHAN-1);
-        signal ii_rx_fromSaerDst : t_PaerDst_array(0 to C_HSSAER_N_CHAN-1);
-        signal ii_rx_fromSaerDst_synched : t_PaerDst_array(0 to C_HSSAER_N_CHAN-1);
-        signal i_HSSAER_Rx : std_logic_vector(0 to C_HSSAER_N_CHAN-1);
-        signal synch_fifo_wr_en : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
-        signal synch_fifo_rd_en : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
-        signal synch_fifo_full : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
-        signal synch_fifo_empty : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
-        signal i_reset_synch_fifos : std_logic;
-        
-        type RxSaerHighBits_t is array (0 to 3) of std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-        signal RxSaerHighBits : RxSaerHighBits_t;
-
-    begin
+  RxSaerHighBits(0) <= RxSaerHighBits0_i;
+  RxSaerHighBits(1) <= RxSaerHighBits1_i;
+  RxSaerHighBits(2) <= RxSaerHighBits2_i;
+  RxSaerHighBits(3) <= RxSaerHighBits3_i;
+  
+  ii_hssaer_nrst <= nRst and EnableHSSAER_i;
+  i_reset_synch_fifos <= not(ii_hssaer_nrst);
+  
+  g_hssaer_rx : for i in 0 to C_HSSAER_N_CHAN-1 generate
+      --for all : hssaer_paer_rx use entity hssaer_lib.hssaer_paer_rx(module);
+  begin
+  
+    u_paer2hssaer_rx : hssaer_paer_rx_wrapper
+      generic map (
+        dsize       => C_PAER_DSIZE,             -- positive;
+        int_dsize   => C_INTERNAL_DSIZE          -- positive := 32
+      )
+      port map (
+        nrst        => ii_hssaer_nrst,           -- in  std_logic;
+        lsclkp      => Clk_ls_p,                 -- in  std_logic;
+        lsclkn      => Clk_ls_n,                 -- in  std_logic;
+        hsclkp      => Clk_hs_p,                 -- in  std_logic;
+        hsclkn      => Clk_hs_n,                 -- in  std_logic;
     
-        RxSaerHighBits(0) <= RxSaerHighBits0_i;
-        RxSaerHighBits(1) <= RxSaerHighBits1_i;
-        RxSaerHighBits(2) <= RxSaerHighBits2_i;
-        RxSaerHighBits(3) <= RxSaerHighBits3_i;
-
-        ii_hssaer_nrst <= nRst and EnableHSSAER_i;
-        i_reset_synch_fifos <= not(ii_hssaer_nrst);
-
-        g_hssaer_rx : for i in 0 to C_HSSAER_N_CHAN-1 generate
-            --for all : hssaer_paer_rx use entity hssaer_lib.hssaer_paer_rx(module);
-        begin
-
-            u_paer2hssaer_rx : hssaer_paer_rx_wrapper
-                generic map (
-                    dsize       => C_PAER_DSIZE,             -- positive;
-                    int_dsize   => C_INTERNAL_DSIZE          -- positive := 32
-                )
-                port map (
-                    nrst        => ii_hssaer_nrst,           -- in  std_logic;
-                    lsclkp      => Clk_ls_p,                 -- in  std_logic;
-                    lsclkn      => Clk_ls_n,                 -- in  std_logic;
-                    hsclkp      => Clk_hs_p,                 -- in  std_logic;
-                    hsclkn      => Clk_hs_n,                 -- in  std_logic;
-
-                    rx          => i_HSSAER_Rx(i),           -- in  std_logic;
-
-                    higher_bits => RxSaerHighBits(i),         -- in  std_logic_vector(int_dsize-1 downto dsize);
-
-                    ae          => ii_rx_fromSaerSrc(i).idx, -- out std_logic_vector(int_dsize-1 downto 0);
-                    src_rdy     => ii_rx_fromSaerSrc(i).vld, -- out std_logic;
-                    dst_rdy     => ii_rx_fromSaerDst_synched(i).rdy, -- in  std_logic;
-
-                    err_ko      => i_RxSaerStat(i).err_ko,   -- out std_logic;
-                    err_rx      => i_RxSaerStat(i).err_rx,   -- out std_logic;
-                    err_to      => i_RxSaerStat(i).err_to,   -- out std_logic;
-                    err_of      => i_RxSaerStat(i).err_of,   -- out std_logic;
-                    int         => i_RxSaerStat(i).int,      -- out std_logic;
-                    run         => i_RxSaerStat(i).run,       -- out std_logic;
-
-                    aux_channel => Aux_Channel_i             -- in  std_logic;
-                );
-             
-             i_synch_fifo : synch_fifo
-                  PORT MAP (
-                    rst => i_reset_synch_fifos,
-                    wr_clk => Clk_ls_p,
-                    rd_clk => Clk_i,
-                    din => ii_rx_fromSaerSrc(i).idx,
-                    wr_en => synch_fifo_wr_en(i),
-                    rd_en => synch_fifo_rd_en(i),
-                    dout => ii_rx_fromSaerSrc_synched(i).idx,
-                    full => synch_fifo_full(i),
-                    empty => synch_fifo_empty(i)
-                  );
-            
-            synch_fifo_wr_en(i) <= ii_rx_fromSaerSrc(i).vld and not(synch_fifo_full(i));
-            synch_fifo_rd_en(i) <= ii_rx_fromSaerDst(i).rdy and not(synch_fifo_empty(i));
-            ii_rx_fromSaerSrc_synched(i).vld <= not(synch_fifo_empty(i));
-            ii_rx_fromSaerDst_synched(i).rdy <= not(synch_fifo_full(i));
-
-   p_debug_check : process (Clk_ls_p)
+        rx          => i_HSSAER_Rx(i),           -- in  std_logic;
+    
+        higher_bits => RxSaerHighBits(i),         -- in  std_logic_vector(int_dsize-1 downto dsize);
+    
+        ae          => ii_rx_fromSaerSrc(i).idx, -- out std_logic_vector(int_dsize-1 downto 0);
+        src_rdy     => ii_rx_fromSaerSrc(i).vld, -- out std_logic;
+        dst_rdy     => ii_rx_fromSaerDst_synched(i).rdy, -- in  std_logic;
+    
+        err_ko      => i_RxSaerStat(i).err_ko,   -- out std_logic;
+        err_rx      => i_RxSaerStat(i).err_rx,   -- out std_logic;
+        err_to      => i_RxSaerStat(i).err_to,   -- out std_logic;
+        err_of      => i_RxSaerStat(i).err_of,   -- out std_logic;
+        int         => i_RxSaerStat(i).int,      -- out std_logic;
+        run         => i_RxSaerStat(i).run,       -- out std_logic;
+    
+        aux_channel => Aux_Channel_i             -- in  std_logic;
+        );
+    
+    i_synch_fifo : synch_fifo
+      port map (
+        rst     => i_reset_synch_fifos,
+        wr_clk  => Clk_ls_p,
+        rd_clk  => Clk_i,
+        din     => ii_rx_fromSaerSrc(i).idx,
+        wr_en   => synch_fifo_wr_en(i),
+        rd_en   => synch_fifo_rd_en(i),
+        dout    => ii_rx_fromSaerSrc_synched(i).idx,
+        full    => synch_fifo_full(i),
+        empty   => synch_fifo_empty(i)
+        );
+      
+    synch_fifo_wr_en(i) <= ii_rx_fromSaerSrc(i).vld and not(synch_fifo_full(i));
+    synch_fifo_rd_en(i) <= ii_rx_fromSaerDst(i).rdy and not(synch_fifo_empty(i));
+    ii_rx_fromSaerSrc_synched(i).vld <= not(synch_fifo_empty(i));
+    ii_rx_fromSaerDst_synched(i).rdy <= not(synch_fifo_full(i));
+  
+    p_debug_check : process (Clk_ls_p)
     begin
-        if (rising_edge(Clk_ls_p)) then
-            if (ii_hssaer_nrst = '0') then
-                DBG_FIFO0 <= (others => '0');
-                DBG_FIFO1 <= (others => '0');
-                DBG_FIFO2 <= (others => '0');
-                DBG_FIFO3 <= (others => '0');
-                DBG_FIFO4 <= (others => '0');
-            else
-                if (ii_rx_fromSaerSrc(1).vld='1' and ii_rx_fromSaerDst(1).rdy='1')  then
-                    DBG_FIFO0 <= ii_rx_fromSaerSrc(1).idx;
-                    DBG_FIFO1 <= DBG_FIFO0;
-                    DBG_FIFO2 <= DBG_FIFO1;
-                    DBG_FIFO3 <= DBG_FIFO2;
-                    DBG_FIFO4 <= DBG_FIFO3;
-                end if;
-            end if;
-        end if;
-    end process p_debug_check;
-
-i_HSSAER_Rx(i) <= HSSAER_Rx_i(i) and HSSaerChanEn_i(i);
-
-DBG_src_rdy(i) <= ii_rx_fromSaerSrc(i).vld;
-DBG_dst_rdy(i) <= ii_rx_fromSaerDst(i).rdy;
-DBG_err(i)     <= i_RxSaerStat(i).err_ko or i_RxSaerStat(i).err_rx or i_RxSaerStat(i).err_to or i_RxSaerStat(i).err_of;
-DBG_run(i)     <= i_RxSaerStat(i).run;
-DBG_RX(i)      <= i_HSSAER_Rx(i);
-
-RxSaerStat_o(i) <= i_RxSaerStat(i);
-        end generate g_hssaer_rx;
-
-        u_hssaer_arbiter : neuserial_PAER_arbiter
-            generic map (
-                C_NUM_CHAN         => C_HSSAER_N_CHAN,    -- natural range 1 to 4
-                C_ODATA_WIDTH      => C_INTERNAL_DSIZE    -- natural
-            )
-            port map (
-                Clk                => Clk_i,           -- in  std_logic;
-                nRst               => ii_hssaer_nrst,     -- in  std_logic;
-
-                --ArbCfg_i           =>                     -- in  t_ArbiterCfg;
-
-                SplittedPaerSrc_i  => ii_rx_fromSaerSrc_synched,  -- in  t_PaerSrc_array(0 to C_NUM_CHAN-1);
-                SplittedPaerDst_o  => ii_rx_fromSaerDst,  -- out t_PaerDst_array(0 to C_NUM_CHAN-1);
-
-                PaerData_o         => i_InPaerSrc(1).idx, -- out std_logic_vector(C_ODATA_WIDTH-1 downto 0);
-                PaerSrcRdy_o       => i_InPaerSrc(1).vld, -- out std_logic;
-                PaerDstRdy_i       => i_InPaerDst(1).rdy  -- in  std_logic
-            );
-
-    end generate g_hssaer_true;
-
-
-    g_hssaer_false : if C_HAS_HSSAER = false generate
-        -- Output signals passivation
-
+    if (rising_edge(Clk_ls_p)) then
+      if (ii_hssaer_nrst = '0') then
         DBG_FIFO0 <= (others => '0');
         DBG_FIFO1 <= (others => '0');
         DBG_FIFO2 <= (others => '0');
         DBG_FIFO3 <= (others => '0');
         DBG_FIFO4 <= (others => '0');
+      else
+        if (ii_rx_fromSaerSrc(1).vld='1' and ii_rx_fromSaerDst(1).rdy='1')  then
+          DBG_FIFO0 <= ii_rx_fromSaerSrc(1).idx;
+          DBG_FIFO1 <= DBG_FIFO0;
+          DBG_FIFO2 <= DBG_FIFO1;
+          DBG_FIFO3 <= DBG_FIFO2;
+          DBG_FIFO4 <= DBG_FIFO3;
+        end if;
+      end if;
+    end if;
+    end process p_debug_check;
+  
+    i_HSSAER_Rx(i) <= HSSAER_Rx_i(i) and HSSaerChanEn_i(i);
+    
+    DBG_src_rdy(i) <= ii_rx_fromSaerSrc(i).vld;
+    DBG_dst_rdy(i) <= ii_rx_fromSaerDst(i).rdy;
+    DBG_err(i)     <= i_RxSaerStat(i).err_ko or i_RxSaerStat(i).err_rx or i_RxSaerStat(i).err_to or i_RxSaerStat(i).err_of;
+    DBG_run(i)     <= i_RxSaerStat(i).run;
+    DBG_RX(i)      <= i_HSSAER_Rx(i);
+    
+    RxSaerStat_o(i) <= i_RxSaerStat(i);
+  
+  end generate g_hssaer_rx;
 
-        i_InPaerSrc(1).idx <= (others => '0');
-        i_InPaerSrc(1).vld <= '0';
+  u_hssaer_arbiter : neuserial_PAER_arbiter
+    generic map (
+      C_NUM_CHAN         => C_HSSAER_N_CHAN,    -- natural range 1 to 4
+      C_ODATA_WIDTH      => C_INTERNAL_DSIZE    -- natural
+      )
+    port map (
+      Clk                => Clk_i,           -- in  std_logic;
+      nRst               => ii_hssaer_nrst,     -- in  std_logic;
+      
+      --ArbCfg_i           =>                     -- in  t_ArbiterCfg;
+      
+      SplittedPaerSrc_i  => ii_rx_fromSaerSrc_synched,  -- in  t_PaerSrc_array(0 to C_NUM_CHAN-1);
+      SplittedPaerDst_o  => ii_rx_fromSaerDst,  -- out t_PaerDst_array(0 to C_NUM_CHAN-1);
+      
+      PaerData_o         => i_InPaerSrc(1).idx, -- out std_logic_vector(C_ODATA_WIDTH-1 downto 0);
+      PaerSrcRdy_o       => i_InPaerSrc(1).vld, -- out std_logic;
+      PaerDstRdy_i       => i_InPaerDst(1).rdy  -- in  std_logic
+      );
 
-        g_hssaer_rx : for i in 0 to C_HSSAER_N_CHAN-1 generate
-            RxSaerStat_o(i).err_ko <= '0';
-            RxSaerStat_o(i).err_rx <= '0';
-            RxSaerStat_o(i).err_to <= '0';
-            RxSaerStat_o(i).err_of <= '0';
-            RxSaerStat_o(i).int    <= '0';
-            RxSaerStat_o(i).run    <= '0';
-        end generate g_hssaer_rx;
+end generate g_hssaer_true;
 
-    end generate g_hssaer_false;
+
+g_hssaer_false : if C_HAS_HSSAER = false generate
+    -- Output signals passivation
+
+  DBG_FIFO0 <= (others => '0');
+  DBG_FIFO1 <= (others => '0');
+  DBG_FIFO2 <= (others => '0');
+  DBG_FIFO3 <= (others => '0');
+  DBG_FIFO4 <= (others => '0');
+  
+  i_InPaerSrc(1).idx <= (others => '0');
+  i_InPaerSrc(1).vld <= '0';
+  
+  g_hssaer_rx : for i in 0 to C_HSSAER_N_CHAN-1 generate
+    RxSaerStat_o(i).err_ko <= '0';
+    RxSaerStat_o(i).err_rx <= '0';
+    RxSaerStat_o(i).err_to <= '0';
+    RxSaerStat_o(i).err_of <= '0';
+    RxSaerStat_o(i).int    <= '0';
+    RxSaerStat_o(i).run    <= '0';
+  end generate g_hssaer_rx;
+
+end generate g_hssaer_false;
 
 DBG_FIFO_0 <= DBG_FIFO0;
 DBG_FIFO_1 <= DBG_FIFO1;
@@ -485,9 +499,9 @@ DBG_FIFO_3 <= DBG_FIFO3;
 DBG_FIFO_4 <= DBG_FIFO4;
 
 
-    -------------------------------------------------------------
-    -- GTP Receiver
-    -------------------------------------------------------------
+-------------------------------------------------------------
+-- GTP Receiver
+-------------------------------------------------------------
 
 g_gtp_true : if C_HAS_GTP = true generate
  
@@ -509,7 +523,7 @@ g_gtp_true : if C_HAS_GTP = true generate
       EN1S_i                  => En1Sec_i,  -- Enable @ 1 sec in clk domain 
   
       -- Status
-      PLL_ALARM_o             => i_PllAlarm,
+      PLL_ALARM_o             => i_RxGtpPllAlarm,
       
       -- ---------------------------------------------------------------------------------------
       -- TX SIDE
@@ -555,13 +569,13 @@ g_gtp_true : if C_HAS_GTP = true generate
       RX_MESSAGE_RATE_o       => i_GtpRxMessageRate,
   
       -- Data RX 
-      RX_DATA_o               => i_GtpData,
-      RX_DATA_SRC_RDY_o       => i_GtpDataSrcRdy,
-      RX_DATA_DST_RDY_i       => i_GtpDataDstRdy,
+      RX_DATA_o               => i_InPaerSrc(2).idx,
+      RX_DATA_SRC_RDY_o       => i_InPaerSrc(2).vld,
+      RX_DATA_DST_RDY_i       => i_InPaerDst(2).rdy,
       -- Message RX
-      RX_MSG_o                => i_GtpMsg,
-      RX_MSG_SRC_RDY_o        => i_GtpMsgSrcRdy, 
-      RX_MSG_DST_RDY_i        => i_GtpMsgDstRdy, 
+      RX_MSG_o                => i_GtpRxMsg,
+      RX_MSG_SRC_RDY_o        => i_GtpRxMsgSrcRdy, 
+      RX_MSG_DST_RDY_i        => i_GtpRxMsgDstRdy, 
       
           
      
@@ -607,25 +621,24 @@ g_gtp_true : if C_HAS_GTP = true generate
       GTP_PLL_LOCK_i           => GtpPllLock_i,                                   -- ASYNC        --
       GTP_PLL_REFCLKLOST_i     => GtpPllRefclklost_i                              -- SYS_CLK      -- 
       );
+      
      
-  i_InPaerSrc(2).idx  <= i_GtpData;
-  i_InPaerSrc(2).vld  <= i_GtpDataSrcRdy; 
-  i_GtpDataDstRdy     <= i_InPaerDst(2).rdy;
+  i_GtpRxMsgDstRdy      <= '0';
   
-  i_GtpMsgDstRdy      <= '0';
+  RxGtpStat_o.pll_alarm <= i_RxGtpPllAlarm;
   
-  GtpRxDataRate_o     <= i_GtpRxDataRate; 
-  GtpRxAlignRate_o    <= i_GtpRxAlignRate; 
-  GtpRxMsgRate_o      <= i_GtpRxMsgRate; 
-  GtpRxIdleRate_o     <= i_GtpRxIdleRate; 
-  GtpRxEventRate_o    <= i_GtpRxEventRate; 
-  GtpRxMessageRate_o  <= i_GtpRxMessageRate;     
+  GtpRxDataRate_o       <= i_GtpRxDataRate; 
+  GtpRxAlignRate_o      <= i_GtpRxAlignRate; 
+  GtpRxMsgRate_o        <= i_GtpRxMsgRate; 
+  GtpRxIdleRate_o       <= i_GtpRxIdleRate; 
+  GtpRxEventRate_o      <= i_GtpRxEventRate; 
+  GtpRxMessageRate_o    <= i_GtpRxMessageRate;     
   
-  RxGtpAlignRequest_o <= i_RxGtpAlignRequest;  
+  RxGtpAlignRequest_o   <= i_RxGtpAlignRequest;  
      
-  SoftResetRx_o       <= i_SoftResetRx;  
-  GtpDataValid_o      <= i_GtpDataValid;
-  GtpRxuserrdy_o      <= i_GtpRxuserrdy;
+  SoftResetRx_o         <= i_SoftResetRx;  
+  GtpDataValid_o        <= i_GtpDataValid;
+  GtpRxuserrdy_o        <= i_GtpRxuserrdy;
   
 end generate g_gtp_true;
   
@@ -636,6 +649,8 @@ g_gtp_false : if C_HAS_GTP = false generate
   
   i_InPaerSrc(2).idx <= (others => '0');
   i_InPaerSrc(2).vld <= '0';
+  
+  RxGtpStat_o.pll_alarm <= '0';
   
   GtpRxDataRate_o     <= (others => '0'); 
   GtpRxAlignRate_o    <= (others => '0'); 
@@ -652,9 +667,10 @@ g_gtp_false : if C_HAS_GTP = false generate
   
 end generate g_gtp_false;
     
-    ----------------------------------
-    -- SpiNNlink receiver
-    ----------------------------------
+    
+----------------------------------
+-- SpiNNlink receiver
+----------------------------------
 
 g_spinnlnk_true : if C_HAS_SPNNLNK = true generate
     
@@ -745,28 +761,28 @@ begin
 
 end generate g_spinnlnk_false;
        
-    --===========================================================
-    -- ARBITER amongst all the possible channel
-    --===========================================================
+--===========================================================
+-- ARBITER amongst all the possible channel
+--===========================================================
 
-    u_rx_arbiter : neuserial_PAER_arbiter
-        generic map (
-            C_NUM_CHAN         => 4,                  -- natural range 1 to 4;
-            C_ODATA_WIDTH      => C_OUTPUT_DSIZE      -- natural
-        )
-        port map (
-            Clk                => Clk_i,           -- in  std_logic;
-            nRst               => nRst,               -- in  std_logic;
-
-            --ArbCfg_i           =>                     -- in  t_ArbiterCfg;
-
-            SplittedPaerSrc_i  => i_InPaerSrc,        -- in  t_PaerSrc_array(0 to C_NUM_CHAN);
-            SplittedPaerDst_o  => i_InPaerDst,        -- out t_PaerDst_array(0 to C_NUM_CHAN);
-
-            PaerData_o         => ToMonDataIn_o,      -- out std_logic_vector(C_ODATA_WIDTH-1 downto 0);
-            PaerSrcRdy_o       => ToMonSrcRdy_o,      -- out std_logic;
-            PaerDstRdy_i       => ToMonDstRdy_i       -- in  std_logic
-        );
+u_rx_arbiter : neuserial_PAER_arbiter
+  generic map (
+    C_NUM_CHAN         => 4,                  -- natural range 1 to 4;
+    C_ODATA_WIDTH      => C_OUTPUT_DSIZE      -- natural
+    )
+  port map (
+    Clk                => Clk_i,           -- in  std_logic;
+    nRst               => nRst,               -- in  std_logic;
+    
+    --ArbCfg_i           =>                     -- in  t_ArbiterCfg;
+    
+    SplittedPaerSrc_i  => i_InPaerSrc,        -- in  t_PaerSrc_array(0 to C_NUM_CHAN);
+    SplittedPaerDst_o  => i_InPaerDst,        -- out t_PaerDst_array(0 to C_NUM_CHAN);
+    
+    PaerData_o         => ToMonDataIn_o,      -- out std_logic_vector(C_ODATA_WIDTH-1 downto 0);
+    PaerSrcRdy_o       => ToMonSrcRdy_o,      -- out std_logic;
+    PaerDstRdy_i       => ToMonDstRdy_i       -- in  std_logic
+    );
 
 
 end architecture str;

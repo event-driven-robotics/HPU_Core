@@ -302,10 +302,9 @@ entity neuserial_core is
         LRxSaerStat_o             : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
         RRxSaerStat_o             : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
         AUXRxSaerStat_o           : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-        
-        --
-        -- SPiNNaker
-        ---------------------        
+        LRxGtpStat_o              : out t_RxGtpStat;
+        RRxGtpStat_o              : out t_RxGtpStat;
+        AUXRxGtpStat_o            : out t_RxGtpStat;
         TxSpnnlnkStat_o           : out t_TxSpnnlnkStat;
         LRxSpnnlnkStat_o          : out t_RxSpnnlnkStat;
         RRxSpnnlnkStat_o          : out t_RxSpnnlnkStat;
@@ -866,8 +865,9 @@ u_rx_left_datapath : hpu_rx_datapath
     -----------------------------
     PaerFifoFull_o       => LRxPaerFifoFull_o,           -- out std_logic;
     RxSaerStat_o         => LRxSaerStat_o,               -- out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+    RxGtpStat_o          => LRxGtpStat_o,                -- out t_RxGtpStat;
     RxSpnnlnkStat_o      => LRxSpnnlnkStat_o,            -- out t_RxSpnnlnkStat;
-    
+        
     -- GTP Statistics        
     GtpRxDataRate_o      => i_LRxGtpRxDataRate,           -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
     GtpRxAlignRate_o     => i_LRxGtpRxAlignRate,          -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
@@ -1043,6 +1043,7 @@ u_rx_right_datapath : hpu_rx_datapath
     -----------------------------
     PaerFifoFull_o       => RRxPaerFifoFull_o,           -- out std_logic;
     RxSaerStat_o         => RRxSaerStat_o,               -- out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+    RxGtpStat_o          => RRxGtpStat_o,                -- out t_RxGtpStat;
     RxSpnnlnkStat_o      => RRxSpnnlnkStat_o,            -- out t_RxSpnnlnkStat;
     
     -- GTP Statistics        
@@ -1220,6 +1221,7 @@ u_rx_aux_datapath : hpu_rx_datapath
     -----------------------------
     PaerFifoFull_o       => AuxRxPaerFifoFull_o,           -- out std_logic;
     RxSaerStat_o         => AuxRxSaerStat_o,               -- out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+    RxGtpStat_o          => AuxRxGtpStat_o,                -- out t_RxGtpStat;
     RxSpnnlnkStat_o      => AuxRxSpnnlnkStat_o,            -- out t_RxSpnnlnkStat;
     
     -- GTP Statistics        

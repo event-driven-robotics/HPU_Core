@@ -26,6 +26,7 @@ library HPU_lib;
 
 package NSComponents_pkg is
 
+
 component hpu_rx_datapath is
   generic (
     C_OUTPUT_DSIZE             : natural range 1 to 32 := 32;
@@ -39,10 +40,9 @@ component hpu_rx_datapath is
     C_GTP_RXUSRCLK2_PERIOD_NS  : real                  := 6.4; 
     C_HAS_SPNNLNK              : boolean               := true;
     C_PSPNNLNK_WIDTH           : natural range 1 to 32 := 32;
-    C_SIM_TIME_COMPRESSION     : boolean               := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up
+    C_SIM_TIME_COMPRESSION     : boolean               := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
 port (
-
     -- **********************************************
     -- Barecontrol
     -- **********************************************
@@ -80,6 +80,7 @@ port (
     -- ----------------------------------------------
     PaerFifoFull_o             : out std_logic;
     RxSaerStat_o               : out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+    RxGtpStat_o                : out t_RxGtpStat;
     RxSpnnlnkStat_o            : out t_RxSpnnlnkStat;
     
     -- GTP Statistics        
@@ -202,7 +203,7 @@ port (
     DBG_FIFO_3                 : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
     DBG_FIFO_4                 : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0)            
     );
-end component hpu_rx_datapath;
+end component;
 
 
     component hpu_tx_datapath is

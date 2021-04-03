@@ -303,10 +303,9 @@ component neuserial_core is
         LRxSaerStat_o             : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
         RRxSaerStat_o             : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
         AUXRxSaerStat_o           : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-        
-        --
-        -- SPiNNaker
-        ---------------------        
+        LRxGtpStat_o              : out t_RxGtpStat;
+        RRxGtpStat_o              : out t_RxGtpStat;
+        AUXRxGtpStat_o            : out t_RxGtpStat;
         TxSpnnlnkStat_o           : out t_TxSpnnlnkStat;
         LRxSpnnlnkStat_o          : out t_RxSpnnlnkStat;
         RRxSpnnlnkStat_o          : out t_RxSpnnlnkStat;

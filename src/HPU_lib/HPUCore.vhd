@@ -1219,7 +1219,9 @@ u_time_machine : time_machine
             LRxSaerStat_o           => i_uP_LRxSaerStat,             -- out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
             RRxSaerStat_o           => i_uP_RRxSaerStat,             -- out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
             AUXRxSaerStat_o         => i_uP_AUXRxSaerStat,           -- out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-
+            LRxGtpStat_o            => open, -- : out t_RxGtpStat;
+            RRxGtpStat_o            => open, -- : out t_RxGtpStat;
+            AUXRxGtpStat_o          => open, -- : out t_RxGtpStat;
             TxSpnnlnkStat_o         => i_uP_TxSpnnlnkStat,           -- out t_TxSpnnlnkStat;
             LRxSpnnlnkStat_o        => i_uP_LRxSpnnlnkStat,          -- out t_RxSpnnlnkStat;
             RRxSpnnlnkStat_o        => i_uP_RRxSpnnlnkStat,          -- out t_RxSpnnlnkStat;

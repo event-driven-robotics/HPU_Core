@@ -99,7 +99,19 @@ library ieee;
     end record t_RxSaerStat;
 
     type t_RxSaerStat_array is array (natural range <>) of t_RxSaerStat;
+
+    type t_TxGtpStat is record
+        pll_alarm : std_logic;
+    end record t_TxGtpStat;
     
+    type t_TxGtpStat_array is array (natural range <>) of t_TxGtpStat;
+
+    type t_RxGtpStat is record
+        pll_alarm : std_logic;
+    end record t_RxGtpStat;
+    
+    type t_RxGtpStat_array is array (natural range <>) of t_RxGtpStat;
+            
     type t_TxSpnnlnkStat is record
         dump_mode  : std_logic;
     end record t_TxSpnnlnkStat;
