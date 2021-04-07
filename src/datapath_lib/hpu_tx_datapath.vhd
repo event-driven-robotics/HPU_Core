@@ -182,8 +182,8 @@ signal i_HssaerSrcRdy           : std_logic;
 signal i_SpnnlnkDstRdy          : std_logic;
 signal i_SpnnlnkSrcRdy          : std_logic;
 
-signal i_TxGtpDataDstRdy          : std_logic;
-signal i_TxGtpDataSrcRdy          : std_logic;
+signal i_TxGtpDataDstRdy        : std_logic;
+signal i_TxGtpDataSrcRdy        : std_logic;
 
 signal i_selDest : std_logic_vector(1 downto 0);    
 signal i_MergedSrcRdy           : std_logic;
@@ -535,7 +535,7 @@ signal i_TxGtpIdleRate        : std_logic_vector(15 downto 0); -- Count per mill
 signal i_TxGtpEventRate       : std_logic_vector(15 downto 0); -- Count per millisecond 
 signal i_TxGtpMessageRate     : std_logic_vector( 7 downto 0); -- Count per millisecond     
 
-signal i_TxGtpDataDstRdy      : std_logic;
+-- signal i_TxGtpDataDstRdy      : std_logic;
 signal i_TxGtpMsgDstRdy       : std_logic;  
 
 signal i_GtpSoftResetTx       : std_logic;  

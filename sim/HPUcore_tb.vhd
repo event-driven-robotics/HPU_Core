@@ -80,307 +80,332 @@ constant T_LSCLK : time := ((1.0/F_LSCLK)/2.0) * (1 us);
 -- --------------------------------------------------
 
 component HPUCore is
-    generic (
-        -- -----------------------    
-        -- PAER        
-        C_RX_HAS_PAER             : boolean                       := true;
-        C_RX_PAER_L_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
-        C_RX_PAER_R_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
-        C_RX_PAER_A_SENS_ID       : std_logic_vector(2 downto 0)  := "001";
-        C_TX_HAS_PAER             : boolean                       := true;
-        C_PAER_DSIZE              : natural range 1 to 29         := 24;
-        -- -----------------------        
-        -- HSSAER
-        C_RX_HAS_HSSAER           : boolean                       := true;
-        C_RX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
-        C_RX_SAER0_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-        C_RX_SAER1_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-        C_RX_SAER2_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-        C_RX_SAER3_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";        
-        C_RX_SAER0_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-        C_RX_SAER1_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-        C_RX_SAER2_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-        C_RX_SAER3_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";        
-        C_RX_SAER0_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-        C_RX_SAER1_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-        C_RX_SAER2_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-        C_RX_SAER3_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-        C_TX_HAS_HSSAER           : boolean                       := true;
-        C_TX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
-        -- -----------------------        
-        -- GTP
-        C_RX_HAS_GTP              : boolean                       := true;
-        C_GTP_RXUSRCLK2_PERIOD_NS : real                          := 6.4;        
-        C_TX_HAS_GTP              : boolean                       := true;
-        C_GTP_TXUSRCLK2_PERIOD_NS : real                          := 6.4;  
-        C_GTP_DSIZE               : positive                      := 16;
-        -- -----------------------                
-        -- SPINNLINK
-        C_RX_HAS_SPNNLNK          : boolean                       := true;
-        C_TX_HAS_SPNNLNK          : boolean                       := true;
-        C_PSPNNLNK_WIDTH      	  : natural range 1 to 32         := 32;
-        -- -----------------------
-        -- INTERCEPTION
-        C_RX_LEFT_INTERCEPTION    : boolean                       := false;
-        C_RX_RIGHT_INTERCEPTION   : boolean                       := false;
-        C_RX_AUX_INTERCEPTION     : boolean                       := false;
-        -- -----------------------
-        -- CORE
-        C_SYSCLK_PERIOD_NS        : real                          := 10.0;           -- System Clock period
-        C_DEBUG                   : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
-        C_HAS_DEFAULT_LOOPBACK    : boolean                       := false;
-        -- -----------------------
-        -- BUS PROTOCOL PARAMETERS
-        C_S_AXI_ADDR_WIDTH        : integer                       := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
-        C_S_AXI_DATA_WIDTH        : integer                       := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
-        C_SLV_DWIDTH              : integer                       := 32;
-        -- -----------------------
-        -- SIMULATION
-        C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+  generic (
+    -- -----------------------    
+    -- PAER        
+    C_RX_HAS_PAER             : boolean                       := true;
+    C_RX_PAER_L_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
+    C_RX_PAER_R_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
+    C_RX_PAER_A_SENS_ID       : std_logic_vector(2 downto 0)  := "001";
+    C_TX_HAS_PAER             : boolean                       := true;
+    C_PAER_DSIZE              : natural range 1 to 29         := 24;
+    -- -----------------------        
+    -- HSSAER
+    C_RX_HAS_HSSAER           : boolean                       := true;
+    C_RX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
+    C_RX_SAER0_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER1_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER2_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER3_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";        
+    C_RX_SAER0_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER1_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER2_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER3_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";        
+    C_RX_SAER0_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
+    C_RX_SAER1_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
+    C_RX_SAER2_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
+    C_RX_SAER3_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
+    C_TX_HAS_HSSAER           : boolean                       := true;
+    C_TX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
+    -- -----------------------        
+    -- GTP
+    C_RX_HAS_GTP              : boolean                       := true;
+    C_GTP_RXUSRCLK2_PERIOD_NS : real                          := 6.4;        
+    C_TX_HAS_GTP              : boolean                       := true;
+    C_GTP_TXUSRCLK2_PERIOD_NS : real                          := 6.4;  
+    C_GTP_DSIZE               : positive                      := 16;
+    -- -----------------------                
+    -- SPINNLINK
+    C_RX_HAS_SPNNLNK          : boolean                       := true;
+    C_TX_HAS_SPNNLNK          : boolean                       := true;
+    C_PSPNNLNK_WIDTH      	  : natural range 1 to 32         := 32;
+    -- -----------------------
+    -- INTERCEPTION
+    C_RX_LEFT_INTERCEPTION    : boolean                       := false;
+    C_RX_RIGHT_INTERCEPTION   : boolean                       := false;
+    C_RX_AUX_INTERCEPTION     : boolean                       := false;
+    -- -----------------------
+    -- CORE
+    C_SYSCLK_PERIOD_NS        : real                          := 10.0;           -- System Clock period
+    C_DEBUG                   : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
+    C_HAS_DEFAULT_LOOPBACK    : boolean                       := false;
+    -- -----------------------
+    -- BUS PROTOCOL PARAMETERS
+    C_S_AXI_ADDR_WIDTH        : integer                       := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
+    C_S_AXI_DATA_WIDTH        : integer                       := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
+    C_SLV_DWIDTH              : integer                       := 32;
+    -- -----------------------
+    -- SIMULATION
+    C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
-    port (
+  port (
+    
+    -- SYNC Resetn
+    nSyncReset        : in  std_logic := 'X';
+    
+    -- Clocks for HSSAER interface
+    HSSAER_ClkLS_p    : in  std_logic := '0'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+    HSSAER_ClkLS_n    : in  std_logic := '1'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+    HSSAER_ClkHS_p    : in  std_logic := '0'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+    HSSAER_ClkHS_n    : in  std_logic := '1'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
 
-        -- SYNC Resetn
-        nSyncReset        : in  std_logic := 'X';
 
-        -- Clocks for HSSAER interface
-        HSSAER_ClkLS_p    : in  std_logic := '0'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-        HSSAER_ClkLS_n    : in  std_logic := '1'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-        HSSAER_ClkHS_p    : in  std_logic := '0'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
-        HSSAER_ClkHS_n    : in  std_logic := '1'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+    --============================================
+    -- Tx Interface
+    --============================================
+    
+    -- Parallel AER
+    Tx_PAER_Addr_o              : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    Tx_PAER_Req_o               : out std_logic;
+    Tx_PAER_Ack_i               : in  std_logic;
+    -- HSSAER channels
+    Tx_HSSAER_o                 : out std_logic_vector(0 to C_TX_HSSAER_N_CHAN-1);
+    -- GTP lines
+    Tx_TxGtpMsg_i               : in  std_logic_vector(7 downto 0);
+    Tx_TxGtpMsgSrcRdy_i         : in  std_logic;
+    Tx_TxGtpMsgDstRdy_o         : out std_logic;  
+    Tx_TxGtpAlignRequest_i      : in  std_logic;
+    Tx_TxGtpAlignFlag_o         : out std_logic;
+    Tx_GTP_TxUsrClk2_i          : in  std_logic;   
+    Tx_GTP_SoftResetTx_o        : out  std_logic;                                          
+    Tx_GTP_DataValid_o          : out std_logic;    
+    Tx_GTP_Txuserrdy_o          : out std_logic;                                           
+    Tx_GTP_Txdata_o             : out std_logic_vector(C_GTP_DSIZE-1 downto 0);            
+    Tx_GTP_Txcharisk_o          : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    Tx_GTP_PllLock_i            : in  std_logic;                                           
+    Tx_GTP_PllRefclklost_i      : in  std_logic;         
+    -- SpiNNaker Interface
+    Tx_SPNN_Data_o              : out std_logic_vector(6 downto 0);
+    Tx_SPNN_Ack_i               : in  std_logic; 
 
-        --============================================
-        -- Rx Interface from Vision Sensor Controllers
-        --============================================
 
-        -- Left Sensor
-        ------------------
-        -- Parallel AER
-        LRx_PAER_Addr_i           : in  std_logic_vector(C_PAER_DSIZE-1 downto 0) := (others => '0');
-        LRx_PAER_Req_i            : in  std_logic := '0';
-        LRx_PAER_Ack_o            : out std_logic;
+    --============================================
+    -- Rx Left Interface
+    --============================================
+    
+    -- Parallel AER
+    LRx_PAER_Addr_i             : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    LRx_PAER_Req_i              : in  std_logic;
+    LRx_PAER_Ack_o              : out std_logic;
+    -- HSSAER channels
+    LRx_HSSAER_i                : in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
+    -- GTP lines
+    LRx_RxGtpMsg_o              : out std_logic_vector(7 downto 0);
+    LRx_RxGtpMsgSrcRdy_o        : out std_logic;
+    LRx_RxGtpMsgDstRdy_i        : in  std_logic;  
+    LRx_RxGtpAlignRequest_o     : out std_logic;
+    LRx_GTP_RxUsrClk2_i         : in  std_logic;
+    LRx_GTP_SoftResetRx_o       : out  std_logic;                                          
+    LRx_GTP_DataValid_o         : out std_logic;          
+    LRx_GTP_Rxuserrdy_o         : out std_logic;              
+    LRx_GTP_Rxdata_i            : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);           
+    LRx_GTP_Rxchariscomma_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    LRx_GTP_Rxcharisk_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    LRx_GTP_Rxdisperr_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    LRx_GTP_Rxnotintable_i      : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);            
+    LRx_GTP_Rxbyteisaligned_i   : in  std_logic;                                           
+    LRx_GTP_Rxbyterealign_i     : in  std_logic;         
+    LRx_GTP_PllLock_i           : in  std_logic;                                           
+    LRx_GTP_PllRefclklost_i     : in  std_logic;   
+    -- SpiNNaker Interface
+    LRx_SPNN_Data_i             : in  std_logic_vector(6 downto 0); 
+    LRx_SPNN_Ack_o              : out std_logic;
+    
+    
+    --============================================
+    -- Rx Right Interface
+    --============================================
 
-        -- HSSAER interface
-        LRx_HSSAER_i              : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0) := (others => '0');
+    -- Parallel AER
+    RRx_PAER_Addr_i             : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    RRx_PAER_Req_i              : in  std_logic;
+    RRx_PAER_Ack_o              : out std_logic;
+    -- HSSAER channels
+    RRx_HSSAER_i               : in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
+    -- GTP lines
+    RRx_RxGtpMsg_o              : out std_logic_vector(7 downto 0);
+    RRx_RxGtpMsgSrcRdy_o        : out std_logic;
+    RRx_RxGtpMsgDstRdy_i        : in  std_logic;  
+    RRx_RxGtpAlignRequest_o    : out std_logic;
+    RRx_GTP_RxUsrClk2_i         : in  std_logic;
+    RRx_GTP_SoftResetRx_o          : out  std_logic;                                          
+    RRx_GTP_DataValid_o         : out std_logic;          
+    RRx_GTP_Rxuserrdy_o         : out std_logic;              
+    RRx_GTP_Rxdata_i            : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);           
+    RRx_GTP_Rxchariscomma_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    RRx_GTP_Rxcharisk_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    RRx_GTP_Rxdisperr_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    RRx_GTP_Rxnotintable_i      : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);            
+    RRx_GTP_Rxbyteisaligned_i   : in  std_logic;                                           
+    RRx_GTP_Rxbyterealign_i     : in  std_logic;         
+    RRx_GTP_PllLock_i           : in  std_logic;                                           
+    RRx_GTP_PllRefclklost_i     : in  std_logic;   
+    -- SpiNNaker Interface
+    RRx_SPNN_Data_i             : in  std_logic_vector(6 downto 0); 
+    RRx_SPNN_Ack_o              : out std_logic;
+   
+   
+    --============================================
+    -- Rx auxiliary Interface
+    --============================================
+    
+    -- Parallel AER
+    ARx_PAER_Addr_i             : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    ARx_PAER_Req_i              : in  std_logic;
+    ARx_PAER_Ack_o              : out std_logic;
+    -- HSSAER channels 
+    ARx_HSSAER_i                : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    -- GTP lines
+    ARx_RxGtpMsg_o              : out std_logic_vector(7 downto 0);
+    ARx_RxGtpMsgSrcRdy_o        : out std_logic;
+    ARx_RxGtpMsgDstRdy_i        : in  std_logic;  
+    ARx_RxGtpAlignRequest_o     : out std_logic;
+    ARx_GTP_RxUsrClk2_i         : in  std_logic;
+    ARx_GTP_SoftResetRx_o       : out  std_logic;                                          
+    ARx_GTP_DataValid_o         : out std_logic;          
+    ARx_GTP_Rxuserrdy_o         : out std_logic;              
+    ARx_GTP_Rxdata_i            : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);           
+    ARx_GTP_Rxchariscomma_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    ARx_GTP_Rxcharisk_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    ARx_GTP_Rxdisperr_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    ARx_GTP_Rxnotintable_i      : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);            
+    ARx_GTP_Rxbyteisaligned_i   : in  std_logic;                                           
+    ARx_GTP_Rxbyterealign_i     : in  std_logic;         
+    ARx_GTP_PllLock_i           : in  std_logic;                                           
+    ARx_GTP_PllRefclklost_i     : in  std_logic;   
+    -- SpiNNaker Interface 
+    ARx_SPNN_Data_i             : in  std_logic_vector(6 downto 0); 
+    ARx_SPNN_Ack_o              : out std_logic;  
+    
+   
+    
+    
 
-        -- GTP interface
-        LRx_RXGTP_AlignRequest_o   : out std_logic;
-        LRx_GTP_RxUsrClk2_i        : in  std_logic;                                      
-        LRx_GTP_SoftResetRx_o      : out  std_logic;                                     
-        LRx_GTP_DataValid_o        : out std_logic;                                      
-        LRx_GTP_Rxuserrdy_o        : out std_logic;                                      
-        LRx_GTP_Rxdata_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);       
-        LRx_GTP_Rxchariscomma_i    : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        LRx_GTP_Rxcharisk_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        LRx_GTP_Rxdisperr_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        LRx_GTP_Rxnotintable_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        LRx_GTP_Rxbyteisaligned_i  : in  std_logic;                                      
-        LRx_GTP_Rxbyterealign_i    : in  std_logic;                                      
-        LRx_GTP_PllLock_i          : in  std_logic;                                      
-        LRx_GTP_PllRefclklost_i    : in  std_logic;                                      
-
-        -- Right Sensor
-        ------------------
-        -- Parallel AER
-        RRx_PAER_Addr_i           : in  std_logic_vector(C_PAER_DSIZE-1 downto 0) := (others => '0');
-        RRx_PAER_Req_i            : in  std_logic := '0';
-        RRx_PAER_Ack_o            : out std_logic;
-
-        -- HSSAER interface
-        RRx_HSSAER_i              : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0) := (others => '0');
-
-        -- GTP interface
-        RRx_RXGTP_AlignRequest_o   : out std_logic;
-        RRx_GTP_RxUsrClk2_i        : in  std_logic;                                      
-        RRx_GTP_SoftResetRx_o      : out  std_logic;                                     
-        RRx_GTP_DataValid_o        : out std_logic;                                      
-        RRx_GTP_Rxuserrdy_o        : out std_logic;                                      
-        RRx_GTP_Rxdata_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);       
-        RRx_GTP_Rxchariscomma_i    : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        RRx_GTP_Rxcharisk_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        RRx_GTP_Rxdisperr_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        RRx_GTP_Rxnotintable_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        RRx_GTP_Rxbyteisaligned_i  : in  std_logic;                                      
-        RRx_GTP_Rxbyterealign_i    : in  std_logic;                                      
-        RRx_GTP_PllLock_i          : in  std_logic;                                      
-        RRx_GTP_PllRefclklost_i    : in  std_logic;  
-
-        -- Aux Sensor
-        ------------------
-        -- Parallel AER
-        AuxRx_PAER_Addr_i         : in  std_logic_vector(C_PAER_DSIZE-1 downto 0) := (others => '0');
-        AuxRx_PAER_Req_i          : in  std_logic := '0';
-        AuxRx_PAER_Ack_o          : out std_logic;
-
-        -- HSSAER interface
-        AuxRx_HSSAER_i            : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0) := (others => '0');
-
-        -- GTP interface
-        AuxRx_RXGTP_AlignRequest_o   : out std_logic;
-        AuxRx_GTP_RxUsrClk2_i        : in  std_logic;                                      
-        AuxRx_GTP_SoftResetRx_o      : out  std_logic;                                     
-        AuxRx_GTP_DataValid_o        : out std_logic;                                      
-        AuxRx_GTP_Rxuserrdy_o        : out std_logic;                                      
-        AuxRx_GTP_Rxdata_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);       
-        AuxRx_GTP_Rxchariscomma_i    : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        AuxRx_GTP_Rxcharisk_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        AuxRx_GTP_Rxdisperr_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        AuxRx_GTP_Rxnotintable_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-        AuxRx_GTP_Rxbyteisaligned_i  : in  std_logic;                                      
-        AuxRx_GTP_Rxbyterealign_i    : in  std_logic;                                      
-        AuxRx_GTP_PllLock_i          : in  std_logic;                                      
-        AuxRx_GTP_PllRefclklost_i    : in  std_logic;  
-
-        -- SpiNNlink interface
-        LRx_data_2of7_from_spinnaker_i   : in  std_logic_vector(6 downto 0) := (others => '0'); 
-        LRx_ack_to_spinnaker_o           : out std_logic;
-        RRx_data_2of7_from_spinnaker_i   : in  std_logic_vector(6 downto 0) := (others => '0'); 
-        RRx_ack_to_spinnaker_o           : out std_logic;
-        AuxRx_data_2of7_from_spinnaker_i : in  std_logic_vector(6 downto 0) := (others => '0'); 
-        AuxRx_ack_to_spinnaker_o         : out std_logic;
+    
+    --============================================
+    -- Interception
+    --============================================
+    RRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    RRxSrcRdy_o             : out std_logic;
+    RRxDstRdy_i             : in  std_logic;
+    RRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    RRxBypassSrcRdy_i       : in  std_logic;
+    RRxBypassDstRdy_o       : out std_logic;
+    --
+    LRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    LRxSrcRdy_o             : out std_logic;
+    LRxDstRdy_i             : in  std_logic;
+    LRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    LRxBypassSrcRdy_i       : in  std_logic;
+    LRxBypassDstRdy_o       : out std_logic;
+    --
+    AuxRxData_o             : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    AuxRxSrcRdy_o           : out std_logic;
+    AuxRxDstRdy_i           : in  std_logic;
+    AuxRxBypassData_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    AuxRxBypassSrcRdy_i     : in  std_logic;
+    AuxRxBypassDstRdy_o     : out std_logic;               
         
-        --============================================
-        -- Tx Interface
-        --============================================
-
-        -- Parallel AER
-        Tx_PAER_Addr_o            : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
-        Tx_PAER_Req_o             : out std_logic;
-        Tx_PAER_Ack_i             : in  std_logic := '0';
-
-        -- HSSAER interface
-        Tx_HSSAER_o               : out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
-
-        -- GTP interface
-        
-        -- SpiNNlink interface
-        Tx_data_2of7_to_spinnaker_o      : out std_logic_vector(6 downto 0);
-        Tx_ack_from_spinnaker_i          : in  std_logic := '0';
-        
-        --============================================
-        -- Interception
-        --============================================
-        RRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        RRxSrcRdy_o             : out std_logic;
-        RRxDstRdy_i             : in  std_logic;
-        RRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        RRxBypassSrcRdy_i       : in  std_logic;
-        RRxBypassDstRdy_o       : out std_logic;
-        --
-        LRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        LRxSrcRdy_o             : out std_logic;
-        LRxDstRdy_i             : in  std_logic;
-        LRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        LRxBypassSrcRdy_i       : in  std_logic;
-        LRxBypassDstRdy_o       : out std_logic;
-        --
-        AuxRxData_o             : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        AuxRxSrcRdy_o           : out std_logic;
-        AuxRxDstRdy_i           : in  std_logic;
-        AuxRxBypassData_i       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        AuxRxBypassSrcRdy_i     : in  std_logic;
-        AuxRxBypassDstRdy_o     : out std_logic;               
-            
-        --============================================
-        -- Configuration interface
-        --============================================
-        DefLocFarLpbk_i   : in  std_logic;
-        DefLocNearLpbk_i  : in  std_logic;
-
-        --============================================
-        -- Processor interface
-        --============================================
-        Interrupt_o       : out std_logic;
-
-        -- Debug signals interface
-        DBG_dataOk        : out std_logic;
-        DBG_rawi          : out std_logic_vector(15 downto 0);
-        DBG_data_written  : out std_logic;
-        DBG_dma_burst_counter : out std_logic_vector(10 downto 0);
-        DBG_dma_test_mode      : out std_logic;
-        DBG_dma_EnableDma      : out std_logic;
-        DBG_dma_is_running     : out std_logic;
-        DBG_dma_Length         : out std_logic_vector(10 downto 0);
-        DBG_dma_nedge_run      : out std_logic;
-
-
-        -- ADD USER PORTS ABOVE THIS LINE ------------------
-
-        -- DO NOT EDIT BELOW THIS LINE ---------------------
-        -- Bus protocol ports, do not add to or delete
-        -- Axi lite I/f
-        S_AXI_ACLK        : in  std_logic;
-        S_AXI_ARESETN     : in  std_logic;
-        S_AXI_AWADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
-        S_AXI_AWVALID     : in  std_logic;
-        S_AXI_WDATA       : in  std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-        S_AXI_WSTRB       : in  std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
-        S_AXI_WVALID      : in  std_logic;
-        S_AXI_BREADY      : in  std_logic;
-        S_AXI_ARADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
-        S_AXI_ARVALID     : in  std_logic;
-        S_AXI_RREADY      : in  std_logic;
-        S_AXI_ARREADY     : out std_logic;
-        S_AXI_RDATA       : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-        S_AXI_RRESP       : out std_logic_vector(1 downto 0);
-        S_AXI_RVALID      : out std_logic;
-        S_AXI_WREADY      : out std_logic;
-        S_AXI_BRESP       : out std_logic_vector(1 downto 0);
-        S_AXI_BVALID      : out std_logic;
-        S_AXI_AWREADY     : out std_logic;
-        -- Axi Stream I/f
-        S_AXIS_TREADY     : out std_logic;
-        S_AXIS_TDATA      : in  std_logic_vector(31 downto 0);
-        S_AXIS_TLAST      : in  std_logic;
-        S_AXIS_TVALID     : in  std_logic;
-        M_AXIS_TVALID     : out std_logic;
-        M_AXIS_TDATA      : out std_logic_vector(31 downto 0);
-        M_AXIS_TLAST      : out std_logic;
-        M_AXIS_TREADY     : in  std_logic;
-        -- DO NOT EDIT ABOVE THIS LINE ---------------------
-
-        DBG_din             : out std_logic_vector(63 downto 0);     
-        DBG_wr_en           : out std_logic;  
-        DBG_rd_en           : out std_logic;     
-        DBG_dout            : out std_logic_vector(63 downto 0);          
-        DBG_full            : out std_logic;    
-        DBG_almost_full     : out std_logic;    
-        DBG_overflow        : out std_logic;       
-        DBG_empty           : out std_logic;           
-        DBG_almost_empty    : out std_logic;    
-        DBG_underflow       : out std_logic;     
-        DBG_data_count      : out std_logic_vector(10 downto 0);
-        DBG_CH0_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        DBG_CH0_SRDY        : out std_logic;   
-        DBG_CH0_DRDY        : out std_logic;        
-        DBG_CH1_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        DBG_CH1_SRDY        : out std_logic;   
-        DBG_CH1_DRDY        : out std_logic;        
-        DBG_CH2_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        DBG_CH2_SRDY        : out std_logic;   
-        DBG_CH2_DRDY        : out std_logic;
-        DBG_Timestamp_xD    : out std_logic_vector(31 downto 0);       
-        DBG_MonInAddr_xD    : out std_logic_vector(31 downto 0); 
-        DBG_MonInSrcRdy_xS  : out std_logic;
-        DBG_MonInDstRdy_xS  : out std_logic;
-        DBG_RESETFIFO       : out std_logic;
-        DBG_CTRG_reg        : out std_logic_vector(C_SLV_DWIDTH-1 downto 0); 
-        DBG_ctrl_rd         : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-        DBG_src_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-        DBG_dst_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-        DBG_err             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);  
-        DBG_run             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-        DBG_RX              : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-        DBG_AUXRxSaerChanEn : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-
-        DBG_shreg_aux0      : out std_logic_vector(3 downto 0);
-        DBG_shreg_aux1      : out std_logic_vector(3 downto 0);
-        DBG_shreg_aux2      : out std_logic_vector(3 downto 0);
-        DBG_FIFO_0          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        DBG_FIFO_1          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        DBG_FIFO_2          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        DBG_FIFO_3          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-        DBG_FIFO_4          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0)
+    --============================================
+    -- Configuration interface
+    --============================================
+    DefLocFarLpbk_i   : in  std_logic;
+    DefLocNearLpbk_i  : in  std_logic;
+    
+    --============================================
+    -- Processor interface
+    --============================================
+    Interrupt_o       : out std_logic;
+    
+    -- Debug signals interface
+    DBG_dataOk        : out std_logic;
+    DBG_rawi          : out std_logic_vector(15 downto 0);
+    DBG_data_written  : out std_logic;
+    DBG_dma_burst_counter : out std_logic_vector(10 downto 0);
+    DBG_dma_test_mode      : out std_logic;
+    DBG_dma_EnableDma      : out std_logic;
+    DBG_dma_is_running     : out std_logic;
+    DBG_dma_Length         : out std_logic_vector(10 downto 0);
+    DBG_dma_nedge_run      : out std_logic;
+    
+    
+    -- ADD USER PORTS ABOVE THIS LINE ------------------
+    
+    -- DO NOT EDIT BELOW THIS LINE ---------------------
+    -- Bus protocol ports, do not add to or delete
+    -- Axi lite I/f
+    S_AXI_ACLK        : in  std_logic;
+    S_AXI_ARESETN     : in  std_logic;
+    S_AXI_AWADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
+    S_AXI_AWVALID     : in  std_logic;
+    S_AXI_WDATA       : in  std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+    S_AXI_WSTRB       : in  std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
+    S_AXI_WVALID      : in  std_logic;
+    S_AXI_BREADY      : in  std_logic;
+    S_AXI_ARADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
+    S_AXI_ARVALID     : in  std_logic;
+    S_AXI_RREADY      : in  std_logic;
+    S_AXI_ARREADY     : out std_logic;
+    S_AXI_RDATA       : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+    S_AXI_RRESP       : out std_logic_vector(1 downto 0);
+    S_AXI_RVALID      : out std_logic;
+    S_AXI_WREADY      : out std_logic;
+    S_AXI_BRESP       : out std_logic_vector(1 downto 0);
+    S_AXI_BVALID      : out std_logic;
+    S_AXI_AWREADY     : out std_logic;
+    -- Axi Stream I/f
+    S_AXIS_TREADY     : out std_logic;
+    S_AXIS_TDATA      : in  std_logic_vector(31 downto 0);
+    S_AXIS_TLAST      : in  std_logic;
+    S_AXIS_TVALID     : in  std_logic;
+    M_AXIS_TVALID     : out std_logic;
+    M_AXIS_TDATA      : out std_logic_vector(31 downto 0);
+    M_AXIS_TLAST      : out std_logic;
+    M_AXIS_TREADY     : in  std_logic;
+    -- DO NOT EDIT ABOVE THIS LINE ---------------------
+    
+    DBG_din             : out std_logic_vector(63 downto 0);     
+    DBG_wr_en           : out std_logic;  
+    DBG_rd_en           : out std_logic;     
+    DBG_dout            : out std_logic_vector(63 downto 0);          
+    DBG_full            : out std_logic;    
+    DBG_almost_full     : out std_logic;    
+    DBG_overflow        : out std_logic;       
+    DBG_empty           : out std_logic;           
+    DBG_almost_empty    : out std_logic;    
+    DBG_underflow       : out std_logic;     
+    DBG_data_count      : out std_logic_vector(10 downto 0);
+    DBG_CH0_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    DBG_CH0_SRDY        : out std_logic;   
+    DBG_CH0_DRDY        : out std_logic;        
+    DBG_CH1_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    DBG_CH1_SRDY        : out std_logic;   
+    DBG_CH1_DRDY        : out std_logic;        
+    DBG_CH2_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    DBG_CH2_SRDY        : out std_logic;   
+    DBG_CH2_DRDY        : out std_logic;
+    DBG_Timestamp_xD    : out std_logic_vector(31 downto 0);       
+    DBG_MonInAddr_xD    : out std_logic_vector(31 downto 0); 
+    DBG_MonInSrcRdy_xS  : out std_logic;
+    DBG_MonInDstRdy_xS  : out std_logic;
+    DBG_RESETFIFO       : out std_logic;
+    DBG_CTRG_reg        : out std_logic_vector(C_SLV_DWIDTH-1 downto 0); 
+    DBG_ctrl_rd         : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    DBG_src_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    DBG_dst_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    DBG_err             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);  
+    DBG_run             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    DBG_RX              : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    DBG_AUXRxSaerChanEn : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    
+    DBG_shreg_aux0      : out std_logic_vector(3 downto 0);
+    DBG_shreg_aux1      : out std_logic_vector(3 downto 0);
+    DBG_shreg_aux2      : out std_logic_vector(3 downto 0);
+    DBG_FIFO_0          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    DBG_FIFO_1          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    DBG_FIFO_2          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    DBG_FIFO_3          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    DBG_FIFO_4          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0)
     );
 
 --    attribute MAX_FANOUT  : string;
@@ -542,11 +567,15 @@ component GTP_Emulator is
     );
   port (
     -- GTP interface
-    RXGTP_AlignRequest_i   : in  std_logic;
+    RxGtpAlignRequest_i    : in  std_logic;
+    TxGtpAlignRequest_o    : out std_logic;
     -- 
     GTP_RxUsrClk2_o        : out std_logic;                                      
+    GTP_TxUsrClk2_o        : out std_logic;                                      
     GTP_SoftResetRx_i      : in  std_logic;                                     
+    GTP_SoftResetTx_i      : in  std_logic;                                     
     GTP_DataValid_i        : in  std_logic;                                      
+    --
     GTP_Rxuserrdy_i        : in  std_logic;                                      
     GTP_Rxdata_o           : out std_logic_vector(C_GTP_DSIZE-1 downto 0);       
     GTP_Rxchariscomma_o    : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
@@ -554,29 +583,31 @@ component GTP_Emulator is
     GTP_Rxdisperr_o        : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
     GTP_Rxnotintable_o     : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
     GTP_Rxbyteisaligned_o  : out std_logic;                                      
-    GTP_Rxbyterealign_o    : out std_logic;                                      
+    GTP_Rxbyterealign_o    : out std_logic;    
+    --
+    GTP_Txuserrdy_i        : in  std_logic;                                           
+    GTP_Txdata_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);            
+    GTP_Txcharisk_i        : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0); 
+    --                                  
     GTP_PllLock_o          : out std_logic;                                      
     GTP_PllRefclklost_o    : out std_logic
     );
 end component;
 
-
+ 
 
 signal i_clk                    : std_logic;
 signal i_resetn, i_reset        : std_logic;
 
 -- Spinnaker
-signal LRx_data_2of7_from_spinnaker   : std_logic_vector(6 downto 0); 
-signal LRx_ack_to_spinnaker           : std_logic;
-signal RRx_data_2of7_from_spinnaker   : std_logic_vector(6 downto 0); 
-signal RRx_ack_to_spinnaker           : std_logic;
-signal AuxRx_data_2of7_from_spinnaker : std_logic_vector(6 downto 0); 
-signal AuxRx_ack_to_spinnaker         : std_logic;
-signal Tx_data_2of7_to_spinnaker      : std_logic_vector(6 downto 0);
-signal Tx_ack_from_spinnaker          : std_logic;
-
-
-
+signal data_from_SPNN_L    : std_logic_vector(6 downto 0); 
+signal ack_to_SPNN_L       : std_logic;
+signal data_from_SPNN_R    : std_logic_vector(6 downto 0); 
+signal ack_to_SPNN_R       : std_logic;
+signal data_from_SPNN_A    : std_logic_vector(6 downto 0); 
+signal ack_to_SPNN_A       : std_logic;
+signal data_to_SPNN        : std_logic_vector(6 downto 0);
+signal ack_from_SPNN       : std_logic;
 
 
 --AER
@@ -726,8 +757,30 @@ signal i_vdclink_data_sd        : std_logic;
 signal i_vdclink_clk_sd         : std_logic;
 
 -- GTP
+ 
+signal GTP_PllLock                 : std_logic;                                      
+signal GTP_PllRefclklost           : std_logic; 
+ 
+-- Tx
+signal Tx_TxGtpMsg                 : std_logic_vector(7 downto 0);
+signal Tx_TxGtpMsgSrcRdy           : std_logic;
+signal Tx_TxGtpMsgDstRdy           : std_logic;  
+signal Tx_TxGtpAlignRequest        : std_logic;
+signal Tx_TxGtpAlignFlag           : std_logic;
+signal Tx_GTP_TxUsrClk2            : std_logic;   
+signal Tx_GTP_SoftResetTx          : std_logic;                                          
+signal Tx_GTP_DataValid            : std_logic;    
+signal Tx_GTP_Txuserrdy            : std_logic;                                           
+signal Tx_GTP_Txdata               : std_logic_vector(C_GTP_DSIZE-1 downto 0);            
+signal Tx_GTP_Txcharisk            : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+signal Tx_GTP_PllLock              : std_logic;                                           
+signal Tx_GTP_PllRefclklost        : std_logic;  
+
 -- Left
-signal LRx_RXGTP_AlignRequest     : std_logic;
+signal LRx_RxGtpMsg               : std_logic_vector(7 downto 0);
+signal LRx_RxGtpMsgSrcRdy         : std_logic;
+signal LRx_RxGtpMsgDstRdy         : std_logic;  
+signal LRx_RxGtpAlignRequest      : std_logic;
 signal LRx_GTP_RxUsrClk2          : std_logic;                                      
 signal LRx_GTP_SoftResetRx        : std_logic;                                     
 signal LRx_GTP_DataValid          : std_logic;                                      
@@ -743,7 +796,10 @@ signal LRx_GTP_PllLock            : std_logic;
 signal LRx_GTP_PllRefclklost      : std_logic; 
 
 -- Right
-signal RRx_RXGTP_AlignRequest     : std_logic;
+signal RRx_RxGtpMsg               : std_logic_vector(7 downto 0);
+signal RRx_RxGtpMsgSrcRdy         : std_logic;
+signal RRx_RxGtpMsgDstRdy         : std_logic;  
+signal RRx_RxGtpAlignRequest      : std_logic;
 signal RRx_GTP_RxUsrClk2          : std_logic;                                      
 signal RRx_GTP_SoftResetRx        : std_logic;                                     
 signal RRx_GTP_DataValid          : std_logic;                                      
@@ -759,20 +815,23 @@ signal RRx_GTP_PllLock            : std_logic;
 signal RRx_GTP_PllRefclklost      : std_logic; 
 
 -- Aux
-signal AuxRx_RXGTP_AlignRequest   : std_logic;
-signal AuxRx_GTP_RxUsrClk2        : std_logic;                                      
-signal AuxRx_GTP_SoftResetRx      : std_logic;                                     
-signal AuxRx_GTP_DataValid        : std_logic;                                      
-signal AuxRx_GTP_Rxuserrdy        : std_logic;                                      
-signal AuxRx_GTP_Rxdata           : std_logic_vector(C_GTP_DSIZE-1 downto 0);       
-signal AuxRx_GTP_Rxchariscomma    : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-signal AuxRx_GTP_Rxcharisk        : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-signal AuxRx_GTP_Rxdisperr        : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-signal AuxRx_GTP_Rxnotintable     : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
-signal AuxRx_GTP_Rxbyteisaligned  : std_logic;                                      
-signal AuxRx_GTP_Rxbyterealign    : std_logic;                                      
-signal AuxRx_GTP_PllLock          : std_logic;                                      
-signal AuxRx_GTP_PllRefclklost    : std_logic; 
+signal ARx_RxGtpMsg               : std_logic_vector(7 downto 0);
+signal ARx_RxGtpMsgSrcRdy         : std_logic;
+signal ARx_RxGtpMsgDstRdy         : std_logic;  
+signal ARx_RxGtpAlignRequest      : std_logic;
+signal ARx_GTP_RxUsrClk2          : std_logic;                                      
+signal ARx_GTP_SoftResetRx        : std_logic;                                     
+signal ARx_GTP_DataValid          : std_logic;                                      
+signal ARx_GTP_Rxuserrdy          : std_logic;                                      
+signal ARx_GTP_Rxdata             : std_logic_vector(C_GTP_DSIZE-1 downto 0);       
+signal ARx_GTP_Rxchariscomma      : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal ARx_GTP_Rxcharisk          : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal ARx_GTP_Rxdisperr          : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal ARx_GTP_Rxnotintable       : std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
+signal ARx_GTP_Rxbyteisaligned    : std_logic;                                      
+signal ARx_GTP_Rxbyterealign      : std_logic;                                      
+signal ARx_GTP_PllLock            : std_logic;                                      
+signal ARx_GTP_PllRefclklost      : std_logic; 
 
 
 -- 
@@ -805,33 +864,10 @@ begin
 -- --------------------------------------------------
 -- SpiNNaker Emulator
 -- --------------------------------------------------	
-R_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
-    generic map (
-    HAS_ID     => "false",
-    ID         => 1,
-    HAS_TX     => "false",
-    TX_FILE    => "../../../../../sim/Data_To_R.txt",
-    HAS_RX     => "false",
-    RX_FILE    => ""
-    )
-	port map (
-	-- SpiNNaker link asynchronous output interface
-	Lout       => RRx_data_2of7_from_spinnaker,
-	LoutAck    => RRx_ack_to_spinnaker,
-	
-	-- SpiNNaker link asynchronous input interface
-	Lin        => (others => '0'),
-	LinAck     => open,
-	
-	-- Control interface
-	enable     => SPNN_device_enable_R,
-	rst        => SPNN_device_reset_R -- i_reset
-	);
-
 L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
     generic map (
     HAS_ID     => "false",
-    ID         => 2,
+    ID         => 1,
     HAS_TX     => "false",
     TX_FILE    => "../../../../../sim/Data_To_L.txt",
     HAS_RX     => "false",
@@ -839,8 +875,8 @@ L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
     )
 	port map (
 	-- SpiNNaker link asynchronous output interface
-	Lout       => LRx_data_2of7_from_spinnaker,
-	LoutAck    => LRx_ack_to_spinnaker,
+	Lout       => data_from_SPNN_L, 
+	LoutAck    => ack_to_SPNN_L,
 	
 	-- SpiNNaker link asynchronous input interface
 	Lin        => (others => '0'),
@@ -849,6 +885,29 @@ L_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	-- Control interface
 	enable     => SPNN_device_enable_L,
 	rst        => SPNN_device_reset_L -- i_reset
+	);
+
+R_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
+    generic map (
+    HAS_ID     => "false",
+    ID         => 2,
+    HAS_TX     => "false",
+    TX_FILE    => "../../../../../sim/Data_To_R.txt",
+    HAS_RX     => "false",
+    RX_FILE    => ""
+    )
+	port map (
+	-- SpiNNaker link asynchronous output interface
+	Lout       => data_from_SPNN_R,
+	LoutAck    => ack_to_SPNN_R,   
+	
+	-- SpiNNaker link asynchronous input interface
+	Lin        => (others => '0'),
+	LinAck     => open,
+	
+	-- Control interface
+	enable     => SPNN_device_enable_R,
+	rst        => SPNN_device_reset_R -- i_reset
 	);
 
 AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
@@ -862,8 +921,8 @@ AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
     )
 	port map (
 	-- SpiNNaker link asynchronous output interface
-	Lout       => AUXRx_data_2of7_from_spinnaker,
-	LoutAck    => AUXRx_ack_to_spinnaker,
+	Lout       => data_from_SPNN_A,
+	LoutAck    => ack_to_SPNN_A,
 	
 	-- SpiNNaker link asynchronous input interface
 	Lin        => (others => '0'),
@@ -890,8 +949,8 @@ TX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	LoutAck    => '0',
 	
 	-- SpiNNaker link asynchronous input interface
-	Lin        => Tx_data_2of7_to_spinnaker,
-	LinAck     => Tx_ack_from_spinnaker,
+	Lin        => data_to_SPNN,
+	LinAck     => ack_from_SPNN,
 	
 	-- Control interface
 	enable     => SPNN_device_enable_Tx,
@@ -1048,11 +1107,15 @@ GTP_DEVICE_EMULATOR_i : GTP_Emulator
     )
   port map(
     -- GTP interface
-    RXGTP_AlignRequest_i   => LRx_RXGTP_AlignRequest,  -- : in  std_logic;
+    RxGtpAlignRequest_i    => LRx_RxGtpAlignRequest,  -- : in  std_logic;
+    TxGtpAlignRequest_o    => Tx_TxGtpAlignRequest,
     -- 
-    GTP_RxUsrClk2_o        => LRx_GTP_RxUsrClk2,       -- : out std_logic;                                      
+    GTP_RxUsrClk2_o        => LRx_GTP_RxUsrClk2,       -- : out std_logic;   
+    GTP_TxUsrClk2_o        => Tx_GTP_TxUsrClk2,
     GTP_SoftResetRx_i      => LRx_GTP_SoftResetRx,     -- : in  std_logic;                                     
-    GTP_DataValid_i        => LRx_GTP_DataValid,       -- : in  std_logic;                                      
+    GTP_SoftResetTx_i      => Tx_GTP_SoftResetTx,     -- : in  std_logic;                                     
+    GTP_DataValid_i        => LRx_GTP_DataValid,       -- : in  std_logic;        
+    --                              
     GTP_Rxuserrdy_i        => LRx_GTP_Rxuserrdy,       -- : in  std_logic;                                      
     GTP_Rxdata_o           => LRx_GTP_Rxdata,          -- : out std_logic_vector(C_GTP_DSIZE-1 downto 0);       
     GTP_Rxchariscomma_o    => LRx_GTP_Rxchariscomma,   -- : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
@@ -1060,15 +1123,30 @@ GTP_DEVICE_EMULATOR_i : GTP_Emulator
     GTP_Rxdisperr_o        => LRx_GTP_Rxdisperr,       -- : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
     GTP_Rxnotintable_o     => LRx_GTP_Rxnotintable,    -- : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);   
     GTP_Rxbyteisaligned_o  => LRx_GTP_Rxbyteisaligned, -- : out std_logic;                                      
-    GTP_Rxbyterealign_o    => LRx_GTP_Rxbyterealign,   -- : out std_logic;                                      
-    GTP_PllLock_o          => LRx_GTP_PllLock,         -- : out std_logic;                                      
-    GTP_PllRefclklost_o    => LRx_GTP_PllRefclklost    -- : out std_logic
+    GTP_Rxbyterealign_o    => LRx_GTP_Rxbyterealign,   -- : out std_logic;       
+    --
+    GTP_Txuserrdy_i        => Tx_GTP_Txuserrdy, 
+    GTP_Txdata_i           => Tx_GTP_Txdata, 
+    GTP_Txcharisk_i        => Tx_GTP_Txcharisk,
+    --                               
+    GTP_PllLock_o          => GTP_PllLock,         -- : out std_logic;                                      
+    GTP_PllRefclklost_o    => GTP_PllRefclklost    -- : out std_logic
     );
 
 
 -- --------------------------------------------------
 --  Unit Under Test: HPUcore
 -- --------------------------------------------------
+
+LRx_GTP_PllLock         <= GTP_PllLock;
+LRx_GTP_PllRefclklost   <= GTP_PllRefclklost;
+RRx_GTP_PllLock         <= GTP_PllLock;
+RRx_GTP_PllRefclklost   <= GTP_PllRefclklost;
+ARx_GTP_PllLock         <= GTP_PllLock;
+ARx_GTP_PllRefclklost   <= GTP_PllRefclklost;
+Tx_GTP_PllLock          <= GTP_PllLock;
+Tx_GTP_PllRefclklost    <= GTP_PllRefclklost;
+
 HPUCORE_i : HPUCore  
     generic map (
     
@@ -1078,7 +1156,7 @@ HPUCORE_i : HPUCore
         C_RX_PAER_L_SENS_ID         => "000",
         C_RX_PAER_R_SENS_ID         => "000",
         C_RX_PAER_A_SENS_ID         => "001",
-        C_TX_HAS_PAER               => false,
+        C_TX_HAS_PAER               => true,
         C_PAER_DSIZE                => 24,   
         -- -----------------------        
         -- HSSAER
@@ -1100,9 +1178,9 @@ HPUCORE_i : HPUCore
         C_TX_HSSAER_N_CHAN          => 3,
         -- -----------------------        
         -- GTP
-        C_RX_HAS_GTP                => true,
+        C_RX_HAS_GTP                => false,
         C_GTP_RXUSRCLK2_PERIOD_NS   => 6.4,     
-        C_TX_HAS_GTP                => false,
+        C_TX_HAS_GTP                => true,
         C_GTP_TXUSRCLK2_PERIOD_NS   => 6.4,  
         C_GTP_DSIZE                 => C_GTP_DSIZE,
         -- -----------------------                
@@ -1141,22 +1219,51 @@ HPUCORE_i : HPUCore
         HSSAER_ClkHS_p   			      => HSSAER_ClkHS_p, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
         HSSAER_ClkHS_n   			      => HSSAER_ClkHS_n, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
 
+
         --============================================
-        -- Rx Interface from Vision Sensor Controllers
+        -- Tx Interface
         --============================================
 
-        -- Left Sensor
-        ------------------
+        -- Parallel AER
+        Tx_PAER_Addr_o            	=> data_to_AER_Tx,
+        Tx_PAER_Req_o             	=> req_to_AER_Tx,
+        Tx_PAER_Ack_i             	=> ack_from_AER_Tx,
+        -- HSSAER channels
+        Tx_HSSAER_o               	=> open,
+        -- GTP lines
+        Tx_TxGtpMsg_i               => Tx_TxGtpMsg,
+        Tx_TxGtpMsgSrcRdy_i         => Tx_TxGtpMsgSrcRdy,
+        Tx_TxGtpMsgDstRdy_o         => Tx_TxGtpMsgDstRdy,
+        Tx_TxGtpAlignRequest_i      => Tx_TxGtpAlignRequest,
+        Tx_TxGtpAlignFlag_o         => Tx_TxGtpAlignFlag,
+        Tx_GTP_TxUsrClk2_i          => Tx_GTP_TxUsrClk2,
+        Tx_GTP_SoftResetTx_o        => Tx_GTP_SoftResetTx,
+        Tx_GTP_DataValid_o          => Tx_GTP_DataValid,
+        Tx_GTP_Txuserrdy_o          => Tx_GTP_Txuserrdy,
+        Tx_GTP_Txdata_o             => Tx_GTP_Txdata,
+        Tx_GTP_Txcharisk_o          => Tx_GTP_Txcharisk,
+        Tx_GTP_PllLock_i            => Tx_GTP_PllLock,
+        Tx_GTP_PllRefclklost_i      => Tx_GTP_PllRefclklost,
+        -- SpiNNaker Interface      
+        Tx_SPNN_Data_o              => data_to_SPNN,  --   : out std_logic_vector(6 downto 0);
+        Tx_SPNN_Ack_i               => ack_from_SPNN,      --   : in  std_logic;
+
+
+        --============================================
+        -- Rx Left Interface
+        --============================================
+
         -- Parallel AER
         LRx_PAER_Addr_i           	=> data_from_AER_L,
         LRx_PAER_Req_i            	=> req_from_AER_L,
         LRx_PAER_Ack_o            	=> ack_to_AER_L,
-
-        -- HSSAER interface
+        -- HSSAER channels
         LRx_HSSAER_i              	=> (others=> '0'),
-
-        -- GTP interface
-        LRx_RXGTP_AlignRequest_o    => LRx_RXGTP_AlignRequest,
+        -- GTP lines
+        LRx_RxGtpMsg_o              => LRx_RxGtpMsg,              
+        LRx_RxGtpMsgSrcRdy_o        => LRx_RxGtpMsgSrcRdy,        
+        LRx_RxGtpMsgDstRdy_i        => LRx_RxGtpMsgDstRdy,        
+        LRx_RxGtpAlignRequest_o     => LRx_RxGtpAlignRequest,
         LRx_GTP_RxUsrClk2_i         => LRx_GTP_RxUsrClk2,
         LRx_GTP_SoftResetRx_o       => LRx_GTP_SoftResetRx,
         LRx_GTP_DataValid_o         => LRx_GTP_DataValid,
@@ -1170,19 +1277,25 @@ HPUCORE_i : HPUCore
         LRx_GTP_Rxbyterealign_i     => LRx_GTP_Rxbyterealign,
         LRx_GTP_PllLock_i           => LRx_GTP_PllLock,
         LRx_GTP_PllRefclklost_i     => LRx_GTP_PllRefclklost,
+        -- SpiNNaker Interface 
+        LRx_SPNN_Data_i             => data_from_SPNN_L,  --   : out std_logic_vector(6 downto 0);
+        LRx_SPNN_Ack_o              => ack_to_SPNN_L,      --   : in  std_logic;        
 
-        -- Right Sensor
-        ------------------
+        --============================================
+        -- Rx Right Interface
+        --============================================
+
         -- Parallel AER
         RRx_PAER_Addr_i           	=> data_from_AER_R,
         RRx_PAER_Req_i            	=> req_from_AER_R,
         RRx_PAER_Ack_o            	=> ack_to_AER_R,
-
-        -- HSSAER interface
+        -- HSSAER channels
         RRx_HSSAER_i              	=> (others=> '0'),
-
-        -- GTP interface
-        RRx_RXGTP_AlignRequest_o    => RRx_RXGTP_AlignRequest,
+        -- GTP lines
+        RRx_RxGtpMsg_o              => RRx_RxGtpMsg,              
+        RRx_RxGtpMsgSrcRdy_o        => RRx_RxGtpMsgSrcRdy,        
+        RRx_RxGtpMsgDstRdy_i        => RRx_RxGtpMsgDstRdy,        
+        RRx_RxGtpAlignRequest_o     => RRx_RxGtpAlignRequest,
         RRx_GTP_RxUsrClk2_i         => RRx_GTP_RxUsrClk2,
         RRx_GTP_SoftResetRx_o       => RRx_GTP_SoftResetRx,
         RRx_GTP_DataValid_o         => RRx_GTP_DataValid,
@@ -1196,58 +1309,41 @@ HPUCORE_i : HPUCore
         RRx_GTP_Rxbyterealign_i     => RRx_GTP_Rxbyterealign,
         RRx_GTP_PllLock_i           => RRx_GTP_PllLock,
         RRx_GTP_PllRefclklost_i     => RRx_GTP_PllRefclklost,
-
-        -- Aux Sensor
-        ------------------
-        -- Parallel AER
-        AuxRx_PAER_Addr_i         	=> data_from_AER_Aux,
-        AuxRx_PAER_Req_i          	=> req_from_AER_Aux,
-        AuxRx_PAER_Ack_o          	=> ack_to_AER_Aux,
-
-        -- HSSAER interface
-        AuxRx_HSSAER_i            	=> (others=> '0'),
-
-        -- GTP interface
-        AuxRx_RXGTP_AlignRequest_o  => AuxRx_RXGTP_AlignRequest,
-        AuxRx_GTP_RxUsrClk2_i       => AuxRx_GTP_RxUsrClk2,  
-        AuxRx_GTP_SoftResetRx_o     => AuxRx_GTP_SoftResetRx,  
-        AuxRx_GTP_DataValid_o       => AuxRx_GTP_DataValid,  
-        AuxRx_GTP_Rxuserrdy_o       => AuxRx_GTP_Rxuserrdy,  
-        AuxRx_GTP_Rxdata_i          => AuxRx_GTP_Rxdata,  
-        AuxRx_GTP_Rxchariscomma_i   => AuxRx_GTP_Rxchariscomma,  
-        AuxRx_GTP_Rxcharisk_i       => AuxRx_GTP_Rxcharisk,  
-        AuxRx_GTP_Rxdisperr_i       => AuxRx_GTP_Rxdisperr,  
-        AuxRx_GTP_Rxnotintable_i    => AuxRx_GTP_Rxnotintable,  
-        AuxRx_GTP_Rxbyteisaligned_i => AuxRx_GTP_Rxbyteisaligned,  
-        AuxRx_GTP_Rxbyterealign_i   => AuxRx_GTP_Rxbyterealign,  
-        AuxRx_GTP_PllLock_i         => AuxRx_GTP_PllLock,  
-        AuxRx_GTP_PllRefclklost_i   => AuxRx_GTP_PllRefclklost,
-
-        -- SpiNNlink interface
-        LRx_data_2of7_from_spinnaker_i   => LRx_data_2of7_from_spinnaker,   -- in  std_logic_vector(6 downto 0); 
-        LRx_ack_to_spinnaker_o           => LRx_ack_to_spinnaker,           -- out std_logic;
-        RRx_data_2of7_from_spinnaker_i   => RRx_data_2of7_from_spinnaker,   -- in  std_logic_vector(6 downto 0); 
-        RRx_ack_to_spinnaker_o           => RRx_ack_to_spinnaker,           -- out std_logic;
-        AuxRx_data_2of7_from_spinnaker_i => AuxRx_data_2of7_from_spinnaker, -- in  std_logic_vector(6 downto 0); 
-        AuxRx_ack_to_spinnaker_o         => AuxRx_ack_to_spinnaker,         -- out std_logic;
+        -- SpiNNaker Interface 
+        RRx_SPNN_Data_i             => data_from_SPNN_R,  --   : out std_logic_vector(6 downto 0);
+        RRx_SPNN_Ack_o              => ack_to_SPNN_R,      --   : in  std_logic;        
 
         --============================================
-        -- Tx Interface
+        -- Rx Auxiliary Interface
         --============================================
 
-        -- Parallel AER
-        Tx_PAER_Addr_o            	=> data_to_AER_Tx,
-        Tx_PAER_Req_o             	=> req_to_AER_Tx,
-        Tx_PAER_Ack_i             	=> ack_from_AER_Tx,
-
-        -- HSSAER interface
-        Tx_HSSAER_o               	=> open,
-
-        -- GTP interface
-
-        -- SpiNNlink interface
-        Tx_data_2of7_to_spinnaker_o  => Tx_data_2of7_to_spinnaker,  --   : out std_logic_vector(6 downto 0);
-        Tx_ack_from_spinnaker_i      => Tx_ack_from_spinnaker,      --   : in  std_logic;
+        -- Parallel AER 
+        ARx_PAER_Addr_i           	=> data_from_AER_Aux,
+        ARx_PAER_Req_i            	=> req_from_AER_Aux,
+        ARx_PAER_Ack_o            	=> ack_to_AER_Aux,
+        -- HSSAER channels
+        ARx_HSSAER_i              	=> (others=> '0'),
+        -- GTP lines
+        ARx_RxGtpMsg_o              => ARx_RxGtpMsg,              
+        ARx_RxGtpMsgSrcRdy_o        => ARx_RxGtpMsgSrcRdy,        
+        ARx_RxGtpMsgDstRdy_i        => ARx_RxGtpMsgDstRdy,        
+        ARx_RxGtpAlignRequest_o     => ARx_RxGtpAlignRequest,
+        ARx_GTP_RxUsrClk2_i         => ARx_GTP_RxUsrClk2,
+        ARx_GTP_SoftResetRx_o       => ARx_GTP_SoftResetRx,
+        ARx_GTP_DataValid_o         => ARx_GTP_DataValid,
+        ARx_GTP_Rxuserrdy_o         => ARx_GTP_Rxuserrdy,
+        ARx_GTP_Rxdata_i            => ARx_GTP_Rxdata,
+        ARx_GTP_Rxchariscomma_i     => ARx_GTP_Rxchariscomma,
+        ARx_GTP_Rxcharisk_i         => ARx_GTP_Rxcharisk,
+        ARx_GTP_Rxdisperr_i         => ARx_GTP_Rxdisperr,
+        ARx_GTP_Rxnotintable_i      => ARx_GTP_Rxnotintable,
+        ARx_GTP_Rxbyteisaligned_i   => ARx_GTP_Rxbyteisaligned,
+        ARx_GTP_Rxbyterealign_i     => ARx_GTP_Rxbyterealign,
+        ARx_GTP_PllLock_i           => ARx_GTP_PllLock,
+        ARx_GTP_PllRefclklost_i     => ARx_GTP_PllRefclklost,
+        -- SpiNNaker Interface 
+        ARx_SPNN_Data_i             => data_from_SPNN_A,  --   : out std_logic_vector(6 downto 0);
+        ARx_SPNN_Ack_o              => ack_to_SPNN_A,      --   : in  std_logic;         
         
         --============================================
         -- Interception

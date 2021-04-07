@@ -176,6 +176,7 @@ port (
     RxGtpMsgSrcRdy_o           : out std_logic;
     RxGtpMsgDstRdy_i           : in  std_logic;    
     
+    
     -- **********************************************
     -- Debug signals
     -- **********************************************
