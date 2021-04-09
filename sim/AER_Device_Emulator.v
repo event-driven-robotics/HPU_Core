@@ -84,8 +84,6 @@ begin
   AERout = 0;
   AERoutReq  = 1'b0;               // active HIGH!
 
-  wait (rst);
-  wait (!rst);
   
   # 1000;
 
@@ -117,14 +115,11 @@ initial
 begin
   AERinAck = 1'b0;  // active HIGH!
 
-  wait (rst);
-  wait (!rst);
-
   forever
   begin
     wait (AERinReq);  // active HIGH
     # AER_HSDLY
-      AERinAck = 1'b1;
+      AERinAck = enable;
 
     wait (!AERinReq);
     # AER_HSDLY

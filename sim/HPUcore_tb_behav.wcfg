@@ -20,17 +20,17 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="72747447030fs"></ZoomStartTime>
-      <ZoomEndTime time="74047759253fs"></ZoomEndTime>
-      <Cursor1Time time="73196444000fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="317685000001fs"></ZoomEndTime>
+      <Cursor1Time time="244804139000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="292"></NameColumnWidth>
-      <ValueColumnWidth column_width="110"></ValueColumnWidth>
+      <ValueColumnWidth column_width="98"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="174" />
    <wave_markers>
-      <marker time="529052925000" label="" />
+      <marker time="99484800000" label="" />
    </wave_markers>
    <wvobject fp_name="/HPUcore_tb/HSSAER_ClkLS_p" type="logic">
       <obj_property name="ElementShortName">HSSAER_ClkLS_p</obj_property>
@@ -255,10 +255,10 @@
       <wvobject fp_name="group425" type="group">
          <obj_property name="label">AER Emulator</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="group394" type="group">
             <obj_property name="label">AER Emulator - Left</obj_property>
             <obj_property name="DisplayName">label</obj_property>
-            <obj_property name="isExpanded"></obj_property>
             <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERout" type="array">
                <obj_property name="ElementShortName">AERout[23:0]</obj_property>
                <obj_property name="ObjectShortName">AERout[23:0]</obj_property>
@@ -270,18 +270,6 @@
             <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERoutAck" type="logic">
                <obj_property name="ElementShortName">AERoutAck</obj_property>
                <obj_property name="ObjectShortName">AERoutAck</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERin" type="array">
-               <obj_property name="ElementShortName">AERin[23:0]</obj_property>
-               <obj_property name="ObjectShortName">AERin[23:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERinReq" type="logic">
-               <obj_property name="ElementShortName">AERinReq</obj_property>
-               <obj_property name="ObjectShortName">AERinReq</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/AERinAck" type="logic">
-               <obj_property name="ElementShortName">AERinAck</obj_property>
-               <obj_property name="ObjectShortName">AERinAck</obj_property>
             </wvobject>
             <wvobject fp_name="/HPUcore_tb/L_AER_DEVICE_EMULATOR_i/enable" type="logic">
                <obj_property name="ElementShortName">enable</obj_property>
@@ -311,18 +299,6 @@
                <obj_property name="ElementShortName">AERoutAck</obj_property>
                <obj_property name="ObjectShortName">AERoutAck</obj_property>
             </wvobject>
-            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AERin" type="array">
-               <obj_property name="ElementShortName">AERin[23:0]</obj_property>
-               <obj_property name="ObjectShortName">AERin[23:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AERinReq" type="logic">
-               <obj_property name="ElementShortName">AERinReq</obj_property>
-               <obj_property name="ObjectShortName">AERinReq</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/AERinAck" type="logic">
-               <obj_property name="ElementShortName">AERinAck</obj_property>
-               <obj_property name="ObjectShortName">AERinAck</obj_property>
-            </wvobject>
             <wvobject fp_name="/HPUcore_tb/R_AER_DEVICE_EMULATOR_i/enable" type="logic">
                <obj_property name="ElementShortName">enable</obj_property>
                <obj_property name="ObjectShortName">enable</obj_property>
@@ -351,18 +327,6 @@
                <obj_property name="ElementShortName">AERoutAck</obj_property>
                <obj_property name="ObjectShortName">AERoutAck</obj_property>
             </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AERin" type="array">
-               <obj_property name="ElementShortName">AERin[23:0]</obj_property>
-               <obj_property name="ObjectShortName">AERin[23:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AERinReq" type="logic">
-               <obj_property name="ElementShortName">AERinReq</obj_property>
-               <obj_property name="ObjectShortName">AERinReq</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/AERinAck" type="logic">
-               <obj_property name="ElementShortName">AERinAck</obj_property>
-               <obj_property name="ObjectShortName">AERinAck</obj_property>
-            </wvobject>
             <wvobject fp_name="/HPUcore_tb/AUX_AER_DEVICE_EMULATOR_i/enable" type="logic">
                <obj_property name="ElementShortName">enable</obj_property>
                <obj_property name="ObjectShortName">enable</obj_property>
@@ -379,54 +343,6 @@
          <wvobject fp_name="group424" type="group">
             <obj_property name="label">AER Emulator - TX</obj_property>
             <obj_property name="DisplayName">label</obj_property>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERout" type="array">
-               <obj_property name="ElementShortName">AERout[23:0]</obj_property>
-               <obj_property name="ObjectShortName">AERout[23:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERoutReq" type="logic">
-               <obj_property name="ElementShortName">AERoutReq</obj_property>
-               <obj_property name="ObjectShortName">AERoutReq</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERoutAck" type="logic">
-               <obj_property name="ElementShortName">AERoutAck</obj_property>
-               <obj_property name="ObjectShortName">AERoutAck</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERin" type="array">
-               <obj_property name="ElementShortName">AERin[23:0]</obj_property>
-               <obj_property name="ObjectShortName">AERin[23:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERinReq" type="logic">
-               <obj_property name="ElementShortName">AERinReq</obj_property>
-               <obj_property name="ObjectShortName">AERinReq</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERinAck" type="logic">
-               <obj_property name="ElementShortName">AERinAck</obj_property>
-               <obj_property name="ObjectShortName">AERinAck</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/enable" type="logic">
-               <obj_property name="ElementShortName">enable</obj_property>
-               <obj_property name="ObjectShortName">enable</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/rst" type="logic">
-               <obj_property name="ElementShortName">rst</obj_property>
-               <obj_property name="ObjectShortName">rst</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AER_HSDLY" type="array">
-               <obj_property name="ElementShortName">AER_HSDLY[31:0]</obj_property>
-               <obj_property name="ObjectShortName">AER_HSDLY[31:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERout" type="array">
-               <obj_property name="ElementShortName">AERout[23:0]</obj_property>
-               <obj_property name="ObjectShortName">AERout[23:0]</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERoutReq" type="logic">
-               <obj_property name="ElementShortName">AERoutReq</obj_property>
-               <obj_property name="ObjectShortName">AERoutReq</obj_property>
-            </wvobject>
-            <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERoutAck" type="logic">
-               <obj_property name="ElementShortName">AERoutAck</obj_property>
-               <obj_property name="ObjectShortName">AERoutAck</obj_property>
-            </wvobject>
             <wvobject fp_name="/HPUcore_tb/AER_DEVICE_EMULATOR_Tx_i/AERin" type="array">
                <obj_property name="ElementShortName">AERin[23:0]</obj_property>
                <obj_property name="ObjectShortName">AERin[23:0]</obj_property>
@@ -708,6 +624,7 @@
    <wvobject fp_name="group384" type="group">
       <obj_property name="label">PAER</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="group141" type="group">
          <obj_property name="label">PAER - RX Right</obj_property>
          <obj_property name="DisplayName">label</obj_property>
@@ -818,18 +735,26 @@
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TREADY" type="logic">
          <obj_property name="ElementShortName">S_AXIS_TREADY</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TREADY</obj_property>
+         <obj_property name="CustomSignalColor">#FF0080</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TDATA" type="array">
          <obj_property name="ElementShortName">S_AXIS_TDATA[31:0]</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TDATA[31:0]</obj_property>
+         <obj_property name="CustomSignalColor">#FF0080</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TLAST" type="logic">
          <obj_property name="ElementShortName">S_AXIS_TLAST</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TLAST</obj_property>
+         <obj_property name="CustomSignalColor">#FF0080</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TVALID" type="logic">
          <obj_property name="ElementShortName">S_AXIS_TVALID</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TVALID</obj_property>
+         <obj_property name="CustomSignalColor">#FF0080</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/M_AXIS_TDATA" type="array">
          <obj_property name="ElementShortName">M_AXIS_TDATA[31:0]</obj_property>
@@ -1259,34 +1184,50 @@
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/Tx_GTP_TxUsrClk2_i" type="logic">
             <obj_property name="ElementShortName">Tx_GTP_TxUsrClk2_i</obj_property>
             <obj_property name="ObjectShortName">Tx_GTP_TxUsrClk2_i</obj_property>
+            <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/Tx_GTP_SoftResetTx_o" type="logic">
             <obj_property name="ElementShortName">Tx_GTP_SoftResetTx_o</obj_property>
             <obj_property name="ObjectShortName">Tx_GTP_SoftResetTx_o</obj_property>
+            <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/Tx_GTP_DataValid_o" type="logic">
             <obj_property name="ElementShortName">Tx_GTP_DataValid_o</obj_property>
             <obj_property name="ObjectShortName">Tx_GTP_DataValid_o</obj_property>
+            <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/Tx_GTP_Txuserrdy_o" type="logic">
             <obj_property name="ElementShortName">Tx_GTP_Txuserrdy_o</obj_property>
             <obj_property name="ObjectShortName">Tx_GTP_Txuserrdy_o</obj_property>
+            <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/Tx_GTP_Txdata_o" type="array">
             <obj_property name="ElementShortName">Tx_GTP_Txdata_o[15:0]</obj_property>
             <obj_property name="ObjectShortName">Tx_GTP_Txdata_o[15:0]</obj_property>
+            <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/Tx_GTP_Txcharisk_o" type="array">
             <obj_property name="ElementShortName">Tx_GTP_Txcharisk_o[1:0]</obj_property>
             <obj_property name="ObjectShortName">Tx_GTP_Txcharisk_o[1:0]</obj_property>
+            <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/Tx_GTP_PllLock_i" type="logic">
             <obj_property name="ElementShortName">Tx_GTP_PllLock_i</obj_property>
             <obj_property name="ObjectShortName">Tx_GTP_PllLock_i</obj_property>
+            <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
          </wvobject>
          <wvobject fp_name="/HPUcore_tb/HPUCORE_i/Tx_GTP_PllRefclklost_i" type="logic">
             <obj_property name="ElementShortName">Tx_GTP_PllRefclklost_i</obj_property>
             <obj_property name="ObjectShortName">Tx_GTP_PllRefclklost_i</obj_property>
+            <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+            <obj_property name="UseCustomSignalColor">true</obj_property>
          </wvobject>
       </wvobject>
       <wvobject fp_name="group440" type="group">

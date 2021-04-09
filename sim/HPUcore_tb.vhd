@@ -68,12 +68,27 @@ end HPUcore_tb;
  
 architecture behavior of HPUcore_tb is 
  
+-- Clock generation constants
+
+constant CLK_FREQ_c                    : real := 100.0; -- MHz                
+constant CLK_HALF_PERIOD_c             : time := 5.0 ns;
+
+constant CLK_HSSAER_LS_FREQ_c          : real := 100.0; -- MHz                
+constant CLK_HSSAER_LS_HALF_PERIOD_c   : time := 5.0 ns;
+
+constant CLK_HSSAER_HS_FREQ_c          : real := 300.0; -- MHz           
+constant CLK_HSSAER_HS_HALF_PERIOD_1_c : time := 1667 ps;  
+constant CLK_HSSAER_HS_HALF_PERIOD_2_c : time := 1666 ps;
+constant CLK_HSSAER_HS_HALF_PERIOD_3_c : time := 1667 ps;  
+constant CLK_HSSAER_HS_HALF_PERIOD_4_c : time := 1667 ps;
+constant CLK_HSSAER_HS_HALF_PERIOD_5_c : time := 1666 ps;  
+constant CLK_HSSAER_HS_HALF_PERIOD_6_c : time := 1667 ps;
  
-constant F_HSCLK : real := 300.0; -- MHz
-constant T_HSCLK : time := ((1.0/F_HSCLK)/2.0) * (1 us);
- 
-constant F_LSCLK : real := 100.0; -- MHz
-constant T_LSCLK : time := ((1.0/F_LSCLK)/2.0) * (1 us); 
+-- constant F_HSCLK : real := 300.0; -- MHz
+-- constant T_HSCLK : time := ((1.0/F_HSCLK)/2.0) * (1 us);
+--  
+-- constant F_LSCLK : real := 100.0; -- MHz
+-- constant T_LSCLK : time := ((1.0/F_LSCLK)/2.0) * (1 us); 
  
 -- --------------------------------------------------
 --  Unit Under Test: HPUcore
@@ -652,6 +667,7 @@ signal SPNN_device_enable_Tx    : std_logic;
 signal SPNN_device_reset_Tx	    : std_logic;
 
 -- Clocks
+signal Clk                		: std_logic;
 signal HSSAER_ClkLS_p      		: std_logic;
 signal HSSAER_ClkLS_n      		: std_logic;
 signal HSSAER_ClkHS_p      		: std_logic;
@@ -1092,7 +1108,7 @@ AER_DEVICE_EMULATOR_Tx_i : AER_Device_Emulator
 		-- AER Device asynchronous input interface
 		AERin		=> data_to_AER_Tx,
 		AERinReq    => req_to_AER_Tx,
-		AERinAck    => ack_from_AER_Tx,
+		AERinAck    => ack_from_AER_Tx, 
 
 		-- Control interface
 		enable		=> AER_device_enable_Tx,
@@ -1505,16 +1521,16 @@ end process Start_Proc;
 
 Enable_AER_Proc : process
 	begin
-		AER_device_enable_L   <= '0';
-		AER_device_enable_R   <= '0';
-		AER_device_enable_Aux <= '0';
-		AER_device_enable_Tx  <= '0';
+		AER_device_enable_L   <= '1';
+		AER_device_enable_R   <= '1';
+		AER_device_enable_Aux <= '1';
+		AER_device_enable_Tx  <= '1';
 
 		wait for 30 us;
-		AER_device_enable_L   <= '0';
-		AER_device_enable_R   <= '0';
-		AER_device_enable_Aux <= '0';
-		AER_device_enable_Tx  <= '0';
+		AER_device_enable_L   <= '1';
+		AER_device_enable_R   <= '1';
+		AER_device_enable_Aux <= '1';
+		AER_device_enable_Tx  <= '1';
 		wait;
 end process Enable_AER_Proc;
 
@@ -1529,38 +1545,7 @@ Enable_SPNN_Proc : process
     SPNN_device_enable_R   <= '0';
     SPNN_device_enable_Tx  <= '0';
     SPNN_device_enable_Aux <= '0';
-		
-		wait for 1 us;
-    SPNN_device_reset_L   <= '1';
-    SPNN_device_reset_R   <= '1';
-    SPNN_device_reset_Tx  <= '1';
-    SPNN_device_reset_Aux <= '1';
-
-		wait for 1 us;
-    SPNN_device_reset_L   <= '1';
-    SPNN_device_reset_R   <= '1';
-    SPNN_device_reset_Tx  <= '1';
-    SPNN_device_reset_Aux <= '1';
-        
-        
-		wait for 10 us;		
-    SPNN_device_enable_L   <= '0';
-    SPNN_device_enable_R   <= '0';
-    SPNN_device_enable_Tx  <= '0';
-    SPNN_device_enable_Aux <= '0';        
-    
-    wait for 200 us;        
-    SPNN_device_enable_L   <= '0';
-    SPNN_device_enable_R   <= '0';
-    SPNN_device_enable_Tx  <= '0';
-    SPNN_device_enable_Aux <= '0'; 
-           
-    wait for 600 us;        
-    SPNN_device_enable_L   <= '0';
-    SPNN_device_enable_R   <= '0';
-    SPNN_device_enable_Tx  <= '0';
-    SPNN_device_enable_Aux <= '0'; 
-        
+ 
 		wait;
 end process Enable_SPNN_Proc;
 
@@ -1614,15 +1599,31 @@ begin
     end loop;
 end process log_file_writing;
 
+
+
+-- ---------------------------------------------
+-- CLOCKs
+
+Sys_Clock_Proc : process
+	begin
+		Clk <= '0';
+    wait for CLK_HALF_PERIOD_c;
+		loop
+			Clk <= not Clk;
+			wait for CLK_HALF_PERIOD_c;
+		end loop;
+end process Sys_Clock_Proc;
+
 LS_Clock_Proc : process
 	begin
 		HSSAER_ClkLS_p <= '0';
 		HSSAER_ClkLS_n <= '1';
-		wait until i_resetn='1';
+--		wait until i_resetn='1';
+    wait for CLK_HSSAER_LS_HALF_PERIOD_c;
 		loop
 			HSSAER_ClkLS_p <= not HSSAER_ClkLS_p;
 			HSSAER_ClkLS_n <= not HSSAER_ClkLS_n;
-			wait for T_HSCLK * 3;
+			wait for CLK_HSSAER_LS_HALF_PERIOD_c;
 		end loop;
 end process LS_Clock_Proc;
 
@@ -1630,12 +1631,29 @@ HS_Clock_Proc : process
 	begin
 		HSSAER_ClkHS_p <= '0';
 		HSSAER_ClkHS_n <= '1';
-		wait until i_resetn='1';
+--		wait until i_resetn='1';
 		loop
 			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
 			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
-			wait for T_HSCLK;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_1_c;
+			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
+			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_2_c;
+			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
+			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_3_c;
+			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
+			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_4_c;
+			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
+			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_5_c;
+			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
+			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_6_c;			
 		end loop;
 end process HS_Clock_Proc;
+
+
 
 END;
