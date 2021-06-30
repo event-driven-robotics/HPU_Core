@@ -31,180 +31,185 @@ library HPU_lib;
 --****************************
 
 entity neuserial_axilite is
-    generic (
-        C_DATA_WIDTH : integer range 16 to 32;                  -- HPU_libs only when  C_DATA_WIDTH = 32 !!!
-C_ADDR_WIDTH : integer range  5 to 32;
-C_SLV_DWIDTH : integer := 32;                           -- HPU_libs only when  C_SLV_DWIDTH = 32 !!!
--- HSSAER lines parameters
-C_RX_HAS_PAER              : boolean;
-C_RX_HAS_GTP               : boolean;
-C_RX_HAS_SPNNLNK           : boolean;
-C_RX_HAS_HSSAER            : boolean;
-C_RX_HSSAER_N_CHAN         : natural range 1 to 4;
-C_TX_HAS_PAER              : boolean;
-C_TX_HAS_GTP               : boolean;
-C_TX_HAS_SPNNLNK           : boolean;
-C_TX_HAS_HSSAER            : boolean;
-C_TX_HSSAER_N_CHAN         : natural range 1 to 4
-);
-port (
--- ADD USER PORTS BELOW THIS LINE ------------------
-
--- Interrupt
--------------------------
-RawInterrupt_i                 : in  std_logic_vector(15 downto 0);
-InterruptLine_o                : out std_logic;
-
--- RX Buffer Reg
--------------------------
-ReadRxBuffer_o                 : out std_logic;
-RxDataBuffer_i                 : in  std_logic_vector(31 downto 0);
-RxTimeBuffer_i                 : in  std_logic_vector(31 downto 0);
-RxFifoThresholdNumData_o       : out std_logic_vector(10 downto 0);
--- Tx Buffer Reg
--------------------------
-WriteTxBuffer_o                : out std_logic;
-TxDataBuffer_o                 : out std_logic_vector(31 downto 0);
-
-
--- Controls
--------------------------
-DMA_is_running_i               : in  std_logic;
-EnableDMAIf_o                  : out std_logic;
-ResetStream_o                  : out std_logic;
-DmaLength_o                    : out std_logic_vector(15 downto 0);
-DMA_test_mode_o                : out std_logic;
-fulltimestamp_o                : out std_logic;
-
-CleanTimer_o                   : out std_logic;
-FlushRXFifos_o                 : out std_logic;
-FlushTXFifos_o                 : out std_logic;
-LatTlast_o                     : out std_logic;
-TlastCnt_i                     : in  std_logic_vector(31 downto 0);
-TDataCnt_i                     : in  std_logic_vector(31 downto 0);
-TlastTO_o                      : out std_logic_vector(31 downto 0);
-TlastTOwritten_o               : out std_logic;
-
---TxEnable_o                     : out std_logic;
---TxPaerFlushFifos_o             : out std_logic;
---LRxEnable_o                    : out std_logic;
---RRxEnable_o                    : out std_logic;
-LRxPaerFlushFifos_o            : out std_logic;
-RRxPaerFlushFifos_o            : out std_logic;
-AuxRxPaerFlushFifos_o          : out std_logic;
-
--- Configurations
--------------------------
-DefLocFarLpbk_i                : in  std_logic;
-DefLocNearLpbk_i               : in  std_logic;
---EnableLoopBack_o               : out std_logic;
-RemoteLoopback_o               : out std_logic;
-LocNearLoopback_o              : out std_logic;
-LocFarLPaerLoopback_o          : out std_logic;
-LocFarRPaerLoopback_o          : out std_logic;
-LocFarAuxPaerLoopback_o        : out std_logic;
-LocFarLSaerLoopback_o          : out std_logic;
-LocFarRSaerLoopback_o          : out std_logic;
-LocFarAuxSaerLoopback_o        : out std_logic;
-LocFarSaerLpbkCfg_o            : out t_XConCfg;
-LocFarSpnnLnkLoopbackSel_o     : out  std_logic_vector(1 downto 0);
-                               
---EnableIp_o                     : out std_logic;
-                               
-TxPaerEn_o                     : out std_logic;
-TxHSSaerEn_o                   : out std_logic;
-TxGtpEn_o                      : out std_logic;
-TxSpnnLnkEn_o                  : out std_logic;
-TxDestSwitch_o                 : out std_logic_vector(2 downto 0);
---TxPaerIgnoreFifoFull_o         : out std_logic;
-TxPaerReqActLevel_o            : out std_logic;
-TxPaerAckActLevel_o            : out std_logic;
-TxSaerChanEn_o                 : out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
-
--- TX Timestamp
-TxTSMode_o                     : out std_logic_vector(1 downto 0);
-TxTSTimeoutSel_o               : out std_logic_vector(3 downto 0);
-TxTSRetrigCmd_o                : out std_logic;
-TxTSRearmCmd_o                 : out std_logic;
-TxTSRetrigStatus_i             : in  std_logic;
-TxTSTimeoutCounts_i            : in  std_logic;
-TxTSMaskSel_o                  : out std_logic_vector(1 downto 0);
-
---
-LRxPaerEn_o                    : out std_logic;
-RRxPaerEn_o                    : out std_logic;
-AUXRxPaerEn_o                  : out std_logic;
-LRxHSSaerEn_o                  : out std_logic;
-RRxHSSaerEn_o                  : out std_logic;
-AUXRxHSSaerEn_o                : out std_logic;
-LRxGtpEn_o                     : out std_logic;
-RRxGtpEn_o                     : out std_logic;
-AUXRxGtpEn_o                   : out std_logic;
-LRxSpnnLnkEn_o                 : out std_logic;
-RRxSpnnLnkEn_o                 : out std_logic;
-AUXRxSpnnLnkEn_o               : out std_logic;
-LRxSaerChanEn_o                : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-RRxSaerChanEn_o                : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-AUXRxSaerChanEn_o              : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-RxPaerReqActLevel_o            : out std_logic;
-RxPaerAckActLevel_o            : out std_logic;
-RxPaerIgnoreFifoFull_o         : out std_logic;
-RxPaerAckSetDelay_o            : out std_logic_vector(7 downto 0);
-RxPaerSampleDelay_o            : out std_logic_vector(7 downto 0);
-RxPaerAckRelDelay_o            : out std_logic_vector(7 downto 0);
-                               
--- Status                      
--------------------------
-WrapDetected_i                 : in  std_logic;
-
-TxSaerStat_i                   : in  t_TxSaerStat_array(C_TX_HSSAER_N_CHAN-1 downto 0);
-LRxSaerStat_i                  : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-RRxSaerStat_i                  : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-AUXRxSaerStat_i                : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-TxSpnnlnkStat_i                : in  t_TxSpnnlnkStat;
-LRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
-RRxSpnnlnkStat_i               : in  t_RxSpnnlnkStat;
-AuxRxSpnnlnkStat_i             : in  t_RxSpnnlnkStat;
-                               
--- Spinnaker                     
--------------------------
-Spnn_start_key_o               : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
-Spnn_stop_key_o                : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
-Spnn_tx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
-Spnn_rx_mask_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
-Spnn_ctrl_o                    : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
-Spnn_status_i                  : in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
-
--- DEBUG
--------------------------
-DBG_CTRL_reg                   : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-DBG_ctrl_rd                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-
--- ADD USER PORTS ABOVE THIS LINE ------------------
-
--- DO NOT EDIT BELOW THIS LINE ---------------------
--- Bus protocol ports, do not add to or delete
--- Axi lite I-f
-S_AXI_ACLK                     : in  std_logic;
-S_AXI_ARESETN                  : in  std_logic;
-S_AXI_AWADDR                   : in  std_logic_vector(C_ADDR_WIDTH-1 downto 0);
-S_AXI_AWVALID                  : in  std_logic;
-S_AXI_WDATA                    : in  std_logic_vector(C_DATA_WIDTH-1 downto 0);
-S_AXI_WSTRB                    : in  std_logic_vector(3 downto 0);
-S_AXI_WVALID                   : in  std_logic;
-S_AXI_BREADY                   : in  std_logic;
-S_AXI_ARADDR                   : in  std_logic_vector(C_ADDR_WIDTH-1 downto 0);
-S_AXI_ARVALID                  : in  std_logic;
-S_AXI_RREADY                   : in  std_logic;
-S_AXI_ARREADY                  : out std_logic;
-S_AXI_RDATA                    : out std_logic_vector(C_DATA_WIDTH-1 downto 0);
-S_AXI_RRESP                    : out std_logic_vector(1 downto 0);
-S_AXI_RVALID                   : out std_logic;
-S_AXI_WREADY                   : out std_logic;
-S_AXI_BRESP                    : out std_logic_vector(1 downto 0);
-S_AXI_BVALID                   : out std_logic;
-S_AXI_AWREADY                  : out std_logic
--- DO NOT EDIT ABOVE THIS LINE ---------------------
+  generic (
+    C_DATA_WIDTH                    : integer range 16 to 32  := 32;   -- HPU_libs only when  C_DATA_WIDTH = 32 !!!
+    C_ADDR_WIDTH                    : integer range  5 to 32  :=  8;
+    C_SLV_DWIDTH                    : integer                 := 32;   -- HPU_libs only when  C_SLV_DWIDTH = 32 !!!
+    C_RX_L_HAS_PAER                 : boolean                 := true;
+    C_RX_R_HAS_PAER                 : boolean                 := true;
+    C_RX_A_HAS_PAER                 : boolean                 := true;
+    C_RX_L_HAS_HSSAER               : boolean                 := true;
+    C_RX_R_HAS_HSSAER               : boolean                 := true;
+    C_RX_A_HAS_HSSAER               : boolean                 := true;
+    C_RX_HSSAER_N_CHAN              : natural range 1 to 4    := 4;
+    C_RX_L_HAS_GTP                  : boolean                 := true;
+    C_RX_R_HAS_GTP                  : boolean                 := true;
+    C_RX_A_HAS_GTP                  : boolean                 := true;
+    C_RX_L_HAS_SPNNLNK              : boolean                 := true;
+    C_RX_R_HAS_SPNNLNK              : boolean                 := true;
+    C_RX_A_HAS_SPNNLNK              : boolean                 := true;
+    --
+    C_TX_HAS_PAER                   : boolean                 := true;
+    C_TX_HAS_HSSAER                 : boolean                 := true;
+    C_TX_HSSAER_N_CHAN              : natural range 1 to 4    := 4;
+    C_TX_HAS_GTP                    : boolean                 := true;
+    C_TX_HAS_SPNNLNK                : boolean                 := true
+    );
+    port (
+    
+    -- Interrupt
+    -------------------------
+    RawInterrupt_i                  : in  std_logic_vector(15 downto 0);
+    InterruptLine_o                 : out std_logic;
+    
+    -- RX Buffer Reg
+    -------------------------
+    ReadRxBuffer_o                  : out std_logic;
+    RxDataBuffer_i                  : in  std_logic_vector(31 downto 0);
+    RxTimeBuffer_i                  : in  std_logic_vector(31 downto 0);
+    RxFifoThresholdNumData_o        : out std_logic_vector(10 downto 0);
+    -- Tx Buffer Reg
+    -------------------------
+    WriteTxBuffer_o                 : out std_logic;
+    TxDataBuffer_o                  : out std_logic_vector(31 downto 0);
+    
+    
+    -- Controls
+    -------------------------
+    DMA_is_running_i                : in  std_logic;
+    EnableDMAIf_o                   : out std_logic;
+    ResetStream_o                   : out std_logic;
+    DmaLength_o                     : out std_logic_vector(15 downto 0);
+    DMA_test_mode_o                 : out std_logic;
+    fulltimestamp_o                 : out std_logic;
+    
+    CleanTimer_o                    : out std_logic;
+    FlushRXFifos_o                  : out std_logic;
+    FlushTXFifos_o                  : out std_logic;
+    LatTlast_o                      : out std_logic;
+    TlastCnt_i                      : in  std_logic_vector(31 downto 0);
+    TDataCnt_i                      : in  std_logic_vector(31 downto 0);
+    TlastTO_o                       : out std_logic_vector(31 downto 0);
+    TlastTOwritten_o                : out std_logic;
+    
+    --TxEnable_o                     : out std_logic;
+    --TxPaerFlushFifos_o             : out std_logic;
+    --LRxEnable_o                    : out std_logic;
+    --RRxEnable_o                    : out std_logic;
+    LRxPaerFlushFifos_o             : out std_logic;
+    RRxPaerFlushFifos_o             : out std_logic;
+    AuxRxPaerFlushFifos_o           : out std_logic;
+    
+    -- Configurations
+    -------------------------
+    DefLocFarLpbk_i                 : in  std_logic;
+    DefLocNearLpbk_i                : in  std_logic;
+    --EnableLoopBack_o               : out std_logic;
+    RemoteLoopback_o                : out std_logic;
+    LocNearLoopback_o               : out std_logic;
+    LocFarLPaerLoopback_o           : out std_logic;
+    LocFarRPaerLoopback_o           : out std_logic;
+    LocFarAuxPaerLoopback_o         : out std_logic;
+    LocFarLSaerLoopback_o           : out std_logic;
+    LocFarRSaerLoopback_o           : out std_logic;
+    LocFarAuxSaerLoopback_o         : out std_logic;
+    LocFarSaerLpbkCfg_o             : out t_XConCfg;
+    LocFarSpnnLnkLoopbackSel_o      : out  std_logic_vector(1 downto 0);
+                                   
+    --EnableIp_o                     : out std_logic;
+                                   
+    TxPaerEn_o                      : out std_logic;
+    TxHSSaerEn_o                    : out std_logic;
+    TxGtpEn_o                       : out std_logic;
+    TxSpnnLnkEn_o                   : out std_logic;
+    TxDestSwitch_o                  : out std_logic_vector(2 downto 0);
+    --TxPaerIgnoreFifoFull_o         : out std_logic;
+    TxPaerReqActLevel_o             : out std_logic;
+    TxPaerAckActLevel_o             : out std_logic;
+    TxSaerChanEn_o                  : out std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
+    
+    -- TX Timestamp
+    TxTSMode_o                      : out std_logic_vector(1 downto 0);
+    TxTSTimeoutSel_o                : out std_logic_vector(3 downto 0);
+    TxTSRetrigCmd_o                 : out std_logic;
+    TxTSRearmCmd_o                  : out std_logic;
+    TxTSRetrigStatus_i              : in  std_logic;
+    TxTSTimeoutCounts_i             : in  std_logic;
+    TxTSMaskSel_o                   : out std_logic_vector(1 downto 0);
+    
+    --
+    LRxPaerEn_o                     : out std_logic;
+    RRxPaerEn_o                     : out std_logic;
+    AUXRxPaerEn_o                   : out std_logic;
+    LRxHSSaerEn_o                   : out std_logic;
+    RRxHSSaerEn_o                   : out std_logic;
+    AUXRxHSSaerEn_o                 : out std_logic;
+    LRxGtpEn_o                      : out std_logic;
+    RRxGtpEn_o                      : out std_logic;
+    AUXRxGtpEn_o                    : out std_logic;
+    LRxSpnnLnkEn_o                  : out std_logic;
+    RRxSpnnLnkEn_o                  : out std_logic;
+    AUXRxSpnnLnkEn_o                : out std_logic;
+    LRxSaerChanEn_o                 : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    RRxSaerChanEn_o                 : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    AUXRxSaerChanEn_o               : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    RxPaerReqActLevel_o             : out std_logic;
+    RxPaerAckActLevel_o             : out std_logic;
+    RxPaerIgnoreFifoFull_o          : out std_logic;
+    RxPaerAckSetDelay_o             : out std_logic_vector(7 downto 0);
+    RxPaerSampleDelay_o             : out std_logic_vector(7 downto 0);
+    RxPaerAckRelDelay_o             : out std_logic_vector(7 downto 0);
+                                   
+    -- Status                      
+    -------------------------
+    WrapDetected_i                  : in  std_logic;
+    
+    TxSaerStat_i                    : in  t_TxSaerStat_array(C_TX_HSSAER_N_CHAN-1 downto 0);
+    LRxSaerStat_i                   : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    RRxSaerStat_i                   : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    AUXRxSaerStat_i                 : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    TxSpnnlnkStat_i                 : in  t_TxSpnnlnkStat;
+    LRxSpnnlnkStat_i                : in  t_RxSpnnlnkStat;
+    RRxSpnnlnkStat_i                : in  t_RxSpnnlnkStat;
+    AuxRxSpnnlnkStat_i              : in  t_RxSpnnlnkStat;
+                                   
+    -- Spinnaker                     
+    -------------------------
+    Spnn_start_key_o                : out std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command 
+    Spnn_stop_key_o                 : out std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command  
+    Spnn_tx_mask_o                  : out std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+    Spnn_rx_mask_o                  : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+    Spnn_ctrl_o                     : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+    Spnn_status_i                   : in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
+    
+    -- DEBUG
+    -------------------------
+    DBG_CTRL_reg                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    DBG_ctrl_rd                     : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    
+    -- DO NOT EDIT BELOW THIS LINE ---------------------
+    -- Bus protocol ports, do not add to or delete
+    -- Axi lite I-f
+    S_AXI_ACLK                      : in  std_logic;
+    S_AXI_ARESETN                   : in  std_logic;
+    S_AXI_AWADDR                    : in  std_logic_vector(C_ADDR_WIDTH-1 downto 0);
+    S_AXI_AWVALID                   : in  std_logic;
+    S_AXI_WDATA                     : in  std_logic_vector(C_DATA_WIDTH-1 downto 0);
+    S_AXI_WSTRB                     : in  std_logic_vector(3 downto 0);
+    S_AXI_WVALID                    : in  std_logic;
+    S_AXI_BREADY                    : in  std_logic;
+    S_AXI_ARADDR                    : in  std_logic_vector(C_ADDR_WIDTH-1 downto 0);
+    S_AXI_ARVALID                   : in  std_logic;
+    S_AXI_RREADY                    : in  std_logic;
+    S_AXI_ARREADY                   : out std_logic;
+    S_AXI_RDATA                     : out std_logic_vector(C_DATA_WIDTH-1 downto 0);
+    S_AXI_RRESP                     : out std_logic_vector(1 downto 0);
+    S_AXI_RVALID                    : out std_logic;
+    S_AXI_WREADY                    : out std_logic;
+    S_AXI_BRESP                     : out std_logic_vector(1 downto 0);
+    S_AXI_BVALID                    : out std_logic;
+    S_AXI_AWREADY                   : out std_logic
+    -- DO NOT EDIT ABOVE THIS LINE ---------------------
     );
 
     attribute MAX_FANOUT : string;
@@ -229,7 +234,21 @@ architecture rtl of neuserial_axilite is
 
     constant c_zero_vect : std_logic_vector(31 downto 0) := (others => '0');
 
+    constant C_RX_HAS_ALMOST_ONE_PAER     : boolean :=  C_RX_L_HAS_PAER or
+                                                        C_RX_R_HAS_PAER or
+                                                        C_RX_A_HAS_PAER;
+                                                  
+    constant C_RX_HAS_ALMOST_ONE_HSSAER   : boolean :=  C_RX_L_HAS_HSSAER or
+                                                        C_RX_R_HAS_HSSAER or
+                                                        C_RX_A_HAS_HSSAER;                                              
 
+    constant C_RX_HAS_ALMOST_ONE_GTP      : boolean :=  C_RX_L_HAS_GTP or
+                                                        C_RX_R_HAS_GTP or
+                                                        C_RX_A_HAS_GTP;
+                                                  
+    constant C_RX_HAS_ALMOST_ONE_SPNNLNK  : boolean :=  C_RX_L_HAS_SPNNLNK or
+                                                        C_RX_R_HAS_SPNNLNK or
+                                                        C_RX_A_HAS_SPNNLNK;             
     ----------------------------------------------------------------------------
     -- AXI4 Lite internal signals
     ----------------------------------------------------------------------------
@@ -492,12 +511,16 @@ begin
     p_hssaer_rx_err : process (LRxSaerStat_i, RRxSaerStat_i)
     begin
         i_rawHSSaerErr <= (others => '0');
-        if (C_RX_HAS_HSSAER) then
+        if (C_RX_L_HAS_HSSAER) then
             for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 i_rawHSSaerErr( 0+4*i+0) <= LRxSaerStat_i(i).err_ko;
                 i_rawHSSaerErr( 0+4*i+1) <= LRxSaerStat_i(i).err_rx;
                 i_rawHSSaerErr( 0+4*i+2) <= LRxSaerStat_i(i).err_to;
                 i_rawHSSaerErr( 0+4*i+3) <= LRxSaerStat_i(i).err_of;
+            end loop;
+        end if;
+        if (C_RX_R_HAS_HSSAER) then
+            for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 i_rawHSSaerErr(16+4*i+0) <= RRxSaerStat_i(i).err_ko;
                 i_rawHSSaerErr(16+4*i+1) <= RRxSaerStat_i(i).err_rx;
                 i_rawHSSaerErr(16+4*i+2) <= RRxSaerStat_i(i).err_to;
@@ -509,7 +532,7 @@ begin
    p_hssaer_aux_rx_err : process (AUXRxSaerStat_i)
     begin
         i_rawAUXHSSaerErr <= (others => '0');
-        if (C_RX_HAS_HSSAER) then
+        if (C_RX_A_HAS_HSSAER) then
             for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 i_rawAUXHSSaerErr( 0+4*i+0) <= AUXRxSaerStat_i(i).err_ko;
                 i_rawAUXHSSaerErr( 0+4*i+1) <= AUXRxSaerStat_i(i).err_rx;
@@ -1210,15 +1233,15 @@ begin
     -- CTRL_reg - R/W
     --
 
-    i_LocFarRPaerLoopback  <= i_CTRL_reg(31) when C_RX_HAS_PAER and C_TX_HAS_PAER else '0';
-    i_LocFarLPaerLoopback  <= i_CTRL_reg(30) when C_RX_HAS_PAER and C_TX_HAS_PAER else '0';
-    i_LocFarRSaerLoopback  <= i_CTRL_reg(29) when C_RX_HAS_HSSAER and C_TX_HAS_HSSAER else '0';
-    i_LocFarLSaerLoopback  <= i_CTRL_reg(28) when C_RX_HAS_HSSAER and C_TX_HAS_HSSAER else '0';
-    i_LocFarAUXPaerLoopback<= i_CTRL_reg(27) when C_RX_HAS_PAER and C_TX_HAS_PAER else '0';
-    i_LocFarAUXSaerLoopback<= i_CTRL_reg(26) when C_RX_HAS_HSSAER and C_TX_HAS_HSSAER else '0';
+    i_LocFarRPaerLoopback  <= i_CTRL_reg(31) when C_RX_R_HAS_PAER and C_TX_HAS_PAER else '0';
+    i_LocFarLPaerLoopback  <= i_CTRL_reg(30) when C_RX_L_HAS_PAER and C_TX_HAS_PAER else '0';
+    i_LocFarRSaerLoopback  <= i_CTRL_reg(29) when C_RX_R_HAS_HSSAER and C_TX_HAS_HSSAER else '0';
+    i_LocFarLSaerLoopback  <= i_CTRL_reg(28) when C_RX_L_HAS_HSSAER and C_TX_HAS_HSSAER else '0';
+    i_LocFarAUXPaerLoopback<= i_CTRL_reg(27) when C_RX_A_HAS_PAER and C_TX_HAS_PAER else '0';
+    i_LocFarAUXSaerLoopback<= i_CTRL_reg(26) when C_RX_A_HAS_HSSAER and C_TX_HAS_HSSAER else '0';
     i_LocNearLoopback      <= i_CTRL_reg(25);
     i_RemoteLoopback       <= i_CTRL_reg(24);
-    i_LocFarSpnnLnkLoopbackSel <= i_CTRL_reg(23 downto 22) when C_RX_HAS_SPNNLNK and C_TX_HAS_SPNNLNK else "00";
+    i_LocFarSpnnLnkLoopbackSel <= i_CTRL_reg(23 downto 22) when C_RX_HAS_ALMOST_ONE_SPNNLNK and C_TX_HAS_SPNNLNK else "00";
  --                        <= i_CTRL_reg(21);                               -- Available        
  --                        <= i_CTRL_reg(20);                               -- Available     
  --                        <= i_CTRL_reg(19);                               -- Available     
@@ -1233,9 +1256,9 @@ begin
  -- i_RRxEnable            <= i_CTRL_reg(10) when C_RX_HAS_PAER else '0';   -- Reserved for future use
     i_LatTlast             <= i_CTRL_reg(9);
     i_FlushTXFifos         <= i_CTRL_reg(8);
-    i_AuxRxPaerFlushFifos  <= i_CTRL_reg(7)  when C_RX_HAS_PAER else '0';
-    i_RRxPaerFlushFifos    <= i_CTRL_reg(6)  when C_RX_HAS_PAER else '0';
-    i_LRxPaerFlushFifos    <= i_CTRL_reg(5)  when C_RX_HAS_PAER else '0';
+    i_AuxRxPaerFlushFifos  <= i_CTRL_reg(7)  when C_RX_A_HAS_PAER else '0';
+    i_RRxPaerFlushFifos    <= i_CTRL_reg(6)  when C_RX_R_HAS_PAER else '0';
+    i_LRxPaerFlushFifos    <= i_CTRL_reg(5)  when C_RX_L_HAS_PAER else '0';
     i_FlushRXFifos         <= i_CTRL_reg(4);
  -- i_EnableLoopBack       <= i_CTRL_reg(3);                                -- Reserved for back compatibility with neuelab
     i_interruptEnable      <= i_CTRL_reg(2);
@@ -1319,16 +1342,22 @@ begin
     begin
         i_LPBK_CNFG_rd <= (others => '0');
         i_LPBK_CNFG_AUX_rd <= (others => '0');
-        if (C_RX_HAS_HSSAER) then
+        if (C_RX_L_HAS_HSSAER) then
             for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 i_LPBK_CNFG_rd(4*i+3)                   <= i_LocFarSaerLpbkCfg.rx1Cfg(i).lpbk;
                 i_LPBK_CNFG_rd(4*i+2)                   <= i_LocFarSaerLpbkCfg.rx1Cfg(i).zero;
                 i_LPBK_CNFG_rd(4*i+1 downto 4*i)        <= std_logic_vector(to_unsigned(i_LocFarSaerLpbkCfg.rx1Cfg(i).idx,2));
-
+            end loop;
+        end if;
+        if (C_RX_R_HAS_HSSAER) then
+            for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 i_LPBK_CNFG_rd(16+4*i+3)                <= i_LocFarSaerLpbkCfg.rx2Cfg(i).lpbk;
                 i_LPBK_CNFG_rd(16+4*i+2)                <= i_LocFarSaerLpbkCfg.rx2Cfg(i).zero;
                 i_LPBK_CNFG_rd(16+4*i+1 downto 16+4*i)  <= std_logic_vector(to_unsigned(i_LocFarSaerLpbkCfg.rx2Cfg(i).idx,2));
-
+            end loop;
+        end if;
+        if (C_RX_A_HAS_HSSAER) then
+            for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 i_LPBK_CNFG_AUX_rd(4*i+3)               <= i_LocFarSaerLpbkCfg.rx3Cfg(i).lpbk;
                 i_LPBK_CNFG_AUX_rd(4*i+2)               <= i_LocFarSaerLpbkCfg.rx3Cfg(i).zero;
                 i_LPBK_CNFG_AUX_rd(4*i+1 downto 4*i)    <= std_logic_vector(to_unsigned(i_LocFarSaerLpbkCfg.rx3Cfg(i).idx,2));
@@ -1490,14 +1519,21 @@ begin
     p_hssaer_stat : process (LRxSaerStat_i, RRxSaerStat_i, TxSaerStat_i, AUXRxSaerStat_i)
     begin
         i_HSSAER_STAT_rd <= (others => '0');
-        if (C_RX_HAS_HSSAER) then
+        if (C_RX_L_HAS_HSSAER) then
             for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 i_HSSAER_STAT_rd( 0+i) <= LRxSaerStat_i(i).run;
+            end loop;
+        end if;
+        if (C_RX_R_HAS_HSSAER) then
+            for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 i_HSSAER_STAT_rd( 8+i) <= RRxSaerStat_i(i).run;
+            end loop;
+        end if;
+        if (C_RX_A_HAS_HSSAER) then
+            for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 i_HSSAER_STAT_rd(24+i) <= AUXRxSaerStat_i(i).run;
             end loop;
         end if;
-
         if (C_TX_HAS_HSSAER) then
             for i in 0 to C_TX_HSSAER_N_CHAN-1 loop
                 i_HSSAER_STAT_rd(16+i) <= TxSaerStat_i(i).run;
@@ -1525,7 +1561,7 @@ begin
         v_glbl_err_of := '0'; v_glbl_err_of_msk := '0';
         v_glbl_err_rx := '0'; v_glbl_err_rx_msk := '0';
         v_glbl_err_to := '0'; v_glbl_err_to_msk := '0';
-        if (C_RX_HAS_HSSAER) then
+        if (C_RX_HAS_ALMOST_ONE_HSSAER) then
             for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 v_glbl_err_ko := v_glbl_err_ko or (i_HSSAER_RX_ERR_reg(4*i+0)) or (i_HSSAER_RX_ERR_reg(16+4*i+0)) or i_aux_err_cnt(0);
                 v_glbl_err_rx := v_glbl_err_rx or (i_HSSAER_RX_ERR_reg(4*i+1)) or (i_HSSAER_RX_ERR_reg(16+4*i+1)) or i_aux_err_cnt(1);
@@ -1557,16 +1593,16 @@ begin
     -- ------------------------------------------------------------------------
     -- RX_CTRL_reg - R/W
 
-    i_RRxSaerChanEn  <= i_RX_CTRL_reg(27 downto 24)   when C_RX_HAS_HSSAER  else (others => '0');
-    i_RRxSpnnLnkEn   <= i_RX_CTRL_reg(19)             when C_RX_HAS_SPNNLNK else '0';
-    i_RRxGtpEn       <= i_RX_CTRL_reg(18)             when C_RX_HAS_GTP     else '0';
-    i_RRxPaerEn      <= i_RX_CTRL_reg(17)             when C_RX_HAS_PAER    else '0';
-    i_RRxHSSaerEn    <= i_RX_CTRL_reg(16)             when C_RX_HAS_HSSAER  else '0';
-    i_LRxSaerChanEn  <= i_RX_CTRL_reg(11 downto  8)   when C_RX_HAS_HSSAER  else (others => '0');
-    i_LRxSpnnLnkEn   <= i_RX_CTRL_reg(3)              when C_RX_HAS_SPNNLNK else '0';
-    i_LRxGtpEn       <= i_RX_CTRL_reg(2)              when C_RX_HAS_GTP     else '0';
-    i_LRxPaerEn      <= i_RX_CTRL_reg(1)              when C_RX_HAS_PAER    else '0';
-    i_LRxHSSaerEn    <= i_RX_CTRL_reg(0)              when C_RX_HAS_HSSAER  else '0';
+    i_RRxSaerChanEn  <= i_RX_CTRL_reg(27 downto 24)   when C_RX_R_HAS_HSSAER    else (others => '0');
+    i_RRxSpnnLnkEn   <= i_RX_CTRL_reg(19)             when C_RX_R_HAS_SPNNLNK   else '0';
+    i_RRxGtpEn       <= i_RX_CTRL_reg(18)             when C_RX_R_HAS_GTP       else '0';
+    i_RRxPaerEn      <= i_RX_CTRL_reg(17)             when C_RX_R_HAS_PAER      else '0';
+    i_RRxHSSaerEn    <= i_RX_CTRL_reg(16)             when C_RX_R_HAS_HSSAER    else '0';
+    i_LRxSaerChanEn  <= i_RX_CTRL_reg(11 downto  8)   when C_RX_L_HAS_HSSAER    else (others => '0');
+    i_LRxSpnnLnkEn   <= i_RX_CTRL_reg(3)              when C_RX_L_HAS_SPNNLNK   else '0';
+    i_LRxGtpEn       <= i_RX_CTRL_reg(2)              when C_RX_L_HAS_GTP       else '0';
+    i_LRxPaerEn      <= i_RX_CTRL_reg(1)              when C_RX_L_HAS_PAER      else '0';
+    i_LRxHSSaerEn    <= i_RX_CTRL_reg(0)              when C_RX_L_HAS_HSSAER    else '0';
 
     i_RX_CTRL_rd <= c_zero_vect(31 downto 28) &
                     i_RRxSaerChanEn           &
@@ -1600,12 +1636,12 @@ begin
     -- ------------------------------------------------------------------------
     -- RX_CNFG_reg - R/W
 
-    i_RxPaerAckRelDelay    <= i_RX_CNFG_reg(31 downto 24)   when C_RX_HAS_PAER else (others => '0');
-    i_RxPaerAckSetDelay    <= i_RX_CNFG_reg(23 downto 16)   when C_RX_HAS_PAER else (others => '0');
-    i_RxPaerSampleDelay    <= i_RX_CNFG_reg(15 downto  8)   when C_RX_HAS_PAER else (others => '0');
-    i_RxPaerIgnoreFifoFull <= i_RX_CNFG_reg(4)              when C_RX_HAS_PAER else '0';
-    i_RxPaerAckActLevel    <= i_RX_CNFG_reg(1)              when C_RX_HAS_PAER else '0';
-    i_RxPaerReqActLevel    <= i_RX_CNFG_reg(0)              when C_RX_HAS_PAER else '0';
+    i_RxPaerAckRelDelay    <= i_RX_CNFG_reg(31 downto 24)   when C_RX_HAS_ALMOST_ONE_PAER else (others => '0');
+    i_RxPaerAckSetDelay    <= i_RX_CNFG_reg(23 downto 16)   when C_RX_HAS_ALMOST_ONE_PAER else (others => '0');
+    i_RxPaerSampleDelay    <= i_RX_CNFG_reg(15 downto  8)   when C_RX_HAS_ALMOST_ONE_PAER else (others => '0');
+    i_RxPaerIgnoreFifoFull <= i_RX_CNFG_reg(4)              when C_RX_HAS_ALMOST_ONE_PAER else '0';
+    i_RxPaerAckActLevel    <= i_RX_CNFG_reg(1)              when C_RX_HAS_ALMOST_ONE_PAER else '0';
+    i_RxPaerReqActLevel    <= i_RX_CNFG_reg(0)              when C_RX_HAS_ALMOST_ONE_PAER else '0';
 
     i_RX_CNFG_rd <= i_RxPaerAckRelDelay       &
                     i_RxPaerAckSetDelay       &
@@ -1700,10 +1736,10 @@ begin
                       To_StdLogic(C_TX_HAS_HSSAER)                           &
                       c_zero_vect(15 downto 14)                              &
                       std_logic_vector(to_unsigned(C_RX_HSSAER_N_CHAN-1,2))  &
-                      To_StdLogic(C_RX_HAS_SPNNLNK)                          &
-                      To_StdLogic(C_RX_HAS_GTP)                              &
-                      To_StdLogic(C_RX_HAS_PAER)                             &
-                      To_StdLogic(C_RX_HAS_HSSAER)                           ;
+                      To_StdLogic(C_RX_HAS_ALMOST_ONE_SPNNLNK)               &
+                      To_StdLogic(C_RX_HAS_ALMOST_ONE_GTP)                   &
+                      To_StdLogic(C_RX_HAS_ALMOST_ONE_PAER)                  &
+                      To_StdLogic(C_RX_HAS_ALMOST_ONE_HSSAER)                ;
 
 
     -- ------------------------------------------------------------------------
@@ -1731,11 +1767,11 @@ begin
     -- ------------------------------------------------------------------------
     -- AUX_CTRL_reg - R/W
 
-    i_AUXRxSaerChanEn  <= i_AUX_CTRL_reg(11 downto  8)   when C_RX_HAS_HSSAER  else (others => '0');
-    i_AUXRxSpnnLnkEn   <= i_AUX_CTRL_reg(3)              when C_RX_HAS_SPNNLNK else '0';
-    i_AUXRxGtpEn       <= i_AUX_CTRL_reg(2)              when C_RX_HAS_GTP     else '0';
-    i_AUXRxPaerEn      <= i_AUX_CTRL_reg(1)              when C_RX_HAS_PAER    else '0';
-    i_AUXRxHSSaerEn    <= i_AUX_CTRL_reg(0)              when C_RX_HAS_HSSAER  else '0';
+    i_AUXRxSaerChanEn  <= i_AUX_CTRL_reg(11 downto  8)   when C_RX_A_HAS_HSSAER  else (others => '0');
+    i_AUXRxSpnnLnkEn   <= i_AUX_CTRL_reg(3)              when C_RX_A_HAS_SPNNLNK else '0';
+    i_AUXRxGtpEn       <= i_AUX_CTRL_reg(2)              when C_RX_A_HAS_GTP     else '0';
+    i_AUXRxPaerEn      <= i_AUX_CTRL_reg(1)              when C_RX_A_HAS_PAER    else '0';
+    i_AUXRxHSSaerEn    <= i_AUX_CTRL_reg(0)              when C_RX_A_HAS_HSSAER  else '0';
 
     i_AUX_CTRL_rd <= c_zero_vect(31 downto 12) &
                      i_AUXRxSaerChanEn         &
@@ -1825,7 +1861,7 @@ begin
         v_err_of := '0'; v_err_of_msk := '0';
         v_err_rx := '0'; v_err_rx_msk := '0';
         v_err_to := '0'; v_err_to_msk := '0';
-        if (C_RX_HAS_HSSAER) then
+        if (C_RX_A_HAS_HSSAER) then
             for i in 0 to C_RX_HSSAER_N_CHAN-1 loop
                 if ( to_integer(unsigned(i_HSSAER_AUX_RX_ERR_CNT_reg(i).cnt_ko)) >= to_integer(unsigned(i_HSSAER_AUX_RX_ERR_THR_reg(7  downto  0))) ) then
                   v_err_ko := v_err_ko or '1';

@@ -12,9 +12,9 @@ WRD CTRL    00001002   ## Senza Loopback
 WAT 100
 
 ##  Abilitazione e configurazione PAER Left
-## WRD RXPAERCF 02000103
-## WAT 100
-## WRD RX_CTRL 00000002
+WRD RXPAERCF 02000103
+WAT 100
+WRD RX_CTRL 00000002
 
 
 ##  Abilitazione Rx GTP Left
@@ -28,8 +28,8 @@ WAT 100
 ## WAT 100
 
 ## Abilitazione Tx GTP
-WRD TX_CTRL 00002074
-WAT 100
+## WRD TX_CTRL 00002074
+## WAT 100
 
 
 ##    wat 10000

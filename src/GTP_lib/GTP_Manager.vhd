@@ -445,6 +445,19 @@ signal rx_data_w1_exp_gckrx        : std_logic;
 -- signal data_w0_gckrx            : std_logic_vector(GTP_DATA_WIDTH_g-1 downto 0);
 signal rx_data_w1_gckrx            : std_logic_vector(GTP_DATA_WIDTH_g-1 downto 0);
 
+
+
+-- DEBUG
+attribute mark_debug : string;
+attribute mark_debug of RX_DATA_o               : signal is "true";
+attribute mark_debug of RX_DATA_SRC_RDY_o       : signal is "true";
+attribute mark_debug of RX_DATA_DST_RDY_i       : signal is "true";
+attribute mark_debug of RX_ALIGN_REQUEST_o      : signal is "true";
+
+
+
+
+
 begin
 
 

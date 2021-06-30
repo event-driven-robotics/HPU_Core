@@ -39,7 +39,9 @@ entity neuserial_core is
   generic (
     -- -----------------------    
     -- PAER        
-    C_RX_HAS_PAER             : boolean                       := true;
+    C_RX_L_HAS_PAER           : boolean                       := true;
+    C_RX_R_HAS_PAER           : boolean                       := true;
+    C_RX_A_HAS_PAER           : boolean                       := true;
     C_RX_PAER_L_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
     C_RX_PAER_R_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
     C_RX_PAER_A_SENS_ID       : std_logic_vector(2 downto 0)  := "001";
@@ -47,7 +49,9 @@ entity neuserial_core is
     C_PAER_DSIZE              : natural range 1 to 29         := 24;
     -- -----------------------        
     -- HSSAER
-    C_RX_HAS_HSSAER           : boolean                       := true;
+    C_RX_L_HAS_HSSAER         : boolean                       := true;
+    C_RX_R_HAS_HSSAER         : boolean                       := true;
+    C_RX_A_HAS_HSSAER         : boolean                       := true;
     C_RX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
     C_RX_SAER0_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
     C_RX_SAER1_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
@@ -65,25 +69,28 @@ entity neuserial_core is
     C_TX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
     -- -----------------------        
     -- GTP
-    C_RX_HAS_GTP              : boolean                       := true;
+    C_RX_L_HAS_GTP            : boolean                       := true;
+    C_RX_R_HAS_GTP            : boolean                       := true;
+    C_RX_A_HAS_GTP            : boolean                       := true;
     C_GTP_RXUSRCLK2_PERIOD_NS : real                          := 6.4;        
     C_TX_HAS_GTP              : boolean                       := true;
     C_GTP_TXUSRCLK2_PERIOD_NS : real                          := 6.4;  
     C_GTP_DSIZE               : positive                      := 16;
     -- -----------------------                
     -- SPINNLINK
-    C_RX_HAS_SPNNLNK          : boolean                       := true;
+    C_RX_L_HAS_SPNNLNK        : boolean                       := true;
+    C_RX_R_HAS_SPNNLNK        : boolean                       := true;
+    C_RX_A_HAS_SPNNLNK        : boolean                       := true;
     C_TX_HAS_SPNNLNK          : boolean                       := true;
     C_PSPNNLNK_WIDTH      	  : natural range 1 to 32         := 32;
     -- -----------------------
     -- INTERCEPTION
-    C_RX_LEFT_INTERCEPTION    : boolean                       := false;
-    C_RX_RIGHT_INTERCEPTION   : boolean                       := false;
-    C_RX_AUX_INTERCEPTION     : boolean                       := false;
+    C_RX_L_INTERCEPTION       : boolean                       := false;
+    C_RX_R_INTERCEPTION       : boolean                       := false;
+    C_RX_A_INTERCEPTION       : boolean                       := false;
     -- -----------------------
     -- SIMULATION
     C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
-    
     );
   port (
     --
@@ -576,10 +583,10 @@ architecture str of neuserial_core is
 --    for all : neuserial_PAER_arbiter use entity datapath_lib.neuserial_PAER_arbiter(rtl);
 --    for all : CoreMonSeqRR           use entity neuelab_lib.CoreMonSeqRR(str);
 
+
 -- GTP
 
--- 
-
+-- GTP TX
 signal i_TxGtpDataRate      : std_logic_vector(15 downto 0); 
 signal i_TxGtpAlignRate     : std_logic_vector( 7 downto 0); 
 signal i_TxGtpMsgRate       : std_logic_vector(15 downto 0); 
@@ -611,11 +618,22 @@ signal i_AuxRxGtpIdleRate     : std_logic_vector(15 downto 0);
 signal i_AuxRxGtpEventRate    : std_logic_vector(15 downto 0);
 signal i_AuxRxGtpMessageRate  : std_logic_vector( 7 downto 0);
 
--- --------------
--- GTPTX
 
-
-
+-- DEBUG
+attribute mark_debug : string;
+attribute mark_debug of RRx_GTP_RxUsrClk2_i       : signal is "true";
+attribute mark_debug of RRx_GTP_SoftResetRx_o     : signal is "true";         
+attribute mark_debug of RRx_GTP_DataValid_o       : signal is "true";           
+attribute mark_debug of RRx_GTP_Rxuserrdy_o       : signal is "true";                   
+attribute mark_debug of RRx_GTP_Rxdata_i          : signal is "true";
+attribute mark_debug of RRx_GTP_Rxchariscomma_i   : signal is "true";
+attribute mark_debug of RRx_GTP_Rxcharisk_i       : signal is "true";
+attribute mark_debug of RRx_GTP_Rxdisperr_i       : signal is "true";
+attribute mark_debug of RRx_GTP_Rxnotintable_i    : signal is "true";
+attribute mark_debug of RRx_GTP_Rxbyteisaligned_i : signal is "true";                   
+attribute mark_debug of RRx_GTP_Rxbyterealign_i   : signal is "true";                   
+attribute mark_debug of RRx_GTP_PllLock_i         : signal is "true";                 
+attribute mark_debug of RRx_GTP_PllRefclklost_i   : signal is "true";    
 
 begin
 
@@ -861,8 +879,8 @@ u_tx_datapath : hpu_tx_datapath
 
     -- SpiNNlink Interface
     -- ----------------------------------------------
-		SPNN_Data_o             => Tx_SPNN_Data_o,
-		SPNN_Ack_i              => Tx_SPNN_Ack_i
+		SPNN_Data_o             => i_TxData2of7ToSpinnaker, -- Tx_SPNN_Data_o,
+		SPNN_Ack_i              => i_TxAckFromSpinnaker     -- Tx_SPNN_Ack_i
     );
     
    
@@ -875,14 +893,14 @@ u_rx_left_datapath : hpu_rx_datapath
   generic map (
     C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
     C_PAER_DSIZE              => C_PAER_DSIZE,
-    C_HAS_PAER                => C_RX_HAS_PAER,
-    C_HAS_HSSAER              => C_RX_HAS_HSSAER,
+    C_HAS_PAER                => C_RX_L_HAS_PAER,
+    C_HAS_HSSAER              => C_RX_L_HAS_HSSAER,
     C_HSSAER_N_CHAN           => C_RX_HSSAER_N_CHAN,
-    C_HAS_GTP                 => C_RX_HAS_GTP,
+    C_HAS_GTP                 => C_RX_L_HAS_GTP,
     C_GTP_DSIZE               => C_GTP_DSIZE,
     C_GTP_TXUSRCLK2_PERIOD_NS => C_GTP_TXUSRCLK2_PERIOD_NS,
     C_GTP_RXUSRCLK2_PERIOD_NS => C_GTP_RXUSRCLK2_PERIOD_NS,
-    C_HAS_SPNNLNK             => C_RX_HAS_SPNNLNK,
+    C_HAS_SPNNLNK             => C_RX_L_HAS_SPNNLNK,
     C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH,
     C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION
     )
@@ -1044,14 +1062,14 @@ u_rx_right_datapath : hpu_rx_datapath
   generic map (
     C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
     C_PAER_DSIZE              => C_PAER_DSIZE,
-    C_HAS_PAER                => C_RX_HAS_PAER,
-    C_HAS_HSSAER              => C_RX_HAS_HSSAER,
+    C_HAS_PAER                => C_RX_R_HAS_PAER,
+    C_HAS_HSSAER              => C_RX_R_HAS_HSSAER,
     C_HSSAER_N_CHAN           => C_RX_HSSAER_N_CHAN,
-    C_HAS_GTP                 => C_RX_HAS_GTP,
+    C_HAS_GTP                 => C_RX_R_HAS_GTP,
     C_GTP_DSIZE               => C_GTP_DSIZE,
     C_GTP_TXUSRCLK2_PERIOD_NS => C_GTP_TXUSRCLK2_PERIOD_NS,
     C_GTP_RXUSRCLK2_PERIOD_NS => C_GTP_RXUSRCLK2_PERIOD_NS,
-    C_HAS_SPNNLNK             => C_RX_HAS_SPNNLNK,
+    C_HAS_SPNNLNK             => C_RX_R_HAS_SPNNLNK,
     C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH,
     C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION
     )
@@ -1214,14 +1232,14 @@ u_rx_aux_datapath : hpu_rx_datapath
   generic map (
     C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
     C_PAER_DSIZE              => C_PAER_DSIZE,
-    C_HAS_PAER                => C_RX_HAS_PAER,
-    C_HAS_HSSAER              => C_RX_HAS_HSSAER,
+    C_HAS_PAER                => C_RX_A_HAS_PAER,
+    C_HAS_HSSAER              => C_RX_A_HAS_HSSAER,
     C_HSSAER_N_CHAN           => C_RX_HSSAER_N_CHAN,
-    C_HAS_GTP                 => C_RX_HAS_GTP,
+    C_HAS_GTP                 => C_RX_A_HAS_GTP,
     C_GTP_DSIZE               => C_GTP_DSIZE,
     C_GTP_TXUSRCLK2_PERIOD_NS => C_GTP_TXUSRCLK2_PERIOD_NS,
     C_GTP_RXUSRCLK2_PERIOD_NS => C_GTP_RXUSRCLK2_PERIOD_NS,
-    C_HAS_SPNNLNK             => C_RX_HAS_SPNNLNK,
+    C_HAS_SPNNLNK             => C_RX_A_HAS_SPNNLNK,
     C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH,
     C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION
     )
@@ -1384,7 +1402,7 @@ u_rx_aux_datapath : hpu_rx_datapath
 --Interceptions
 ---------------------
 
-LEFT_INTERCEPTION_TRUE_gen: if C_RX_LEFT_INTERCEPTION = true generate
+LEFT_INTERCEPTION_TRUE_gen: if C_RX_L_INTERCEPTION = true generate
 begin
     LRxData_o           <= LRxData;
     LRxSrcRdy_o         <= LRxSrcRdy;
@@ -1393,7 +1411,7 @@ begin
     i_rxMonSrc(0).vld   <= LRxBypassSrcRdy_i; 
     LRxBypassDstRdy_o   <= i_rxMonDst(0).rdy;
 end generate;
-LEFT_INTERCEPTION_FALSE_gen: if C_RX_LEFT_INTERCEPTION = false generate
+LEFT_INTERCEPTION_FALSE_gen: if C_RX_L_INTERCEPTION = false generate
 begin
     i_rxMonSrc(0).idx   <= LRxData;
     i_rxMonSrc(0).vld   <= LRxSrcRdy; 
@@ -1401,7 +1419,7 @@ begin
 end generate;
 
 
-RIGHT_INTERCEPTION_TRUE_gen: if C_RX_RIGHT_INTERCEPTION = true generate
+RIGHT_INTERCEPTION_TRUE_gen: if C_RX_R_INTERCEPTION = true generate
 begin
     RRxData_o           <= RRxData;
     RRxSrcRdy_o         <= RRxSrcRdy;
@@ -1410,7 +1428,7 @@ begin
     i_rxMonSrc(1).vld   <= RRxBypassSrcRdy_i; 
     RRxBypassDstRdy_o   <= i_rxMonDst(1).rdy;  
 end generate;
-RIGHT_INTERCEPTION_FALSE_gen: if C_RX_RIGHT_INTERCEPTION = false generate
+RIGHT_INTERCEPTION_FALSE_gen: if C_RX_R_INTERCEPTION = false generate
 begin
     i_rxMonSrc(1).idx   <= RRxData;
     i_rxMonSrc(1).vld   <= RRxSrcRdy; 
@@ -1418,7 +1436,7 @@ begin
 end generate;
 
 
-AUX_INTERCEPTION_TRUE_gen: if C_RX_AUX_INTERCEPTION = true generate
+AUX_INTERCEPTION_TRUE_gen: if C_RX_A_INTERCEPTION = true generate
 begin
     AuxRxData_o         <= AuxRxData;
     AuxRxSrcRdy_o       <= AuxRxSrcRdy;
@@ -1427,7 +1445,7 @@ begin
     i_rxMonSrc(2).vld   <= AuxRxBypassSrcRdy_i; 
     AuxRxBypassDstRdy_o <= i_rxMonDst(2).rdy;  
 end generate;
-AUX_INTERCEPTION_FALSE_gen: if C_RX_AUX_INTERCEPTION = false generate
+AUX_INTERCEPTION_FALSE_gen: if C_RX_A_INTERCEPTION = false generate
 begin
     i_rxMonSrc(2).idx   <= AuxRxData;
     i_rxMonSrc(2).vld   <= AuxRxSrcRdy; 

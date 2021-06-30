@@ -98,16 +98,20 @@ component HPUCore is
   generic (
     -- -----------------------    
     -- PAER        
-    C_RX_HAS_PAER             : boolean                       := true;
+    C_RX_L_HAS_PAER           : boolean                       := false;
+    C_RX_R_HAS_PAER           : boolean                       := false;
+    C_RX_A_HAS_PAER           : boolean                       := false;
     C_RX_PAER_L_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
     C_RX_PAER_R_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
     C_RX_PAER_A_SENS_ID       : std_logic_vector(2 downto 0)  := "001";
-    C_TX_HAS_PAER             : boolean                       := true;
+    C_TX_HAS_PAER             : boolean                       := false;
     C_PAER_DSIZE              : natural range 1 to 29         := 24;
     -- -----------------------        
     -- HSSAER
-    C_RX_HAS_HSSAER           : boolean                       := true;
-    C_RX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
+    C_RX_L_HAS_HSSAER         : boolean                       := false;
+    C_RX_R_HAS_HSSAER         : boolean                       := false;
+    C_RX_A_HAS_HSSAER         : boolean                       := false;
+    C_RX_HSSAER_N_CHAN        : natural range 1 to 4          := 4;
     C_RX_SAER0_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
     C_RX_SAER1_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
     C_RX_SAER2_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
@@ -120,28 +124,35 @@ component HPUCore is
     C_RX_SAER1_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
     C_RX_SAER2_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
     C_RX_SAER3_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-    C_TX_HAS_HSSAER           : boolean                       := true;
-    C_TX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
+    C_TX_HAS_HSSAER           : boolean                       := false;
+    C_TX_HSSAER_N_CHAN        : natural range 1 to 4          := 4;
     -- -----------------------        
     -- GTP
-    C_RX_HAS_GTP              : boolean                       := true;
-    C_GTP_RXUSRCLK2_PERIOD_NS : real                          := 6.4;        
-    C_TX_HAS_GTP              : boolean                       := true;
-    C_GTP_TXUSRCLK2_PERIOD_NS : real                          := 6.4;  
+    C_RX_L_HAS_GTP            : boolean                       := false;
+    C_RX_R_HAS_GTP            : boolean                       := false;
+    C_RX_A_HAS_GTP            : boolean                       := false;
+--    C_GTP_RXUSRCLK2_PERIOD_NS : real                          := 6.4;        
+    C_GTP_RXUSRCLK2_PERIOD_PS : positive                      := 6400;        -- Positive (integer) because IP Packager doesn't support real generics 
+    C_TX_HAS_GTP              : boolean                       := false;
+--    C_GTP_TXUSRCLK2_PERIOD_NS : real                          := 6.4;  
+    C_GTP_TXUSRCLK2_PERIOD_PS : positive                      := 6400;        -- Positive (integer) because IP Packager doesn't support real generics    
     C_GTP_DSIZE               : positive                      := 16;
     -- -----------------------                
     -- SPINNLINK
-    C_RX_HAS_SPNNLNK          : boolean                       := true;
-    C_TX_HAS_SPNNLNK          : boolean                       := true;
+    C_RX_L_HAS_SPNNLNK        : boolean                       := false;
+    C_RX_R_HAS_SPNNLNK        : boolean                       := false;
+    C_RX_A_HAS_SPNNLNK        : boolean                       := false;
+    C_TX_HAS_SPNNLNK          : boolean                       := false;
     C_PSPNNLNK_WIDTH      	  : natural range 1 to 32         := 32;
     -- -----------------------
     -- INTERCEPTION
-    C_RX_LEFT_INTERCEPTION    : boolean                       := false;
-    C_RX_RIGHT_INTERCEPTION   : boolean                       := false;
-    C_RX_AUX_INTERCEPTION     : boolean                       := false;
+    C_RX_L_INTERCEPTION       : boolean                       := false;
+    C_RX_R_INTERCEPTION       : boolean                       := false;
+    C_RX_A_INTERCEPTION       : boolean                       := false;
     -- -----------------------
     -- CORE
-    C_SYSCLK_PERIOD_NS        : real                          := 10.0;           -- System Clock period
+--    C_SYSCLK_PERIOD_NS        : real                          := 10.0;           -- System Clock period
+    C_SYSCLK_PERIOD_PS        : positive                      := 10000;          -- Positive (integer) because IP Packager doesn't support real generics 
     C_DEBUG                   : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
     C_HAS_DEFAULT_LOOPBACK    : boolean                       := false;
     -- -----------------------
@@ -292,10 +303,6 @@ component HPUCore is
     ARx_SPNN_Data_i             : in  std_logic_vector(6 downto 0); 
     ARx_SPNN_Ack_o              : out std_logic;  
     
-   
-    
-    
-
     
     --============================================
     -- Interception
@@ -1165,18 +1172,21 @@ Tx_GTP_PllRefclklost    <= GTP_PllRefclklost;
 
 HPUCORE_i : HPUCore  
     generic map (
-    
         -- -----------------------    
         -- PAER        
-        C_RX_HAS_PAER               => false, 
+        C_RX_L_HAS_PAER             => true, 
+        C_RX_R_HAS_PAER             => false, 
+        C_RX_A_HAS_PAER             => false, 
         C_RX_PAER_L_SENS_ID         => "000",
         C_RX_PAER_R_SENS_ID         => "000",
         C_RX_PAER_A_SENS_ID         => "001",
-        C_TX_HAS_PAER               => true,
+        C_TX_HAS_PAER               => false,
         C_PAER_DSIZE                => 24,   
         -- -----------------------        
         -- HSSAER
-        C_RX_HAS_HSSAER             => false, 
+        C_RX_L_HAS_HSSAER           => false, 
+        C_RX_R_HAS_HSSAER           => false, 
+        C_RX_A_HAS_HSSAER           => false, 
         C_RX_HSSAER_N_CHAN          => 3,
         C_RX_SAER0_L_SENS_ID        => "000",
         C_RX_SAER1_L_SENS_ID        => "000",
@@ -1194,24 +1204,31 @@ HPUCORE_i : HPUCore
         C_TX_HSSAER_N_CHAN          => 3,
         -- -----------------------        
         -- GTP
-        C_RX_HAS_GTP                => false,
-        C_GTP_RXUSRCLK2_PERIOD_NS   => 6.4,     
-        C_TX_HAS_GTP                => true,
-        C_GTP_TXUSRCLK2_PERIOD_NS   => 6.4,  
+        C_RX_L_HAS_GTP              => false,
+        C_RX_R_HAS_GTP              => false,
+        C_RX_A_HAS_GTP              => false,
+        -- C_GTP_RXUSRCLK2_PERIOD_NS   => 6.4,     
+        C_GTP_RXUSRCLK2_PERIOD_PS   => 6400,     
+        C_TX_HAS_GTP                => false,
+        -- C_GTP_TXUSRCLK2_PERIOD_NS   => 6.4, 
+        C_GTP_TXUSRCLK2_PERIOD_PS   => 6400,   
         C_GTP_DSIZE                 => C_GTP_DSIZE,
         -- -----------------------                
         -- SPINNLINK
-        C_RX_HAS_SPNNLNK            => false, 
+        C_RX_L_HAS_SPNNLNK          => false, 
+        C_RX_R_HAS_SPNNLNK          => false, 
+        C_RX_A_HAS_SPNNLNK          => false, 
         C_TX_HAS_SPNNLNK            => false,
         C_PSPNNLNK_WIDTH		        => 32,
         -- -----------------------
         -- INTERCEPTION
-        C_RX_LEFT_INTERCEPTION      => false,
-        C_RX_RIGHT_INTERCEPTION     => false,
-        C_RX_AUX_INTERCEPTION       => false,
+        C_RX_L_INTERCEPTION         => false,
+        C_RX_R_INTERCEPTION         => false,
+        C_RX_A_INTERCEPTION         => false,
         -- -----------------------
         -- CORE
-        C_SYSCLK_PERIOD_NS          => 10.0,               
+        --C_SYSCLK_PERIOD_NS          => 10.0,               
+        C_SYSCLK_PERIOD_PS          => 10000,               
         C_DEBUG                     => false,                
         C_HAS_DEFAULT_LOOPBACK      => false,
         -- -----------------------
@@ -1224,7 +1241,6 @@ HPUCORE_i : HPUCore
         C_SIM_TIME_COMPRESSION      => true
     )
     port map(
-        -- ADD USER PORTS BELOW THIS LINE ------------------
 
         -- SYNC Resetn
         nSyncReset        			    => i_resetn,
