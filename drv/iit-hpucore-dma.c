@@ -34,6 +34,7 @@
 #include <linux/dmapool.h>
 #include <linux/interrupt.h>
 #include <linux/stringify.h>
+#include <linux/version.h>
 
 /* max HPUs that can be handled */
 #define HPU_MINOR_COUNT 10
@@ -801,7 +802,11 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 	if (lenght % 8)
 		return -EINVAL;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
 	if (!access_ok(VERIFY_WRITE, buf, lenght))
+#else
+	if (!access_ok(buf, lenght))
+#endif
 		return -EFAULT;
 
 	mutex_lock(&priv->dma_tx_pool.mutex_lock);
@@ -920,8 +925,11 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 	unsigned long flags;
 	size_t read = 0;
 	struct hpu_priv *priv = fp->private_data;
-
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
 	if (!access_ok(VERIFY_READ, buf, length))
+#else
+	if (!access_ok(buf, length))
+#endif
 		return -EFAULT;
 
 	dev_dbg(&priv->pdev->dev, "----tot to read %d\n", length);
