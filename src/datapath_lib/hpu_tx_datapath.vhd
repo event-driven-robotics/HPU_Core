@@ -374,7 +374,7 @@ begin
     reset_sych_fifo <= not(ii_hssaer_nrst);
     ii_tx_toSaerDst_synched(i).rdy <= not(synch_fifo_full(i));
     
-    i_synch_fifo : synch_fifo
+    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16
       port map (
         rst     => reset_sych_fifo,
         wr_clk  => Clk_i,

@@ -1,10 +1,10 @@
-// Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+// Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
-// Tool Version: Vivado v.2019.1 (win64) Build 2552052 Fri May 24 14:49:42 MDT 2019
-// Date        : Wed Mar 31 16:42:10 2021
-// Host        : IITICUBLAP127 running 64-bit major release  (build 9200)
+// Tool Version: Vivado v.2020.1 (win64) Build 2902540 Wed May 27 19:54:49 MDT 2020
+// Date        : Thu Sep 23 14:47:21 2021
+// Host        : IITICUBWS052 running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode funcsim
-//               C:/Progetti/Repository/HPU_Core/src/GTP_lib/GTP_MSG_SYNC_FIFO/GTP_MSG_SYNC_FIFO_sim_netlist.v
+//               d:/Projects/Repository/HPU_Core_GTP/src/GTP_lib/GTP_MSG_SYNC_FIFO/GTP_MSG_SYNC_FIFO_sim_netlist.v
 // Design      : GTP_MSG_SYNC_FIFO
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -12,7 +12,7 @@
 // --------------------------------------------------------------------------------
 `timescale 1 ps / 1 ps
 
-(* CHECK_LICENSE_TYPE = "GTP_MSG_SYNC_FIFO,fifo_generator_v13_2_4,{}" *) (* downgradeipidentifiedwarnings = "yes" *) (* x_core_info = "fifo_generator_v13_2_4,Vivado 2019.1" *) 
+(* CHECK_LICENSE_TYPE = "GTP_MSG_SYNC_FIFO,fifo_generator_v13_2_5,{}" *) (* downgradeipidentifiedwarnings = "yes" *) (* x_core_info = "fifo_generator_v13_2_5,Vivado 2020.1" *) 
 (* NotValidForBitStream *)
 module GTP_MSG_SYNC_FIFO
    (rst,
@@ -27,8 +27,8 @@ module GTP_MSG_SYNC_FIFO
     empty,
     valid);
   input rst;
-  (* x_interface_info = "xilinx.com:signal:clock:1.0 write_clk CLK" *) (* x_interface_parameter = "XIL_INTERFACENAME write_clk, FREQ_HZ 100000000, PHASE 0.000, INSERT_VIP 0" *) input wr_clk;
-  (* x_interface_info = "xilinx.com:signal:clock:1.0 read_clk CLK" *) (* x_interface_parameter = "XIL_INTERFACENAME read_clk, FREQ_HZ 100000000, PHASE 0.000, INSERT_VIP 0" *) input rd_clk;
+  (* x_interface_info = "xilinx.com:signal:clock:1.0 write_clk CLK" *) (* x_interface_parameter = "XIL_INTERFACENAME write_clk, FREQ_HZ 100000000, FREQ_TOLERANCE_HZ 0, PHASE 0.000, INSERT_VIP 0" *) input wr_clk;
+  (* x_interface_info = "xilinx.com:signal:clock:1.0 read_clk CLK" *) (* x_interface_parameter = "XIL_INTERFACENAME read_clk, FREQ_HZ 100000000, FREQ_TOLERANCE_HZ 0, PHASE 0.000, INSERT_VIP 0" *) input rd_clk;
   (* x_interface_info = "xilinx.com:interface:fifo_write:1.0 FIFO_WRITE WR_DATA" *) input [7:0]din;
   (* x_interface_info = "xilinx.com:interface:fifo_write:1.0 FIFO_WRITE WR_EN" *) input wr_en;
   (* x_interface_info = "xilinx.com:interface:fifo_read:1.0 FIFO_READ RD_EN" *) input rd_en;
@@ -373,7 +373,8 @@ module GTP_MSG_SYNC_FIFO
   (* C_WR_PNTR_WIDTH_WDCH = "10" *) 
   (* C_WR_PNTR_WIDTH_WRCH = "4" *) 
   (* C_WR_RESPONSE_LATENCY = "1" *) 
-  GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_4 U0
+  (* KEEP_HIERARCHY = "soft" *) 
+  GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_5 U0
        (.almost_empty(NLW_U0_almost_empty_UNCONNECTED),
         .almost_full(NLW_U0_almost_full_UNCONNECTED),
         .axi_ar_data_count(NLW_U0_axi_ar_data_count_UNCONNECTED[4:0]),
@@ -609,7 +610,8 @@ endmodule
 
 (* DEF_VAL = "1'b0" *) (* DEST_SYNC_FF = "2" *) (* INIT_SYNC_FF = "0" *) 
 (* INV_DEF_VAL = "1'b1" *) (* ORIG_REF_NAME = "xpm_cdc_async_rst" *) (* RST_ACTIVE_HIGH = "1" *) 
-(* VERSION = "0" *) (* XPM_MODULE = "TRUE" *) (* xpm_cdc = "ASYNC_RST" *) 
+(* VERSION = "0" *) (* XPM_MODULE = "TRUE" *) (* keep_hierarchy = "true" *) 
+(* xpm_cdc = "ASYNC_RST" *) 
 module GTP_MSG_SYNC_FIFO_xpm_cdc_async_rst
    (src_arst,
     dest_clk,
@@ -649,8 +651,9 @@ endmodule
 
 (* DEF_VAL = "1'b0" *) (* DEST_SYNC_FF = "2" *) (* INIT_SYNC_FF = "0" *) 
 (* INV_DEF_VAL = "1'b1" *) (* ORIG_REF_NAME = "xpm_cdc_async_rst" *) (* RST_ACTIVE_HIGH = "1" *) 
-(* VERSION = "0" *) (* XPM_MODULE = "TRUE" *) (* xpm_cdc = "ASYNC_RST" *) 
-module GTP_MSG_SYNC_FIFO_xpm_cdc_async_rst__2
+(* VERSION = "0" *) (* XPM_MODULE = "TRUE" *) (* keep_hierarchy = "true" *) 
+(* xpm_cdc = "ASYNC_RST" *) 
+module GTP_MSG_SYNC_FIFO_xpm_cdc_async_rst__1
    (src_arst,
     dest_clk,
     dest_arst);
@@ -690,7 +693,7 @@ endmodule
 (* DEST_SYNC_FF = "3" *) (* INIT_SYNC_FF = "0" *) (* ORIG_REF_NAME = "xpm_cdc_gray" *) 
 (* REG_OUTPUT = "1" *) (* SIM_ASSERT_CHK = "0" *) (* SIM_LOSSLESS_GRAY_CHK = "0" *) 
 (* VERSION = "0" *) (* WIDTH = "4" *) (* XPM_MODULE = "TRUE" *) 
-(* xpm_cdc = "GRAY" *) 
+(* keep_hierarchy = "true" *) (* xpm_cdc = "GRAY" *) 
 module GTP_MSG_SYNC_FIFO_xpm_cdc_gray
    (src_clk,
     src_in_bin,
@@ -914,7 +917,7 @@ endmodule
 (* DEST_SYNC_FF = "3" *) (* INIT_SYNC_FF = "0" *) (* ORIG_REF_NAME = "xpm_cdc_gray" *) 
 (* REG_OUTPUT = "1" *) (* SIM_ASSERT_CHK = "0" *) (* SIM_LOSSLESS_GRAY_CHK = "0" *) 
 (* VERSION = "0" *) (* WIDTH = "4" *) (* XPM_MODULE = "TRUE" *) 
-(* xpm_cdc = "GRAY" *) 
+(* keep_hierarchy = "true" *) (* xpm_cdc = "GRAY" *) 
 module GTP_MSG_SYNC_FIFO_xpm_cdc_gray__2
    (src_clk,
     src_in_bin,
@@ -1137,7 +1140,7 @@ endmodule
 
 (* DEST_SYNC_FF = "5" *) (* INIT_SYNC_FF = "0" *) (* ORIG_REF_NAME = "xpm_cdc_single" *) 
 (* SIM_ASSERT_CHK = "0" *) (* SRC_INPUT_REG = "0" *) (* VERSION = "0" *) 
-(* XPM_MODULE = "TRUE" *) (* xpm_cdc = "SINGLE" *) 
+(* XPM_MODULE = "TRUE" *) (* keep_hierarchy = "true" *) (* xpm_cdc = "SINGLE" *) 
 module GTP_MSG_SYNC_FIFO_xpm_cdc_single
    (src_clk,
     src_in,
@@ -1202,7 +1205,7 @@ endmodule
 
 (* DEST_SYNC_FF = "5" *) (* INIT_SYNC_FF = "0" *) (* ORIG_REF_NAME = "xpm_cdc_single" *) 
 (* SIM_ASSERT_CHK = "0" *) (* SRC_INPUT_REG = "0" *) (* VERSION = "0" *) 
-(* XPM_MODULE = "TRUE" *) (* xpm_cdc = "SINGLE" *) 
+(* XPM_MODULE = "TRUE" *) (* keep_hierarchy = "true" *) (* xpm_cdc = "SINGLE" *) 
 module GTP_MSG_SYNC_FIFO_xpm_cdc_single__2
    (src_clk,
     src_in,
@@ -1321,6 +1324,7 @@ module GTP_MSG_SYNC_FIFO_clk_x_pntrs
         .O(\dest_out_bin_ff_reg[2] ));
   (* DEST_SYNC_FF = "3" *) 
   (* INIT_SYNC_FF = "0" *) 
+  (* KEEP_HIERARCHY = "true" *) 
   (* REG_OUTPUT = "1" *) 
   (* SIM_ASSERT_CHK = "0" *) 
   (* SIM_LOSSLESS_GRAY_CHK = "0" *) 
@@ -1335,6 +1339,7 @@ module GTP_MSG_SYNC_FIFO_clk_x_pntrs
         .src_in_bin(\src_gray_ff_reg[3]_0 ));
   (* DEST_SYNC_FF = "3" *) 
   (* INIT_SYNC_FF = "0" *) 
+  (* KEEP_HIERARCHY = "true" *) 
   (* REG_OUTPUT = "1" *) 
   (* SIM_ASSERT_CHK = "0" *) 
   (* SIM_LOSSLESS_GRAY_CHK = "0" *) 
@@ -1376,8 +1381,8 @@ module GTP_MSG_SYNC_FIFO_dmem
   wire [7:0]Q;
   wire [3:0]count_d2;
   wire [7:0]din;
+  wire [7:0]dout_i0;
   wire [3:0]\gpr1.dout_i_reg[1]_0 ;
-  wire [7:0]p_0_out;
   wire rd_clk;
   wire wr_clk;
   wire [1:0]NLW_RAM_reg_0_15_0_5_DOD_UNCONNECTED;
@@ -1388,6 +1393,7 @@ module GTP_MSG_SYNC_FIFO_dmem
   (* METHODOLOGY_DRC_VIOS = "" *) 
   (* RTL_RAM_BITS = "128" *) 
   (* RTL_RAM_NAME = "inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.mem/gdm.dm_gen.dm/RAM" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "0" *) 
   (* ram_addr_end = "15" *) 
   (* ram_offset = "0" *) 
@@ -1402,15 +1408,16 @@ module GTP_MSG_SYNC_FIFO_dmem
         .DIB(din[3:2]),
         .DIC(din[5:4]),
         .DID({1'b0,1'b0}),
-        .DOA(p_0_out[1:0]),
-        .DOB(p_0_out[3:2]),
-        .DOC(p_0_out[5:4]),
+        .DOA(dout_i0[1:0]),
+        .DOB(dout_i0[3:2]),
+        .DOC(dout_i0[5:4]),
         .DOD(NLW_RAM_reg_0_15_0_5_DOD_UNCONNECTED[1:0]),
         .WCLK(wr_clk),
         .WE(EN));
   (* METHODOLOGY_DRC_VIOS = "" *) 
   (* RTL_RAM_BITS = "128" *) 
   (* RTL_RAM_NAME = "inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.mem/gdm.dm_gen.dm/RAM" *) 
+  (* RTL_RAM_TYPE = "RAM_SDP" *) 
   (* ram_addr_begin = "0" *) 
   (* ram_addr_end = "15" *) 
   (* ram_offset = "0" *) 
@@ -1425,7 +1432,7 @@ module GTP_MSG_SYNC_FIFO_dmem
         .DIB({1'b0,1'b0}),
         .DIC({1'b0,1'b0}),
         .DID({1'b0,1'b0}),
-        .DOA(p_0_out[7:6]),
+        .DOA(dout_i0[7:6]),
         .DOB(NLW_RAM_reg_0_15_6_7_DOB_UNCONNECTED[1:0]),
         .DOC(NLW_RAM_reg_0_15_6_7_DOC_UNCONNECTED[1:0]),
         .DOD(NLW_RAM_reg_0_15_6_7_DOD_UNCONNECTED[1:0]),
@@ -1437,7 +1444,7 @@ module GTP_MSG_SYNC_FIFO_dmem
        (.C(rd_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_0_out[0]),
+        .D(dout_i0[0]),
         .Q(Q[0]));
   FDCE #(
     .INIT(1'b0)) 
@@ -1445,7 +1452,7 @@ module GTP_MSG_SYNC_FIFO_dmem
        (.C(rd_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_0_out[1]),
+        .D(dout_i0[1]),
         .Q(Q[1]));
   FDCE #(
     .INIT(1'b0)) 
@@ -1453,7 +1460,7 @@ module GTP_MSG_SYNC_FIFO_dmem
        (.C(rd_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_0_out[2]),
+        .D(dout_i0[2]),
         .Q(Q[2]));
   FDCE #(
     .INIT(1'b0)) 
@@ -1461,7 +1468,7 @@ module GTP_MSG_SYNC_FIFO_dmem
        (.C(rd_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_0_out[3]),
+        .D(dout_i0[3]),
         .Q(Q[3]));
   FDCE #(
     .INIT(1'b0)) 
@@ -1469,7 +1476,7 @@ module GTP_MSG_SYNC_FIFO_dmem
        (.C(rd_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_0_out[4]),
+        .D(dout_i0[4]),
         .Q(Q[4]));
   FDCE #(
     .INIT(1'b0)) 
@@ -1477,7 +1484,7 @@ module GTP_MSG_SYNC_FIFO_dmem
        (.C(rd_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_0_out[5]),
+        .D(dout_i0[5]),
         .Q(Q[5]));
   FDCE #(
     .INIT(1'b0)) 
@@ -1485,7 +1492,7 @@ module GTP_MSG_SYNC_FIFO_dmem
        (.C(rd_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_0_out[6]),
+        .D(dout_i0[6]),
         .Q(Q[6]));
   FDCE #(
     .INIT(1'b0)) 
@@ -1493,7 +1500,7 @@ module GTP_MSG_SYNC_FIFO_dmem
        (.C(rd_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_0_out[7]),
+        .D(dout_i0[7]),
         .Q(Q[7]));
 endmodule
 
@@ -1536,16 +1543,14 @@ module GTP_MSG_SYNC_FIFO_fifo_generator_ramfifo
   wire \ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.sckt_rd_rst_ic_reg ;
   wire \ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.wr_rst_busy_i_reg ;
   wire overflow;
-  wire [3:0]p_0_out_0;
-  wire [3:0]p_13_out;
-  wire p_20_out;
-  wire [3:0]p_24_out;
-  wire [3:0]p_25_out;
-  wire p_6_out;
   wire ram_rd_en_i;
+  wire ram_regout_en;
+  wire ram_wr_en;
   wire rd_clk;
   wire rd_en;
+  wire [3:0]rd_pntr;
   wire [2:0]rd_pntr_plus1;
+  wire [3:0]rd_pntr_wr;
   wire rst;
   wire rst_full_ff_i;
   wire rst_full_gen_i;
@@ -1554,26 +1559,28 @@ module GTP_MSG_SYNC_FIFO_fifo_generator_ramfifo
   wire valid;
   wire wr_clk;
   wire wr_en;
+  wire [3:0]wr_pntr;
   wire [2:0]wr_pntr_plus2;
+  wire [3:0]wr_pntr_rd;
 
   GTP_MSG_SYNC_FIFO_clk_x_pntrs \gntv_or_sync_fifo.gcx.clkx 
        (.Q(wr_pntr_plus2),
-        .RD_PNTR_WR(p_25_out),
-        .WR_PNTR_RD(p_24_out),
+        .RD_PNTR_WR(rd_pntr_wr),
+        .WR_PNTR_RD(wr_pntr_rd),
         .\dest_out_bin_ff_reg[2] (\gntv_or_sync_fifo.gcx.clkx_n_0 ),
         .\dest_out_bin_ff_reg[2]_0 (\gntv_or_sync_fifo.gcx.clkx_n_5 ),
         .ram_empty_i_reg(rd_pntr_plus1),
         .rd_clk(rd_clk),
-        .\src_gray_ff_reg[3] (p_13_out),
-        .\src_gray_ff_reg[3]_0 (p_0_out_0),
+        .\src_gray_ff_reg[3] (wr_pntr),
+        .\src_gray_ff_reg[3]_0 (rd_pntr),
         .wr_clk(wr_clk));
   GTP_MSG_SYNC_FIFO_rd_logic \gntv_or_sync_fifo.gl0.rd 
        (.AR(\ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.sckt_rd_rst_ic_reg ),
-        .E(p_6_out),
+        .E(ram_regout_en),
         .Q(rd_pntr_plus1),
-        .WR_PNTR_RD(p_24_out),
+        .WR_PNTR_RD(wr_pntr_rd),
         .empty(empty),
-        .\gc0.count_d1_reg[3] (p_0_out_0),
+        .\gc0.count_d1_reg[3] (rd_pntr),
         .\gpregsm1.curr_fwft_state_reg[1] (ram_rd_en_i),
         .ram_empty_i_reg(\gntv_or_sync_fifo.gcx.clkx_n_5 ),
         .rd_clk(rd_clk),
@@ -1581,12 +1588,12 @@ module GTP_MSG_SYNC_FIFO_fifo_generator_ramfifo
         .valid(valid));
   GTP_MSG_SYNC_FIFO_wr_logic \gntv_or_sync_fifo.gl0.wr 
        (.AR(rstblk_n_0),
-        .E(p_20_out),
+        .E(ram_wr_en),
         .FULL_FB(\gntv_or_sync_fifo.gl0.wr_n_1 ),
         .Q(wr_pntr_plus2),
-        .RD_PNTR_WR(p_25_out),
+        .RD_PNTR_WR(rd_pntr_wr),
         .full(full),
-        .\gic0.gc0.count_d2_reg[3] (p_13_out),
+        .\gic0.gc0.count_d2_reg[3] (wr_pntr),
         .\gof.gof1.overflow_i_reg (rstblk_n_5),
         .out(rst_full_ff_i),
         .overflow(overflow),
@@ -1597,12 +1604,12 @@ module GTP_MSG_SYNC_FIFO_fifo_generator_ramfifo
   GTP_MSG_SYNC_FIFO_memory \gntv_or_sync_fifo.mem 
        (.AR(\ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.sckt_rd_rst_ic_reg ),
         .E(ram_rd_en_i),
-        .EN(p_20_out),
-        .count_d2(p_13_out),
+        .EN(ram_wr_en),
+        .count_d2(wr_pntr),
         .din(din),
         .dout(dout),
-        .\goreg_dm.dout_i_reg[7]_0 (p_6_out),
-        .\gpr1.dout_i_reg[1] (p_0_out_0),
+        .\goreg_dm.dout_i_reg[7]_0 (ram_regout_en),
+        .\gpr1.dout_i_reg[1] (rd_pntr),
         .rd_clk(rd_clk),
         .wr_clk(wr_clk));
   GTP_MSG_SYNC_FIFO_reset_blk_ramfifo rstblk
@@ -1745,8 +1752,8 @@ endmodule
 (* C_WR_DEPTH_WRCH = "16" *) (* C_WR_FREQ = "1" *) (* C_WR_PNTR_WIDTH = "4" *) 
 (* C_WR_PNTR_WIDTH_AXIS = "10" *) (* C_WR_PNTR_WIDTH_RACH = "4" *) (* C_WR_PNTR_WIDTH_RDCH = "10" *) 
 (* C_WR_PNTR_WIDTH_WACH = "4" *) (* C_WR_PNTR_WIDTH_WDCH = "10" *) (* C_WR_PNTR_WIDTH_WRCH = "4" *) 
-(* C_WR_RESPONSE_LATENCY = "1" *) (* ORIG_REF_NAME = "fifo_generator_v13_2_4" *) 
-module GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_4
+(* C_WR_RESPONSE_LATENCY = "1" *) (* ORIG_REF_NAME = "fifo_generator_v13_2_5" *) 
+module GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_5
    (backup,
     backup_marker,
     clk,
@@ -2733,7 +2740,7 @@ module GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_4
        (.G(\<const0> ));
   VCC VCC
        (.P(\<const1> ));
-  GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_4_synth inst_fifo_gen
+  GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_5_synth inst_fifo_gen
        (.din(din),
         .dout(dout),
         .empty(empty),
@@ -2749,8 +2756,8 @@ module GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_4
         .wr_en(wr_en));
 endmodule
 
-(* ORIG_REF_NAME = "fifo_generator_v13_2_4_synth" *) 
-module GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_4_synth
+(* ORIG_REF_NAME = "fifo_generator_v13_2_5_synth" *) 
+module GTP_MSG_SYNC_FIFO_fifo_generator_v13_2_5_synth
    (\ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.wr_rst_busy_i_reg ,
     \ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.sckt_rd_rst_ic_reg ,
     empty,
@@ -3304,10 +3311,10 @@ module GTP_MSG_SYNC_FIFO_rd_logic
   wire [2:0]Q;
   wire [3:0]WR_PNTR_RD;
   wire empty;
+  wire empty_fb_i;
   wire [3:0]\gc0.count_d1_reg[3] ;
   wire [0:0]\gpregsm1.curr_fwft_state_reg[1] ;
   wire \gr1.gr1_int.rfwft_n_3 ;
-  wire p_2_out;
   wire ram_empty_i_reg;
   wire rd_clk;
   wire rd_en;
@@ -3323,13 +3330,13 @@ module GTP_MSG_SYNC_FIFO_rd_logic
         .empty(empty),
         .\gpregsm1.curr_fwft_state_reg[1]_0 (\gr1.gr1_int.rfwft_n_3 ),
         .\gpregsm1.curr_fwft_state_reg[1]_1 (\gpregsm1.curr_fwft_state_reg[1] ),
-        .out(p_2_out),
+        .out(empty_fb_i),
         .rd_clk(rd_clk),
         .rd_en(rd_en),
         .valid(valid));
   GTP_MSG_SYNC_FIFO_rd_status_flags_as \gras.rsts 
        (.AR(AR),
-        .out(p_2_out),
+        .out(empty_fb_i),
         .ram_empty_i_reg_0(rpntr_n_0),
         .rd_clk(rd_clk));
   GTP_MSG_SYNC_FIFO_rd_bin_cntr rpntr
@@ -3422,17 +3429,25 @@ module GTP_MSG_SYNC_FIFO_reset_blk_ramfifo
   wire \ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.wr_rst_busy_i_reg_0 ;
   wire \ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.wr_rst_busy_i_reg_1 ;
   wire rd_clk;
+  (* DONT_TOUCH *) wire [2:0]rd_rst_reg;
   wire [3:0]rd_rst_wr_ext;
   wire rst;
   (* async_reg = "true" *) (* msgon = "true" *) wire rst_d1;
   (* async_reg = "true" *) (* msgon = "true" *) wire rst_d2;
   (* async_reg = "true" *) (* msgon = "true" *) wire rst_d3;
+  (* async_reg = "true" *) (* msgon = "true" *) wire rst_d4;
+  (* async_reg = "true" *) (* msgon = "true" *) wire rst_d5;
+  (* async_reg = "true" *) (* msgon = "true" *) wire rst_d6;
+  (* async_reg = "true" *) (* msgon = "true" *) wire rst_d7;
+  (* async_reg = "true" *) (* msgon = "true" *) wire rst_rd_reg1;
   (* async_reg = "true" *) (* msgon = "true" *) wire rst_rd_reg2;
+  (* async_reg = "true" *) (* msgon = "true" *) wire rst_wr_reg1;
   (* async_reg = "true" *) (* msgon = "true" *) wire rst_wr_reg2;
   wire sckt_rd_rst_wr;
   wire wr_clk;
   wire wr_en;
   wire [1:0]wr_rst_rd_ext;
+  (* DONT_TOUCH *) wire [2:0]wr_rst_reg;
 
   assign \grstd1.grst_full.grst_f.rst_d3_reg_0  = rst_d3;
   assign out = rst_d2;
@@ -3482,6 +3497,72 @@ module GTP_MSG_SYNC_FIFO_reset_blk_ramfifo
         .D(\grstd1.grst_full.grst_f.rst_d3_i_1_n_0 ),
         .PRE(rst_wr_reg2),
         .Q(rst_d3));
+  (* ASYNC_REG *) 
+  (* KEEP = "yes" *) 
+  (* msgon = "true" *) 
+  FDPE #(
+    .INIT(1'b1)) 
+    \grstd1.grst_full.grst_f.rst_d4_reg 
+       (.C(wr_clk),
+        .CE(1'b1),
+        .D(rst_d3),
+        .PRE(rst_wr_reg2),
+        .Q(rst_d4));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_0
+       (.I0(1'b1),
+        .O(wr_rst_reg[2]));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_1
+       (.I0(1'b1),
+        .O(wr_rst_reg[1]));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_10
+       (.I0(1'b1),
+        .O(rst_d7));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_2
+       (.I0(1'b1),
+        .O(wr_rst_reg[0]));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_3
+       (.I0(1'b1),
+        .O(rd_rst_reg[2]));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_4
+       (.I0(1'b1),
+        .O(rd_rst_reg[1]));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_5
+       (.I0(1'b1),
+        .O(rd_rst_reg[0]));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_6
+       (.I0(1'b0),
+        .O(rst_wr_reg1));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_7
+       (.I0(1'b0),
+        .O(rst_rd_reg1));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_8
+       (.I0(1'b1),
+        .O(rst_d5));
+  LUT1 #(
+    .INIT(2'h2)) 
+    i_9
+       (.I0(1'b1),
+        .O(rst_d6));
   FDCE #(
     .INIT(1'b0)) 
     \ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.rd_rst_wr_ext_reg[0] 
@@ -3518,6 +3599,7 @@ module GTP_MSG_SYNC_FIFO_reset_blk_ramfifo
   (* DEST_SYNC_FF = "2" *) 
   (* INIT_SYNC_FF = "0" *) 
   (* INV_DEF_VAL = "1'b1" *) 
+  (* KEEP_HIERARCHY = "true" *) 
   (* RST_ACTIVE_HIGH = "1" *) 
   (* VERSION = "0" *) 
   (* XPM_CDC = "ASYNC_RST" *) 
@@ -3590,6 +3672,7 @@ module GTP_MSG_SYNC_FIFO_reset_blk_ramfifo
         .Q(wr_rst_rd_ext[1]));
   (* DEST_SYNC_FF = "5" *) 
   (* INIT_SYNC_FF = "0" *) 
+  (* KEEP_HIERARCHY = "true" *) 
   (* SIM_ASSERT_CHK = "0" *) 
   (* SRC_INPUT_REG = "0" *) 
   (* VERSION = "0" *) 
@@ -3602,6 +3685,7 @@ module GTP_MSG_SYNC_FIFO_reset_blk_ramfifo
         .src_in(\ngwrdrst.grst.g7serrst.gnsckt_wrst.gic_rst.sckt_rd_rst_ic_reg_0 ));
   (* DEST_SYNC_FF = "5" *) 
   (* INIT_SYNC_FF = "0" *) 
+  (* KEEP_HIERARCHY = "true" *) 
   (* SIM_ASSERT_CHK = "0" *) 
   (* SRC_INPUT_REG = "0" *) 
   (* VERSION = "0" *) 
@@ -3616,11 +3700,12 @@ module GTP_MSG_SYNC_FIFO_reset_blk_ramfifo
   (* DEST_SYNC_FF = "2" *) 
   (* INIT_SYNC_FF = "0" *) 
   (* INV_DEF_VAL = "1'b1" *) 
+  (* KEEP_HIERARCHY = "true" *) 
   (* RST_ACTIVE_HIGH = "1" *) 
   (* VERSION = "0" *) 
   (* XPM_CDC = "ASYNC_RST" *) 
   (* XPM_MODULE = "TRUE" *) 
-  GTP_MSG_SYNC_FIFO_xpm_cdc_async_rst__2 \ngwrdrst.grst.g7serrst.gnsckt_wrst.rst_wr_reg2_inst 
+  GTP_MSG_SYNC_FIFO_xpm_cdc_async_rst__1 \ngwrdrst.grst.g7serrst.gnsckt_wrst.rst_wr_reg2_inst 
        (.dest_arst(rst_wr_reg2),
         .dest_clk(wr_clk),
         .src_arst(rst));
@@ -3655,13 +3740,13 @@ module GTP_MSG_SYNC_FIFO_wr_bin_cntr
   wire [3:0]RD_PNTR_WR;
   wire \dest_out_bin_ff_reg[3] ;
   wire [3:0]\gic0.gc0.count_d2_reg[3]_0 ;
-  wire [3:0]p_14_out;
   wire [3:0]plusOp;
   wire ram_full_i_i_4_n_0;
   wire ram_full_i_reg;
   wire ram_full_i_reg_0;
   wire ram_full_i_reg_1;
   wire wr_clk;
+  wire [3:0]wr_pntr_plus1;
 
   LUT1 #(
     .INIT(2'h1)) 
@@ -3698,7 +3783,7 @@ module GTP_MSG_SYNC_FIFO_wr_bin_cntr
         .CE(E),
         .D(Q[0]),
         .PRE(AR),
-        .Q(p_14_out[0]));
+        .Q(wr_pntr_plus1[0]));
   FDCE #(
     .INIT(1'b0)) 
     \gic0.gc0.count_d1_reg[1] 
@@ -3706,7 +3791,7 @@ module GTP_MSG_SYNC_FIFO_wr_bin_cntr
         .CE(E),
         .CLR(AR),
         .D(Q[1]),
-        .Q(p_14_out[1]));
+        .Q(wr_pntr_plus1[1]));
   FDCE #(
     .INIT(1'b0)) 
     \gic0.gc0.count_d1_reg[2] 
@@ -3714,7 +3799,7 @@ module GTP_MSG_SYNC_FIFO_wr_bin_cntr
         .CE(E),
         .CLR(AR),
         .D(Q[2]),
-        .Q(p_14_out[2]));
+        .Q(wr_pntr_plus1[2]));
   FDCE #(
     .INIT(1'b0)) 
     \gic0.gc0.count_d1_reg[3] 
@@ -3722,14 +3807,14 @@ module GTP_MSG_SYNC_FIFO_wr_bin_cntr
         .CE(E),
         .CLR(AR),
         .D(Q[3]),
-        .Q(p_14_out[3]));
+        .Q(wr_pntr_plus1[3]));
   FDCE #(
     .INIT(1'b0)) 
     \gic0.gc0.count_d2_reg[0] 
        (.C(wr_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_14_out[0]),
+        .D(wr_pntr_plus1[0]),
         .Q(\gic0.gc0.count_d2_reg[3]_0 [0]));
   FDCE #(
     .INIT(1'b0)) 
@@ -3737,7 +3822,7 @@ module GTP_MSG_SYNC_FIFO_wr_bin_cntr
        (.C(wr_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_14_out[1]),
+        .D(wr_pntr_plus1[1]),
         .Q(\gic0.gc0.count_d2_reg[3]_0 [1]));
   FDCE #(
     .INIT(1'b0)) 
@@ -3745,7 +3830,7 @@ module GTP_MSG_SYNC_FIFO_wr_bin_cntr
        (.C(wr_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_14_out[2]),
+        .D(wr_pntr_plus1[2]),
         .Q(\gic0.gc0.count_d2_reg[3]_0 [2]));
   FDCE #(
     .INIT(1'b0)) 
@@ -3753,7 +3838,7 @@ module GTP_MSG_SYNC_FIFO_wr_bin_cntr
        (.C(wr_clk),
         .CE(E),
         .CLR(AR),
-        .D(p_14_out[3]),
+        .D(wr_pntr_plus1[3]),
         .Q(\gic0.gc0.count_d2_reg[3]_0 [3]));
   FDCE #(
     .INIT(1'b0)) 
@@ -3793,19 +3878,19 @@ module GTP_MSG_SYNC_FIFO_wr_bin_cntr
        (.I0(ram_full_i_reg),
         .I1(ram_full_i_reg_0),
         .I2(RD_PNTR_WR[3]),
-        .I3(p_14_out[3]),
+        .I3(wr_pntr_plus1[3]),
         .I4(ram_full_i_reg_1),
         .I5(ram_full_i_i_4_n_0),
         .O(\dest_out_bin_ff_reg[3] ));
   LUT6 #(
     .INIT(64'h9009000000009009)) 
     ram_full_i_i_4
-       (.I0(p_14_out[2]),
+       (.I0(wr_pntr_plus1[2]),
         .I1(RD_PNTR_WR[2]),
-        .I2(p_14_out[1]),
+        .I2(wr_pntr_plus1[1]),
         .I3(RD_PNTR_WR[1]),
         .I4(RD_PNTR_WR[0]),
-        .I5(p_14_out[0]),
+        .I5(wr_pntr_plus1[0]),
         .O(ram_full_i_i_4_n_0));
 endmodule
 
@@ -3990,12 +4075,15 @@ module glbl ();
 
     parameter ROC_WIDTH = 100000;
     parameter TOC_WIDTH = 0;
+    parameter GRES_WIDTH = 10000;
+    parameter GRES_START = 10000;
 
 //--------   STARTUP Globals --------------
     wire GSR;
     wire GTS;
     wire GWE;
     wire PRLD;
+    wire GRESTORE;
     tri1 p_up_tmp;
     tri (weak1, strong0) PLL_LOCKG = p_up_tmp;
 
@@ -4008,6 +4096,7 @@ module glbl ();
     reg GSR_int;
     reg GTS_int;
     reg PRLD_int;
+    reg GRESTORE_int;
 
 //--------   JTAG Globals --------------
     wire JTAG_TDO_GLBL;
@@ -4035,6 +4124,7 @@ module glbl ();
     assign (strong1, weak0) GSR = GSR_int;
     assign (strong1, weak0) GTS = GTS_int;
     assign (weak1, weak0) PRLD = PRLD_int;
+    assign (strong1, weak0) GRESTORE = GRESTORE_int;
 
     initial begin
 	GSR_int = 1'b1;
@@ -4048,6 +4138,14 @@ module glbl ();
 	GTS_int = 1'b1;
 	#(TOC_WIDTH)
 	GTS_int = 1'b0;
+    end
+
+    initial begin 
+	GRESTORE_int = 1'b0;
+	#(GRES_START);
+	GRESTORE_int = 1'b1;
+	#(GRES_WIDTH);
+	GRESTORE_int = 1'b0;
     end
 
 endmodule

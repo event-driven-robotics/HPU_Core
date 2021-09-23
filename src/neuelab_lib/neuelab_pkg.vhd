@@ -12,7 +12,7 @@ library ieee;
 
 package NEComponents_pkg is
 
-    component Infifo_64_1024_32 is
+    component INFIFO_64_1024_S7 is
         port (
             clk          : in  std_logic;
             srst         : in  std_logic;
@@ -28,10 +28,10 @@ package NEComponents_pkg is
             underflow    : out std_logic;
             data_count   : out std_logic_vector(10 downto 0)
         );
-    end component Infifo_64_1024_32;
+    end component INFIFO_64_1024_S7;
 
     
-    component Outfifo_32_2048_64 is
+    component OUTFIFO_32_2048_64_1024_S7 is
         port (
             rst          : in  std_logic;
             wr_clk       : in  std_logic;
@@ -47,7 +47,7 @@ package NEComponents_pkg is
             almost_empty : out std_logic;
             underflow    : out std_logic
         );
-    end component Outfifo_32_2048_64;
+    end component OUTFIFO_32_2048_64_1024_S7;
 
     
     component Timestamp is 

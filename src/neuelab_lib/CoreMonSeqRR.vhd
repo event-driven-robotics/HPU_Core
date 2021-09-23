@@ -400,7 +400,7 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
     SeqInAddrEvt_xD(23 downto 16) <= LiEnSeqInAddrEvt_xD(23 downto 16);
     SeqInAddrEvt_xD(31 downto 24) <= LiEnSeqInAddrEvt_xD(31 downto 24);
     --
-    u_Outfifo_32_2048_64 : Outfifo_32_2048_64
+    u_OUTFIFO_32_2048_64_1024_S7 : OUTFIFO_32_2048_64_1024_S7
         port map (
             rst          => ResetTX_xR,    -- high-active reset
             wr_clk       => CoreClk_xCI,
@@ -436,7 +436,7 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
     LiEnMonOutAddrEvt_xD(31 downto 24) <= MonOutAddrEvt_xD(31 downto 24);
     --
 
-    u_Infifo_64_1024_32 : Infifo_64_1024_32
+    u_INFIFO_64_1024_S7 : INFIFO_64_1024_S7
         port map (
             clk          => CoreClk_xCI,
             srst         => ResetRX_xR,    -- high-active reset

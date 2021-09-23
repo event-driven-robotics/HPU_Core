@@ -1,4 +1,14 @@
 -- ********************************************
+-- Version 4.1 Rev 0:  
+-- - Compatibility extended to Ultrascale+
+--   (M. Casti - IIT)
+-- 
+-- ********************************************
+-- Version 4.0 Rev 0:  
+-- - GTP Interface for Series 7
+--   (M. Casti - IIT)
+-- 
+-- ********************************************
 -- Version 3.6 Rev 0:  28th, January 2021
 -- - Added interception ports (for algorythm insertion)
 -- - Updated the list of tags for externale sensor (IMU and Cochlea) - see AERSensorsMap.xlxs
