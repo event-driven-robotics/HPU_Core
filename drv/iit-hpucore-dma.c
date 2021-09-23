@@ -12,6 +12,15 @@
  *
  */
 
+#ifndef CONFIG_ARM
+/*
+ * On ARMv7 (i.e. Zynq7000) the cache invalidation operation required by the
+ * dma synchronization primitives lead to worse performances wrt using DMA
+ * coherent memory
+ */
+#define HPU_DMA_STREAMING
+#endif
+
 #include <asm/io.h>
 #include <asm/uaccess.h>
 #include <linux/iopoll.h>
@@ -499,6 +508,24 @@ struct hpu_priv {
 	unsigned int rx_data_count;
 };
 
+static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
+		dma_addr_t *dma_handle, enum dma_data_direction dir, gfp_t gfp)
+{
+	void *virt = kmalloc(size, GFP_KERNEL);
+	if (virt)
+		*dma_handle = dma_map_single_attrs(dev, virt, size, dir,
+		       DMA_ATTR_NON_CONSISTENT | DMA_ATTR_WRITE_COMBINE);
+	return virt;
+}
+
+static inline void dma_free_noncoherent(struct device *dev, size_t size, void *virt,
+		dma_addr_t dma_handle, enum dma_data_direction dir)
+{
+	dma_unmap_single_attrs(dev, dma_handle, size, dir,
+			       DMA_ATTR_NON_CONSISTENT | DMA_ATTR_WRITE_COMBINE);
+	kfree(virt);
+}
+
 #define HPU_REG_LOG 0
 
 #define HPU_DEBUGFS_ULONG(priv, x) debugfs_create_ulong(__stringify(x), 0444, \
@@ -510,7 +537,8 @@ static dev_t hpu_devt;
 static DEFINE_IDA(hpu_ida);
 
 static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
-static void hpu_dma_free_pool(struct hpu_priv *priv, struct hpu_dma_pool *hpu_pool);
+static void hpu_dma_free_pool(struct hpu_priv *priv, struct hpu_dma_pool *hpu_pool,
+	enum dma_data_direction dir);
 static void hpu_do_set_axis_lat(struct hpu_priv *priv);
 static void _hpu_do_set_axis_lat(struct hpu_priv *priv);
 
@@ -550,6 +578,11 @@ static void hpu_tx_dma_callback(void *_buffer)
 	struct hpu_priv *priv = buffer->priv;
 
 	/* mark as spare */
+#ifdef HPU_DMA_STREAMING
+	dma_sync_single_for_cpu(&priv->pdev->dev, buffer->phys,
+				priv->dma_tx_pool.ps,
+				DMA_TO_DEVICE);
+#endif
 	spin_lock(&priv->dma_tx_pool.spin_lock);
 	priv->dma_tx_pool.filled--;
 	complete(&priv->dma_tx_pool.completion);
@@ -762,6 +795,10 @@ static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *re
 	 * an early TLAST sending also a dummy data, so we need to discard it
 	 */
 	len = rawlen;
+#ifdef HPU_DMA_STREAMING
+	dma_sync_single_for_cpu(&priv->pdev->dev, buffer->phys, priv->dma_rx_pool.ps,
+				DMA_FROM_DEVICE);
+#endif
 	if ((len / 4) & 1) {
 		priv->early_tlast++;
 		len -= 4;
@@ -866,7 +903,10 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 						       DMA_PREP_INTERRUPT);
 		dma_desc->callback = hpu_tx_dma_callback;
 		dma_desc->callback_param = dma_buf;
-
+#ifdef HPU_DMA_STREAMING
+		dma_sync_single_for_device(&priv->pdev->dev, dma_buf->phys,
+				   priv->dma_tx_pool.ps, DMA_TO_DEVICE);
+#endif
 		cookie = dmaengine_submit(dma_desc);
 		priv->pkt_txed++;
 		priv->byte_txed += copy;
@@ -1133,20 +1173,21 @@ static void hpu_dma_release(struct hpu_priv *priv)
 {
 	if (priv->dma_rx_chan) {
 		dma_release_channel(priv->dma_rx_chan);
-		hpu_dma_free_pool(priv, &priv->dma_rx_pool);
+		hpu_dma_free_pool(priv, &priv->dma_rx_pool, DMA_FROM_DEVICE);
 	}
 
 	if (priv->dma_tx_chan) {
 		dma_release_channel(priv->dma_tx_chan);
-		hpu_dma_free_pool(priv, &priv->dma_tx_pool);
+		hpu_dma_free_pool(priv, &priv->dma_tx_pool, DMA_TO_DEVICE);
 	}
 }
 
 static int hpu_dma_alloc_pool(struct hpu_priv *priv,
-			      struct hpu_dma_pool *hpu_pool)
+			      struct hpu_dma_pool *hpu_pool,
+			      enum dma_data_direction dir)
 {
 	int i;
-
+#ifndef HPU_DMA_STREAMING
 	hpu_pool->dma_pool = dma_pool_create(HPU_DRIVER_NAME, &priv->pdev->dev,
 					 hpu_pool->ps, 4, 0);
 
@@ -1154,7 +1195,7 @@ static int hpu_dma_alloc_pool(struct hpu_priv *priv,
 		dev_err(&priv->pdev->dev, "Error creating DMA pool\n");
 		return -ENOMEM;
 	}
-
+#endif
 	hpu_pool->ring = kmalloc(hpu_pool->pn * sizeof(struct hpu_buf), GFP_KERNEL);
 	if (!(hpu_pool->ring)) {
 		dev_err(&priv->pdev->dev, "Can't alloc mem for dma ring\n");
@@ -1162,10 +1203,16 @@ static int hpu_dma_alloc_pool(struct hpu_priv *priv,
 	}
 
 	for (i = 0; i < hpu_pool->pn; i++) {
-	        hpu_pool->ring[i].virt =
-		    (unsigned char *)dma_pool_alloc(hpu_pool->dma_pool, GFP_KERNEL,
-						    &hpu_pool->ring[i].phys);
-
+#ifdef HPU_DMA_STREAMING
+	        hpu_pool->ring[i].virt = dma_alloc_noncoherent(&priv->pdev->dev,
+							       hpu_pool->ps,
+							       &hpu_pool->ring[i].phys,
+							       dir, GFP_KERNEL);
+#else
+		hpu_pool->ring[i].virt = (unsigned char *)
+			dma_pool_alloc(hpu_pool->dma_pool, GFP_KERNEL,
+				       &hpu_pool->ring[i].phys);
+#endif
 		if (!hpu_pool->ring[i].virt)
 			return -ENOMEM;
 	}
@@ -1183,17 +1230,25 @@ static int hpu_dma_alloc_pool(struct hpu_priv *priv,
 }
 
 static void hpu_dma_free_pool(struct hpu_priv *priv,
-			      struct hpu_dma_pool *hpu_pool)
+			      struct hpu_dma_pool *hpu_pool,
+			      enum dma_data_direction dir)
 {
 	int i;
 
 	for (i = 0; i < hpu_pool->pn; i++) {
+#ifdef HPU_DMA_STREAMING
+		dma_free_noncoherent(&priv->pdev->dev, hpu_pool->ps, hpu_pool->ring[i].virt,
+				     hpu_pool->ring[i].phys, dir);
+#else
 		dma_pool_free(hpu_pool->dma_pool,
 			      hpu_pool->ring[i].virt, hpu_pool->ring[i].phys);
+#endif
 		hpu_pool->ring[i].virt = NULL;
 	}
 
+#ifndef HPU_DMA_STREAMING
 	dma_pool_destroy(hpu_pool->dma_pool);
+#endif
 	hpu_pool->dma_pool = NULL;
 	kfree(hpu_pool->ring);
 	hpu_pool->ring = NULL;
@@ -1216,7 +1271,10 @@ static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
 
 	dma_desc->callback_result = hpu_rx_dma_callback;
 	dma_desc->callback_param = buf;
-
+#ifdef HPU_DMA_STREAMING
+	dma_sync_single_for_device(&priv->pdev->dev, buf->phys,
+				   priv->dma_rx_pool.ps, DMA_FROM_DEVICE);
+#endif
 	cookie = dmaengine_submit(dma_desc);
 	buf->cookie = cookie;
 	/* this buffer is new and has to be fully read */
@@ -1784,7 +1842,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	if (priv->dma_tx_chan) {
 		priv->dma_tx_pool.ps = tx_ps;
 		priv->dma_tx_pool.pn = tx_pn;
-		ret = hpu_dma_alloc_pool(priv, &priv->dma_tx_pool);
+		ret = hpu_dma_alloc_pool(priv, &priv->dma_tx_pool, DMA_TO_DEVICE);
 
 		if (ret) {
 			dev_err(&priv->pdev->dev,
@@ -1795,7 +1853,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 
 	priv->dma_rx_pool.ps = rx_ps;
 	priv->dma_rx_pool.pn = rx_pn;
-	ret = hpu_dma_alloc_pool(priv, &priv->dma_rx_pool);
+	ret = hpu_dma_alloc_pool(priv, &priv->dma_rx_pool, DMA_FROM_DEVICE);
 
 	/*
 	 * In case of error go to deallocation rollback path, since
