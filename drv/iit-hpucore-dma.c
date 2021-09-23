@@ -512,9 +512,15 @@ static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
 		dma_addr_t *dma_handle, enum dma_data_direction dir, gfp_t gfp)
 {
 	void *virt = kmalloc(size, GFP_KERNEL);
-	if (virt)
+	if (virt) {
 		*dma_handle = dma_map_single_attrs(dev, virt, size, dir,
 		       DMA_ATTR_NON_CONSISTENT | DMA_ATTR_WRITE_COMBINE);
+		if (dma_mapping_error(dev, *dma_handle))  {
+			kfree(virt);
+			return NULL;
+		}
+	}
+
 	return virt;
 }
 
