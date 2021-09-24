@@ -19,7 +19,7 @@ package definitions_pkg is
     constant CHIP_TYPE_ATIS : std_logic_vector(2 downto 0) := "010";
     constant CHIP_TYPE_GEN3 : std_logic_vector(2 downto 0) := "011";
 
-    constant C_FPGA_VERSION : std_logic_vector(7 downto 0) := "00110001";       -- version 3.1
+--    constant C_FPGA_VERSION : std_logic_vector(7 downto 0) := "00110001";       -- version 3.1
 
 end package definitions_pkg;
 

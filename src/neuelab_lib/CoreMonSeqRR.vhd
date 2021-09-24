@@ -27,6 +27,8 @@ library HPU_lib;
 
 entity CoreMonSeqRR is
     generic (
+        C_FAMILY                              : string := "Serie7"; -- "Serie7", "Ultrascale+" 
+        --
         C_PAER_DSIZE                         : integer;
         TestEnableSequencerNoWait            : boolean;
         TestEnableSequencerToMonitorLoopback : boolean;
@@ -400,7 +402,11 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
     SeqInAddrEvt_xD(23 downto 16) <= LiEnSeqInAddrEvt_xD(23 downto 16);
     SeqInAddrEvt_xD(31 downto 24) <= LiEnSeqInAddrEvt_xD(31 downto 24);
     --
-    u_OUTFIFO_32_2048_64_1024_S7 : OUTFIFO_32_2048_64_1024_S7
+    
+OUTFIFO_FOR_SERIE7 : if C_FAMILY = "Serie7"  generate -- "Serie7", "Ultrascale+" 
+begin
+   
+    u_OUTFIFO_32_2048_64_1024 : OUTFIFO_32_2048_64_1024_S7
         port map (
             rst          => ResetTX_xR,    -- high-active reset
             wr_clk       => CoreClk_xCI,
@@ -416,6 +422,33 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
             almost_empty => open,
             underflow    => open
         );
+
+end generate;
+
+OUTFIFO_FOR_ULTRASCALE_PLUS : if C_FAMILY = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
+begin
+   
+    u_OUTFIFO_32_2048_64_1024 : OUTFIFO_32_2048_64_1024_USP
+        port map (
+            rst          => ResetTX_xR,    -- high-active reset
+            wr_clk       => CoreClk_xCI,
+            rd_clk       => CoreClk_xCI,
+            din          => CoreFifoDat_xDI,
+            wr_en        => CoreFifoWrite_xSI,
+            rd_en        => SeqInRead_xS,
+            dout         => LiEnSeqInAddrEvt_xD,
+            full         => CoreFifoFull_xSO,
+            almost_full  => CoreFifoAlmostFull_xSO,
+            overflow     => open,
+            empty        => SeqInEmpty_xS,
+            almost_empty => open,
+            underflow    => open
+        );
+
+end generate;
+
+    
+
 
     CoreFifoEmpty_xSO <= SeqInEmpty_xS;
 
@@ -436,7 +469,10 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
     LiEnMonOutAddrEvt_xD(31 downto 24) <= MonOutAddrEvt_xD(31 downto 24);
     --
 
-    u_INFIFO_64_1024_S7 : INFIFO_64_1024_S7
+INFIFO_FOR_SERIE7 : if C_FAMILY = "Serie7"  generate -- "Serie7", "Ultrascale+" 
+begin
+   
+    u_INFIFO_64_1024 : INFIFO_64_1024_S7
         port map (
             clk          => CoreClk_xCI,
             srst         => ResetRX_xR,    -- high-active reset
@@ -452,6 +488,34 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
             underflow    => DBG_underflow,
             data_count   => fifoWrDataCount_xD
         );
+
+end generate;
+
+INFIFO_FOR_ULTRASCALE_PLUS : if C_FAMILY = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
+begin
+   
+    u_INFIFO_64_1024 : INFIFO_64_1024_USP
+        port map (
+            clk          => CoreClk_xCI,
+            srst         => ResetRX_xR,    -- high-active reset
+            din          => LiEnMonOutAddrEvt_xD,
+            wr_en        => enableFifoWriting_xS,
+            rd_en        => effectiveRdEn_xS,
+            dout         => i_fifoCoreDat_xD,
+            full         => MonOutFull_xS,
+            almost_full  => DBG_almost_full,
+            overflow     => DBG_overflow,
+            empty        => i_FifoCoreEmpty_xSO,
+            almost_empty => i_FifoCoreAlmostEmpty_xSO,
+            underflow    => DBG_underflow,
+            data_count   => fifoWrDataCount_xD,
+            wr_rst_busy  => open, -- wr_rst_busy,
+            rd_rst_busy  => open -- rd_rst_busy
+        );
+
+end generate;
+
+
 
     FifoCoreNumData_o <= fifoWrDataCount_xD;
 

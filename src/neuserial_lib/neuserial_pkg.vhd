@@ -29,6 +29,8 @@ package NSComponents_pkg is
 
 component hpu_rx_datapath is
   generic (
+    C_FAMILY                  : string                        := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
+    --
     C_OUTPUT_DSIZE             : natural range 1 to 32 := 32;
     C_PAER_DSIZE               : positive              := 20;
     C_HAS_PAER                 : boolean               := true;
@@ -198,6 +200,8 @@ end component;
 
 component hpu_tx_datapath is
   generic (
+    C_FAMILY                  : string                        := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
+    --
     C_INPUT_DSIZE               : natural range 1 to 32 := 32;
     C_PAER_DSIZE                : positive              := 20;
     C_HAS_PAER                  : boolean               := true;
@@ -324,6 +328,8 @@ end component hpu_tx_datapath;
 
 component CoreMonSeqRR is
   generic (
+    C_FAMILY                              : string := "Serie7"; -- "Serie7", "Ultrascale+" 
+    --
     C_PAER_DSIZE                         : integer;
     TestEnableSequencerNoWait            : boolean;
     TestEnableSequencerToMonitorLoopback : boolean;

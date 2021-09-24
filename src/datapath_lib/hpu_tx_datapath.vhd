@@ -32,6 +32,8 @@ library GTP_lib;
 
 entity hpu_tx_datapath is
   generic (
+    C_FAMILY                    : string                := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
+    --
     C_INPUT_DSIZE               : natural range 1 to 32 := 32;
     C_PAER_DSIZE                : positive              := 20;
     C_HAS_PAER                  : boolean               := true;
@@ -373,8 +375,11 @@ begin
 
     reset_sych_fifo <= not(ii_hssaer_nrst);
     ii_tx_toSaerDst_synched(i).rdy <= not(synch_fifo_full(i));
-    
-    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16
+
+SYNC_FIFO_FOR_SERIE7 : if C_FAMILY = "Serie7"  generate -- "Serie7", "Ultrascale+" 
+begin
+   
+    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_S7
       port map (
         rst     => reset_sych_fifo,
         wr_clk  => Clk_i,
@@ -386,6 +391,27 @@ begin
         full    => synch_fifo_full(i),
         empty   => synch_fifo_empty(i)
       );
+
+end generate;    
+
+SYNC_FIFO_FOR_ULTRASCALE_PLUS : if C_FAMILY = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
+begin
+   
+    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_USP
+      port map (
+        rst     => reset_sych_fifo,
+        wr_clk  => Clk_i,
+        rd_clk  => Clk_ls_p,
+        din     => ii_tx_toSaerSrc(i).idx,
+        wr_en   => synch_fifo_wr_en(i),
+        rd_en   => synch_fifo_rd_en(i),
+        dout    => ii_tx_toSaerSrc_synched(i).idx,
+        full    => synch_fifo_full(i),
+        empty   => synch_fifo_empty(i)
+      );
+
+end generate;
+
     synch_fifo_wr_en(i) <= ii_tx_toSaerSrc(i).vld and not(synch_fifo_full(i));
     synch_fifo_rd_en(i) <= ii_tx_toSaerDst(i).rdy and not(synch_fifo_empty(i));
     
@@ -551,6 +577,8 @@ i_TxGtpErrorInjection <= '0';
  
   GTP_MANAGER_TX_i : GTP_Manager 
     generic map( 
+      FAMILY_g                  =>  C_FAMILY,
+      --
       USER_DATA_WIDTH_g         =>  C_INPUT_DSIZE,               -- Width of Data - Fabric side
       USER_MESSAGE_WIDTH_g      =>    8,                          -- Width of Message - Fabric side 
       GTP_DATA_WIDTH_g          =>  C_GTP_DSIZE,                  -- Width of Data - GTP side

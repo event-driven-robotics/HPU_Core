@@ -333,7 +333,7 @@ package DPComponents_pkg is
         );
     end component hssaer_paer_rx_wrapper;
 
-    component SYNC_FIFO_32_16
+    component SYNC_FIFO_32_16_S7
       port (
         rst : in std_logic;
         wr_clk : in std_logic;
@@ -347,6 +347,20 @@ package DPComponents_pkg is
       );
     end component;
 
+    component SYNC_FIFO_32_16_USP
+      port (
+        rst : in std_logic;
+        wr_clk : in std_logic;
+        rd_clk : in std_logic;
+        din : in std_logic_vector(31 downto 0);
+        wr_en : in std_logic;
+        rd_en : in std_logic;
+        dout : out std_logic_vector(31 downto 0);
+        full : out std_logic;
+        empty : out std_logic
+      );
+    end component;
+    
 end package DPComponents_pkg;
 
 

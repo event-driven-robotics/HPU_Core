@@ -30,7 +30,27 @@ package NEComponents_pkg is
         );
     end component INFIFO_64_1024_S7;
 
-    
+    component INFIFO_64_1024_USP is
+        port (
+            clk          : in  std_logic;
+            srst         : in  std_logic;
+            din          : in  std_logic_vector(63 downto 0);
+            wr_en        : in  std_logic;
+            rd_en        : in  std_logic;
+            dout         : out std_logic_vector(63 downto 0);
+            full         : out std_logic;
+            almost_full  : out std_logic;
+            overflow     : out std_logic;
+            empty        : out std_logic;
+            almost_empty : out std_logic;
+            underflow    : out std_logic;
+            data_count   : out std_logic_vector(10 downto 0);
+            wr_rst_busy  : out std_logic;
+            rd_rst_busy  : out std_logic
+        );
+    end component INFIFO_64_1024_USP;
+
+        
     component OUTFIFO_32_2048_64_1024_S7 is
         port (
             rst          : in  std_logic;
@@ -49,7 +69,25 @@ package NEComponents_pkg is
         );
     end component OUTFIFO_32_2048_64_1024_S7;
 
-    
+    component OUTFIFO_32_2048_64_1024_USP is
+        port (
+            rst          : in  std_logic;
+            wr_clk       : in  std_logic;
+            rd_clk       : in  std_logic;
+            din          : in  std_logic_vector(31 downto 0);
+            wr_en        : in  std_logic;
+            rd_en        : in  std_logic;
+            dout         : out std_logic_vector(63 downto 0);
+            full         : out std_logic;
+            almost_full  : out std_logic;
+            overflow     : out std_logic;
+            empty        : out std_logic;
+            almost_empty : out std_logic;
+            underflow    : out std_logic
+        );
+    end component OUTFIFO_32_2048_64_1024_USP;
+
+   
     component Timestamp is 
         port (
             Rst_xRBI       : in  std_logic;

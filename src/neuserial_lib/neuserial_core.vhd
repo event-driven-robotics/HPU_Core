@@ -38,6 +38,9 @@ library spinn_neu_if_lib;
 entity neuserial_core is
   generic (
     -- -----------------------    
+    -- GENERAL
+    C_FAMILY                  : string                        := "Serie7"; -- "Serie7", "Ultrascale+" 
+    -- -----------------------    
     -- PAER        
     C_RX_L_HAS_PAER           : boolean                       := true;
     C_RX_R_HAS_PAER           : boolean                       := true;
@@ -760,6 +763,8 @@ i_Spnn_offload_off <= i_Spnn_cmd_start or SpnnCtrl_i(1);
 
 u_tx_datapath : hpu_tx_datapath
   generic map (
+    C_FAMILY                  => C_FAMILY,
+    --
     C_INPUT_DSIZE             => C_INTERNAL_DSIZE,
     C_PAER_DSIZE              => C_PAER_DSIZE,
     C_HAS_PAER                => C_TX_HAS_PAER,
@@ -891,6 +896,8 @@ u_tx_datapath : hpu_tx_datapath
 
 u_rx_left_datapath : hpu_rx_datapath
   generic map (
+    C_FAMILY                  => C_FAMILY,
+    --
     C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
     C_PAER_DSIZE              => C_PAER_DSIZE,
     C_HAS_PAER                => C_RX_L_HAS_PAER,
@@ -1060,6 +1067,8 @@ u_rx_left_datapath : hpu_rx_datapath
 
 u_rx_right_datapath : hpu_rx_datapath
   generic map (
+    C_FAMILY                  => C_FAMILY,
+    --
     C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
     C_PAER_DSIZE              => C_PAER_DSIZE,
     C_HAS_PAER                => C_RX_R_HAS_PAER,
@@ -1230,6 +1239,8 @@ u_rx_right_datapath : hpu_rx_datapath
 
 u_rx_aux_datapath : hpu_rx_datapath
   generic map (
+    C_FAMILY                  => C_FAMILY,
+    --
     C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
     C_PAER_DSIZE              => C_PAER_DSIZE,
     C_HAS_PAER                => C_RX_A_HAS_PAER,
@@ -1528,6 +1539,8 @@ end generate;
 
     u_CoreMonSeqRR : CoreMonSeqRR
         generic map (
+            C_FAMILY                             => C_FAMILY,
+            --
             C_PAER_DSIZE                         => C_PAER_DSIZE,
             TestEnableSequencerNoWait            => c_TestEnableSequencerNoWait,
             TestEnableSequencerToMonitorLoopback => c_TestEnableSequencerToMonitorLoopback,

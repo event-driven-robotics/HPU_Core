@@ -26,6 +26,8 @@ package GTP_pkg is
 
 component GTP_Manager is
   generic ( 
+    FAMILY_g                  : string                := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
+    --
     USER_DATA_WIDTH_g         : integer range 0 to 64 := 32;    -- Width of Data - Fabric side
     USER_MESSAGE_WIDTH_g      : integer range 0 to 64 :=  8;    -- Width of Message - Fabric side 
     GTP_DATA_WIDTH_g          : integer range 0 to 64 := 16;    -- Width of Data - GTP side

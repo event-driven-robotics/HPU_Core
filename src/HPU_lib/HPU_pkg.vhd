@@ -40,6 +40,9 @@ end record time_tick;
 component neuserial_core is
   generic (
     -- -----------------------    
+    -- GENERAL
+    C_FAMILY                  : string                        := "Serie7"; -- "Serie7", "Ultrascale+" 
+    -- -----------------------        
     -- PAER        
     C_RX_L_HAS_PAER           : boolean                       := true;
     C_RX_R_HAS_PAER           : boolean                       := true;

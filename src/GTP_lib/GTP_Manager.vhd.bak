@@ -32,8 +32,6 @@ library ieee;
 
 entity GTP_Manager is
   generic ( 
-    FAMILY_g                  : string                := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
-    --
     USER_DATA_WIDTH_g         : integer range 0 to 64 := 32;    -- Width of Data - Fabric side
     USER_MESSAGE_WIDTH_g      : integer range 0 to 64 :=  8;    -- Width of Message - Fabric side 
     GTP_DATA_WIDTH_g          : integer range 0 to 64 := 16;    -- Width of Data - GTP side
@@ -156,7 +154,7 @@ architecture Behavioral of GTP_Manager is
 
 attribute ASYNC_REG : string;
 
-component GTP_DATA_SYNC_FIFO_S7
+component GTP_DATA_SYNC_FIFO
   port (
     rst : in std_logic;
     wr_clk : in std_logic;
@@ -172,39 +170,7 @@ component GTP_DATA_SYNC_FIFO_S7
   );
 end component;
 
-component GTP_DATA_SYNC_FIFO_USP
-  port (
-    rst : in std_logic;
-    wr_clk : in std_logic;
-    rd_clk : in std_logic;
-    din : in std_logic_vector(31 downto 0);
-    wr_en : in std_logic;
-    rd_en : in std_logic;
-    dout : out std_logic_vector(31 downto 0);
-    full : out std_logic;
-    overflow : out std_logic;
-    empty : out std_logic;
-    valid : out std_logic
-  );
-end component;
-
-component GTP_MSG_SYNC_FIFO_S7
-  port (
-    rst : in std_logic;
-    wr_clk : in std_logic;
-    rd_clk : in std_logic;
-    din : in std_logic_vector(7 downto 0);
-    wr_en : in std_logic;
-    rd_en : in std_logic;
-    dout : out std_logic_vector(7 downto 0);
-    full : out std_logic;
-    overflow : out std_logic;
-    empty : out std_logic;
-    valid : out std_logic
-  );
-end component;
-
-component GTP_MSG_SYNC_FIFO_USP
+component GTP_MSG_SYNC_FIFO
   port (
     rst : in std_logic;
     wr_clk : in std_logic;
@@ -479,19 +445,6 @@ signal rx_data_w1_exp_gckrx        : std_logic;
 -- signal data_w0_gckrx            : std_logic_vector(GTP_DATA_WIDTH_g-1 downto 0);
 signal rx_data_w1_gckrx            : std_logic_vector(GTP_DATA_WIDTH_g-1 downto 0);
 
-
-
--- DEBUG
-attribute mark_debug : string;
-attribute mark_debug of RX_DATA_o               : signal is "true";
-attribute mark_debug of RX_DATA_SRC_RDY_o       : signal is "true";
-attribute mark_debug of RX_DATA_DST_RDY_i       : signal is "true";
-attribute mark_debug of RX_ALIGN_REQUEST_o      : signal is "true";
-
-
-
-
-
 begin
 
 
@@ -679,45 +632,21 @@ tx_data_fifo_wr_en       <= not tx_data_fifo_full and TX_DATA_SRC_RDY_i;
 tx_data_fifo_rd_en_gcktx <= tx_data_w0_flag_gcktx and not tx_data_fifo_empty_gcktx;
 tx_data_fifo_rst         <= tx_rst_gcktx;
 
-TX_DATA_SYNC_FIFO_FOR_SERIE7 : if FAMILY_g = "Serie7"  generate -- "Serie7", "Ultrascale+" 
-begin
-   
-  TX_DATA_SYNC_FIFO_i :  GTP_DATA_SYNC_FIFO_S7
-    port map (
-      rst       => tx_data_fifo_rst,               
-      wr_clk    => CLK_i,         
-      rd_clk    => GTP_TXUSRCLK2_i,         
-      din       => tx_data_fifo_din,      
-      wr_en     => tx_data_fifo_wr_en,        
-      rd_en     => tx_data_fifo_rd_en_gcktx,        
-      dout      => tx_data_fifo_dout_gcktx,  
-      full      => tx_data_fifo_full,         
-      overflow  => tx_data_fifo_overflow,     
-      empty     => tx_data_fifo_empty_gcktx,        
-      valid     => tx_data_fifo_valid_gcktx         
-    );
-  
-  end generate;    
+TX_DATA_SYNC_FIFO_i :  GTP_DATA_SYNC_FIFO
+  port map (
+    rst       => tx_data_fifo_rst,               
+    wr_clk    => CLK_i,         
+    rd_clk    => GTP_TXUSRCLK2_i,         
+    din       => tx_data_fifo_din,      
+    wr_en     => tx_data_fifo_wr_en,        
+    rd_en     => tx_data_fifo_rd_en_gcktx,        
+    dout      => tx_data_fifo_dout_gcktx,  
+    full      => tx_data_fifo_full,         
+    overflow  => tx_data_fifo_overflow,     
+    empty     => tx_data_fifo_empty_gcktx,        
+    valid     => tx_data_fifo_valid_gcktx         
+  );
 
-TX_DATA_SYNC_FIFO_FOR_ULTRASCALE_PLUS : if FAMILY_g = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
-begin
-   
-  TX_DATA_SYNC_FIFO_i :  GTP_DATA_SYNC_FIFO_USP
-    port map (
-      rst       => tx_data_fifo_rst,               
-      wr_clk    => CLK_i,         
-      rd_clk    => GTP_TXUSRCLK2_i,         
-      din       => tx_data_fifo_din,      
-      wr_en     => tx_data_fifo_wr_en,        
-      rd_en     => tx_data_fifo_rd_en_gcktx,        
-      dout      => tx_data_fifo_dout_gcktx,  
-      full      => tx_data_fifo_full,         
-      overflow  => tx_data_fifo_overflow,     
-      empty     => tx_data_fifo_empty_gcktx,        
-      valid     => tx_data_fifo_valid_gcktx         
-    );
-
-end generate;
 
 -- Messages
 
@@ -726,45 +655,21 @@ tx_msg_fifo_wr_en       <= not tx_msg_fifo_full and TX_MSG_SRC_RDY_i;
 tx_msg_fifo_rd_en_gcktx <= tx_msg_flag_gcktx and not tx_msg_fifo_empty_gcktx;
 tx_msg_fifo_rst         <= tx_rst_gcktx;
 
-TX_MSG_SYNC_FIFO_FOR_SERIE7 : if FAMILY_g = "Serie7"  generate -- "Serie7", "Ultrascale+" 
-begin
-   
-  TX_MSG_SYNC_FIFO_i :  GTP_MSG_SYNC_FIFO_S7
-    port map (
-      rst       => tx_msg_fifo_rst,               
-      wr_clk    => CLK_i,        
-      rd_clk    => GTP_TXUSRCLK2_i,
-      din       => tx_msg_fifo_din,      
-      wr_en     => tx_msg_fifo_wr_en,        
-      rd_en     => tx_msg_fifo_rd_en_gcktx,        
-      dout      => tx_msg_fifo_dout_gcktx,  
-      full      => tx_msg_fifo_full,         
-      overflow  => tx_msg_fifo_overflow,     
-      empty     => tx_msg_fifo_empty_gcktx,        
-      valid     => tx_msg_fifo_valid_gcktx        
-    );
+TX_MSG_SYNC_FIFO_i :  GTP_MSG_SYNC_FIFO
+  port map (
+    rst       => tx_msg_fifo_rst,               
+    wr_clk    => CLK_i,        
+    rd_clk    => GTP_TXUSRCLK2_i,
+    din       => tx_msg_fifo_din,      
+    wr_en     => tx_msg_fifo_wr_en,        
+    rd_en     => tx_msg_fifo_rd_en_gcktx,        
+    dout      => tx_msg_fifo_dout_gcktx,  
+    full      => tx_msg_fifo_full,         
+    overflow  => tx_msg_fifo_overflow,     
+    empty     => tx_msg_fifo_empty_gcktx,        
+    valid     => tx_msg_fifo_valid_gcktx        
+  );
   
-  end generate;    
-
-TX_MSG_SYNC_FIFO_FOR_ULTRASCALE_PLUS : if FAMILY_g = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
-begin
-   
-  TX_MSG_SYNC_FIFO_i :  GTP_MSG_SYNC_FIFO_USP
-    port map (
-      rst       => tx_msg_fifo_rst,               
-      wr_clk    => CLK_i,        
-      rd_clk    => GTP_TXUSRCLK2_i,
-      din       => tx_msg_fifo_din,      
-      wr_en     => tx_msg_fifo_wr_en,        
-      rd_en     => tx_msg_fifo_rd_en_gcktx,        
-      dout      => tx_msg_fifo_dout_gcktx,  
-      full      => tx_msg_fifo_full,         
-      overflow  => tx_msg_fifo_overflow,     
-      empty     => tx_msg_fifo_empty_gcktx,        
-      valid     => tx_msg_fifo_valid_gcktx        
-    );
-
-end generate;
 
 tx_data_w_enable_gcktx    <= tx_data_fifo_valid_gcktx and not tx_align_req_r_gcktx;
 
@@ -1214,90 +1119,42 @@ rx_data_fifo_wr_en_gckrx <= rx_data_w0_exp_gckrx and not rx_data_fifo_full_gckrx
 rx_data_fifo_rd_en       <= not rx_data_fifo_empty and RX_DATA_DST_RDY_i;
 rx_data_fifo_rst         <= rx_rst_gckrx;
 
-RX_DATA_SYNC_FIFO_FOR_SERIE7 : if FAMILY_g = "Serie7"  generate -- "Serie7", "Ultrascale+" 
-begin
-   
-  DATA_FIFO_RX_i :  GTP_DATA_SYNC_FIFO_S7
-    port map (
-      rst       => rx_data_fifo_rst,               
-      wr_clk    => GTP_RXUSRCLK2_i,        
-      rd_clk    => CLK_i,         
-      din       => rx_data_fifo_din_gckrx,      
-      wr_en     => rx_data_fifo_wr_en_gckrx,        
-      rd_en     => rx_data_fifo_rd_en,        
-      dout      => rx_data_fifo_dout,  
-      full      => rx_data_fifo_full_gckrx,         
-      overflow  => rx_data_fifo_overflow_gckrx,     
-      empty     => rx_data_fifo_empty,        
-      valid     => rx_data_fifo_valid         
-    );
-  
-  end generate;    
+DATA_FIFO_RX_i :  GTP_DATA_SYNC_FIFO
+  port map (
+    rst       => rx_data_fifo_rst,               
+    wr_clk    => GTP_RXUSRCLK2_i,        
+    rd_clk    => CLK_i,         
+    din       => rx_data_fifo_din_gckrx,      
+    wr_en     => rx_data_fifo_wr_en_gckrx,        
+    rd_en     => rx_data_fifo_rd_en,        
+    dout      => rx_data_fifo_dout,  
+    full      => rx_data_fifo_full_gckrx,         
+    overflow  => rx_data_fifo_overflow_gckrx,     
+    empty     => rx_data_fifo_empty,        
+    valid     => rx_data_fifo_valid         
+  );
 
-RX_DATA_SYNC_FIFO_FOR_ULTRASCALE_PLUS : if FAMILY_g = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
-begin
-   
-  DATA_FIFO_RX_i :  GTP_DATA_SYNC_FIFO_USP
-    port map (
-      rst       => rx_data_fifo_rst,               
-      wr_clk    => GTP_RXUSRCLK2_i,        
-      rd_clk    => CLK_i,         
-      din       => rx_data_fifo_din_gckrx,      
-      wr_en     => rx_data_fifo_wr_en_gckrx,        
-      rd_en     => rx_data_fifo_rd_en,        
-      dout      => rx_data_fifo_dout,  
-      full      => rx_data_fifo_full_gckrx,         
-      overflow  => rx_data_fifo_overflow_gckrx,     
-      empty     => rx_data_fifo_empty,        
-      valid     => rx_data_fifo_valid         
-    );
-
-end generate;
 
 rx_msg_fifo_din_gckrx   <= GTP_RXDATA_i(7 downto 0);
 rx_msg_fifo_wr_en_gckrx <= rx_msg_flag_gckrx and not rx_msg_fifo_full_gckrx;
 rx_msg_fifo_rd_en <= not rx_msg_fifo_empty and RX_MSG_DST_RDY_i;
 rx_msg_fifo_rst   <= rx_rst_gckrx;
-  
-RX_MSG_SYNC_FIFO_FOR_SERIE7 : if FAMILY_g = "Serie7"  generate -- "Serie7", "Ultrascale+" 
-begin
-   
-  MSG_FIFO_RX_i :  GTP_MSG_SYNC_FIFO_S7
-    port map (
-      rst       => rx_msg_fifo_rst,               
-      wr_clk    => GTP_RXUSRCLK2_i,        
-      rd_clk    => CLK_i,         
-      din       => rx_msg_fifo_din_gckrx,      
-      wr_en     => rx_msg_fifo_wr_en_gckrx,        
-      rd_en     => rx_msg_fifo_rd_en,        
-      dout      => rx_msg_fifo_dout,  
-      full      => rx_msg_fifo_full_gckrx,         
-      overflow  => rx_msg_fifo_overflow_gckrx,     
-      empty     => rx_msg_fifo_empty,        
-      valid     => rx_msg_fifo_valid         
-    );
-  
-  end generate;    
 
-RX_MSG_SYNC_FIFO_FOR_ULTRASCALE_PLUS : if FAMILY_g = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
-begin
-   
-  DATA_FIFO_RX_i :  GTP_DATA_SYNC_FIFO_USP
-    port map (
-      rst       => rx_data_fifo_rst,               
-      wr_clk    => GTP_RXUSRCLK2_i,        
-      rd_clk    => CLK_i,         
-      din       => rx_data_fifo_din_gckrx,      
-      wr_en     => rx_data_fifo_wr_en_gckrx,        
-      rd_en     => rx_data_fifo_rd_en,        
-      dout      => rx_data_fifo_dout,  
-      full      => rx_data_fifo_full_gckrx,         
-      overflow  => rx_data_fifo_overflow_gckrx,     
-      empty     => rx_data_fifo_empty,        
-      valid     => rx_data_fifo_valid         
-    );
-
-end generate;
+MSG_FIFO_RX_i :  GTP_MSG_SYNC_FIFO
+  port map (
+    rst       => rx_msg_fifo_rst,               
+    wr_clk    => GTP_RXUSRCLK2_i,        
+    rd_clk    => CLK_i,         
+    din       => rx_msg_fifo_din_gckrx,      
+    wr_en     => rx_msg_fifo_wr_en_gckrx,        
+    rd_en     => rx_msg_fifo_rd_en,        
+    dout      => rx_msg_fifo_dout,  
+    full      => rx_msg_fifo_full_gckrx,         
+    overflow  => rx_msg_fifo_overflow_gckrx,     
+    empty     => rx_msg_fifo_empty,        
+    valid     => rx_msg_fifo_valid         
+  );
+  
 
 -- ----------------------------------------------------------------------------------
 -- OUTPUTs

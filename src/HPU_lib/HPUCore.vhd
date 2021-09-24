@@ -131,6 +131,9 @@ library neuserial_lib;
 entity HPUCore is
   generic (
     -- -----------------------    
+    -- GENERAL
+    C_FAMILY                  : string                        := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
+    -- -----------------------    
     -- PAER        
     C_RX_L_HAS_PAER           : boolean                       := true;
     C_RX_R_HAS_PAER           : boolean                       := true;
@@ -1014,6 +1017,9 @@ end generate;
 
 u_neuserial_core : neuserial_core
   generic map (
+    -- -----------------------    
+    -- GENERIC
+    C_FAMILY                 => C_FAMILY,
     -- -----------------------    
     -- PAER        
     C_RX_L_HAS_PAER           => C_RX_L_HAS_PAER,           -- : boolean                       := true;

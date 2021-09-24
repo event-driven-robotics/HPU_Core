@@ -34,6 +34,8 @@ library GTP_lib;
 
 entity hpu_rx_datapath is
   generic (
+    C_FAMILY                   : string                := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
+    --
     C_OUTPUT_DSIZE             : natural range 1 to 32 := 32;
     C_PAER_DSIZE               : positive              := 20;
     C_HAS_PAER                 : boolean               := true;
@@ -349,7 +351,10 @@ begin
         aux_channel => Aux_Channel_i             -- in  std_logic;
         );
     
-    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16
+SYNC_FIFO_FOR_SERIE7 : if C_FAMILY = "Serie7"  generate -- "Serie7", "Ultrascale+" 
+begin
+   
+    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_S7
       port map (
         rst     => i_reset_synch_fifos,
         wr_clk  => Clk_ls_p,
@@ -361,6 +366,27 @@ begin
         full    => synch_fifo_full(i),
         empty   => synch_fifo_empty(i)
         );
+
+end generate;    
+
+SYNC_FIFO_FOR_ULTRASCALE_PLUS : if C_FAMILY = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
+begin
+   
+    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_USP
+      port map (
+        rst     => i_reset_synch_fifos,
+        wr_clk  => Clk_ls_p,
+        rd_clk  => Clk_i,
+        din     => ii_rx_fromSaerSrc(i).idx,
+        wr_en   => synch_fifo_wr_en(i),
+        rd_en   => synch_fifo_rd_en(i),
+        dout    => ii_rx_fromSaerSrc_synched(i).idx,
+        full    => synch_fifo_full(i),
+        empty   => synch_fifo_empty(i)
+        );
+
+end generate;
+
       
     synch_fifo_wr_en(i) <= ii_rx_fromSaerSrc(i).vld and not(synch_fifo_full(i));
     synch_fifo_rd_en(i) <= ii_rx_fromSaerDst(i).rdy and not(synch_fifo_empty(i));
@@ -482,6 +508,7 @@ begin
 
   GTP_MANAGER_RX_i : GTP_Manager 
     generic map( 
+      FAMILY_g                  =>  C_FAMILY,
       USER_DATA_WIDTH_g         =>  C_OUTPUT_DSIZE,               -- Width of Data - Fabric side
       USER_MESSAGE_WIDTH_g      =>    8,                          -- Width of Message - Fabric side 
       GTP_DATA_WIDTH_g          =>  C_GTP_DSIZE,                  -- Width of Data - GTP side
