@@ -970,6 +970,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 	struct hpu_buf *item;
 	unsigned long flags;
 	size_t read = 0;
+	int submitted = 0;
 	struct hpu_priv *priv = fp->private_data;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
 	if (!access_ok(VERIFY_READ, buf, length))
@@ -1111,11 +1112,14 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				dev_err(&priv->pdev->dev,
 					"DMA RX submit error %d while reading\n",
 					ret2);
-
+			submitted++;
 			priv->dma_rx_pool.buf_index = (priv->dma_rx_pool.buf_index + 1)
 				& (priv->dma_rx_pool.pn - 1);
 			BUG_ON(priv->dma_rx_pool.buf_index >= priv->dma_rx_pool.pn);
-			dma_async_issue_pending(priv->dma_rx_chan);
+			if (submitted == priv->dma_rx_pool.pn / 3) {
+				dma_async_issue_pending(priv->dma_rx_chan);
+				submitted = 0;
+			}
 		} else {
 			/* buffer partially consumed, advance in-buffer index */
 			item->head_index += copy;
@@ -1133,6 +1137,9 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 		if (ret)
 			break;
 	}
+
+	if (submitted)
+		dma_async_issue_pending(priv->dma_rx_chan);
 
 	dev_dbg(&priv->pdev->dev, "----END read\n");
 
