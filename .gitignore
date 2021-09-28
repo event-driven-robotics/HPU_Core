@@ -1,22 +1,48 @@
-# ignore all logs
-*.git
-
-# ignore stuff folders
-mug
-
-# ignore Vivado subfolders
-Vivado/*
-# but NOT xpr file
-!Vivado/*.xpr
-
-# ignore Local folder
-Local/*
-
-# Ignore any files with DRAFT suffix
-*DRAFT* 
-
-# Ignore Word temporary documents
-*~$*.doc*
-
-# Ignore any files with BETA suffix
-*BETA* 
+# ignore all logs                                 
+*.git                                             
+                                                  
+#ignore latex auxillary files                     
+*.aux                                             
+*.log                                             
+*.synctex.gz                                      
+*.toc                                             
+                                                  
+# ignore stuff folders                            
+mug                                               
+                                                  
+# ignore ZIP files                                
+*.zip                                             
+                                                  
+# ignore Vivado subfolders                        
+Vivado/*                                          
+# but:                                            
+# NOT xpr file                                    
+!Vivado/*.xpr                                     
+# NOT synthesis/simulation sources                
+!Vivado/*.srcs                                    
+# NOT simulation vaweforms conf.                  
+!Vivado/*.wcfg                                    
+                                                  
+# Ignore Office temporary documents               
+*~$*.*                                            
+                                                  
+# Ignore any files with BETA/TEMP/LOCAL/DRAFT tag 
+*BETA*                                            
+*beta*                                            
+*TEMP*                                            
+*temp*                                            
+*TMP*                                             
+*tmp*                                             
+*LOCAL*                                           
+*local*                                           
+*DRAFT*                                           
+*draft*                                           
+                                                  
+# Vivado IP source subfolder:                     
+src/Vivado_ip/**/*.*                              
+!src/Vivado_ip/**/*.xci                           
+                                                  
+# Vivado Block Diagram source subfolder:          
+src/Vivado_bd/**/*.*                              
+!src/Vivado_bd/**/*.bd                            
+!src/Vivado_bd/**/*.ui 

@@ -64,113 +64,98 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../src/IP/Vivado/SYNC_FIFO_32_16_S7/SYNC_FIFO_32_16_S7.xci">
+      <File Path="$PPRDIR/../src/Vivado_ip/SYNC_FIFO_32_16_S7/SYNC_FIFO_32_16_S7.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/GTP_lib/GTP_MSG_SYNC_FIFO_S7/GTP_MSG_SYNC_FIFO_S7.xci">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_S7/GTP_MSG_SYNC_FIFO_S7.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/GTP_lib/GTP_DATA_SYNC_FIFO_S7/GTP_DATA_SYNC_FIFO_S7.xci">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_S7/GTP_DATA_SYNC_FIFO_S7.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/GTP_lib/GTP_DATA_SYNC_FIFO_USP/GTP_DATA_SYNC_FIFO_USP.xci">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_USP/GTP_DATA_SYNC_FIFO_USP.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/GTP_lib/GTP_MSG_SYNC_FIFO_USP/GTP_MSG_SYNC_FIFO_USP.xci">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_USP/GTP_MSG_SYNC_FIFO_USP.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/IP/Vivado/SYNC_FIFO_32_16_USP/SYNC_FIFO_32_16_USP.xci">
+      <File Path="$PPRDIR/../src/Vivado_ip/SYNC_FIFO_32_16_USP/SYNC_FIFO_32_16_USP.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/ddr_sampler.v">
+      <File Path="$PPRDIR/../src/hdl/ddr_sampler.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/fifo_lfsr.v">
+      <File Path="$PPRDIR/../src/hdl/fifo_lfsr.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hssaer_paer_rx_wrapper.v">
+      <File Path="$PPRDIR/../src/hdl/hssaer_paer_rx_wrapper.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hssaer_paer_trx.v">
+      <File Path="$PPRDIR/../src/hdl/hssaer_paer_trx.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hssaer_paer_tx_wrapper.v">
+      <File Path="$PPRDIR/../src/hdl/hssaer_paer_tx_wrapper.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hssaer_rx.v">
+      <File Path="$PPRDIR/../src/hdl/hssaer_rx.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hssaer_tx.v">
+      <File Path="$PPRDIR/../src/hdl/hssaer_tx.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/spinn_neu_if_lib/in_mapper.v">
-        <FileInfo>
-          <Attr Name="Library" Val="spinn_neu_if_lib"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/nrzi_ddr_tx.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/spinn_neu_if_lib/out_mapper.v">
+      <File Path="$PPRDIR/../src/hdl/spinn_neu_if_lib/in_mapper.v">
         <FileInfo>
           <Attr Name="Library" Val="spinn_neu_if_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -178,7 +163,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/spinn_neu_if_lib/spinn_driver.v">
+      <File Path="$PPRDIR/../src/hdl/nrzi_ddr_tx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/spinn_neu_if_lib/out_mapper.v">
         <FileInfo>
           <Attr Name="Library" Val="spinn_neu_if_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -186,7 +178,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/spinn_neu_if_lib/spinn_neu_if.v">
+      <File Path="$PPRDIR/../src/hdl/spinn_neu_if_lib/spinn_driver.v">
         <FileInfo>
           <Attr Name="Library" Val="spinn_neu_if_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -194,7 +186,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/spinn_neu_if_lib/spinn_receiver.v">
+      <File Path="$PPRDIR/../src/hdl/spinn_neu_if_lib/spinn_neu_if.v">
         <FileInfo>
           <Attr Name="Library" Val="spinn_neu_if_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -202,7 +194,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/spinn_neu_if_lib/synchronizer.v">
+      <File Path="$PPRDIR/../src/hdl/spinn_neu_if_lib/spinn_receiver.v">
         <FileInfo>
           <Attr Name="Library" Val="spinn_neu_if_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -210,280 +202,288 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/tmiv_cnt2.v">
+      <File Path="$PPRDIR/../src/hdl/spinn_neu_if_lib/synchronizer.v">
+        <FileInfo>
+          <Attr Name="Library" Val="spinn_neu_if_lib"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/tmiv_cnt2.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/tmiv_dec.v">
+      <File Path="$PPRDIR/../src/hdl/tmiv_dec.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/twophase.v">
+      <File Path="$PPRDIR/../src/hdl/twophase.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/utils.v">
+      <File Path="$PPRDIR/../src/hdl/utils.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/AEXSsequencerRR.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/AEXSsequencerRR.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/AsyncStabilizer.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/AsyncStabilizer.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/neuelab_lib/neuelab_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/neuelab_lib/neuelab_pkg.vhd">
         <FileInfo>
           <Attr Name="Library" Val="neuelab_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/Vision_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/Vision_pkg.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/HPU_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/HPU_pkg.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/neuelab_lib/CoreMonSeqRR.vhd">
+      <File Path="$PPRDIR/../src/hdl/neuelab_lib/CoreMonSeqRR.vhd">
         <FileInfo>
           <Attr Name="Library" Val="neuelab_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/GTP_lib/GTP_Manager.vhd">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_Manager.vhd">
         <FileInfo>
           <Attr Name="Library" Val="GTP_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/GTP_lib/GTP_enable_signal_cdc.vhd">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_enable_signal_cdc.vhd">
         <FileInfo>
           <Attr Name="Library" Val="GTP_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/GTP_lib/GTP_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_pkg.vhd">
         <FileInfo>
           <Attr Name="Library" Val="GTP_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/GTP_lib/GTP_time_machine.vhd">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_time_machine.vhd">
         <FileInfo>
           <Attr Name="Library" Val="GTP_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/neuserial_lib/neuserial_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/neuserial_lib/neuserial_pkg.vhd">
         <FileInfo>
           <Attr Name="Library" Val="neuserial_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/MonitorRR.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/MonitorRR.vhd">
         <FileInfo>
           <Attr Name="Library" Val="neuelab_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/RegisterArray1.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/RegisterArray1.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/ShiftRegFifo.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/ShiftRegFifo.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/ShiftRegFifoRRInp.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/ShiftRegFifoRRInp.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/datapath_lib/datapath_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/datapath_lib/datapath_pkg.vhd">
         <FileInfo>
           <Attr Name="Library" Val="datapath_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/ShiftRegFifoRROut.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/ShiftRegFifoRROut.vhd">
         <FileInfo>
           <Attr Name="Library" Val="datapath_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/SimplePAERInputRRv2.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/SimplePAERInputRRv2.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/SimplePAEROutputRR.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/SimplePAEROutputRR.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/TimestampWrapDetector.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/TimestampWrapDetector.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/common_lib/common.vhd">
+      <File Path="$PPRDIR/../src/hdl/common_lib/common.vhd">
         <FileInfo>
           <Attr Name="Library" Val="common_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/spinn_neu_if_lib/spinn_neu_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/spinn_neu_if_lib/spinn_neu_pkg.vhd">
         <FileInfo>
           <Attr Name="Library" Val="spinn_neu_if_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/datapath_lib/hpu_rx_datapath.vhd">
+      <File Path="$PPRDIR/../src/hdl/datapath_lib/hpu_rx_datapath.vhd">
         <FileInfo>
           <Attr Name="Library" Val="datapath_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/datapath_lib/hpu_tx_datapath.vhd">
+      <File Path="$PPRDIR/../src/hdl/datapath_lib/hpu_tx_datapath.vhd">
         <FileInfo>
           <Attr Name="Library" Val="datapath_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/merge_rdy.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/merge_rdy.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/datapath_lib/neuserial_PAER_arbiter.vhd">
+      <File Path="$PPRDIR/../src/hdl/datapath_lib/neuserial_PAER_arbiter.vhd">
         <FileInfo>
           <Attr Name="Library" Val="datapath_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/neuserial_PAER_splitter.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/neuserial_PAER_splitter.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/neuserial_lib/neuserial_axilite.vhd">
+      <File Path="$PPRDIR/../src/hdl/neuserial_lib/neuserial_axilite.vhd">
         <FileInfo>
           <Attr Name="Library" Val="neuserial_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/neuserial_lib/neuserial_axistream.vhd">
+      <File Path="$PPRDIR/../src/hdl/neuserial_lib/neuserial_axistream.vhd">
         <FileInfo>
           <Attr Name="Library" Val="neuserial_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/neuserial_lib/neuserial_core.vhd">
+      <File Path="$PPRDIR/../src/hdl/neuserial_lib/neuserial_core.vhd">
         <FileInfo>
           <Attr Name="Library" Val="neuserial_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/neuserial_lib/neuserial_loopback.vhd">
+      <File Path="$PPRDIR/../src/hdl/neuserial_lib/neuserial_loopback.vhd">
         <FileInfo>
           <Attr Name="Library" Val="neuserial_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/req_fifo.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/req_fifo.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/time_machine.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/time_machine.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/timestamp.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/timestamp.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/HPU_lib/HPUCore.vhd">
+      <File Path="$PPRDIR/../src/hdl/HPU_lib/HPUCore.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/GTP_lib/GTPRX_HPU_S7/GTPRX_HPU_S7.xci">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTPRX_HPU_S7/GTPRX_HPU_S7.xci">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -491,7 +491,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/spinn_neu_if_lib/user_int.v">
+      <File Path="$PPRDIR/../src/hdl/spinn_neu_if_lib/user_int.v">
         <FileInfo>
           <Attr Name="Library" Val="spinn_neu_if_lib"/>
           <Attr Name="AutoDisabled" Val="1"/>
@@ -599,7 +599,7 @@
       </Config>
     </FileSet>
     <FileSet Name="OUTFIFO_32_2048_64_1024_S7" Type="BlockSrcs" RelSrcDir="$PSRCDIR/OUTFIFO_32_2048_64_1024_S7">
-      <File Path="$PPRDIR/../src/IP/Vivado/OUTFIFO_32_2048_64_1024_S7/OUTFIFO_32_2048_64_1024_S7.xci">
+      <File Path="$PPRDIR/../src/Vivado_ip/OUTFIFO_32_2048_64_1024_S7/OUTFIFO_32_2048_64_1024_S7.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -612,7 +612,7 @@
       </Config>
     </FileSet>
     <FileSet Name="INFIFO_64_1024_S7" Type="BlockSrcs" RelSrcDir="$PSRCDIR/INFIFO_64_1024_S7">
-      <File Path="$PPRDIR/../src/IP/Vivado/INFIFO_64_1024_S7/INFIFO_64_1024_S7.xci">
+      <File Path="$PPRDIR/../src/Vivado_ip/INFIFO_64_1024_S7/INFIFO_64_1024_S7.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -625,7 +625,7 @@
       </Config>
     </FileSet>
     <FileSet Name="OUTFIFO_32_2048_64_1024_USP" Type="BlockSrcs" RelSrcDir="$PSRCDIR/OUTFIFO_32_2048_64_1024_USP">
-      <File Path="$PPRDIR/../src/IP/Vivado/OUTFIFO_32_2048_64_1024_USP/OUTFIFO_32_2048_64_1024_USP.xci">
+      <File Path="$PPRDIR/../src/Vivado_ip/OUTFIFO_32_2048_64_1024_USP/OUTFIFO_32_2048_64_1024_USP.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -638,7 +638,7 @@
       </Config>
     </FileSet>
     <FileSet Name="INFIFO_64_1024_USP" Type="BlockSrcs" RelSrcDir="$PSRCDIR/INFIFO_64_1024_USP">
-      <File Path="$PPRDIR/../src/IP/Vivado/INFIFO_64_1024_USP/INFIFO_64_1024_USP.xci">
+      <File Path="$PPRDIR/../src/Vivado_ip/INFIFO_64_1024_USP/INFIFO_64_1024_USP.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
