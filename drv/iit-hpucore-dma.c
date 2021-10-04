@@ -932,7 +932,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 #endif
 		return -EFAULT;
 
-	dev_dbg(&priv->pdev->dev, "----tot to read %d\n", length);
+	dev_dbg(&priv->pdev->dev, "----tot to read %zu\n", length);
 
 	mutex_lock(&priv->dma_rx_pool.mutex_lock);
 
@@ -1037,7 +1037,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 		buf_count = item->tail_index - item->head_index;
 		copy = min(length, buf_count);
 
-		dev_dbg(&priv->pdev->dev, "going to read %d bytes from offset %d\n",
+		dev_dbg(&priv->pdev->dev, "going to read %zu bytes from offset %d\n",
 			length, item->head_index);
 
 		ret = __copy_to_user(buf + read,
@@ -1081,7 +1081,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 		read += copy;
 		length -= copy;
 		BUG_ON(length < 0);
-		dev_dbg(&priv->pdev->dev, "read %d, rem %d\n", read, length);
+		dev_dbg(&priv->pdev->dev, "read %zu, rem %zu\n", read, length);
 
 		/* partially copied */
 		if (ret)
@@ -2449,7 +2449,7 @@ static int hpu_probe(struct platform_device *pdev)
 	hpu_register_chardev(priv);
 
 	if (hpu_debugfsdir) {
-		sprintf(buf, "hpu.%x", res->start);
+		sprintf(buf, "hpu.%pa", &res->start);
 		priv->debugfsdir = debugfs_create_dir(buf, hpu_debugfsdir);
 	}
 
