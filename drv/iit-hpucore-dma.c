@@ -1109,6 +1109,14 @@ static int hpu_dma_init(struct hpu_priv *priv)
 		return -ENODEV;
 	}
 
+	/*
+	 * DMA RX channel is mandatory, while TX is not. We assume RX and TX
+	 * CHs are two CHs from the same DMA controller, so we just set the
+	 * mask as per the RX channel
+	 */
+	dma_set_mask_and_coherent(&priv->pdev->dev,
+				  dma_get_mask(priv->dma_rx_chan->device->dev));
+
 	priv->dma_tx_chan = dma_request_slave_channel(&priv->pdev->dev, "tx");
 
 	if (IS_ERR_OR_NULL(priv->dma_tx_chan)) {
