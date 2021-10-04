@@ -511,14 +511,28 @@ struct hpu_priv {
 static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
 		dma_addr_t *dma_handle, enum dma_data_direction dir, gfp_t gfp)
 {
-	void *virt = kmalloc(size, GFP_KERNEL);
-	if (virt) {
-		*dma_handle = dma_map_single_attrs(dev, virt, size, dir,
-		       DMA_ATTR_NON_CONSISTENT | DMA_ATTR_WRITE_COMBINE);
-		if (dma_mapping_error(dev, *dma_handle))  {
-			kfree(virt);
-			return NULL;
+	struct page *page;
+	void *virt = NULL;
+
+	if (get_order(size) > 0) {
+		page = alloc_pages(GFP_KERNEL | __GFP_COMP, get_order(size));
+		if (page) {
+			*dma_handle = dma_map_page_attrs(dev, page, 0, size, dir,
+							 DMA_ATTR_NON_CONSISTENT |
+							 DMA_ATTR_WRITE_COMBINE);
+			virt = page_address(page);
 		}
+	} else {
+		virt = kmalloc(size, GFP_KERNEL);
+		if (virt)
+			*dma_handle = dma_map_single_attrs(dev, virt, size, dir,
+							   DMA_ATTR_NON_CONSISTENT |
+							   DMA_ATTR_WRITE_COMBINE);
+	}
+
+	if (virt && dma_mapping_error(dev, *dma_handle)) {
+		kfree(virt);
+		return NULL;
 	}
 
 	return virt;
@@ -527,9 +541,18 @@ static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
 static inline void dma_free_noncoherent(struct device *dev, size_t size, void *virt,
 		dma_addr_t dma_handle, enum dma_data_direction dir)
 {
-	dma_unmap_single_attrs(dev, dma_handle, size, dir,
-			       DMA_ATTR_NON_CONSISTENT | DMA_ATTR_WRITE_COMBINE);
-	kfree(virt);
+	if (get_order(size) > 0) {
+		dma_unmap_page_attrs(dev, dma_handle, size, dir,
+				     DMA_ATTR_NON_CONSISTENT |
+				     DMA_ATTR_WRITE_COMBINE);
+		__free_pages(virt_to_page(virt), get_order(size));
+	} else {
+
+		dma_unmap_single_attrs(dev, dma_handle, size, dir,
+				       DMA_ATTR_NON_CONSISTENT |
+				       DMA_ATTR_WRITE_COMBINE);
+		kfree(virt);
+	}
 }
 
 #define HPU_REG_LOG 0
