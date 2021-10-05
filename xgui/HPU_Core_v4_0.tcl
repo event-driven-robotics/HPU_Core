@@ -5,8 +5,6 @@ source [file join [file dirname [file dirname [info script]]] gui/HPUCore_v3_0.g
 # Definitional proc to organize widgets for parameters.
 proc init_gui { IPINST } {
   ipgui::add_param $IPINST -name "Component_Name"
-  set C_FAMILY [ipgui::add_param $IPINST -name "C_FAMILY" -widget comboBox]
-  set_property tooltip {Choose the target FPGA Family} ${C_FAMILY}
   #Adding Page
   set PippoPAER [ipgui::add_page $IPINST -name "PippoPAER" -display_name {PAER / SAER}]
   set_property tooltip {PAER Interface} ${PippoPAER}

@@ -41,7 +41,7 @@ component neuserial_core is
   generic (
     -- -----------------------    
     -- GENERAL
-    C_FAMILY                  : string                        := "Serie7"; -- "Serie7", "Ultrascale+" 
+    C_FAMILY                  : string                        := "zynq"; -- "zynq", "zynquplus" 
     -- -----------------------        
     -- PAER        
     C_RX_L_HAS_PAER           : boolean                       := true;

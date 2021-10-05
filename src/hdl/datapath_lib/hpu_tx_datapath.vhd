@@ -32,7 +32,7 @@ library GTP_lib;
 
 entity hpu_tx_datapath is
   generic (
-    C_FAMILY                    : string                := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
+    C_FAMILY                    : string                := "zynquplus"; -- "zynq", "zynquplus" 
     --
     C_INPUT_DSIZE               : natural range 1 to 32 := 32;
     C_PAER_DSIZE                : positive              := 20;
@@ -376,10 +376,10 @@ begin
     reset_sych_fifo <= not(ii_hssaer_nrst);
     ii_tx_toSaerDst_synched(i).rdy <= not(synch_fifo_full(i));
 
-SYNC_FIFO_FOR_SERIE7 : if C_FAMILY = "Serie7"  generate -- "Serie7", "Ultrascale+" 
+SYNC_FIFO_FOR_ZYNQ : if C_FAMILY = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
-    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_S7
+    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_ZYNQ
       port map (
         rst     => reset_sych_fifo,
         wr_clk  => Clk_i,
@@ -394,10 +394,10 @@ begin
 
 end generate;    
 
-SYNC_FIFO_FOR_ULTRASCALE_PLUS : if C_FAMILY = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
+SYNC_FIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
    
-    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_USP
+    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_ZYNQUPLUS
       port map (
         rst     => reset_sych_fifo,
         wr_clk  => Clk_i,

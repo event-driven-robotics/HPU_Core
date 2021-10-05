@@ -34,7 +34,7 @@ library GTP_lib;
 
 entity hpu_rx_datapath is
   generic (
-    C_FAMILY                   : string                := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
+    C_FAMILY                   : string                := "zynquplus"; -- "zynq", "zynquplus" 
     --
     C_OUTPUT_DSIZE             : natural range 1 to 32 := 32;
     C_PAER_DSIZE               : positive              := 20;
@@ -351,10 +351,10 @@ begin
         aux_channel => Aux_Channel_i             -- in  std_logic;
         );
     
-SYNC_FIFO_FOR_SERIE7 : if C_FAMILY = "Serie7"  generate -- "Serie7", "Ultrascale+" 
+SYNC_FIFO_FOR_ZYNQ : if C_FAMILY = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
-    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_S7
+    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_ZYNQ
       port map (
         rst     => i_reset_synch_fifos,
         wr_clk  => Clk_ls_p,
@@ -369,10 +369,10 @@ begin
 
 end generate;    
 
-SYNC_FIFO_FOR_ULTRASCALE_PLUS : if C_FAMILY = "Ultrascale+"  generate -- "Serie7", "Ultrascale+" 
+SYNC_FIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
    
-    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_USP
+    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_ZYNQUPLUS
       port map (
         rst     => i_reset_synch_fifos,
         wr_clk  => Clk_ls_p,

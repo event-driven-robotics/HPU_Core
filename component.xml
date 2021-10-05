@@ -398,7 +398,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>2c151277</spirit:value>
+            <spirit:value>ab96f46f</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -417,7 +417,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>2c151277</spirit:value>
+            <spirit:value>ab96f46f</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -446,7 +446,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>2076e8c9</spirit:value>
+            <spirit:value>90f9cc72</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -5175,7 +5175,7 @@
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="string">
         <spirit:name>C_FAMILY</spirit:name>
-        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_FAMILY">Ultrascale+</spirit:value>
+        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_FAMILY">zynq</spirit:value>
       </spirit:modelParameter>
     </spirit:modelParameters>
   </spirit:model>
@@ -5184,11 +5184,6 @@
       <spirit:name>choice_list_07c83d4f</spirit:name>
       <spirit:enumeration>16</spirit:enumeration>
       <spirit:enumeration>32</spirit:enumeration>
-    </spirit:choice>
-    <spirit:choice>
-      <spirit:name>choice_list_59378d0a</spirit:name>
-      <spirit:enumeration>Serie7</spirit:enumeration>
-      <spirit:enumeration>Ultrascale+</spirit:enumeration>
     </spirit:choice>
     <spirit:choice>
       <spirit:name>choice_list_99a1d2b9</spirit:name>
@@ -5497,27 +5492,27 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/OUTFIFO_32_2048_64_1024_S7/OUTFIFO_32_2048_64_1024_S7.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/OUTFIFO_32_2048_64_1024_ZYNQ/OUTFIFO_32_2048_64_1024_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/INFIFO_64_1024_S7/INFIFO_64_1024_S7.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/INFIFO_64_1024_ZYNQ/INFIFO_64_1024_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_S7/GTP_DATA_SYNC_FIFO_S7.xci</spirit:name>
+        <spirit:name>src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_ZYNQ/GTP_DATA_SYNC_FIFO_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/SYNC_FIFO_32_16_S7/SYNC_FIFO_32_16_S7.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/SYNC_FIFO_32_16_ZYNQ/SYNC_FIFO_32_16_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_S7/GTP_MSG_SYNC_FIFO_S7.xci</spirit:name>
+        <spirit:name>src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_ZYNQ/GTP_MSG_SYNC_FIFO_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -5529,27 +5524,27 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/OUTFIFO_32_2048_64_1024_USP/OUTFIFO_32_2048_64_1024_USP.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/INFIFO_64_1024_ZYNQUPLUS/INFIFO_64_1024_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/INFIFO_64_1024_USP/INFIFO_64_1024_USP.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/OUTFIFO_32_2048_64_1024_ZYNQUPLUS/OUTFIFO_32_2048_64_1024_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_USP/GTP_DATA_SYNC_FIFO_USP.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/SYNC_FIFO_32_16_ZYNQUPLUS/SYNC_FIFO_32_16_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_USP/GTP_MSG_SYNC_FIFO_USP.xci</spirit:name>
+        <spirit:name>src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_ZYNQUPLUS/GTP_MSG_SYNC_FIFO_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/SYNC_FIFO_32_16_USP/SYNC_FIFO_32_16_USP.xci</spirit:name>
+        <spirit:name>src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_ZYNQUPLUS/GTP_DATA_SYNC_FIFO_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -5576,6 +5571,7 @@
       <spirit:file>
         <spirit:name>src/hdl/HPU_lib/time_machine.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_9b32d3a9</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
@@ -5874,27 +5870,27 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/OUTFIFO_32_2048_64_1024_S7/OUTFIFO_32_2048_64_1024_S7.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/OUTFIFO_32_2048_64_1024_ZYNQ/OUTFIFO_32_2048_64_1024_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/INFIFO_64_1024_S7/INFIFO_64_1024_S7.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/INFIFO_64_1024_ZYNQ/INFIFO_64_1024_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_S7/GTP_DATA_SYNC_FIFO_S7.xci</spirit:name>
+        <spirit:name>src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_ZYNQ/GTP_DATA_SYNC_FIFO_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/SYNC_FIFO_32_16_S7/SYNC_FIFO_32_16_S7.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/SYNC_FIFO_32_16_ZYNQ/SYNC_FIFO_32_16_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_S7/GTP_MSG_SYNC_FIFO_S7.xci</spirit:name>
+        <spirit:name>src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_ZYNQ/GTP_MSG_SYNC_FIFO_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -5905,27 +5901,27 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/OUTFIFO_32_2048_64_1024_USP/OUTFIFO_32_2048_64_1024_USP.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/INFIFO_64_1024_ZYNQUPLUS/INFIFO_64_1024_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/INFIFO_64_1024_USP/INFIFO_64_1024_USP.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/OUTFIFO_32_2048_64_1024_ZYNQUPLUS/OUTFIFO_32_2048_64_1024_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_USP/GTP_DATA_SYNC_FIFO_USP.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/SYNC_FIFO_32_16_ZYNQUPLUS/SYNC_FIFO_32_16_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_USP/GTP_MSG_SYNC_FIFO_USP.xci</spirit:name>
+        <spirit:name>src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_ZYNQUPLUS/GTP_MSG_SYNC_FIFO_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/SYNC_FIFO_32_16_USP/SYNC_FIFO_32_16_USP.xci</spirit:name>
+        <spirit:name>src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_ZYNQUPLUS/GTP_DATA_SYNC_FIFO_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -6029,7 +6025,7 @@
       <spirit:file>
         <spirit:name>xgui/HPU_Core_v4_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_2076e8c9</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_90f9cc72</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -6477,32 +6473,14 @@
     <spirit:parameter>
       <spirit:name>C_FAMILY</spirit:name>
       <spirit:displayName>FPGA Family</spirit:displayName>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.C_FAMILY" spirit:choiceRef="choice_list_59378d0a">Ultrascale+</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.C_FAMILY">zynq</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
     <xilinx:coreExtensions>
       <xilinx:supportedFamilies>
-        <xilinx:family xilinx:lifeCycle="Production">virtex7</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">qvirtex7</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">kintex7</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">kintex7l</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">qkintex7</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">qkintex7l</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">artix7</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">artix7l</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">aartix7</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">qartix7</xilinx:family>
         <xilinx:family xilinx:lifeCycle="Production">zynq</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">qzynq</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">azynq</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">spartan7</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">aspartan7</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">virtexu</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">virtexuplus</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">kintexuplus</xilinx:family>
         <xilinx:family xilinx:lifeCycle="Production">zynquplus</xilinx:family>
-        <xilinx:family xilinx:lifeCycle="Production">kintexu</xilinx:family>
       </xilinx:supportedFamilies>
       <xilinx:taxonomies>
         <xilinx:taxonomy>/IIT/Interfaces</xilinx:taxonomy>
@@ -6517,7 +6495,7 @@
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
       <xilinx:coreRevision>1</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2021-09-28T15:44:27Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2021-10-05T09:26:35Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
@@ -7943,16 +7921,99 @@
         <xilinx:tag xilinx:name="ui.data.coregen.dd@3d0b125a_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@2fa2ef41_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@5c6cf0cc_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@336545c9_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3562f0ae_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2b7bf4fd_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7ffda315_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@657621d4_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3bea6849_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1930ed6e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b503947_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@18a93f1a_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@43325ad0_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@46956883_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7b6d44c2_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b3c0780_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@359c202b_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3208d9c5_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@70cf0c7f_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77fab29d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d6020c3_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ea1d04e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@46ba1863_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1b6a0120_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@64ba524e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@c5f2aaa_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1bd537fe_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@41f4500d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@32d9f8e7_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@65f6060d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69cb3628_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@640d5957_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@310a43da_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61456_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7d075b9c_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4a87320a_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6e8fec71_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1fbfe9c3_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7ffd4953_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7421bd78_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54af029a_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40cbd499_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@111d0e6e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@789567eb_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@56d4d90b_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2a852686_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@99a932e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7490bbc9_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7f70ebc8_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7369e6c7_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@aa00b8e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@435b6c9d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@34bb7fee_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3f7b71a2_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f231846_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@267a9337_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3fcf358c_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@397cf44d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@250cea11_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@41adec40_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4511529f_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6c825da7_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14d821b1_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2baec48c_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@56f15c63_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@414cbd6d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6cc9b32d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@683c3e7d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@42d564d0_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a8935ca_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@129b84e6_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4642cc26_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6ca6d785_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7eb53bf_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b4ba864_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@12debe79_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1823fce7_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d48d4af_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4a0737e5_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7cb9edf6_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b1c9c4f_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3908182e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@156ddcdc_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@104781c_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7a56ac33_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d21c4cd_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2020.1</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="bc3f383b"/>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="7399192a"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="7325d68b"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="81cf3150"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="05cfd868"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="547c883b"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="b0953e8c"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="2a5e6bb2"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="20a62737"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

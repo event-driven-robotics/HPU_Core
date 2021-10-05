@@ -1,6 +1,6 @@
 -- ********************************************
 -- Version 4.1 Rev 0:  
--- - Compatibility extended to Ultrascale+
+-- - Compatibility extended to zynquplus
 --   (M. Casti - IIT)
 -- 
 -- ********************************************
@@ -132,7 +132,7 @@ entity HPUCore is
   generic (
     -- -----------------------    
     -- GENERAL
-    C_FAMILY                  : string                        := "Ultrascale+"; -- "Serie7", "Ultrascale+" 
+    C_FAMILY                  : string                        := "zynq"; -- "zynq", "zynquplus" 
     -- -----------------------    
     -- PAER        
     C_RX_L_HAS_PAER           : boolean                       := true;

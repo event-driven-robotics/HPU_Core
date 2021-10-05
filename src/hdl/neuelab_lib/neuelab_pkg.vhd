@@ -12,7 +12,7 @@ library ieee;
 
 package NEComponents_pkg is
 
-    component INFIFO_64_1024_S7 is
+    component INFIFO_64_1024_ZYNQ is
         port (
             clk          : in  std_logic;
             srst         : in  std_logic;
@@ -28,9 +28,9 @@ package NEComponents_pkg is
             underflow    : out std_logic;
             data_count   : out std_logic_vector(10 downto 0)
         );
-    end component INFIFO_64_1024_S7;
+    end component INFIFO_64_1024_ZYNQ;
 
-    component INFIFO_64_1024_USP is
+    component INFIFO_64_1024_ZYNQUPLUS is
         port (
             clk          : in  std_logic;
             srst         : in  std_logic;
@@ -48,10 +48,10 @@ package NEComponents_pkg is
             wr_rst_busy  : out std_logic;
             rd_rst_busy  : out std_logic
         );
-    end component INFIFO_64_1024_USP;
+    end component INFIFO_64_1024_ZYNQUPLUS;
 
         
-    component OUTFIFO_32_2048_64_1024_S7 is
+    component OUTFIFO_32_2048_64_1024_ZYNQ is
         port (
             rst          : in  std_logic;
             wr_clk       : in  std_logic;
@@ -67,9 +67,9 @@ package NEComponents_pkg is
             almost_empty : out std_logic;
             underflow    : out std_logic
         );
-    end component OUTFIFO_32_2048_64_1024_S7;
+    end component OUTFIFO_32_2048_64_1024_ZYNQ;
 
-    component OUTFIFO_32_2048_64_1024_USP is
+    component OUTFIFO_32_2048_64_1024_ZYNQUPLUS is
         port (
             rst          : in  std_logic;
             wr_clk       : in  std_logic;
@@ -85,7 +85,7 @@ package NEComponents_pkg is
             almost_empty : out std_logic;
             underflow    : out std_logic
         );
-    end component OUTFIFO_32_2048_64_1024_USP;
+    end component OUTFIFO_32_2048_64_1024_ZYNQUPLUS;
 
    
     component Timestamp is 

@@ -45,13 +45,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="25"/>
-    <Option Name="WTModelSimExportSim" Val="25"/>
-    <Option Name="WTQuestaExportSim" Val="25"/>
-    <Option Name="WTIesExportSim" Val="25"/>
-    <Option Name="WTVcsExportSim" Val="25"/>
-    <Option Name="WTRivieraExportSim" Val="25"/>
-    <Option Name="WTActivehdlExportSim" Val="25"/>
+    <Option Name="WTXSimExportSim" Val="27"/>
+    <Option Name="WTModelSimExportSim" Val="27"/>
+    <Option Name="WTQuestaExportSim" Val="27"/>
+    <Option Name="WTIesExportSim" Val="27"/>
+    <Option Name="WTVcsExportSim" Val="27"/>
+    <Option Name="WTRivieraExportSim" Val="27"/>
+    <Option Name="WTActivehdlExportSim" Val="27"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -64,42 +64,35 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PPRDIR/../src/Vivado_ip/SYNC_FIFO_32_16_S7/SYNC_FIFO_32_16_S7.xci">
+      <File Path="$PPRDIR/../src/Vivado_ip/INFIFO_64_1024_ZYNQ/INFIFO_64_1024_ZYNQ.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_S7/GTP_MSG_SYNC_FIFO_S7.xci">
+      <File Path="$PPRDIR/../src/Vivado_ip/OUTFIFO_32_2048_64_1024_ZYNQ/OUTFIFO_32_2048_64_1024_ZYNQ.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_S7/GTP_DATA_SYNC_FIFO_S7.xci">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_ZYNQ/GTP_MSG_SYNC_FIFO_ZYNQ.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_USP/GTP_DATA_SYNC_FIFO_USP.xci">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_ZYNQ/GTP_DATA_SYNC_FIFO_ZYNQ.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_USP/GTP_MSG_SYNC_FIFO_USP.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/Vivado_ip/SYNC_FIFO_32_16_USP/SYNC_FIFO_32_16_USP.xci">
+      <File Path="$PPRDIR/../src/Vivado_ip/SYNC_FIFO_32_16_ZYNQ/SYNC_FIFO_32_16_ZYNQ.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -483,14 +476,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTPRX_HPU_S7/GTPRX_HPU_S7.xci">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/hdl/spinn_neu_if_lib/user_int.v">
         <FileInfo>
           <Attr Name="Library" Val="spinn_neu_if_lib"/>
@@ -502,6 +487,14 @@
       </File>
       <File Path="$PPRDIR/../component.xml">
         <FileInfo SFType="IPXACT"/>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTPRX_HPU_ZYNQ/GTPRX_HPU_ZYNQ.xci">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
@@ -598,8 +591,8 @@
         <Option Name="TopAutoSet" Val="TRUE"/>
       </Config>
     </FileSet>
-    <FileSet Name="OUTFIFO_32_2048_64_1024_S7" Type="BlockSrcs" RelSrcDir="$PSRCDIR/OUTFIFO_32_2048_64_1024_S7">
-      <File Path="$PPRDIR/../src/Vivado_ip/OUTFIFO_32_2048_64_1024_S7/OUTFIFO_32_2048_64_1024_S7.xci">
+    <FileSet Name="INFIFO_64_1024_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/INFIFO_64_1024_ZYNQUPLUS">
+      <File Path="$PPRDIR/../src/Vivado_ip/INFIFO_64_1024_ZYNQUPLUS/INFIFO_64_1024_ZYNQUPLUS.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -607,12 +600,12 @@
         </FileInfo>
       </File>
       <Config>
-        <Option Name="TopModule" Val="OUTFIFO_32_2048_64_1024_S7"/>
+        <Option Name="TopModule" Val="INFIFO_64_1024_ZYNQUPLUS"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="INFIFO_64_1024_S7" Type="BlockSrcs" RelSrcDir="$PSRCDIR/INFIFO_64_1024_S7">
-      <File Path="$PPRDIR/../src/Vivado_ip/INFIFO_64_1024_S7/INFIFO_64_1024_S7.xci">
+    <FileSet Name="OUTFIFO_32_2048_64_1024_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/OUTFIFO_32_2048_64_1024_ZYNQUPLUS">
+      <File Path="$PPRDIR/../src/Vivado_ip/OUTFIFO_32_2048_64_1024_ZYNQUPLUS/OUTFIFO_32_2048_64_1024_ZYNQUPLUS.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -620,12 +613,12 @@
         </FileInfo>
       </File>
       <Config>
-        <Option Name="TopModule" Val="INFIFO_64_1024_S7"/>
+        <Option Name="TopModule" Val="OUTFIFO_32_2048_64_1024_ZYNQUPLUS"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="OUTFIFO_32_2048_64_1024_USP" Type="BlockSrcs" RelSrcDir="$PSRCDIR/OUTFIFO_32_2048_64_1024_USP">
-      <File Path="$PPRDIR/../src/Vivado_ip/OUTFIFO_32_2048_64_1024_USP/OUTFIFO_32_2048_64_1024_USP.xci">
+    <FileSet Name="SYNC_FIFO_32_16_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/SYNC_FIFO_32_16_ZYNQUPLUS">
+      <File Path="$PPRDIR/../src/Vivado_ip/SYNC_FIFO_32_16_ZYNQUPLUS/SYNC_FIFO_32_16_ZYNQUPLUS.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -633,12 +626,12 @@
         </FileInfo>
       </File>
       <Config>
-        <Option Name="TopModule" Val="OUTFIFO_32_2048_64_1024_USP"/>
+        <Option Name="TopModule" Val="SYNC_FIFO_32_16_ZYNQUPLUS"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="INFIFO_64_1024_USP" Type="BlockSrcs" RelSrcDir="$PSRCDIR/INFIFO_64_1024_USP">
-      <File Path="$PPRDIR/../src/Vivado_ip/INFIFO_64_1024_USP/INFIFO_64_1024_USP.xci">
+    <FileSet Name="GTP_MSG_SYNC_FIFO_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/GTP_MSG_SYNC_FIFO_ZYNQUPLUS">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_ZYNQUPLUS/GTP_MSG_SYNC_FIFO_ZYNQUPLUS.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -646,7 +639,21 @@
         </FileInfo>
       </File>
       <Config>
-        <Option Name="TopModule" Val="INFIFO_64_1024_USP"/>
+        <Option Name="TopModule" Val="GTP_MSG_SYNC_FIFO_ZYNQUPLUS"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="GTP_DATA_SYNC_FIFO_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/GTP_DATA_SYNC_FIFO_ZYNQUPLUS">
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_ZYNQUPLUS/GTP_DATA_SYNC_FIFO_ZYNQUPLUS.xci">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="GTP_DATA_SYNC_FIFO_ZYNQUPLUS"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
@@ -679,7 +686,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="OUTFIFO_32_2048_64_1024_S7_synth_1" Type="Ft3:Synth" SrcSet="OUTFIFO_32_2048_64_1024_S7" Part="xczu5ev-sfvc784-2-i" ConstrsSet="OUTFIFO_32_2048_64_1024_S7" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
+    <Run Id="INFIFO_64_1024_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="INFIFO_64_1024_ZYNQUPLUS" Part="xczu5ev-sfvc784-2-i" ConstrsSet="INFIFO_64_1024_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
         <Step Id="synth_design"/>
@@ -688,7 +695,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="INFIFO_64_1024_S7_synth_1" Type="Ft3:Synth" SrcSet="INFIFO_64_1024_S7" Part="xczu5ev-sfvc784-2-i" ConstrsSet="INFIFO_64_1024_S7" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
+    <Run Id="OUTFIFO_32_2048_64_1024_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="OUTFIFO_32_2048_64_1024_ZYNQUPLUS" Part="xczu5ev-sfvc784-2-i" ConstrsSet="OUTFIFO_32_2048_64_1024_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
         <Step Id="synth_design"/>
@@ -697,26 +704,29 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="OUTFIFO_32_2048_64_1024_USP_synth_1" Type="Ft3:Synth" SrcSet="OUTFIFO_32_2048_64_1024_USP" Part="xczu5ev-sfvc784-2-i" ConstrsSet="OUTFIFO_32_2048_64_1024_USP" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/OUTFIFO_32_2048_64_1024_USP_synth_1" IncludeInArchive="true">
+    <Run Id="SYNC_FIFO_32_16_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="SYNC_FIFO_32_16_ZYNQUPLUS" Part="xczu5ev-sfvc784-2-i" ConstrsSet="SYNC_FIFO_32_16_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
         <Step Id="synth_design"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="INFIFO_64_1024_USP_synth_1" Type="Ft3:Synth" SrcSet="INFIFO_64_1024_USP" Part="xczu5ev-sfvc784-2-i" ConstrsSet="INFIFO_64_1024_USP" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/INFIFO_64_1024_USP_synth_1" IncludeInArchive="true">
+    <Run Id="GTP_MSG_SYNC_FIFO_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="GTP_MSG_SYNC_FIFO_ZYNQUPLUS" Part="xczu5ev-sfvc784-2-i" ConstrsSet="GTP_MSG_SYNC_FIFO_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
         <Step Id="synth_design"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+      <RQSFiles/>
+    </Run>
+    <Run Id="GTP_DATA_SYNC_FIFO_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="GTP_DATA_SYNC_FIFO_ZYNQUPLUS" Part="xczu5ev-sfvc784-2-i" ConstrsSet="GTP_DATA_SYNC_FIFO_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
+        <Step Id="synth_design"/>
+      </Strategy>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
@@ -738,7 +748,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="OUTFIFO_32_2048_64_1024_S7_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="OUTFIFO_32_2048_64_1024_S7" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="OUTFIFO_32_2048_64_1024_S7_synth_1" IncludeInArchive="false" GenFullBitstream="true">
+    <Run Id="INFIFO_64_1024_ZYNQUPLUS_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="INFIFO_64_1024_ZYNQUPLUS" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="INFIFO_64_1024_ZYNQUPLUS_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
         <Step Id="init_design"/>
@@ -755,7 +765,7 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="INFIFO_64_1024_S7_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="INFIFO_64_1024_S7" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="INFIFO_64_1024_S7_synth_1" IncludeInArchive="false" GenFullBitstream="true">
+    <Run Id="OUTFIFO_32_2048_64_1024_ZYNQUPLUS_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="OUTFIFO_32_2048_64_1024_ZYNQUPLUS" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="OUTFIFO_32_2048_64_1024_ZYNQUPLUS_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
         <Step Id="init_design"/>
@@ -772,11 +782,9 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="OUTFIFO_32_2048_64_1024_USP_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="OUTFIFO_32_2048_64_1024_USP" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="OUTFIFO_32_2048_64_1024_USP_synth_1" IncludeInArchive="false" GenFullBitstream="true">
+    <Run Id="SYNC_FIFO_32_16_ZYNQUPLUS_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="SYNC_FIFO_32_16_ZYNQUPLUS" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="SYNC_FIFO_32_16_ZYNQUPLUS_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -791,11 +799,26 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="INFIFO_64_1024_USP_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="INFIFO_64_1024_USP" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="INFIFO_64_1024_USP_synth_1" IncludeInArchive="false" GenFullBitstream="true">
+    <Run Id="GTP_MSG_SYNC_FIFO_ZYNQUPLUS_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="GTP_MSG_SYNC_FIFO_ZYNQUPLUS" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="GTP_MSG_SYNC_FIFO_ZYNQUPLUS_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2020"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+      <RQSFiles/>
+    </Run>
+    <Run Id="GTP_DATA_SYNC_FIFO_ZYNQUPLUS_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="GTP_DATA_SYNC_FIFO_ZYNQUPLUS" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="GTP_DATA_SYNC_FIFO_ZYNQUPLUS_synth_1" IncludeInArchive="false" GenFullBitstream="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
