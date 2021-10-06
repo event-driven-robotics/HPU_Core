@@ -18,7 +18,16 @@
  * dma synchronization primitives lead to worse performances wrt using DMA
  * coherent memory
  */
+
 #define HPU_DMA_STREAMING
+/* On ZynqMP it seems conveninet to defer the DMA resubmitting task to a kernel
+ * thread. While on Zynq7000 it was expected not to be convenient, because it
+ * just have two cores, it seems that it also does not work in principle (i.e.
+ * the core that is leveraged from doing this task doesn't seem to get any
+ * benefit) for reasons yet to be clarified. For now we just enable it only
+ * on ARMv8 (i.e. ZynqMP)
+ */
+#define HPU_DMA_DEFER_SUBMIT
 #endif
 
 #include <asm/io.h>
@@ -31,6 +40,7 @@
 #include <linux/device.h>
 #include <linux/fs.h>
 #include <linux/kernel.h>
+#include <linux/kthread.h>
 #include <linux/module.h>
 #include <linux/of_platform.h>
 #include <linux/semaphore.h>
@@ -443,6 +453,7 @@ struct hpu_buf {
 	int head_index, tail_index;
 	dma_cookie_t cookie;
 	struct hpu_priv *priv;
+	struct list_head node;
 };
 
 struct hpu_dma_pool {
@@ -455,6 +466,10 @@ struct hpu_dma_pool {
 	int filled;
 	int ps;
 	int pn;
+	struct list_head pending_list;
+	struct wait_queue_head wq;
+	struct task_struct *thread;
+	struct mutex list_lock;
 };
 
 enum fifo_status {
@@ -506,6 +521,7 @@ struct hpu_priv {
 	int axis_lat;
 	unsigned int rx_tlast_count;
 	unsigned int rx_data_count;
+	bool thread_exit;
 };
 
 static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
@@ -566,6 +582,9 @@ static dev_t hpu_devt;
 static DEFINE_IDA(hpu_ida);
 
 static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf);
+static void hpu_rx_dma_submit_buffer_deferred(struct hpu_priv *priv, struct hpu_buf *buf);
+static void hpu_rx_dma_wake_deferred(struct hpu_priv *priv);
+
 static void hpu_dma_free_pool(struct hpu_priv *priv, struct hpu_dma_pool *hpu_pool,
 	enum dma_data_direction dir);
 static void hpu_do_set_axis_lat(struct hpu_priv *priv);
@@ -625,7 +644,7 @@ static void hpu_tx_dma_callback(void *_buffer)
 static void hpu_drain_rx_dma(struct hpu_priv *priv)
 {
 	int finished = 0;
-	int ret;
+	__maybe_unused int ret;
 
 	while (1) {
 		spin_lock_bh(&priv->dma_rx_pool.spin_lock);
@@ -635,10 +654,14 @@ static void hpu_drain_rx_dma(struct hpu_priv *priv)
 		spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
 		if (finished)
 			break;
-
+#ifdef HPU_DMA_DEFER_SUBMIT
+		hpu_rx_dma_submit_buffer_deferred(priv,
+						  &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index]);
+#else
 		ret = hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[priv->dma_rx_pool.buf_index]);
 		if (ret)
 			dev_err(&priv->pdev->dev, "DMA RX submit error %d while housekeeping\n", ret);
+#endif
 		/* forcefully advance index. 1pkt lost */
 		priv->dma_rx_pool.buf_index =
 			(priv->dma_rx_pool.buf_index + 1) &
@@ -647,7 +670,11 @@ static void hpu_drain_rx_dma(struct hpu_priv *priv)
 		BUG_ON(priv->dma_rx_pool.buf_index >= priv->dma_rx_pool.pn);
 
 		priv->cnt_pktloss++;
+#ifdef HPU_DMA_DEFER_SUBMIT
+		hpu_rx_dma_wake_deferred(priv);
+#else
 		dma_async_issue_pending(priv->dma_rx_chan);
+#endif
 	}
 }
 
@@ -986,7 +1013,8 @@ static int hpu_rx_is_suspended(struct hpu_priv *priv)
 static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				loff_t *offset)
 {
-	int ret, ret2;
+	int ret;
+	__maybe_unused int ret2;
 	size_t copy;
 	int index;
 	size_t buf_count;
@@ -1130,17 +1158,26 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
 
 			/* resubmit DMA buffer */
+#ifdef HPU_DMA_DEFER_SUBMIT
+			hpu_rx_dma_submit_buffer_deferred(priv, &priv->dma_rx_pool.ring[index]);
+#else
 			ret2 = hpu_rx_dma_submit_buffer(priv, &priv->dma_rx_pool.ring[index]);
 			if (ret2)
 				dev_err(&priv->pdev->dev,
 					"DMA RX submit error %d while reading\n",
-					ret2);
+                                       ret2);
+#endif
 			submitted++;
+
 			priv->dma_rx_pool.buf_index = (priv->dma_rx_pool.buf_index + 1)
 				& (priv->dma_rx_pool.pn - 1);
 			BUG_ON(priv->dma_rx_pool.buf_index >= priv->dma_rx_pool.pn);
 			if (submitted == priv->dma_rx_pool.pn / 3) {
+#ifdef HPU_DMA_DEFER_SUBMIT
+				hpu_rx_dma_wake_deferred(priv);
+#else
 				dma_async_issue_pending(priv->dma_rx_chan);
+#endif
 				submitted = 0;
 			}
 		} else {
@@ -1161,9 +1198,13 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			break;
 	}
 
-	if (submitted)
+	if (submitted) {
+#ifdef HPU_DMA_DEFER_SUBMIT
+		hpu_rx_dma_wake_deferred(priv);
+#else
 		dma_async_issue_pending(priv->dma_rx_chan);
-
+#endif
+	}
 	dev_dbg(&priv->pdev->dev, "----END read\n");
 
 	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
@@ -1288,6 +1329,74 @@ static void hpu_dma_free_pool(struct hpu_priv *priv,
 	hpu_pool->dma_pool = NULL;
 	kfree(hpu_pool->ring);
 	hpu_pool->ring = NULL;
+}
+
+static void __maybe_unused hpu_rx_dma_thread_terminate(struct hpu_priv *priv)
+{
+	priv->thread_exit = 1;
+	wake_up(&priv->dma_rx_pool.wq);
+	kthread_stop(priv->dma_rx_pool.thread);
+}
+
+static int hpu_rx_dma_submit_thread(void *data)
+{
+	struct hpu_buf *buf, *tmp;
+	struct hpu_priv *priv = data;
+	int submitted = 0;
+
+	while (true) {
+		wait_event(priv->dma_rx_pool.wq,
+			   (!list_empty(&priv->dma_rx_pool.pending_list) ||
+			    priv->thread_exit));
+
+		if (priv->thread_exit)
+			break;
+
+		mutex_lock(&priv->dma_rx_pool.list_lock);
+		list_for_each_entry_safe(buf, tmp, &priv->dma_rx_pool.pending_list, node) {
+			list_del(&buf->node);
+			mutex_unlock(&priv->dma_rx_pool.list_lock);
+			hpu_rx_dma_submit_buffer(priv, buf);
+			submitted++;
+			if (submitted == priv->dma_rx_pool.pn / 3) {
+				dma_async_issue_pending(priv->dma_rx_chan);
+				submitted = 0;
+			}
+			mutex_lock(&priv->dma_rx_pool.list_lock);
+		}
+		mutex_unlock(&priv->dma_rx_pool.list_lock);
+		if (submitted)
+			dma_async_issue_pending(priv->dma_rx_chan);
+		submitted = 0;
+	}
+
+	return 0;
+}
+
+static int __maybe_unused hpu_rx_dma_thread_create(struct hpu_priv *priv)
+{
+	priv->thread_exit = 0;
+	init_waitqueue_head(&priv->dma_rx_pool.wq);
+	mutex_init(&priv->dma_rx_pool.list_lock);
+	INIT_LIST_HEAD(&priv->dma_rx_pool.pending_list);
+	priv->dma_rx_pool.thread = kthread_run(hpu_rx_dma_submit_thread,
+					       priv, "HPU_%pa_DMA_helper",
+					       &priv->reg_base);
+
+	return 0;
+}
+
+static void __maybe_unused hpu_rx_dma_submit_buffer_deferred(struct hpu_priv *priv,
+					      struct hpu_buf *buf)
+{
+	mutex_lock(&priv->dma_rx_pool.list_lock);
+	list_add_tail(&buf->node, &priv->dma_rx_pool.pending_list);
+	mutex_unlock(&priv->dma_rx_pool.list_lock);
+}
+
+static void __maybe_unused hpu_rx_dma_wake_deferred(struct hpu_priv *priv)
+{
+	wake_up(&priv->dma_rx_pool.wq);
 }
 
 static int hpu_rx_dma_submit_buffer(struct hpu_priv *priv, struct hpu_buf *buf)
@@ -2435,6 +2544,9 @@ static int hpu_register_chardev(struct hpu_priv *priv)
 
 static int hpu_unregister_chardev(struct hpu_priv *priv)
 {
+#ifdef HPU_DMA_DEFER_SUBMIT
+	hpu_rx_dma_thread_terminate(priv);
+#endif
 	cdev_del(&priv->cdev);
 	device_destroy(hpu_class, priv->devt);
 	ida_simple_remove(&hpu_ida, priv->id);
@@ -2548,6 +2660,9 @@ static int hpu_probe(struct platform_device *pdev)
 	init_completion(&priv->dma_rx_pool.completion);
 	init_completion(&priv->dma_tx_pool.completion);
 
+#ifdef HPU_DMA_DEFER_SUBMIT
+	hpu_rx_dma_thread_create(priv);
+#endif
 	hpu_register_chardev(priv);
 
 	if (hpu_debugfsdir) {
