@@ -391,6 +391,6 @@ The DMA driver needs to be able to:
 - Enqueue new transfer requests while running
 - Support partial transfers (i.e. early-terminated transfers, providing residue information)
 
-EDL Zynq kernel (https://github.com/andreamerello/linux-zynq-stable) has been patched in order to accomplish to this requirements.
+EDL [Zynq7000](https://gitlab.iit.it/edl/linux-kernel-zynq7000) and [ZynqMP](https://gitlab.iit.it/edl/linux-kernel-zynqmp) kernels have been patched with a customized DMA Xilinx driver that satisfy to these requirements.
 
-Depending by [rx/tx]_[pn/ps] The HPU driver needs to allocate large portions of DMAable memory. Please make sure that CMA (Contiguous Memory Allocator) is enabled in kernel config (CONFIG_CMA=y) and that a reasonable amount of memory is reserved (e.g. append *CMA=32M* to your kernel arguments).
+*NOTE*: expecially on Zynq7000, a lot of coherent memory is used by the drv; depending by [rx/tx]_[pn/ps] The HPU driver needs to allocate large portions of DMAable memory. Please make sure that CMA (Contiguous Memory Allocator) is enabled in kernel config (CONFIG_CMA=y) and that a reasonable amount of memory is reserved (e.g. append *CMA=32M* to your kernel arguments).
