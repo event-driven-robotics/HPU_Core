@@ -66,7 +66,7 @@ entity HPUcore_tb is
         );
 end HPUcore_tb;
  
-architecture behavior of HPUcore_tb is 
+architecture behavior of HPUcore_tb is   
  
 -- Clock generation constants
 
@@ -97,6 +97,9 @@ constant CLK_HSSAER_HS_HALF_PERIOD_6_c : time := 1667 ps;
 component HPUCore is
   generic (
     -- -----------------------    
+    -- GENERAL
+    C_FAMILY                  : string                        := "zynq"; -- "zynq", "zynquplus" 
+    -- ----------------------- 
     -- PAER        
     C_RX_L_HAS_PAER           : boolean                       := false;
     C_RX_R_HAS_PAER           : boolean                       := false;
@@ -1173,6 +1176,9 @@ Tx_GTP_PllRefclklost    <= GTP_PllRefclklost;
 HPUCORE_i : HPUCore  
     generic map (
         -- -----------------------    
+        -- GENERAL
+        C_FAMILY                    => "zynquplus", -- "zynq", "zynquplus"  
+        -- ----------------------- 
         -- PAER        
         C_RX_L_HAS_PAER             => true, 
         C_RX_R_HAS_PAER             => false, 

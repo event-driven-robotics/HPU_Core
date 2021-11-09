@@ -20,18 +20,22 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="317685000001fs"></ZoomEndTime>
-      <Cursor1Time time="244804139000fs"></Cursor1Time>
+      <ZoomStartTime time="23976998fs"></ZoomStartTime>
+      <ZoomEndTime time="25480999fs"></ZoomEndTime>
+      <Cursor1Time time="24627998fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="292"></NameColumnWidth>
-      <ValueColumnWidth column_width="98"></ValueColumnWidth>
+      <ValueColumnWidth column_width="90"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="174" />
+   <WVObjectSize size="39" />
    <wave_markers>
       <marker time="99484800000" label="" />
    </wave_markers>
+   <wvobject fp_name="/HPUcore_tb/i_clk" type="logic">
+      <obj_property name="ElementShortName">i_clk</obj_property>
+      <obj_property name="ObjectShortName">i_clk</obj_property>
+   </wvobject>
    <wvobject fp_name="/HPUcore_tb/HSSAER_ClkLS_p" type="logic">
       <obj_property name="ElementShortName">HSSAER_ClkLS_p</obj_property>
       <obj_property name="ObjectShortName">HSSAER_ClkLS_p</obj_property>
@@ -648,6 +652,7 @@
       <wvobject fp_name="group140" type="group">
          <obj_property name="label">PAER - RX Left</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="/HPUcore_tb/data_from_AER_L" type="array">
             <obj_property name="ElementShortName">data_from_AER_L[23:0]</obj_property>
             <obj_property name="ObjectShortName">data_from_AER_L[23:0]</obj_property>
@@ -731,7 +736,6 @@
    <wvobject fp_name="group145" type="group">
       <obj_property name="label">AXI Stream</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TREADY" type="logic">
          <obj_property name="ElementShortName">S_AXIS_TREADY</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TREADY</obj_property>
@@ -776,6 +780,7 @@
    <wvobject fp_name="group144" type="group">
       <obj_property name="label">AXI Lite</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXI_ACLK" type="logic">
          <obj_property name="ElementShortName">S_AXI_ACLK</obj_property>
          <obj_property name="ObjectShortName">S_AXI_ACLK</obj_property>
@@ -1052,6 +1057,7 @@
    <wvobject fp_name="group272" type="group">
       <obj_property name="label">AEX Sequencer</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Rst_xRBI" type="logic">
          <obj_property name="ElementShortName">Rst_xRBI</obj_property>
          <obj_property name="ObjectShortName">Rst_xRBI</obj_property>
@@ -1176,7 +1182,6 @@
    <wvobject fp_name="group336" type="group">
       <obj_property name="label">TX</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="group333" type="group">
          <obj_property name="label">GTP</obj_property>
          <obj_property name="DisplayName">label</obj_property>
@@ -1249,190 +1254,117 @@
       </wvobject>
    </wvobject>
    <wvobject type="divider" fp_name="divider354">
-      <obj_property name="label">mug</obj_property>
+      <obj_property name="label">Detailed</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/Reset_xRBI" type="logic">
-      <obj_property name="ElementShortName">Reset_xRBI</obj_property>
-      <obj_property name="ObjectShortName">Reset_xRBI</obj_property>
    </wvobject>
    <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/CoreClk_xCI" type="logic">
       <obj_property name="ElementShortName">CoreClk_xCI</obj_property>
       <obj_property name="ObjectShortName">CoreClk_xCI</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonInAddr_xDI" type="array">
-      <obj_property name="ElementShortName">MonInAddr_xDI[31:0]</obj_property>
-      <obj_property name="ObjectShortName">MonInAddr_xDI[31:0]</obj_property>
+   <wvobject type="divider" fp_name="divider515">
+      <obj_property name="label">RX FIFO</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonInDstRdy_xSO" type="logic">
-      <obj_property name="ElementShortName">MonInDstRdy_xSO</obj_property>
-      <obj_property name="ObjectShortName">MonInDstRdy_xSO</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/ResetRX_xR" type="logic">
+      <obj_property name="ElementShortName">ResetRX_xR</obj_property>
+      <obj_property name="ObjectShortName">ResetRX_xR</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonInSrcRdy_xSI" type="logic">
-      <obj_property name="ElementShortName">MonInSrcRdy_xSI</obj_property>
-      <obj_property name="ObjectShortName">MonInSrcRdy_xSI</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/LiEnMonOutAddrEvt_xD" type="array">
+      <obj_property name="ElementShortName">LiEnMonOutAddrEvt_xD[63:0]</obj_property>
+      <obj_property name="ObjectShortName">LiEnMonOutAddrEvt_xD[63:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqOutAddr_xDO" type="array">
-      <obj_property name="ElementShortName">SeqOutAddr_xDO[31:0]</obj_property>
-      <obj_property name="ObjectShortName">SeqOutAddr_xDO[31:0]</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/enableFifoWriting_xS" type="logic">
+      <obj_property name="ElementShortName">enableFifoWriting_xS</obj_property>
+      <obj_property name="ObjectShortName">enableFifoWriting_xS</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqOutSrcRdy_xSO" type="logic">
-      <obj_property name="ElementShortName">SeqOutSrcRdy_xSO</obj_property>
-      <obj_property name="ObjectShortName">SeqOutSrcRdy_xSO</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonOutFull_xS" type="logic">
+      <obj_property name="ElementShortName">MonOutFull_xS</obj_property>
+      <obj_property name="ObjectShortName">MonOutFull_xS</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqOutDstRdy_xSI" type="logic">
-      <obj_property name="ElementShortName">SeqOutDstRdy_xSI</obj_property>
-      <obj_property name="ObjectShortName">SeqOutDstRdy_xSI</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/i_fifoCoreDat_xD" type="array">
+      <obj_property name="ElementShortName">i_fifoCoreDat_xD[63:0]</obj_property>
+      <obj_property name="ObjectShortName">i_fifoCoreDat_xD[63:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqInRead_xS" type="logic">
-      <obj_property name="ElementShortName">SeqInRead_xS</obj_property>
-      <obj_property name="ObjectShortName">SeqInRead_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/rst" type="logic">
-      <obj_property name="ElementShortName">rst</obj_property>
-      <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/wr_clk" type="logic">
-      <obj_property name="ElementShortName">wr_clk</obj_property>
-      <obj_property name="ObjectShortName">wr_clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/rd_clk" type="logic">
-      <obj_property name="ElementShortName">rd_clk</obj_property>
-      <obj_property name="ObjectShortName">rd_clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/din" type="array">
-      <obj_property name="ElementShortName">din[31:0]</obj_property>
-      <obj_property name="ObjectShortName">din[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/wr_en" type="logic">
-      <obj_property name="ElementShortName">wr_en</obj_property>
-      <obj_property name="ObjectShortName">wr_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/rd_en" type="logic">
-      <obj_property name="ElementShortName">rd_en</obj_property>
-      <obj_property name="ObjectShortName">rd_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/dout" type="array">
-      <obj_property name="ElementShortName">dout[63:0]</obj_property>
-      <obj_property name="ObjectShortName">dout[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/full" type="logic">
-      <obj_property name="ElementShortName">full</obj_property>
-      <obj_property name="ObjectShortName">full</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/almost_full" type="logic">
-      <obj_property name="ElementShortName">almost_full</obj_property>
-      <obj_property name="ObjectShortName">almost_full</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/overflow" type="logic">
-      <obj_property name="ElementShortName">overflow</obj_property>
-      <obj_property name="ObjectShortName">overflow</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/empty" type="logic">
-      <obj_property name="ElementShortName">empty</obj_property>
-      <obj_property name="ObjectShortName">empty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/almost_empty" type="logic">
-      <obj_property name="ElementShortName">almost_empty</obj_property>
-      <obj_property name="ObjectShortName">almost_empty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_Outfifo_32_2048_64/underflow" type="logic">
-      <obj_property name="ElementShortName">underflow</obj_property>
-      <obj_property name="ObjectShortName">underflow</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider587">
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FlushTXFifos_xSI" type="logic">
-      <obj_property name="ElementShortName">FlushTXFifos_xSI</obj_property>
-      <obj_property name="ObjectShortName">FlushTXFifos_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FlushRXFifos_xSI" type="logic">
-      <obj_property name="ElementShortName">FlushRXFifos_xSI</obj_property>
-      <obj_property name="ObjectShortName">FlushRXFifos_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DmaLength_xDI" type="array">
-      <obj_property name="ElementShortName">DmaLength_xDI[15:0]</obj_property>
-      <obj_property name="ObjectShortName">DmaLength_xDI[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/Timing_xSI" type="array">
-      <obj_property name="ElementShortName">Timing_xSI</obj_property>
-      <obj_property name="ObjectShortName">Timing_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/CleanTimer_xSI" type="logic">
-      <obj_property name="ElementShortName">CleanTimer_xSI</obj_property>
-      <obj_property name="ObjectShortName">CleanTimer_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/WrapDetected_xSO" type="logic">
-      <obj_property name="ElementShortName">WrapDetected_xSO</obj_property>
-      <obj_property name="ObjectShortName">WrapDetected_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FullTimestamp_i" type="logic">
-      <obj_property name="ElementShortName">FullTimestamp_i</obj_property>
-      <obj_property name="ObjectShortName">FullTimestamp_i</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/EnableMonitor_xSI" type="logic">
-      <obj_property name="ElementShortName">EnableMonitor_xSI</obj_property>
-      <obj_property name="ObjectShortName">EnableMonitor_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/CoreReady_xSI" type="logic">
-      <obj_property name="ElementShortName">CoreReady_xSI</obj_property>
-      <obj_property name="ObjectShortName">CoreReady_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/TxTSMode_xDI" type="array">
-      <obj_property name="ElementShortName">TxTSMode_xDI[1:0]</obj_property>
-      <obj_property name="ObjectShortName">TxTSMode_xDI[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/TxTSTimeoutSel_xDI" type="array">
-      <obj_property name="ElementShortName">TxTSTimeoutSel_xDI[3:0]</obj_property>
-      <obj_property name="ObjectShortName">TxTSTimeoutSel_xDI[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/TxTSRetrigCmd_xSI" type="logic">
-      <obj_property name="ElementShortName">TxTSRetrigCmd_xSI</obj_property>
-      <obj_property name="ObjectShortName">TxTSRetrigCmd_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/TxTSRearmCmd_xSI" type="logic">
-      <obj_property name="ElementShortName">TxTSRearmCmd_xSI</obj_property>
-      <obj_property name="ObjectShortName">TxTSRearmCmd_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/TxTSRetrigStatus_xSO" type="logic">
-      <obj_property name="ElementShortName">TxTSRetrigStatus_xSO</obj_property>
-      <obj_property name="ObjectShortName">TxTSRetrigStatus_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/TxTSTimeoutCounts_xSO" type="logic">
-      <obj_property name="ElementShortName">TxTSTimeoutCounts_xSO</obj_property>
-      <obj_property name="ObjectShortName">TxTSTimeoutCounts_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/TxTSMaskSel_xSI" type="array">
-      <obj_property name="ElementShortName">TxTSMaskSel_xSI[1:0]</obj_property>
-      <obj_property name="ObjectShortName">TxTSMaskSel_xSI[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FifoCoreDat_xDO" type="array">
-      <obj_property name="ElementShortName">FifoCoreDat_xDO[31:0]</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreDat_xDO[31:0]</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/dataRead_xS" type="logic">
+      <obj_property name="ElementShortName">dataRead_xS</obj_property>
+      <obj_property name="ObjectShortName">dataRead_xS</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
    <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FifoCoreRead_xSI" type="logic">
       <obj_property name="ElementShortName">FifoCoreRead_xSI</obj_property>
       <obj_property name="ObjectShortName">FifoCoreRead_xSI</obj_property>
+      <obj_property name="CustomSignalColor">#00FFFF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FifoCoreEmpty_xSO" type="logic">
-      <obj_property name="ElementShortName">FifoCoreEmpty_xSO</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreEmpty_xSO</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/effectiveRdEn_xS" type="logic">
+      <obj_property name="ElementShortName">effectiveRdEn_xS</obj_property>
+      <obj_property name="ObjectShortName">effectiveRdEn_xS</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FifoCoreAlmostEmpty_xSO" type="logic">
-      <obj_property name="ElementShortName">FifoCoreAlmostEmpty_xSO</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreAlmostEmpty_xSO</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/i_FifoCoreEmpty_xSO" type="logic">
+      <obj_property name="ElementShortName">i_FifoCoreEmpty_xSO</obj_property>
+      <obj_property name="ObjectShortName">i_FifoCoreEmpty_xSO</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FifoCoreBurstReady_xSO" type="logic">
-      <obj_property name="ElementShortName">FifoCoreBurstReady_xSO</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreBurstReady_xSO</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/rxfifo_rd_rst_busy" type="logic">
+      <obj_property name="ElementShortName">rxfifo_rd_rst_busy</obj_property>
+      <obj_property name="ObjectShortName">rxfifo_rd_rst_busy</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FifoCoreFull_xSO" type="logic">
-      <obj_property name="ElementShortName">FifoCoreFull_xSO</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreFull_xSO</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/rxfifo_wr_rst_busy" type="logic">
+      <obj_property name="ElementShortName">rxfifo_wr_rst_busy</obj_property>
+      <obj_property name="ObjectShortName">rxfifo_wr_rst_busy</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/FifoCoreNumData_o" type="array">
-      <obj_property name="ElementShortName">FifoCoreNumData_o[10:0]</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreNumData_o[10:0]</obj_property>
+   <wvobject fp_name="group145" type="group">
+      <obj_property name="label">AXI Stream</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TREADY" type="logic">
+         <obj_property name="ElementShortName">S_AXIS_TREADY</obj_property>
+         <obj_property name="ObjectShortName">S_AXIS_TREADY</obj_property>
+         <obj_property name="CustomSignalColor">#FF0080</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TDATA" type="array">
+         <obj_property name="ElementShortName">S_AXIS_TDATA[31:0]</obj_property>
+         <obj_property name="ObjectShortName">S_AXIS_TDATA[31:0]</obj_property>
+         <obj_property name="CustomSignalColor">#FF0080</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TLAST" type="logic">
+         <obj_property name="ElementShortName">S_AXIS_TLAST</obj_property>
+         <obj_property name="ObjectShortName">S_AXIS_TLAST</obj_property>
+         <obj_property name="CustomSignalColor">#FF0080</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/S_AXIS_TVALID" type="logic">
+         <obj_property name="ElementShortName">S_AXIS_TVALID</obj_property>
+         <obj_property name="ObjectShortName">S_AXIS_TVALID</obj_property>
+         <obj_property name="CustomSignalColor">#FF0080</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/M_AXIS_TDATA" type="array">
+         <obj_property name="ElementShortName">M_AXIS_TDATA[31:0]</obj_property>
+         <obj_property name="ObjectShortName">M_AXIS_TDATA[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/M_AXIS_TVALID" type="logic">
+         <obj_property name="ElementShortName">M_AXIS_TVALID</obj_property>
+         <obj_property name="ObjectShortName">M_AXIS_TVALID</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/M_AXIS_TLAST" type="logic">
+         <obj_property name="ElementShortName">M_AXIS_TLAST</obj_property>
+         <obj_property name="ObjectShortName">M_AXIS_TLAST</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/M_AXIS_TREADY" type="logic">
+         <obj_property name="ElementShortName">M_AXIS_TREADY</obj_property>
+         <obj_property name="ObjectShortName">M_AXIS_TREADY</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider516">
+      <obj_property name="label">TX FIFO</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/ResetTX_xR" type="logic">
+      <obj_property name="ElementShortName">ResetTX_xR</obj_property>
+      <obj_property name="ObjectShortName">ResetTX_xR</obj_property>
    </wvobject>
    <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/CoreFifoDat_xDI" type="array">
       <obj_property name="ElementShortName">CoreFifoDat_xDI[31:0]</obj_property>
@@ -1446,448 +1378,24 @@
       <obj_property name="ElementShortName">CoreFifoFull_xSO</obj_property>
       <obj_property name="ObjectShortName">CoreFifoFull_xSO</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/CoreFifoAlmostFull_xSO" type="logic">
-      <obj_property name="ElementShortName">CoreFifoAlmostFull_xSO</obj_property>
-      <obj_property name="ObjectShortName">CoreFifoAlmostFull_xSO</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/LiEnSeqInAddrEvt_xD" type="array">
+      <obj_property name="ElementShortName">LiEnSeqInAddrEvt_xD[63:0]</obj_property>
+      <obj_property name="ObjectShortName">LiEnSeqInAddrEvt_xD[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqInRead_xS" type="logic">
+      <obj_property name="ElementShortName">SeqInRead_xS</obj_property>
+      <obj_property name="ObjectShortName">SeqInRead_xS</obj_property>
    </wvobject>
    <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/CoreFifoEmpty_xSO" type="logic">
       <obj_property name="ElementShortName">CoreFifoEmpty_xSO</obj_property>
       <obj_property name="ObjectShortName">CoreFifoEmpty_xSO</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_din" type="array">
-      <obj_property name="ElementShortName">DBG_din[63:0]</obj_property>
-      <obj_property name="ObjectShortName">DBG_din[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_wr_en" type="logic">
-      <obj_property name="ElementShortName">DBG_wr_en</obj_property>
-      <obj_property name="ObjectShortName">DBG_wr_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_rd_en" type="logic">
-      <obj_property name="ElementShortName">DBG_rd_en</obj_property>
-      <obj_property name="ObjectShortName">DBG_rd_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_dout" type="array">
-      <obj_property name="ElementShortName">DBG_dout[63:0]</obj_property>
-      <obj_property name="ObjectShortName">DBG_dout[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_full" type="logic">
-      <obj_property name="ElementShortName">DBG_full</obj_property>
-      <obj_property name="ObjectShortName">DBG_full</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_almost_full" type="logic">
-      <obj_property name="ElementShortName">DBG_almost_full</obj_property>
-      <obj_property name="ObjectShortName">DBG_almost_full</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_overflow" type="logic">
-      <obj_property name="ElementShortName">DBG_overflow</obj_property>
-      <obj_property name="ObjectShortName">DBG_overflow</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_empty" type="logic">
-      <obj_property name="ElementShortName">DBG_empty</obj_property>
-      <obj_property name="ObjectShortName">DBG_empty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_almost_empty" type="logic">
-      <obj_property name="ElementShortName">DBG_almost_empty</obj_property>
-      <obj_property name="ObjectShortName">DBG_almost_empty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_underflow" type="logic">
-      <obj_property name="ElementShortName">DBG_underflow</obj_property>
-      <obj_property name="ObjectShortName">DBG_underflow</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_data_count" type="array">
-      <obj_property name="ElementShortName">DBG_data_count[10:0]</obj_property>
-      <obj_property name="ObjectShortName">DBG_data_count[10:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_Timestamp_xD" type="array">
-      <obj_property name="ElementShortName">DBG_Timestamp_xD[31:0]</obj_property>
-      <obj_property name="ObjectShortName">DBG_Timestamp_xD[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_MonInAddr_xD" type="array">
-      <obj_property name="ElementShortName">DBG_MonInAddr_xD[31:0]</obj_property>
-      <obj_property name="ObjectShortName">DBG_MonInAddr_xD[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_MonInSrcRdy_xS" type="logic">
-      <obj_property name="ElementShortName">DBG_MonInSrcRdy_xS</obj_property>
-      <obj_property name="ObjectShortName">DBG_MonInSrcRdy_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_MonInDstRdy_xS" type="logic">
-      <obj_property name="ElementShortName">DBG_MonInDstRdy_xS</obj_property>
-      <obj_property name="ObjectShortName">DBG_MonInDstRdy_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/DBG_RESETFIFO" type="logic">
-      <obj_property name="ElementShortName">DBG_RESETFIFO</obj_property>
-      <obj_property name="ObjectShortName">DBG_RESETFIFO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/EnableSequencer_xS" type="logic">
-      <obj_property name="ElementShortName">EnableSequencer_xS</obj_property>
-      <obj_property name="ObjectShortName">EnableSequencer_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/EnableTimestampCounter_RX_xS" type="logic">
-      <obj_property name="ElementShortName">EnableTimestampCounter_RX_xS</obj_property>
-      <obj_property name="ObjectShortName">EnableTimestampCounter_RX_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/EnableTimestampCounter_RX_xSB" type="logic">
-      <obj_property name="ElementShortName">EnableTimestampCounter_RX_xSB</obj_property>
-      <obj_property name="ObjectShortName">EnableTimestampCounter_RX_xSB</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/EnableTimestampCounter_TX_xS" type="logic">
-      <obj_property name="ElementShortName">EnableTimestampCounter_TX_xS</obj_property>
-      <obj_property name="ObjectShortName">EnableTimestampCounter_TX_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/EnableTimestampCounter_TX_xSB" type="logic">
-      <obj_property name="ElementShortName">EnableTimestampCounter_TX_xSB</obj_property>
-      <obj_property name="ObjectShortName">EnableTimestampCounter_TX_xSB</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/Timestamp_RX_xD" type="array">
-      <obj_property name="ElementShortName">Timestamp_RX_xD[31:0]</obj_property>
-      <obj_property name="ObjectShortName">Timestamp_RX_xD[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/Timestamp_TX_xD" type="array">
-      <obj_property name="ElementShortName">Timestamp_TX_xD[31:0]</obj_property>
-      <obj_property name="ObjectShortName">Timestamp_TX_xD[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/ShortTimestamp_TX_xD" type="array">
-      <obj_property name="ElementShortName">ShortTimestamp_TX_xD[31:0]</obj_property>
-      <obj_property name="ObjectShortName">ShortTimestamp_TX_xD[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/LoadTimer_xS" type="logic">
-      <obj_property name="ElementShortName">LoadTimer_xS</obj_property>
-      <obj_property name="ObjectShortName">LoadTimer_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/LoadValue_xS" type="array">
-      <obj_property name="ElementShortName">LoadValue_xS[31:0]</obj_property>
-      <obj_property name="ObjectShortName">LoadValue_xS[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonOutAddrEvt_xD" type="array">
-      <obj_property name="ElementShortName">MonOutAddrEvt_xD[63:0]</obj_property>
-      <obj_property name="ObjectShortName">MonOutAddrEvt_xD[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/LiEnMonOutAddrEvt_xD" type="array">
-      <obj_property name="ElementShortName">LiEnMonOutAddrEvt_xD[63:0]</obj_property>
-      <obj_property name="ObjectShortName">LiEnMonOutAddrEvt_xD[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonOutWrite_xS" type="logic">
-      <obj_property name="ElementShortName">MonOutWrite_xS</obj_property>
-      <obj_property name="ObjectShortName">MonOutWrite_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonOutFull_xS" type="logic">
-      <obj_property name="ElementShortName">MonOutFull_xS</obj_property>
-      <obj_property name="ObjectShortName">MonOutFull_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqInAddrEvt_xD" type="array">
-      <obj_property name="ElementShortName">SeqInAddrEvt_xD[63:0]</obj_property>
-      <obj_property name="ObjectShortName">SeqInAddrEvt_xD[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/LiEnSeqInAddrEvt_xD" type="array">
-      <obj_property name="ElementShortName">LiEnSeqInAddrEvt_xD[63:0]</obj_property>
-      <obj_property name="ObjectShortName">LiEnSeqInAddrEvt_xD[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqInEmpty_xS" type="logic">
-      <obj_property name="ElementShortName">SeqInEmpty_xS</obj_property>
-      <obj_property name="ObjectShortName">SeqInEmpty_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonInAddr_xD" type="array">
-      <obj_property name="ElementShortName">MonInAddr_xD[31:0]</obj_property>
-      <obj_property name="ObjectShortName">MonInAddr_xD[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonInSrcRdy_xS" type="logic">
-      <obj_property name="ElementShortName">MonInSrcRdy_xS</obj_property>
-      <obj_property name="ObjectShortName">MonInSrcRdy_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MonInDstRdy_xS" type="logic">
-      <obj_property name="ElementShortName">MonInDstRdy_xS</obj_property>
-      <obj_property name="ObjectShortName">MonInDstRdy_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqOutAddr_xD" type="array">
-      <obj_property name="ElementShortName">SeqOutAddr_xD[31:0]</obj_property>
-      <obj_property name="ObjectShortName">SeqOutAddr_xD[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqOutSrcRdy_xS" type="logic">
-      <obj_property name="ElementShortName">SeqOutSrcRdy_xS</obj_property>
-      <obj_property name="ObjectShortName">SeqOutSrcRdy_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/SeqOutDstRdy_xS" type="logic">
-      <obj_property name="ElementShortName">SeqOutDstRdy_xS</obj_property>
-      <obj_property name="ObjectShortName">SeqOutDstRdy_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/ResetRX_xR" type="logic">
-      <obj_property name="ElementShortName">ResetRX_xR</obj_property>
-      <obj_property name="ObjectShortName">ResetRX_xR</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/ResetTX_xR" type="logic">
-      <obj_property name="ElementShortName">ResetTX_xR</obj_property>
-      <obj_property name="ObjectShortName">ResetTX_xR</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/enableFifoWriting_xS" type="logic">
-      <obj_property name="ElementShortName">enableFifoWriting_xS</obj_property>
-      <obj_property name="ObjectShortName">enableFifoWriting_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/fifoWrDataCount_xD" type="array">
-      <obj_property name="ElementShortName">fifoWrDataCount_xD[10:0]</obj_property>
-      <obj_property name="ObjectShortName">fifoWrDataCount_xD[10:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/i_fifoCoreDat_xD" type="array">
-      <obj_property name="ElementShortName">i_fifoCoreDat_xD[63:0]</obj_property>
-      <obj_property name="ObjectShortName">i_fifoCoreDat_xD[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/dataRead_xS" type="logic">
-      <obj_property name="ElementShortName">dataRead_xS</obj_property>
-      <obj_property name="ObjectShortName">dataRead_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/effectiveRdEn_xS" type="logic">
-      <obj_property name="ElementShortName">effectiveRdEn_xS</obj_property>
-      <obj_property name="ObjectShortName">effectiveRdEn_xS</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/i_FifoCoreEmpty_xSO" type="logic">
-      <obj_property name="ElementShortName">i_FifoCoreEmpty_xSO</obj_property>
-      <obj_property name="ObjectShortName">i_FifoCoreEmpty_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/i_FifoCoreAlmostEmpty_xSO" type="logic">
-      <obj_property name="ElementShortName">i_FifoCoreAlmostEmpty_xSO</obj_property>
-      <obj_property name="ObjectShortName">i_FifoCoreAlmostEmpty_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/MSB" type="logic">
-      <obj_property name="ElementShortName">MSB</obj_property>
-      <obj_property name="ObjectShortName">MSB</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/C_PAER_DSIZE" type="other">
-      <obj_property name="ElementShortName">C_PAER_DSIZE</obj_property>
-      <obj_property name="ObjectShortName">C_PAER_DSIZE</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/TestEnableSequencerNoWait" type="other">
-      <obj_property name="ElementShortName">TestEnableSequencerNoWait</obj_property>
-      <obj_property name="ObjectShortName">TestEnableSequencerNoWait</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/TestEnableSequencerToMonitorLoopback" type="other">
-      <obj_property name="ElementShortName">TestEnableSequencerToMonitorLoopback</obj_property>
-      <obj_property name="ObjectShortName">TestEnableSequencerToMonitorLoopback</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/EnableMonitorControlsSequencerToo" type="other">
-      <obj_property name="ElementShortName">EnableMonitorControlsSequencerToo</obj_property>
-      <obj_property name="ObjectShortName">EnableMonitorControlsSequencerToo</obj_property>
-   </wvobject>
-   <wvobject type="divider" fp_name="divider531">
-      <obj_property name="label">AEXSequencer</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Rst_xRBI" type="logic">
-      <obj_property name="ElementShortName">Rst_xRBI</obj_property>
-      <obj_property name="ObjectShortName">Rst_xRBI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Clk_xCI" type="logic">
-      <obj_property name="ElementShortName">Clk_xCI</obj_property>
-      <obj_property name="ObjectShortName">Clk_xCI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Enable_xSI" type="logic">
-      <obj_property name="ElementShortName">Enable_xSI</obj_property>
-      <obj_property name="ObjectShortName">Enable_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/En100us_xSI" type="logic">
-      <obj_property name="ElementShortName">En100us_xSI</obj_property>
-      <obj_property name="ObjectShortName">En100us_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSMode_xDI" type="array">
-      <obj_property name="ElementShortName">TSMode_xDI[1:0]</obj_property>
-      <obj_property name="ObjectShortName">TSMode_xDI[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeoutSel_xDI" type="array">
-      <obj_property name="ElementShortName">TSTimeoutSel_xDI[3:0]</obj_property>
-      <obj_property name="ObjectShortName">TSTimeoutSel_xDI[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSMaskSel_xDI" type="array">
-      <obj_property name="ElementShortName">TSMaskSel_xDI[1:0]</obj_property>
-      <obj_property name="ObjectShortName">TSMaskSel_xDI[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Timestamp_xDI" type="array">
-      <obj_property name="ElementShortName">Timestamp_xDI[31:0]</obj_property>
-      <obj_property name="ObjectShortName">Timestamp_xDI[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/LoadTimer_xSO" type="logic">
-      <obj_property name="ElementShortName">LoadTimer_xSO</obj_property>
-      <obj_property name="ObjectShortName">LoadTimer_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/LoadValue_xSO" type="array">
-      <obj_property name="ElementShortName">LoadValue_xSO[31:0]</obj_property>
-      <obj_property name="ObjectShortName">LoadValue_xSO[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TxTSRetrigCmd_xSI" type="logic">
-      <obj_property name="ElementShortName">TxTSRetrigCmd_xSI</obj_property>
-      <obj_property name="ObjectShortName">TxTSRetrigCmd_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TxTSRearmCmd_xSI" type="logic">
-      <obj_property name="ElementShortName">TxTSRearmCmd_xSI</obj_property>
-      <obj_property name="ObjectShortName">TxTSRearmCmd_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TxTSRetrigStatus_xSO" type="logic">
-      <obj_property name="ElementShortName">TxTSRetrigStatus_xSO</obj_property>
-      <obj_property name="ObjectShortName">TxTSRetrigStatus_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TxTSTimeoutCounts_xSO" type="logic">
-      <obj_property name="ElementShortName">TxTSTimeoutCounts_xSO</obj_property>
-      <obj_property name="ObjectShortName">TxTSTimeoutCounts_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/InAddrEvt_xDI" type="array">
-      <obj_property name="ElementShortName">InAddrEvt_xDI[63:0]</obj_property>
-      <obj_property name="ObjectShortName">InAddrEvt_xDI[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/InRead_xSO" type="logic">
-      <obj_property name="ElementShortName">InRead_xSO</obj_property>
-      <obj_property name="ObjectShortName">InRead_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/InEmpty_xSI" type="logic">
-      <obj_property name="ElementShortName">InEmpty_xSI</obj_property>
-      <obj_property name="ObjectShortName">InEmpty_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/OutAddr_xDO" type="array">
-      <obj_property name="ElementShortName">OutAddr_xDO[31:0]</obj_property>
-      <obj_property name="ObjectShortName">OutAddr_xDO[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/OutSrcRdy_xSO" type="logic">
-      <obj_property name="ElementShortName">OutSrcRdy_xSO</obj_property>
-      <obj_property name="ObjectShortName">OutSrcRdy_xSO</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/OutDstRdy_xSI" type="logic">
-      <obj_property name="ElementShortName">OutDstRdy_xSI</obj_property>
-      <obj_property name="ObjectShortName">OutDstRdy_xSI</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/State_xDP" type="other">
-      <obj_property name="ElementShortName">State_xDP</obj_property>
-      <obj_property name="ObjectShortName">State_xDP</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/State_xDN" type="other">
-      <obj_property name="ElementShortName">State_xDN</obj_property>
-      <obj_property name="ObjectShortName">State_xDN</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Address_xDP" type="array">
-      <obj_property name="ElementShortName">Address_xDP[31:0]</obj_property>
-      <obj_property name="ObjectShortName">Address_xDP[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Address_xDN" type="array">
-      <obj_property name="ElementShortName">Address_xDN[31:0]</obj_property>
-      <obj_property name="ObjectShortName">Address_xDN[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Delta_xDP" type="array">
-      <obj_property name="ElementShortName">Delta_xDP[31:0]</obj_property>
-      <obj_property name="ObjectShortName">Delta_xDP[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Delta_xDN" type="array">
-      <obj_property name="ElementShortName">Delta_xDN[31:0]</obj_property>
-      <obj_property name="ObjectShortName">Delta_xDN[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/NetxTime_xDP" type="array">
-      <obj_property name="ElementShortName">NetxTime_xDP[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NetxTime_xDP[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/NetxTime_xDN" type="array">
-      <obj_property name="ElementShortName">NetxTime_xDN[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NetxTime_xDN[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/LastTime_xDP" type="array">
-      <obj_property name="ElementShortName">LastTime_xDP[31:0]</obj_property>
-      <obj_property name="ObjectShortName">LastTime_xDP[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/LastTime_xDN" type="array">
-      <obj_property name="ElementShortName">LastTime_xDN[31:0]</obj_property>
-      <obj_property name="ObjectShortName">LastTime_xDN[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/NowTime_xDP" type="array">
-      <obj_property name="ElementShortName">NowTime_xDP[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NowTime_xDP[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/NowTime_xDN" type="array">
-      <obj_property name="ElementShortName">NowTime_xDN[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NowTime_xDN[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/NmL_xDP" type="array">
-      <obj_property name="ElementShortName">NmL_xDP[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NmL_xDP[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/NmL_xDN" type="array">
-      <obj_property name="ElementShortName">NmL_xDN[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NmL_xDN[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/NmA_xDP" type="array">
-      <obj_property name="ElementShortName">NmA_xDP[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NmA_xDP[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/NmA_xDN" type="array">
-      <obj_property name="ElementShortName">NmA_xDN[31:0]</obj_property>
-      <obj_property name="ObjectShortName">NmA_xDN[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/AmL_xDP" type="array">
-      <obj_property name="ElementShortName">AmL_xDP[31:0]</obj_property>
-      <obj_property name="ObjectShortName">AmL_xDP[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/AmL_xDN" type="array">
-      <obj_property name="ElementShortName">AmL_xDN[31:0]</obj_property>
-      <obj_property name="ObjectShortName">AmL_xDN[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/combo" type="array">
-      <obj_property name="ElementShortName">combo[2:0]</obj_property>
-      <obj_property name="ObjectShortName">combo[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TimestampPrev_xD" type="array">
-      <obj_property name="ElementShortName">TimestampPrev_xD[31:0]</obj_property>
-      <obj_property name="ObjectShortName">TimestampPrev_xD[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/timeout" type="logic">
-      <obj_property name="ElementShortName">timeout</obj_property>
-      <obj_property name="ObjectShortName">timeout</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeout_cnt" type="array">
-      <obj_property name="ElementShortName">TSTimeout_cnt[23:0]</obj_property>
-      <obj_property name="ObjectShortName">TSTimeout_cnt[23:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeout_cnt_tcn" type="logic">
-      <obj_property name="ElementShortName">TSTimeout_cnt_tcn</obj_property>
-      <obj_property name="ObjectShortName">TSTimeout_cnt_tcn</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TimestampMskd" type="array">
-      <obj_property name="ElementShortName">TimestampMskd[31:0]</obj_property>
-      <obj_property name="ObjectShortName">TimestampMskd[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSMask" type="array">
-      <obj_property name="ElementShortName">TSMask[31:0]</obj_property>
-      <obj_property name="ObjectShortName">TSMask[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/TSTimeoutEnable" type="logic">
-      <obj_property name="ElementShortName">TSTimeoutEnable</obj_property>
-      <obj_property name="ObjectShortName">TSTimeoutEnable</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/timeout_sel" type="other">
-      <obj_property name="ElementShortName">timeout_sel</obj_property>
-      <obj_property name="ObjectShortName">timeout_sel</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/timeout_value" type="array">
-      <obj_property name="ElementShortName">timeout_value[23:0]</obj_property>
-      <obj_property name="ObjectShortName">timeout_value[23:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/SendPending" type="logic">
-      <obj_property name="ElementShortName">SendPending</obj_property>
-      <obj_property name="ObjectShortName">SendPending</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/SendPending_d" type="logic">
-      <obj_property name="ElementShortName">SendPending_d</obj_property>
-      <obj_property name="ObjectShortName">SendPending_d</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/timeout_rearm" type="logic">
-      <obj_property name="ElementShortName">timeout_rearm</obj_property>
-      <obj_property name="ObjectShortName">timeout_rearm</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/StateIsIdle" type="logic">
-      <obj_property name="ElementShortName">StateIsIdle</obj_property>
-      <obj_property name="ObjectShortName">StateIsIdle</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/StateIsWaitDelta" type="logic">
-      <obj_property name="ElementShortName">StateIsWaitDelta</obj_property>
-      <obj_property name="ObjectShortName">StateIsWaitDelta</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/StateIsSend" type="logic">
-      <obj_property name="ElementShortName">StateIsSend</obj_property>
-      <obj_property name="ObjectShortName">StateIsSend</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/u_AEXSsequencerRR/Timeout_Table" type="array">
-      <obj_property name="ElementShortName">Timeout_Table[0:15][23:0]</obj_property>
-      <obj_property name="ObjectShortName">Timeout_Table[0:15][23:0]</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/txfifo_rd_rst_busy" type="logic">
+      <obj_property name="ElementShortName">txfifo_rd_rst_busy</obj_property>
+      <obj_property name="ObjectShortName">txfifo_rd_rst_busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/u_neuserial_core/u_CoreMonSeqRR/txfifo_wr_rst_busy" type="logic">
+      <obj_property name="ElementShortName">txfifo_wr_rst_busy</obj_property>
+      <obj_property name="ObjectShortName">txfifo_wr_rst_busy</obj_property>
    </wvobject>
 </wave_config>

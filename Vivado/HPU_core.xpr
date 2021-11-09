@@ -38,20 +38,20 @@
     <Option Name="IPUserFilesDir" Val="$PPRDIR/../../../../../../Repository/HPU_Core_GTP/Vivado/HPU_core.ip_user_files"/>
     <Option Name="IPStaticSourceDir" Val="$PIPUSERFILESDIR/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
-    <Option Name="WTXSimLaunchSim" Val="1764"/>
+    <Option Name="WTXSimLaunchSim" Val="1769"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="27"/>
-    <Option Name="WTModelSimExportSim" Val="27"/>
-    <Option Name="WTQuestaExportSim" Val="27"/>
-    <Option Name="WTIesExportSim" Val="27"/>
-    <Option Name="WTVcsExportSim" Val="27"/>
-    <Option Name="WTRivieraExportSim" Val="27"/>
-    <Option Name="WTActivehdlExportSim" Val="27"/>
+    <Option Name="WTXSimExportSim" Val="30"/>
+    <Option Name="WTModelSimExportSim" Val="30"/>
+    <Option Name="WTQuestaExportSim" Val="30"/>
+    <Option Name="WTIesExportSim" Val="30"/>
+    <Option Name="WTVcsExportSim" Val="30"/>
+    <Option Name="WTRivieraExportSim" Val="30"/>
+    <Option Name="WTActivehdlExportSim" Val="30"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -78,6 +78,27 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/Vivado_ip/RXFIFO_HPU_ZYNQUPLUS/RXFIFO_HPU_ZYNQUPLUS.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/Vivado_ip/TXFIFO_HPU_ZYNQUPLUS/TXFIFO_HPU_ZYNQUPLUS.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/Vivado_ip/SYNC_FIFO_32_16_ZYNQ/SYNC_FIFO_32_16_ZYNQ.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_MSG_SYNC_FIFO_ZYNQ/GTP_MSG_SYNC_FIFO_ZYNQ.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -86,13 +107,6 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_ZYNQ/GTP_DATA_SYNC_FIFO_ZYNQ.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/Vivado_ip/SYNC_FIFO_32_16_ZYNQ/SYNC_FIFO_32_16_ZYNQ.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -594,6 +608,7 @@
     <FileSet Name="INFIFO_64_1024_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/INFIFO_64_1024_ZYNQUPLUS">
       <File Path="$PPRDIR/../src/Vivado_ip/INFIFO_64_1024_ZYNQUPLUS/INFIFO_64_1024_ZYNQUPLUS.xci">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -607,6 +622,7 @@
     <FileSet Name="OUTFIFO_32_2048_64_1024_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/OUTFIFO_32_2048_64_1024_ZYNQUPLUS">
       <File Path="$PPRDIR/../src/Vivado_ip/OUTFIFO_32_2048_64_1024_ZYNQUPLUS/OUTFIFO_32_2048_64_1024_ZYNQUPLUS.xci">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -646,7 +662,6 @@
     <FileSet Name="GTP_DATA_SYNC_FIFO_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/GTP_DATA_SYNC_FIFO_ZYNQUPLUS">
       <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_DATA_SYNC_FIFO_ZYNQUPLUS/GTP_DATA_SYNC_FIFO_ZYNQUPLUS.xci">
         <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -722,11 +737,12 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="GTP_DATA_SYNC_FIFO_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="GTP_DATA_SYNC_FIFO_ZYNQUPLUS" Part="xczu5ev-sfvc784-2-i" ConstrsSet="GTP_DATA_SYNC_FIFO_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" IncludeInArchive="true">
+    <Run Id="GTP_DATA_SYNC_FIFO_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="GTP_DATA_SYNC_FIFO_ZYNQUPLUS" Part="xczu5ev-sfvc784-2-i" ConstrsSet="GTP_DATA_SYNC_FIFO_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/GTP_DATA_SYNC_FIFO_ZYNQUPLUS_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
         <Step Id="synth_design"/>
       </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>

@@ -180,6 +180,8 @@ signal SeqOutSrcRdy_xS, SeqOutDstRdy_xS : std_logic;
 -- Reset high signal for FIFOs
 signal ResetRX_xR  : std_logic;
 signal ResetTX_xR  : std_logic;
+signal FlushRXFifos_sr : std_logic_vector(15 downto 0);
+signal FlushTXFifos_sr : std_logic_vector(15 downto 0);
 
 --signal i_BGMonitorSel_xAS : std_logic;
 --signal i_BGAddrSel_xAS    : std_logic;
@@ -206,6 +208,13 @@ file logfile_ptr   : text open WRITE_MODE is "monitor_activity.csv";
 
 signal infifo_wr_rst_busy : std_logic;
 signal infifo_rd_rst_busy : std_logic;
+
+signal rxfifo_wr_rst_busy : std_logic;
+signal rxfifo_rd_rst_busy : std_logic;
+
+signal txfifo_wr_rst_busy : std_logic;
+signal txfifo_rd_rst_busy : std_logic;
+
 -----------------------------------------------------------------------------
 -- Debug attributes
 
@@ -237,8 +246,34 @@ begin
     -----------------------------------------------------------------------------
     -- special reset for Fifo
     -----------------------------------------------------------------------------
-    ResetRX_xR <=  not(Reset_xRBI) or FlushRXFifos_xSI;
-    ResetTX_xR <=  not(Reset_xRBI) or FlushTXFifos_xSI;
+    p_ResetForFifo : process (CoreClk_xCI, Reset_xRBI) is
+        begin
+        if (Reset_xRBI = '0') then
+            FlushRXFifos_sr <= (others => '1');
+            FlushTXFifos_sr <= (others => '1');
+        end if;
+        if (rising_edge(CoreClk_xCI)) then
+        
+            if (FlushRXFifos_xSI = '1') then
+                FlushRXFifos_sr <= (others => '1');
+            else 
+                FlushRXFifos_sr <= FlushRXFifos_sr(14 downto 0) & '0';
+            end if;
+
+            if (FlushTXFifos_xSI = '1') then
+                FlushTXFifos_sr <= (others => '1');
+            else 
+                FlushTXFifos_sr <= FlushTXFifos_sr(14 downto 0) & '0';
+            end if;
+            
+        end if;
+    end process p_ResetForFifo;
+    
+    -- ResetRX_xR <=  not(Reset_xRBI) or FlushRXFifos_xSI;
+    -- ResetTX_xR <=  not(Reset_xRBI) or FlushTXFifos_xSI;
+
+    ResetRX_xR <=  FlushRXFifos_sr(15);
+    ResetTX_xR <=  FlushTXFifos_sr(15);
 
     -----------------------------------------------------------------------------
     -- CoreReady_xSI, EnableMonitor_xSI, EnableTimestampCounter_RX_xS, EnableTimestampCounter_TX_xS
@@ -451,23 +486,42 @@ end generate;
 
 OUTFIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
+
+  TXFIFO_HPU_ZYNQUPLUS_i : TXFIFO_HPU_ZYNQUPLUS
+    PORT MAP (
+      rst           => ResetTX_xR,
+      wr_clk        => CoreClk_xCI,
+      rd_clk        => CoreClk_xCI,
+      din           => CoreFifoDat_xDI,
+      wr_en         => CoreFifoWrite_xSI,
+      rd_en         => SeqInRead_xS,
+      dout          => LiEnSeqInAddrEvt_xD,
+      full          => CoreFifoFull_xSO,
+      almost_full   => CoreFifoAlmostFull_xSO,
+      overflow      => open,
+      empty         => SeqInEmpty_xS,
+      almost_empty  => open,
+      underflow     => open,
+      wr_rst_busy   => txfifo_wr_rst_busy,
+      rd_rst_busy   => txfifo_rd_rst_busy
+    );
    
-    u_OUTFIFO_32_2048_64_1024 : OUTFIFO_32_2048_64_1024_ZYNQUPLUS
-        port map (
-            rst          => ResetTX_xR,    -- high-active reset
-            wr_clk       => CoreClk_xCI,
-            rd_clk       => CoreClk_xCI,
-            din          => CoreFifoDat_xDI,
-            wr_en        => CoreFifoWrite_xSI,
-            rd_en        => SeqInRead_xS,
-            dout         => LiEnSeqInAddrEvt_xD,
-            full         => CoreFifoFull_xSO,
-            almost_full  => CoreFifoAlmostFull_xSO,
-            overflow     => open,
-            empty        => SeqInEmpty_xS,
-            almost_empty => open,
-            underflow    => open
-        );
+--    u_OUTFIFO_32_2048_64_1024 : OUTFIFO_32_2048_64_1024_ZYNQUPLUS
+--        port map (
+--            rst          => ResetTX_xR,    -- high-active reset
+--            wr_clk       => CoreClk_xCI,
+--            rd_clk       => CoreClk_xCI,
+--            din          => CoreFifoDat_xDI,
+--            wr_en        => CoreFifoWrite_xSI,
+--            rd_en        => SeqInRead_xS,
+--            dout         => LiEnSeqInAddrEvt_xD,
+--            full         => CoreFifoFull_xSO,
+--            almost_full  => CoreFifoAlmostFull_xSO,
+--            overflow     => open,
+--            empty        => SeqInEmpty_xS,
+--            almost_empty => open,
+--            underflow    => open
+--        );
 
 end generate;
 
@@ -517,25 +571,44 @@ end generate;
 
 INFIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
-   
-    u_INFIFO_64_1024 : INFIFO_64_1024_ZYNQUPLUS
-        port map (
-            clk          => CoreClk_xCI,
-            srst         => ResetRX_xR,    -- high-active reset
-            din          => LiEnMonOutAddrEvt_xD,
-            wr_en        => enableFifoWriting_xS,
-            rd_en        => effectiveRdEn_xS,
-            dout         => i_fifoCoreDat_xD,
-            full         => MonOutFull_xS,
-            almost_full  => DBG_almost_full,
-            overflow     => DBG_overflow,
-            empty        => i_FifoCoreEmpty_xSO,
-            almost_empty => i_FifoCoreAlmostEmpty_xSO,
-            underflow    => DBG_underflow,
-            data_count   => fifoWrDataCount_xD,
-            wr_rst_busy  => infifo_wr_rst_busy,
-            rd_rst_busy  => infifo_rd_rst_busy
+
+      RXFIFO_HPU_ZYNQUPLUS_i : RXFIFO_HPU_ZYNQUPLUS
+        PORT MAP (
+          rst           => ResetRX_xR,
+          wr_clk        => CoreClk_xCI,
+          rd_clk        => CoreClk_xCI,
+          din           => LiEnMonOutAddrEvt_xD,
+          wr_en         => enableFifoWriting_xS,
+          rd_en         => effectiveRdEn_xS,
+          dout          => i_fifoCoreDat_xD,
+          full          => MonOutFull_xS,
+          almost_full   => DBG_almost_full,
+          overflow      => DBG_overflow,
+          empty         => i_FifoCoreEmpty_xSO,
+          almost_empty  => i_FifoCoreAlmostEmpty_xSO,
+          underflow     => DBG_underflow,
+          wr_rst_busy   => rxfifo_wr_rst_busy,
+          rd_rst_busy   => rxfifo_rd_rst_busy
         );
+    
+--     u_INFIFO_64_1024 : INFIFO_64_1024_ZYNQUPLUS
+--         port map (
+--             clk          => CoreClk_xCI,
+--             srst         => ResetRX_xR,    -- high-active reset
+--             din          => LiEnMonOutAddrEvt_xD,
+--             wr_en        => enableFifoWriting_xS,
+--             rd_en        => effectiveRdEn_xS,
+--             dout         => i_fifoCoreDat_xD,
+--             full         => MonOutFull_xS,
+--             almost_full  => DBG_almost_full,
+--             overflow     => DBG_overflow,
+--             empty        => i_FifoCoreEmpty_xSO,
+--             almost_empty => i_FifoCoreAlmostEmpty_xSO,
+--             underflow    => DBG_underflow,
+--             data_count   => fifoWrDataCount_xD,
+--             wr_rst_busy  => infifo_wr_rst_busy,
+--             rd_rst_busy  => infifo_rd_rst_busy
+--         );
 
 end generate;
 

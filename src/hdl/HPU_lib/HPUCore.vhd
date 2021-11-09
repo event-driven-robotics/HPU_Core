@@ -132,7 +132,7 @@ entity HPUCore is
   generic (
     -- -----------------------    
     -- GENERAL
-    C_FAMILY                  : string                        := "zynq"; -- "zynq", "zynquplus" 
+    C_FAMILY                  : string                        := "zynquplus"; -- "zynq", "zynquplus" 
     -- -----------------------    
     -- PAER        
     C_RX_L_HAS_PAER           : boolean                       := true;
