@@ -12,12 +12,12 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="31000001fs"></ZoomEndTime>
-      <Cursor1Time time="11793736fs"></Cursor1Time>
+      <ZoomEndTime time="173205041fs"></ZoomEndTime>
+      <Cursor1Time time="201000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="292"></NameColumnWidth>
-      <ValueColumnWidth column_width="70"></ValueColumnWidth>
+      <NameColumnWidth column_width="273"></NameColumnWidth>
+      <ValueColumnWidth column_width="133"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="15" />
    <wvobject fp_name="/fifo_axis_tb/clear" type="logic">
@@ -176,18 +176,26 @@
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/S_AXIS_TREADY" type="logic">
          <obj_property name="ElementShortName">S_AXIS_TREADY</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TREADY</obj_property>
+         <obj_property name="CustomSignalColor">#D2691E</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/S_AXIS_TDATA" type="array">
          <obj_property name="ElementShortName">S_AXIS_TDATA[31:0]</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TDATA[31:0]</obj_property>
+         <obj_property name="CustomSignalColor">#D2691E</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/S_AXIS_TLAST" type="logic">
          <obj_property name="ElementShortName">S_AXIS_TLAST</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TLAST</obj_property>
+         <obj_property name="CustomSignalColor">#D2691E</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/S_AXIS_TVALID" type="logic">
          <obj_property name="ElementShortName">S_AXIS_TVALID</obj_property>
          <obj_property name="ObjectShortName">S_AXIS_TVALID</obj_property>
+         <obj_property name="CustomSignalColor">#D2691E</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/Clk" type="logic">
          <obj_property name="ElementShortName">Clk</obj_property>
@@ -196,6 +204,30 @@
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/nRst" type="logic">
          <obj_property name="ElementShortName">nRst</obj_property>
          <obj_property name="ObjectShortName">nRst</obj_property>
+      </wvobject>
+      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/state" type="other">
+         <obj_property name="ElementShortName">state</obj_property>
+         <obj_property name="ObjectShortName">state</obj_property>
+      </wvobject>
+      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/i_valid_read" type="logic">
+         <obj_property name="ElementShortName">i_valid_read</obj_property>
+         <obj_property name="ObjectShortName">i_valid_read</obj_property>
+      </wvobject>
+      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/counterData" type="array">
+         <obj_property name="ElementShortName">counterData[15:0]</obj_property>
+         <obj_property name="ObjectShortName">counterData[15:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/i_timeexpired" type="logic">
+         <obj_property name="ElementShortName">i_timeexpired</obj_property>
+         <obj_property name="ObjectShortName">i_timeexpired</obj_property>
+      </wvobject>
+      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/i_sent_a_couple" type="logic">
+         <obj_property name="ElementShortName">i_sent_a_couple</obj_property>
+         <obj_property name="ObjectShortName">i_sent_a_couple</obj_property>
+      </wvobject>
+      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/FifoCoreLastData_i" type="logic">
+         <obj_property name="ElementShortName">FifoCoreLastData_i</obj_property>
+         <obj_property name="ObjectShortName">FifoCoreLastData_i</obj_property>
       </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/DMA_test_mode_i" type="logic">
          <obj_property name="ElementShortName">DMA_test_mode_i</obj_property>
@@ -253,10 +285,6 @@
          <obj_property name="ElementShortName">FifoCoreBurstReady_i</obj_property>
          <obj_property name="ObjectShortName">FifoCoreBurstReady_i</obj_property>
       </wvobject>
-      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/FifoCoreLastData_i" type="logic">
-         <obj_property name="ElementShortName">FifoCoreLastData_i</obj_property>
-         <obj_property name="ObjectShortName">FifoCoreLastData_i</obj_property>
-      </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/CoreFifoDat_o" type="array">
          <obj_property name="ElementShortName">CoreFifoDat_o[31:0]</obj_property>
          <obj_property name="ObjectShortName">CoreFifoDat_o[31:0]</obj_property>
@@ -268,10 +296,6 @@
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/CoreFifoFull_i" type="logic">
          <obj_property name="ElementShortName">CoreFifoFull_i</obj_property>
          <obj_property name="ObjectShortName">CoreFifoFull_i</obj_property>
-      </wvobject>
-      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/state" type="other">
-         <obj_property name="ElementShortName">state</obj_property>
-         <obj_property name="ObjectShortName">state</obj_property>
       </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/next_state" type="other">
          <obj_property name="ElementShortName">next_state</obj_property>
@@ -285,10 +309,6 @@
          <obj_property name="ElementShortName">i_M_AXIS_TLAST</obj_property>
          <obj_property name="ObjectShortName">i_M_AXIS_TLAST</obj_property>
       </wvobject>
-      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/counterData" type="array">
-         <obj_property name="ElementShortName">counterData[15:0]</obj_property>
-         <obj_property name="ObjectShortName">counterData[15:0]</obj_property>
-      </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/i_DMA_running" type="logic">
          <obj_property name="ElementShortName">i_DMA_running</obj_property>
          <obj_property name="ObjectShortName">i_DMA_running</obj_property>
@@ -300,10 +320,6 @@
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/i_TlastCntTx" type="array">
          <obj_property name="ElementShortName">i_TlastCntTx[15:0]</obj_property>
          <obj_property name="ObjectShortName">i_TlastCntTx[15:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/i_valid_read" type="logic">
-         <obj_property name="ElementShortName">i_valid_read</obj_property>
-         <obj_property name="ObjectShortName">i_valid_read</obj_property>
       </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/i_valid_write" type="logic">
          <obj_property name="ElementShortName">i_valid_write</obj_property>
@@ -333,17 +349,9 @@
          <obj_property name="ElementShortName">i_TlastTimer[31:0]</obj_property>
          <obj_property name="ObjectShortName">i_TlastTimer[31:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/i_timeexpired" type="logic">
-         <obj_property name="ElementShortName">i_timeexpired</obj_property>
-         <obj_property name="ObjectShortName">i_timeexpired</obj_property>
-      </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/counterTest" type="array">
          <obj_property name="ElementShortName">counterTest[31:0]</obj_property>
          <obj_property name="ObjectShortName">counterTest[31:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/i_sent_a_couple" type="logic">
-         <obj_property name="ElementShortName">i_sent_a_couple</obj_property>
-         <obj_property name="ObjectShortName">i_sent_a_couple</obj_property>
       </wvobject>
       <wvobject fp_name="/fifo_axis_tb/u_neuserial_axistream/C_NUMBER_OF_INPUT_WORDS" type="other">
          <obj_property name="ElementShortName">C_NUMBER_OF_INPUT_WORDS</obj_property>

@@ -23,6 +23,7 @@ entity neuserial_axistream is
         --                    
         DMA_test_mode_i        : in  std_logic;
         EnableAxistreamIf_i    : in  std_logic;
+        OnlyEvents_i           : in  std_logic;
         DMA_is_running_o       : out std_logic;
         DmaLength_i            : in  std_logic_vector(15 downto 0);
         ResetStream_i          : in  std_logic;
@@ -77,6 +78,8 @@ architecture rtl of neuserial_axistream is
     signal i_timeexpired    : std_logic; 
     signal counterTest      : std_logic_vector(31 downto 0);
     signal i_sent_a_couple  : std_logic;
+    
+
     
   begin 
     enable_p : process (Clk)
@@ -152,6 +155,8 @@ i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counte
                 next_state <= premature_end;
             elsif (FifoCoreEmpty_i = '1' and DMA_test_mode_i = '0') then
                 next_state <= waitfifo;
+            elsif (OnlyEvents_i = '1') then
+                next_state <= dataval;
             else
                 next_state <= timeval;
             end if;
@@ -174,6 +179,8 @@ i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counte
                         next_state <= premature_end;
                     elsif (FifoCoreLastData_i = '1' and DMA_test_mode_i = '0') then
                         next_state <= waitfifo;
+                    elsif (OnlyEvents_i = '1') then
+                        next_state <= dataval;
                     else
                         next_state <= timeval;
                     end if;               

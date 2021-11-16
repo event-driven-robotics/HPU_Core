@@ -66,6 +66,7 @@ component neuserial_axistream is
         --                    
         DMA_test_mode_i        : in  std_logic;
         EnableAxistreamIf_i    : in  std_logic;
+        OnlyEvents_i           : in  std_logic;
         DMA_is_running_o       : out std_logic;
         DmaLength_i            : in  std_logic_vector(15 downto 0);
         ResetStream_i          : in  std_logic;
@@ -171,8 +172,18 @@ signal rx_timestamp : std_logic_vector(31 downto 0);
  signal dataRead    : std_logic;
  signal FifoCoreDat : std_logic_vector(31 downto 0);
 
- signal only_events : std_logic; 
+ signal uP_OnlyEvents : std_logic;  
+ signal OnlyEvents_i  : std_logic;  
 
+ signal dummy : std_logic;
+ 
+type state_type is (idle, waitfifo, readdata, timeval, dataval, premature_end); 
+signal internal_state, internal_next_state : state_type;
+-- alias internal_state is 
+-- << u_neuserial_axistream.i_DMA_running    : std_logic>>;
+
+-- << signal u_neuserial_axistream.state : state_type >> ;
+ 
 begin
 
 ---------------------------------------
@@ -272,11 +283,11 @@ RXFIFO_HPU_ZYNQUPLUS_m : RXFIFO_HPU_ZYNQUPLUS
 uP_DMA_test_mode      <= '0';           -- in  std_logic;                    
 uP_enableDmaIf        <= '1';           -- in  std_logic;                    
 -- uP_DMAIsRunning                      -- out std_logic;                    
-uP_dmaLength          <= x"0100";       -- in  std_logic_vector(15 downto 0);
+uP_dmaLength          <= x"0010";       -- in  std_logic_vector(15 downto 0);
 uP_resetstream        <=  '0';          -- in  std_logic;                    
 up_LatTlast           <=  '1';          -- in  std_logic;                    
 -- up_TlastCnt                          -- out std_logic_vector(31 downto 0);
-up_TlastTO            <= x"00010000";   -- in  std_logic_vector(31 downto 0);
+up_TlastTO            <= x"00001000";   -- in  std_logic_vector(31 downto 0);
 up_TlastTOwritten     <= '0';           -- in  std_logic;                    
 -- up_TDataCnt                          -- out std_logic_vector(31 downto 0);
 
@@ -292,6 +303,7 @@ u_neuserial_axistream : neuserial_axistream
     --
     DMA_test_mode_i                => uP_DMA_test_mode,               -- in  std_logic;
     EnableAxistreamIf_i            => uP_enableDmaIf,                 -- in  std_logic;
+    OnlyEvents_i                   => uP_OnlyEvents,                  -- in  std_logic;
     DMA_is_running_o               => uP_DMAIsRunning,                -- out std_logic;
     DmaLength_i                    => uP_dmaLength,                   -- in  std_logic_vector(15 downto 0);
     ResetStream_i                  => uP_resetstream,                 -- in  std_logic;
@@ -344,15 +356,14 @@ begin
   end if;
 end process p_ReadDataTimeSel;
 
-    dma_rxDataBuffer  <= rx_dout(63 downto 32) when (dataRead = '0' and only_events = '0') else  -- i.e. Time
+    dma_rxDataBuffer  <= rx_dout(63 downto 32) when (dataRead = '0' and OnlyEvents_i = '0') else  -- i.e. Time
                         rx_dout(31 downto  0);                             -- i.e. Data
-    rx_rd_en <=  '0' when (dataRead = '0' and only_events = '0') else dma_readRxBuffer;
+    rx_rd_en <=  '0' when (dataRead = '0' and OnlyEvents_i = '0') else dma_readRxBuffer;
 
 --    FifoCoreFull <= MonOutFull_xS;
 
     --enableFifoWriting_xS <= MonOutWrite_xS when (MonOutAddrEvt_xD(7 downto 0) >= OutThresholdVal_xDI(7 downto 0)) else '0';
 --    enableFifoWriting <= MonOutWrite;
-
 
 
 
@@ -367,7 +378,8 @@ rx_rd_clk <= clk_dma;
 
 rx_din <= rx_timestamp & rx_event;
 
-only_events <= '0';
+uP_OnlyEvents <= '1';
+OnlyEvents_i <= uP_OnlyEvents;
 
 proc_axistream : process  
 begin
@@ -376,7 +388,15 @@ S_AXIS_TDATA  <= x"00000000";
 S_AXIS_TLAST  <= '0';
 S_AXIS_TVALID <= '0';
 
-M_AXIS_TREADY <= '1'; 
+M_AXIS_TREADY <= '0'; 
+
+wait for 40 us;
+M_AXIS_TREADY <= '1';  
+-- wait for 11 * CLK_RD_PERIOD_NS_c;
+-- M_AXIS_TREADY <= '0';
+-- 
+-- wait for 5000 * CLK_RD_PERIOD_NS_c;
+-- M_AXIS_TREADY <= '1';
 wait;
 end process proc_axistream;  
 
@@ -400,51 +420,18 @@ begin
   
   wait for 8 ns;
   
-  wait for 10 us;
-  rx_wr_en   <= '1';
-  wait for CLK_WR_PERIOD_NS_c;
-  rx_wr_en   <= '0';
-  rx_timestamp <= rx_timestamp + 1;
-  rx_event     <= rx_event + 1;
-
-  wait for 1 us;
-  rx_wr_en   <= '1';
-  wait for CLK_WR_PERIOD_NS_c;
-  rx_wr_en   <= '0';
-  rx_timestamp <= rx_timestamp + 1;
-  rx_event     <= rx_event + 1;
-
-  wait for 1 us;
-  rx_wr_en   <= '1';
-  wait for CLK_WR_PERIOD_NS_c;
-  rx_wr_en   <= '0';
-  rx_timestamp <= rx_timestamp + 1;
-  rx_event     <= rx_event + 1;
-
-  wait for 1 us;
-  rx_wr_en   <= '1';
-  wait for CLK_WR_PERIOD_NS_c;
-  rx_wr_en   <= '0';
-  rx_timestamp <= rx_timestamp + 1;
-  rx_event     <= rx_event + 1;
+  wait for 9 us;
+  
+  for i in 1 to 20 loop
+    wait for 1 us; 
+    rx_wr_en   <= '1';
+    wait for CLK_WR_PERIOD_NS_c;
+    rx_wr_en   <= '0';
+    rx_timestamp <= rx_timestamp + 1;
+    rx_event     <= rx_event + 1;
+  end loop;
   
   
-  wait for 1 us;
-  rx_wr_en   <= '1';
-  wait for CLK_WR_PERIOD_NS_c;
-  rx_wr_en   <= '0';
-  rx_timestamp <= rx_timestamp + 1;
-  rx_event     <= rx_event + 1;
-  
-  
-  wait for 1 us;
-  rx_wr_en   <= '1';
-  wait for CLK_WR_PERIOD_NS_c;
-  rx_wr_en   <= '0';
-  rx_timestamp <= rx_timestamp + 1;
-  rx_event     <= rx_event + 1;
-  
-     
   wait;
 end process proc_hpu_to_dma;  
 
