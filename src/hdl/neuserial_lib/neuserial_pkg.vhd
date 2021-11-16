@@ -340,6 +340,8 @@ component CoreMonSeqRR is
     -- clock and reset
     Reset_xRBI          : in  std_logic;
     CoreClk_xCI         : in  std_logic;
+    AxisClk_xCI         : in  std_logic;
+    --
     FlushRXFifos_xSI    : in  std_logic;
     FlushTXFifos_xSI    : in  std_logic;
     --ChipType_xSI        : in  std_logic;

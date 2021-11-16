@@ -333,6 +333,7 @@ package DPComponents_pkg is
         );
     end component hssaer_paer_rx_wrapper;
 
+
     component SYNC_FIFO_32_16_ZYNQ
       port (
         rst : in std_logic;
@@ -347,6 +348,7 @@ package DPComponents_pkg is
       );
     end component;
 
+
     component SYNC_FIFO_32_16_ZYNQUPLUS
       port (
         rst : in std_logic;
@@ -360,6 +362,7 @@ package DPComponents_pkg is
         empty : out std_logic
       );
     end component;
+    
     
 end package DPComponents_pkg;
 

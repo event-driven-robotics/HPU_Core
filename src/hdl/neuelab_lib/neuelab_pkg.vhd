@@ -102,6 +102,8 @@ package NEComponents_pkg is
             empty : OUT STD_LOGIC;
             almost_empty : OUT STD_LOGIC;
             underflow : OUT STD_LOGIC;
+            rd_data_count : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+            wr_data_count : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
             wr_rst_busy : OUT STD_LOGIC;
             rd_rst_busy : OUT STD_LOGIC
         );
@@ -122,6 +124,8 @@ package NEComponents_pkg is
             empty : OUT STD_LOGIC;
             almost_empty : OUT STD_LOGIC;
             underflow : OUT STD_LOGIC;
+            rd_data_count : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+            wr_data_count : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
             wr_rst_busy : OUT STD_LOGIC;
             rd_rst_busy : OUT STD_LOGIC
         );

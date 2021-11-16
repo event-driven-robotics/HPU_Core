@@ -1548,7 +1548,8 @@ end generate;
         )
         port map (
             Reset_xRBI              => nRst,                     -- in  std_logic;
-            CoreClk_xCI             => Clk_i,                 -- in  std_logic;
+            CoreClk_xCI             => Clk_i,                    -- in  std_logic;
+            AxisClk_xCI             => Clk_i,                    -- in  std_logic;
             --
             FlushRXFifos_xSI        => FlushRXFifos_i,           -- in  std_logic;
             FlushTXFifos_xSI        => FlushTXFifos_i,           -- in  std_logic;

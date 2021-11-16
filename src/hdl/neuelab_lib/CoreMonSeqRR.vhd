@@ -39,6 +39,8 @@ entity CoreMonSeqRR is
         -- clock and reset
         Reset_xRBI          : in  std_logic;
         CoreClk_xCI         : in  std_logic;
+        AxisClk_xCI         : in  std_logic;
+        --
         FlushRXFifos_xSI    : in  std_logic;
         FlushTXFifos_xSI    : in  std_logic;
         --ChipType_xSI        : in  std_logic;
@@ -183,6 +185,25 @@ signal ResetTX_xR  : std_logic;
 signal FlushRXFifos_sr : std_logic_vector(15 downto 0);
 signal FlushTXFifos_sr : std_logic_vector(15 downto 0);
 
+signal TxFifoWrEn         : std_logic;
+signal TxFifoRdEn         : std_logic;
+signal TxFifoEmpty        : std_logic;
+signal TxFifoFull         : std_logic;
+signal TxFifoAlmostFull   : std_logic;
+signal TxWrDataCount      : std_logic_vector(11 downto 0);
+signal TxRdDataCount      : std_logic_vector(10 downto 0);
+
+signal RxFifoWrEn         : std_logic;
+signal RxFifoRdEn         : std_logic;
+signal RxFifoEmpty        : std_logic;
+signal RxFifoAlmostempty  : std_logic;
+signal RxFifoFull         : std_logic;
+signal RxFifoAlmostFull   : std_logic;
+signal RxFifoOverflow     : std_logic;
+signal RxFifoUnderflow    : std_logic;
+signal RxFifoWrDataCount  : std_logic_vector(10 downto 0);
+signal RxFifoRdDataCount  : std_logic_vector(10 downto 0);
+
 --signal i_BGMonitorSel_xAS : std_logic;
 --signal i_BGAddrSel_xAS    : std_logic;
 --signal i_BGMonEn_xAS      : std_logic;
@@ -192,7 +213,7 @@ signal FlushTXFifos_sr : std_logic_vector(15 downto 0);
 --signal i_BGBitIn_xAD      : std_logic;
 
 signal enableFifoWriting_xS  : std_logic;
-signal fifoWrDataCount_xD    : std_logic_vector(10 downto 0);
+-- signal fifoWrDataCount_xD    : std_logic_vector(10 downto 0);
 signal i_fifoCoreDat_xD      : std_logic_vector(63 downto 0);
 signal dataRead_xS           : std_logic;
 signal effectiveRdEn_xS      : std_logic;
@@ -487,21 +508,32 @@ end generate;
 OUTFIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
 
+  TxFifoWrEn              <= CoreFifoWrite_xSI and not txfifo_wr_rst_busy;
+  CoreFifoFull_xSO        <= TxFifoFull or txfifo_wr_rst_busy;
+  CoreFifoAlmostFull_xSO  <= TxFifoAlmostFull or txfifo_wr_rst_busy;  
+  
+  TxFifoRdEn              <= SeqInRead_xS and not txfifo_rd_rst_busy;
+  SeqInEmpty_xS           <= TxFifoEmpty or txfifo_rd_rst_busy;
+
+
+
   TXFIFO_HPU_ZYNQUPLUS_i : TXFIFO_HPU_ZYNQUPLUS
     PORT MAP (
       rst           => ResetTX_xR,
-      wr_clk        => CoreClk_xCI,
+      wr_clk        => AxisClk_xCI,
       rd_clk        => CoreClk_xCI,
       din           => CoreFifoDat_xDI,
-      wr_en         => CoreFifoWrite_xSI,
-      rd_en         => SeqInRead_xS,
+      wr_en         => TxFifoWrEn,
+      rd_en         => TxFifoRdEn,
       dout          => LiEnSeqInAddrEvt_xD,
-      full          => CoreFifoFull_xSO,
-      almost_full   => CoreFifoAlmostFull_xSO,
+      full          => TxFifoFull,
+      almost_full   => TxFifoAlmostFull,
       overflow      => open,
-      empty         => SeqInEmpty_xS,
+      empty         => TxFifoEmpty,
       almost_empty  => open,
       underflow     => open,
+      rd_data_count => open,
+      wr_data_count => open,      
       wr_rst_busy   => txfifo_wr_rst_busy,
       rd_rst_busy   => txfifo_rd_rst_busy
     );
@@ -564,7 +596,7 @@ begin
             empty        => i_FifoCoreEmpty_xSO,
             almost_empty => i_FifoCoreAlmostEmpty_xSO,
             underflow    => DBG_underflow,
-            data_count   => fifoWrDataCount_xD
+            data_count   => RxFifoWrDataCount
         );
 
 end generate;
@@ -572,23 +604,35 @@ end generate;
 INFIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
 
-      RXFIFO_HPU_ZYNQUPLUS_i : RXFIFO_HPU_ZYNQUPLUS
-        PORT MAP (
-          rst           => ResetRX_xR,
-          wr_clk        => CoreClk_xCI,
-          rd_clk        => CoreClk_xCI,
-          din           => LiEnMonOutAddrEvt_xD,
-          wr_en         => enableFifoWriting_xS,
-          rd_en         => effectiveRdEn_xS,
-          dout          => i_fifoCoreDat_xD,
-          full          => MonOutFull_xS,
-          almost_full   => DBG_almost_full,
-          overflow      => DBG_overflow,
-          empty         => i_FifoCoreEmpty_xSO,
-          almost_empty  => i_FifoCoreAlmostEmpty_xSO,
-          underflow     => DBG_underflow,
-          wr_rst_busy   => rxfifo_wr_rst_busy,
-          rd_rst_busy   => rxfifo_rd_rst_busy
+  RxFifoWrEn                <= enableFifoWriting_xS and not rxfifo_wr_rst_busy;
+  MonOutFull_xS             <= RxFifoFull or rxfifo_wr_rst_busy;
+  DBG_almost_full           <= RxFifoAlmostFull or rxfifo_wr_rst_busy;
+  DBG_overflow              <= RxFifoOverflow; -- or rxfifo_wr_rst_busy;
+  
+  RxFifoRdEn                <= effectiveRdEn_xS and not rxfifo_rd_rst_busy;
+  i_FifoCoreEmpty_xSO       <= RxFifoEmpty or rxfifo_rd_rst_busy;
+  i_FifoCoreAlmostEmpty_xSO <= RxFifoAlmostEmpty or rxfifo_rd_rst_busy;
+  DBG_underflow             <= RxFifoUnderflow; -- or rxfifo_rd_rst_busy;
+  
+  RXFIFO_HPU_ZYNQUPLUS_i : RXFIFO_HPU_ZYNQUPLUS
+    PORT MAP (
+      rst           => ResetRX_xR,
+      wr_clk        => CoreClk_xCI,
+      rd_clk        => AxisClk_xCI,
+      din           => LiEnMonOutAddrEvt_xD,
+      wr_en         => RxFifoWrEn,
+      rd_en         => RxFifoRdEn,
+      dout          => i_fifoCoreDat_xD,
+      full          => RxFifoFull,
+      almost_full   => RxFifoAlmostFull,
+      overflow      => RxFifoOverflow,
+      empty         => RxFifoEmpty,
+      almost_empty  => RxFifoAlmostEmpty,
+      underflow     => RxFifoUnderflow,
+      rd_data_count => RxFifoRdDataCount,
+      wr_data_count => RxFifoWrDataCount,
+      wr_rst_busy   => rxfifo_wr_rst_busy,
+      rd_rst_busy   => rxfifo_rd_rst_busy
         );
     
 --     u_INFIFO_64_1024 : INFIFO_64_1024_ZYNQUPLUS
@@ -613,11 +657,10 @@ begin
 end generate;
 
 
-
-    FifoCoreNumData_o <= fifoWrDataCount_xD;
+    FifoCoreNumData_o <= RxFifoRdDataCount;
 
     -- It's DmaLength_xDI/2 because of the FIFO is 64 bit and the reading is 32 bit wide
-    FifoCoreBurstReady_xSO <= '1' when (to_integer(unsigned(fifoWrDataCount_xD)) >= to_integer(unsigned('0'&DmaLength_xDI(15 downto 1)))) else '0';
+    FifoCoreBurstReady_xSO <= '1' when (to_integer(unsigned(RxFifoRdDataCount)) >= to_integer(unsigned('0'&DmaLength_xDI(15 downto 1)))) else '0';
 
 
     p_ReadDataTimeSel : process (CoreClk_xCI) is
@@ -699,7 +742,7 @@ FifoCoreEmpty_xSO   <= i_FifoCoreEmpty_xSO;
 FifoCoreAlmostEmpty_xSO <= i_FifoCoreAlmostEmpty_xSO;
 
 --DBG_underflow       <= DBG_underflow;   
-DBG_data_count      <= fifoWrDataCount_xD;
+DBG_data_count     <= RxFifoRdDataCount;
 DBG_Timestamp_xD   <= Timestamp_RX_xD;
 DBG_MonInAddr_xD   <= MonInAddr_xD;
 DBG_MonInSrcRdy_xS <= MonInSrcRdy_xS;
