@@ -193,7 +193,7 @@ proc_clear : process
 begin
   clear_n <= '1';
   clear   <= '0';
-  wait for 1002 ns;
+  wait for 12 ns;
   -- wait for 12 ms;
   clear_n <= '0';
   clear   <= '1'; 
@@ -345,20 +345,42 @@ dma_txBufferFull <= '0';
 
 
 
+-- p_ReadDataTimeSel : process (clk_dma, dma_rst_n) is
+-- begin
+--   if (dma_rst_n = '0') then
+--     dataRead <= '0';
+--   elsif (rising_edge(clk_dma)) then
+--     if (dma_readRxBuffer = '1' or dummy = '1') then
+--       dataRead <= not(dataRead);
+--     end if;
+--   end if;
+-- end process p_ReadDataTimeSel;
+
 p_ReadDataTimeSel : process (clk_dma, dma_rst_n) is
 begin
   if (dma_rst_n = '0') then
     dataRead <= '0';
   elsif (rising_edge(clk_dma)) then
-    if (dma_readRxBuffer = '1') then
+    if (OnlyEvents_i = '1') then
+      dataRead <= '1';
+    elsif (dma_readRxBuffer = '0') then
+      dataRead <= '0';
+    else
       dataRead <= not(dataRead);
     end if;
   end if;
 end process p_ReadDataTimeSel;
 
-    dma_rxDataBuffer  <= rx_dout(63 downto 32) when (dataRead = '0' and OnlyEvents_i = '0') else  -- i.e. Time
-                        rx_dout(31 downto  0);                             -- i.e. Data
-    rx_rd_en <=  '0' when (dataRead = '0' and OnlyEvents_i = '0') else dma_readRxBuffer;
+
+
+
+--   dma_rxDataBuffer  <= rx_dout(63 downto 32) when (dataRead = '0' and OnlyEvents_i = '0') else  -- i.e. Time
+--                        rx_dout(31 downto  0);                             -- i.e. Data
+--   rx_rd_en <=  '0' when (dataRead = '0' and OnlyEvents_i = '0') else dma_readRxBuffer;
+    
+    dma_rxDataBuffer  <= rx_dout(63 downto 32) when (dataRead = '0') else  -- i.e. Time
+                         rx_dout(31 downto  0);                             -- i.e. Data
+    rx_rd_en <=  '0' when (dataRead = '0') else dma_readRxBuffer;
 
 --    FifoCoreFull <= MonOutFull_xS;
 
@@ -372,13 +394,13 @@ end process p_ReadDataTimeSel;
 -- ***************************************************************************************************
 -- USER'S STIMULI
 
-rx_wr_clk <= clk_hpu;
+rx_wr_clk <= clk_hpu;  
 rx_rd_clk <= clk_dma;
 
 
 rx_din <= rx_timestamp & rx_event;
 
-uP_OnlyEvents <= '1';
+  
 OnlyEvents_i <= uP_OnlyEvents;
 
 proc_axistream : process  
@@ -390,13 +412,17 @@ S_AXIS_TVALID <= '0';
 
 M_AXIS_TREADY <= '0'; 
 
-wait for 40 us;
-M_AXIS_TREADY <= '1';  
--- wait for 11 * CLK_RD_PERIOD_NS_c;
+wait for 1 us;
+-- M_AXIS_TREADY <= '1';  
+-- wait for 1 * CLK_RD_PERIOD_NS_c;
 -- M_AXIS_TREADY <= '0';
--- 
 -- wait for 5000 * CLK_RD_PERIOD_NS_c;
--- M_AXIS_TREADY <= '1';
+-- M_AXIS_TREADY <= '1';      
+-- wait for 1 * CLK_RD_PERIOD_NS_c;
+-- M_AXIS_TREADY <= '0';
+-- wait for 5000 * CLK_RD_PERIOD_NS_c;
+M_AXIS_TREADY <= '1';
+
 wait;
 end process proc_axistream;  
 
@@ -404,11 +430,27 @@ end process proc_axistream;
 proc_dma_to_hpu : process  
 begin
 
+  uP_OnlyEvents <= '0'; 
 
-  
+  wait for CLK_RD_PERIOD_NS_c - 2 ns;
+  wait for 18 us;   
+
+  wait for CLK_RD_PERIOD_NS_c;  
+  wait for CLK_RD_PERIOD_NS_c;  
+  uP_OnlyEvents <= '1';  
+  wait for 2 us;
+  uP_OnlyEvents <= '0';  
+
+--  wait for CLK_WR_PERIOD_NS_c;
+--  uP_OnlyEvents <= '0';  
      
   wait;
+
 end process proc_dma_to_hpu; 
+
+
+
+
 
 proc_hpu_to_dma : process  
 begin
@@ -417,21 +459,44 @@ begin
   rx_event      <= (others => '0');
   rx_wr_en      <= '0';
   -- rx_rd_en   <= '0';
+--  uP_OnlyEvents <= '0'; 
   
   wait for 8 ns;
+ 
   
-  wait for 9 us;
+  wait for 10 us;   
   
-  for i in 1 to 20 loop
-    wait for 1 us; 
+  for i in 1 to 4096 loop    
+--    wait for 1 us; 
     rx_wr_en   <= '1';
     wait for CLK_WR_PERIOD_NS_c;
     rx_wr_en   <= '0';
     rx_timestamp <= rx_timestamp + 1;
     rx_event     <= rx_event + 1;
   end loop;
-  
-  
+
+-- wait for 50 us;   
+-- uP_OnlyEvents <= '1';  
+-- for i in 1 to 15 loop    
+--   wait for 1 us; 
+--   rx_wr_en   <= '1';
+--   wait for CLK_WR_PERIOD_NS_c;
+--   rx_wr_en   <= '0';
+--   rx_timestamp <= rx_timestamp + 1;
+--   rx_event     <= rx_event + 1;
+-- end loop; 
+--
+--  wait for 50 us;   
+-- uP_OnlyEvents <= '0';  
+-- for i in 1 to 16 loop    
+--   wait for 1 us; 
+--   rx_wr_en   <= '1';
+--   wait for CLK_WR_PERIOD_NS_c;
+--   rx_wr_en   <= '0';
+--   rx_timestamp <= rx_timestamp + 1;
+--   rx_event     <= rx_event + 1;
+-- end loop;  
+ 
   wait;
 end process proc_hpu_to_dma;  
 

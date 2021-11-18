@@ -529,6 +529,7 @@ signal i_uP_spinnlnk_rx_err      : std_logic;
 
 signal i_uP_DMAIsRunning         : std_logic;
 signal i_uP_enableDmaIf          : std_logic;
+signal i_uP_OnlyEvents           : std_logic;
 signal i_uP_resetstream          : std_logic;
 signal i_uP_dmaLength            : std_logic_vector(15 downto 0);
 signal i_uP_DMA_test_mode        : std_logic;
@@ -927,6 +928,7 @@ u_neuserial_axistream : neuserial_axistream
     --
     DMA_test_mode_i                => i_uP_DMA_test_mode,               -- in  std_logic;
     EnableAxistreamIf_i            => i_uP_enableDmaIf,                 -- in  std_logic;
+    OnlyEvents_i                   => i_uP_OnlyEvents,                  -- in  std_logic;
     DMA_is_running_o               => i_uP_DMAIsRunning,                -- out std_logic;
     DmaLength_i                    => i_uP_dmaLength,                   -- in  std_logic_vector(15 downto 0);
     ResetStream_i                  => i_uP_resetstream,                 -- in  std_logic;

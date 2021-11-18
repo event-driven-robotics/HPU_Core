@@ -75,9 +75,11 @@ architecture rtl of neuserial_axistream is
     signal i_TDataCntTx     : std_logic_vector(15 downto 0);
     signal i_enable_ip      : std_logic;
     signal i_TlastTimer     : std_logic_vector(31 downto 0);   
+    signal i_TlastTimerLock : std_logic;   
     signal i_timeexpired    : std_logic; 
     signal counterTest      : std_logic_vector(31 downto 0);
-    signal i_sent_a_couple  : std_logic;
+--    signal i_sent_a_couple  : std_logic;
+    signal i_sent_an_event  : std_logic;
     
 
     
@@ -90,7 +92,7 @@ architecture rtl of neuserial_axistream is
             else
                 if (ResetStream_i='1') then
                     i_enable_ip <= '0';
-                elsif (EnableAxistreamIf_i='0' and i_sent_a_couple='0') then
+                elsif (EnableAxistreamIf_i='0' and i_sent_an_event='0') then
                     i_enable_ip <= '0';
                 else
                     if EnableAxistreamIf_i = '1' then
@@ -120,8 +122,26 @@ architecture rtl of neuserial_axistream is
       end if;
    end process CountData_p;
 
--- At least a data couple has been sent when counterData>1
-i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counterData'length)) else '0';
+-- At least a data couple has been sent when counterData>2
+-- i_sent_a_couple <= '1' when counterData > std_logic_vector(to_unsigned(2,counterData'length)) else '0';
+
+
+EVENT_SENT_PROC: process (Clk)
+begin
+   if (Clk'event and Clk = '1') then
+      if (nRst = '0') then
+         i_sent_an_event <= '0';
+      else 
+          if (i_valid_lastread='1') then
+              i_sent_an_event <= '0';
+          elsif (state=dataval and i_valid_read='1') then
+              i_sent_an_event <= '1';
+          end if;
+      end if;        
+   end if;
+end process EVENT_SENT_PROC;
+
+
    
 -- ASM that manages the timing of the Shared Multiplier
 
@@ -130,7 +150,7 @@ i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counte
       if (Clk'event and Clk = '1') then
          if (nRst = '0') then
             state <= idle;
-         elsif (EnableAxistreamIf_i='0' and i_sent_a_couple='0') then
+         elsif (EnableAxistreamIf_i='0' and i_sent_an_event='0') then
             state <= idle;
          else
             state <= next_state;
@@ -139,7 +159,7 @@ i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counte
    end process SYNC_PROC;
  
    NEXT_STATE_DECODE: process (state, i_enable_ip, FifoCoreEmpty_i, i_valid_read, EnableAxistreamIf_i,
-                               i_valid_lastread, FifoCoreLastData_i, i_timeexpired, DMA_test_mode_i, i_sent_a_couple)
+                               i_valid_lastread, FifoCoreLastData_i, i_timeexpired, DMA_test_mode_i, i_sent_an_event)
    begin
       case (state) is
       
@@ -151,7 +171,7 @@ i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counte
 			end if;
 			
         when waitfifo =>
-            if (i_timeexpired = '1' and i_sent_a_couple='1') then
+            if (i_timeexpired = '1' and i_sent_an_event='1') then
                 next_state <= premature_end;
             elsif (FifoCoreEmpty_i = '1' and DMA_test_mode_i = '0') then
                 next_state <= waitfifo;
@@ -164,7 +184,7 @@ i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counte
         when timeval =>
             if (i_valid_read = '1') then
                 next_state <= dataval;
-            elsif (i_timeexpired = '1' and i_sent_a_couple='1') then
+            elsif (i_timeexpired = '1' and i_sent_an_event='1') then
                 next_state <= premature_end;
             else 
                 next_state <= timeval;
@@ -295,19 +315,31 @@ i_sent_a_couple <= '1' when counterData /= std_logic_vector(to_unsigned(1,counte
    
    -- Issue a premature end of a burst is the timeout expires and we have sent at least one data couple
    -- When no data have been received but the timeout expired, then sent the received data and then the dummy data
+   tlasttimerlock_p : process (Clk)
+   begin
+   if (Clk'event and Clk = '1') then
+        if (nRst = '0' or i_enable_ip='0' or TlastTOwritten_i='1') then
+            i_TlastTimerLock <= '1';
+        elsif (LatTlat_i='1') then
+            if (i_valid_read='1') then
+                i_TlastTimerLock <= '0';
+            end if;
+        end if;
+       end if;
+   end process tlasttimerlock_p;
+
    tlasttimer_p : process (Clk)
    begin
-      
-       if (Clk'event and Clk = '1') then
+   if (Clk'event and Clk = '1') then
         if (nRst = '0' or i_enable_ip='0' or TlastTOwritten_i='1') then
-            i_TlastTimer <= (others => '0');
+            i_TlastTimer <= (others => '1');
             i_timeexpired <= '0';
         elsif (LatTlat_i='1') then
-            if (i_valid_lastread='1') then
-                i_TlastTimer <= (others => '0');
+            if (i_valid_lastread='1' or i_TlastTimerLock='1') then
+                i_TlastTimer <= TlastTO_i;
                 i_timeexpired <= '0';
-            elsif (i_TlastTimer/=TlastTO_i) then
-                i_TlastTimer <= i_TlastTimer + "01";
+            elsif (i_TlastTimer/=x"00000000") then
+                i_TlastTimer <= i_TlastTimer - "01";
                 i_timeexpired <= '0';
             else
                 i_timeexpired <= '1';

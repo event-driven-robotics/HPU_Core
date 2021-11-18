@@ -617,6 +617,7 @@ component neuserial_axistream is
     --
     DMA_test_mode_i        : in  std_logic;
     EnableAxistreamIf_i    : in  std_logic;
+    OnlyEvents_i           : in  std_logic;
     DMA_is_running_o       : out std_logic;
     DmaLength_i            : in  std_logic_vector(15 downto 0);
     ResetStream_i          : in  std_logic;

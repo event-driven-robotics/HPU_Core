@@ -37,14 +37,17 @@ entity CoreMonSeqRR is
     port (
         ---------------------------------------------------------------------------
         -- clock and reset
-        Reset_xRBI          : in  std_logic;
-        CoreClk_xCI         : in  std_logic;
-        AxisClk_xCI         : in  std_logic;
+        Reset_xRBI              : in  std_logic;
+        CoreClk_xCI             : in  std_logic;
+        AxisClk_xCI             : in  std_logic;
         --
-        FlushRXFifos_xSI    : in  std_logic;
-        FlushTXFifos_xSI    : in  std_logic;
-        --ChipType_xSI        : in  std_logic;
-        DmaLength_xDI       : in  std_logic_vector(15 downto 0);
+        FlushRXFifos_xSI        : in  std_logic;
+        FlushTXFifos_xSI        : in  std_logic;
+        ---------------------------------------------------------------------------
+        -- controls and settings
+        -- ChipType_xSI         : in  std_logic;
+        DmaLength_xDI           : in  std_logic_vector(15 downto 0);
+        OnlyEvents_i            : in  std_logic;
         --
         ---------------------------------------------------------------------------
         -- Enable per timing
