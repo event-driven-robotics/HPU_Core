@@ -137,78 +137,78 @@ package NEComponents_pkg is
    
     component Timestamp is 
         port (
-            Rst_xRBI       : in  std_logic;
-            Clk_xCI        : in  std_logic;
-            Zero_xSI       : in  std_logic;
-            CleanTimer_xSI : in  std_logic;
-            LoadTimer_xSI  : in  std_logic;
-            LoadValue_xSI  : in std_logic_vector(31 downto 0);
-            Timestamp_xDO  : out std_logic_vector(31 downto 0)
+            Rst_n_i        : in  std_logic;
+            Clk_i          : in  std_logic;
+            Zero_i         : in  std_logic;
+            CleanTimer_i   : in  std_logic;
+            LoadTimer_i    : in  std_logic;
+            LoadValue_i    : in std_logic_vector(31 downto 0);
+            Timestamp_o    : out std_logic_vector(31 downto 0)
         );
     end component Timestamp;
 
     
     component TimestampWrapDetector is
         port (
-            Resetn       : in  std_logic;
-            Clk          : in  std_logic;
-            MSB          : in  std_logic;
-            WrapDetected : out std_logic
+            Reset_n_i      : in  std_logic;
+            Clk_i          : in  std_logic;
+            MSB_i          : in  std_logic;
+            WrapDetected_o : out std_logic
         );
     end component TimestampWrapDetector;
 
     
     component MonitorRR is
         port (
-            Rst_xRBI       : in  std_logic;
-            Clk_xCI        : in  std_logic;
-            Timestamp_xDI  : in  std_logic_vector(31 downto 0);
-            FullTimestamp_i: in  std_logic;
+            Rst_n_i         : in  std_logic;
+            Clk_i           : in  std_logic;
+            Timestamp_i     : in  std_logic_vector(31 downto 0);
+            FullTimestamp_i : in  std_logic;
             --
-            MonEn_xSAI     : in  std_logic;
+            MonEn_i         : in  std_logic;
             --
-            InAddr_xDI     : in  std_logic_vector(31 downto 0);
-            InSrcRdy_xSI   : in  std_logic;
-            InDstRdy_xSO   : out std_logic;
+            InAddr_i        : in  std_logic_vector(31 downto 0);
+            InSrcRdy_i      : in  std_logic;
+            InDstRdy_o      : out std_logic;
             --
-            OutAddrEvt_xDO : out std_logic_vector(63 downto 0);
-            OutWrite_xSO   : out std_logic;
-            OutFull_xSI    : in  std_logic
+            OutAddrEvt_o    : out std_logic_vector(63 downto 0);
+            OutWrite_o      : out std_logic;
+            OutFull_i       : in  std_logic
         );
     end component MonitorRR;
 
 
     component AEXSsequencerRR is
         port (
-            Rst_xRBI              : in  std_logic;
-            Clk_xCI               : in  std_logic;
-            Enable_xSI            : in  std_logic;
+            Rst_n_i             : in  std_logic;
+            Clk_i               : in  std_logic;
+            Enable_i            : in  std_logic;
+            --                  
+            En100us_i           : in  std_logic;
+            --                  
+            TSMode_i            : in  std_logic_vector(1 downto 0);
+            TSTimeoutSel_i      : in  std_logic_vector(3 downto 0);
+            TSMaskSel_i         : in  std_logic_vector(1 downto 0);
+            --                  
+            Timestamp_i         : in  std_logic_vector(31 downto 0);
+            LoadTimer_o         : out std_logic;
+            LoadValue_o         : out std_logic_vector(31 downto 0);
+            TxTSRetrigCmd_i     : in  std_logic;
+            TxTSRearmCmd_i      : in  std_logic;
+            TxTSRetrigStatus_o  : out std_logic;
+            TxTSTimeoutCounts_o : out std_logic;
+            --                  
+            InAddrEvt_i         : in  std_logic_vector(63 downto 0);
+            InRead_o            : out std_logic;
+            InEmpty_i           : in  std_logic;
+            --                  
+            OutAddr_o           : out std_logic_vector(31 downto 0);
+            OutSrcRdy_o         : out std_logic;
+            OutDstRdy_i         : in  std_logic
             --
-            En100us_xSI           : in  std_logic;
-            --
-            TSMode_xDI            : in  std_logic_vector(1 downto 0);
-            TSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
-            TSMaskSel_xDI         : in  std_logic_vector(1 downto 0);
-            --
-            Timestamp_xDI         : in  std_logic_vector(31 downto 0);
-            LoadTimer_xSO         : out std_logic;
-            LoadValue_xSO         : out std_logic_vector(31 downto 0);
-            TxTSRetrigCmd_xSI     : in  std_logic;
-            TxTSRearmCmd_xSI      : in  std_logic;
-            TxTSRetrigStatus_xSO  : out std_logic;
-            TxTSTimeoutCounts_xSO : out std_logic;
-            --
-            InAddrEvt_xDI         : in  std_logic_vector(63 downto 0);
-            InRead_xSO            : out std_logic;
-            InEmpty_xSI           : in  std_logic;
-            --
-            OutAddr_xDO           : out std_logic_vector(31 downto 0);
-            OutSrcRdy_xSO         : out std_logic;
-            OutDstRdy_xSI         : in  std_logic
-            --
-            --ConfigAddr_xDO : out std_logic_vector(31 downto 0);
-            --ConfigReq_xSO  : out std_logic;
-            --ConfigAck_xSI  : in  std_logic
+            -- ConfigAddr_o     : out std_logic_vector(31 downto 0);
+            -- ConfigReq_o      : out std_logic;
+            -- ConfigAck_i      : in  std_logic
         );
     end component AEXSsequencerRR;
 

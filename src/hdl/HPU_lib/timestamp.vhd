@@ -13,13 +13,13 @@ library ieee;
 
 entity Timestamp is 
     port (
-        Rst_xRBI       : in  std_logic;
-        Clk_xCI        : in  std_logic;
-        Zero_xSI       : in  std_logic;
-        CleanTimer_xSI : in  std_logic;
-        LoadTimer_xSI  : in  std_logic;
-        LoadValue_xSI  : in std_logic_vector(31 downto 0);
-        Timestamp_xDO  : out std_logic_vector(31 downto 0)
+        Rst_n_i        : in  std_logic;
+        Clk_i          : in  std_logic;
+        Zero_i         : in  std_logic;
+        CleanTimer_i   : in  std_logic;
+        LoadTimer_i    : in  std_logic;
+        LoadValue_i    : in std_logic_vector(31 downto 0);
+        Timestamp_o    : out std_logic_vector(31 downto 0)
     );
 end entity Timestamp;
 
@@ -39,21 +39,21 @@ architecture beh of Timestamp is
   
 begin
 
-    Timestamp_xDO <= std_logic_vector(TsCnt_xDP);
+    Timestamp_o <= std_logic_vector(TsCnt_xDP);
 
 
-    p_next : process (ClkCnt_xDP, TsCnt_xDP, Zero_xSI, CleanTimer_xSI, ClkCnt_xDN, LoadTimer_xSI, LoadValue_xSI)
+    p_next : process (ClkCnt_xDP, TsCnt_xDP, Zero_i, CleanTimer_i, ClkCnt_xDN, LoadTimer_i, LoadValue_i)
     begin
 
         ClkCnt_xDN <= ClkCnt_xDP;
         TsCnt_xDN  <= TsCnt_xDP;
     
-        if ((Zero_xSI = '1') or (CleanTimer_xSI = '1')) then
+        if ((Zero_i = '1') or (CleanTimer_i = '1')) then
             ClkCnt_xDN <= (others => '0');
             TsCnt_xDN  <= (others => '0');
-        elsif (LoadTimer_xSI = '1') then
+        elsif (LoadTimer_i = '1') then
             ClkCnt_xDN <= (others => '0');
-            TsCnt_xDN  <= unsigned(LoadValue_xSI);        
+            TsCnt_xDN  <= unsigned(LoadValue_i);        
         else
             ClkCnt_xDN <= ClkCnt_xDP + 1;
 
@@ -65,13 +65,13 @@ begin
     end process p_next;
 
 
-    p_state : process (Clk_xCI, Rst_xRBI)
+    p_state : process (Clk_i, Rst_n_i)
     begin
     
-        if (Rst_xRBI = '0') then               -- asynchronous reset (active low)
+        if (Rst_n_i = '0') then               -- asynchronous reset (active low)
             ClkCnt_xDP <= (others => '0');
             TsCnt_xDP  <= (others => '0');
-        elsif (rising_edge(Clk_xCI)) then       -- rising clock edge
+        elsif (rising_edge(Clk_i)) then       -- rising clock edge
             ClkCnt_xDP <= ClkCnt_xDN;
             TsCnt_xDP  <= TsCnt_xDN;
         end if;

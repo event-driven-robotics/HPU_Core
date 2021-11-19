@@ -8,6 +8,8 @@
 -- Date        : 19/03/2021
 -- ==============================================================================
 -- HISTORY (main changes) :
+-- Revision 2.0:  12/11/2021 - M. Casti (IIT)
+-- - Redesign of Reset Section
 --
 -- Revision 1.2:  19/03/2021 - M. Casti
 -- - Output Reset RST_o fixed
@@ -40,31 +42,36 @@ library ieee;
 
 entity time_machine is
   generic ( 
-    CLK_PERIOD_NS_g         : real := 10.0;                   -- Main Clock period
-    CLEAR_POLARITY_g        : string := "LOW";                -- Active "HIGH" or "LOW"
-    PON_RESET_DURATION_MS_g : integer range 0 to 255 := 10;   -- Duration of Power-On reset (ms)
-    SIM_TIME_COMPRESSION_g  : in boolean := FALSE             -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+    CLK_PERIOD_NS_g           : real                   := 10.0;   -- Main Clock period
+    CLR_POLARITY_g            : string                 := "HIGH"; -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   : integer range 0 to 31  := 16;     -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  : integer range 0 to 255 := 10;     -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 : boolean                := TRUE;   -- If TRUE a Power On Reset is generated 
+    SIM_TIME_COMPRESSION_g    : boolean                := FALSE   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
   port (
     -- Clock in port
-    CLK_i                   : in  std_logic;   -- Input clock @ 50 MHz,
-    CLEAR_i                 : in  std_logic;   -- Asynchronous active low reset
+    CLK_i                     : in  std_logic;        -- Input Clock
+    MCM_LOCKED_i              : in  std_logic := 'H'; -- Clock locked flag
+    CLR_i                     : in  std_logic := 'L'; -- Polarity controlled Asyncronous Clear input
   
-    -- Output reset
-    RESET_o                 : out std_logic;    -- Reset out (active high)
-    RESET_N_o               : out std_logic;    -- Reset out (active low)
-    PON_RESET_OUT_o         : out std_logic;	  -- Power on Reset out (active high)
-    PON_RESET_N_OUT_o       : out std_logic;	  -- Power on Reset out (active low)
-    
+    -- Reset output
+    ARST_o                    : out std_logic;        -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                  : out std_logic;        -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o               : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o             : out std_logic; 	      -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o              : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o            : out std_logic;	      -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+      
     -- Output ports for generated clock enables
-    EN200NS_o               : out std_logic;	  -- Clock enable every 200 ns
-    EN1US_o                 : out std_logic;	  -- Clock enable every 1 us
-    EN10US_o                : out std_logic;	  -- Clock enable every 10 us
-    EN100US_o               : out std_logic;	  -- Clock enable every 100 us
-    EN1MS_o                 : out std_logic;	  -- Clock enable every 1 ms
-    EN10MS_o                : out std_logic;	  -- Clock enable every 10 ms
-    EN100MS_o               : out std_logic;	  -- Clock enable every 100 ms
-    EN1S_o                  : out std_logic 	  -- Clock enable every 1 s
+    EN200NS_o                 : out std_logic;	      -- Clock enable every 200 ns
+    EN1US_o                   : out std_logic;	      -- Clock enable every 1 us
+    EN10US_o                  : out std_logic;	      -- Clock enable every 10 us
+    EN100US_o                 : out std_logic;	      -- Clock enable every 100 us
+    EN1MS_o                   : out std_logic;	      -- Clock enable every 1 ms
+    EN10MS_o                  : out std_logic;	      -- Clock enable every 10 ms
+    EN100MS_o                 : out std_logic;	      -- Clock enable every 100 ms
+    EN1S_o                    : out std_logic 	      -- Clock enable every 1 s
     );
 end time_machine;
 
@@ -86,24 +93,47 @@ begin
   end if;
 end function;
 
-constant CLR_POL_c    : std_logic := clr_pol(CLEAR_POLARITY_g); 
+function has_por(a : boolean) return std_logic is
+begin
+  if    a = FALSE  then return '0';
+  elsif a = TRUE then return '1';
+  else report "Configuration not supported" severity failure; return '0';
+  end if;
+end function;
 
-signal pp_rst_n, p_rst_n, rst_n : std_logic := '0';
-attribute ASYNC_REG of pp_rst_n : signal is "TRUE";
-attribute ASYNC_REG of p_rst_n  : signal is "TRUE";
-attribute ASYNC_REG of rst_n    : signal is "TRUE";
-signal pp_rst, p_rst, rst       : std_logic := '1';
-attribute ASYNC_REG of pp_rst   : signal is "TRUE";
-attribute ASYNC_REG of p_rst    : signal is "TRUE";
-attribute ASYNC_REG of rst      : signal is "TRUE";
+function has_por_vect(a : boolean; b : integer; c : integer) return std_logic_vector is
+begin
+  if    a = FALSE  then return conv_std_logic_vector(0, c);
+  elsif a = TRUE then return conv_std_logic_vector(b, c);
+  else report "Configuration not supported" severity failure; return conv_std_logic_vector(0, c);
+  end if;
+end function;
 
--- Power On Reset
-signal pon_reset_cnt  : std_logic_vector(7 downto 0);
-signal pon_reset      : std_logic := '1';
-signal pon_reset_n    : std_logic := '0';  -- NOTE: it's important to initialize that signal to "1"
+constant CLR_POL_c    : std_logic := clr_pol(CLR_POLARITY_g); 
+
+signal clear : std_logic;
+
+signal pp_arst, p_arst, arst        : std_logic := has_por(HAS_POR_g);
+  attribute ASYNC_REG of pp_arst    : signal is "TRUE";
+  attribute ASYNC_REG of p_arst     : signal is "TRUE";
+  attribute ASYNC_REG of arst       : signal is "TRUE";
+signal pp_arst_n, p_arst_n, arst_n  : std_logic := not has_por(HAS_POR_g);
+  attribute ASYNC_REG of pp_arst_n  : signal is "TRUE";
+  attribute ASYNC_REG of p_arst_n   : signal is "TRUE";
+  attribute ASYNC_REG of arst_n     : signal is "TRUE";
+
+-- Long Reset
+signal long_arst_cnt  : std_logic_vector(4 downto 0) := has_por_vect(HAS_POR_g, ARST_LONG_PERSISTANCE_g, 5);
+signal long_arst      : std_logic := has_por(HAS_POR_g);
+signal long_arst_n    : std_logic := not has_por(HAS_POR_g);
+
+-- Ultra-Long Reset
+signal ulong_arst_cnt  : std_logic_vector(7 downto 0) := has_por_vect(HAS_POR_g, ARST_ULONG_DURATION_MS_g, 8);
+signal ulong_arst      : std_logic := has_por(HAS_POR_g);
+signal ulong_arst_n    : std_logic := not has_por(HAS_POR_g);
 
 -- -------------------------------------------------------------------------------------------------------------------------
--- Counters
+-- Enable generation Counters
 
 signal en200ns_cnt    : std_logic_vector(4 downto 0);  
 signal en200ns_cnt_tc : std_logic;  
@@ -179,50 +209,70 @@ begin
 -- ---------------------------------------------------------------------------------------------------
 -- RESET DEASSERTION SYNCRONIZATION
 
--- RST_N
-process(CLK_i, CLEAR_i)
+clear <= not MCM_LOCKED_i or (CLR_i xnor CLR_POL_c);
+
+process(CLK_i, clear)
 begin
-  if (CLEAR_i = CLR_POL_c) then
-    pp_rst_n  <= '0';
-    p_rst_n   <= '0';
-    rst_n     <= '0';
+  if (clear = '1') then
+    pp_arst_n  <= '0';
+    p_arst_n   <= '0';
+    arst_n     <= '0';
+    
+    pp_arst    <= '1';
+    p_arst     <= '1';
+    arst       <= '1';   
+    
   elsif rising_edge(CLK_i) then
-    pp_rst_n <= '1';
-    p_rst_n  <= pp_rst_n;
-    rst_n    <= p_rst_n;
+    pp_arst_n <= '1';
+    p_arst_n  <= pp_arst_n;
+    arst_n    <= p_arst_n;
+ 
+    pp_arst   <= '0';
+    p_arst    <= pp_arst;
+    arst      <= p_arst;   
+ 
   end if;
 end process;  
 
--- RST
-process(CLK_i, CLEAR_i)
-begin
-  if (CLEAR_i = CLR_POL_c) then
-    pp_rst    <= '1';
-    p_rst     <= '1';
-    rst       <= '1';
-  elsif rising_edge(CLK_i) then
-    pp_rst   <= '0';
-    p_rst    <= pp_rst;
-    rst      <= p_rst;
-  end if;
-end process;  
+
 
 -- ---------------------------------------------------------------------------------------------------
--- POWER ON RESET
+-- LONG RESET
 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
-    pon_reset_cnt <= conv_std_logic_vector(PON_RESET_DURATION_MS_g, pon_reset_cnt'length);
-    pon_reset     <= '1';
-    pon_reset_n   <= '0';  -- NOTE: it's important to initialize that signal to "1"   
+  if (arst_n = '0') then
+    long_arst_cnt <= conv_std_logic_vector(ARST_LONG_PERSISTANCE_g-1, long_arst_cnt'length);
+    long_arst     <= '1';
+    long_arst_n   <= '0';  
+  elsif rising_edge(CLK_i) then
+    if (long_arst_cnt = conv_std_logic_vector(0, long_arst_cnt'length)) then
+      long_arst     <= '0';
+      long_arst_n   <= '1';
+    else
+      long_arst_cnt <= long_arst_cnt - 1;
+    end if;
+  end if;
+end process; 
+
+
+
+-- ---------------------------------------------------------------------------------------------------
+-- ULTRA-LONG RESET
+
+process(CLK_i, arst_n)
+begin
+  if (arst_n = '0') then
+    ulong_arst_cnt <= conv_std_logic_vector(ARST_ULONG_DURATION_MS_g-1, ulong_arst_cnt'length);
+    ulong_arst     <= '1';
+    ulong_arst_n   <= '0'; 
   elsif rising_edge(CLK_i) then
     if (en1ms = '1') then
-      if (pon_reset_cnt = conv_std_logic_vector(0, pon_reset_cnt'length)) then
-        pon_reset     <= '0';
-        pon_reset_n   <= '1';  -- NOTE: it's important to initialize that signal to "1"
+      if (ulong_arst_cnt = conv_std_logic_vector(0, ulong_arst_cnt'length)) then
+        ulong_arst     <= '0';
+        ulong_arst_n   <= '1';  
       else
-        pon_reset_cnt <= pon_reset_cnt - 1;
+        ulong_arst_cnt <= ulong_arst_cnt - 1;
       end if;
     end if;
   end if;
@@ -236,9 +286,9 @@ end process;
 
 -- Enable @ 200 ns
 en200ns_cnt_tc <= '1' when (en200ns_cnt = conv_std_logic_vector(EN200NS_CONSTANT_c, en200ns_cnt'length)) else '0'; 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en200ns_cnt <= (others => '0');
   elsif rising_edge(CLK_i) then
     if (en200ns_cnt_tc = '1') then
@@ -251,9 +301,9 @@ end process;
 
 p_en200ns <= en200ns_cnt_tc;
 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en200ns <= '0';
   elsif rising_edge(CLK_i) then
     en200ns <= p_en200ns;
@@ -264,9 +314,9 @@ end process;
 -- -------------------------------------------------------------------------------------------------------
 -- Enable @ 1 us
 en1us_cnt_tc <= '1' when (en1us_cnt = conv_std_logic_vector(EN1US_CONSTANT_c ,en1us_cnt'length)) else '0';
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en1us_cnt <= (others => '0');
   elsif rising_edge(CLK_i) then
     if (p_en200ns = '1') then
@@ -281,9 +331,9 @@ end process;
 
 p_en1us <= en1us_cnt_tc and p_en200ns;
 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en1us <= '0';
   elsif rising_edge(CLK_i) then
     en1us <= p_en1us;
@@ -293,9 +343,9 @@ end process;
 
 -- Enable @ 10 us
 en10us_cnt_tc <= '1' when (en10us_cnt = conv_std_logic_vector(EN10US_CONSTANT_c ,en10us_cnt'length)) else '0';
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en10us_cnt <= (others => '0');
   elsif rising_edge(CLK_i) then
     if (p_en1us = '1') then
@@ -310,9 +360,9 @@ end process;
 
 p_en10us <= en10us_cnt_tc and p_en1us;
 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en10us <= '0';
   elsif rising_edge(CLK_i) then
     en10us <= p_en10us;
@@ -322,9 +372,9 @@ end process;
 
 -- Enable @ 100 us
 en100us_cnt_tc <= '1' when (en100us_cnt = conv_std_logic_vector(EN100US_CONSTANT_c ,en100us_cnt'length)) else '0';
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en100us_cnt <= (others => '0');
   elsif rising_edge(CLK_i) then
     if (p_en10us = '1') then
@@ -339,9 +389,9 @@ end process;
 
 p_en100us <= en100us_cnt_tc and p_en10us;
 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en100us <= '0';
   elsif rising_edge(CLK_i) then
     en100us <= p_en100us;
@@ -352,9 +402,9 @@ end process;
 -- -------------------------------------------------------------------------------------------------------  
 -- Enable @ 1  ms
 en1ms_cnt_tc <= '1' when (en1ms_cnt = conv_std_logic_vector(EN1MS_CONSTANT_c, en1ms_cnt'length)) else '0';
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en1ms_cnt <= (others => '0');
   elsif rising_edge(CLK_i) then
     if (p_en100us = '1') then
@@ -369,9 +419,9 @@ end process;
 
 p_en1ms <= en1ms_cnt_tc and p_en100us;
 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en1ms <= '0';
   elsif rising_edge(CLK_i) then
     en1ms <= p_en1ms;
@@ -381,9 +431,9 @@ end process;
 
 -- Enable @ 10 ms
 en10ms_cnt_tc <= '1' when (en10ms_cnt = conv_std_logic_vector(EN10MS_CONSTANT_c ,en10ms_cnt'length)) else '0';
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en10ms_cnt <= (others => '0');
   elsif rising_edge(CLK_i) then
     if (p_en1ms = '1') then
@@ -398,9 +448,9 @@ end process;
 
 p_en10ms <= en10ms_cnt_tc and p_en1ms;
 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en10ms <= '0';
   elsif rising_edge(CLK_i) then
     en10ms <= p_en10ms;
@@ -410,9 +460,9 @@ end process;
 
 -- Enable @ 100 us
 en100ms_cnt_tc <= '1' when (en100ms_cnt = conv_std_logic_vector(EN100MS_CONSTANT_c ,en100ms_cnt'length)) else '0';
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en100ms_cnt <= (others => '0');
   elsif rising_edge(CLK_i) then
     if (p_en10ms = '1') then
@@ -427,9 +477,9 @@ end process;
 
 p_en100ms <= en100ms_cnt_tc and p_en10ms;
 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en100ms <= '0';
   elsif rising_edge(CLK_i) then
     en100ms <= p_en100ms;
@@ -439,9 +489,9 @@ end process;
   
 -- Enable @ 1  ms
 en1s_cnt_tc <= '1' when (en1s_cnt = conv_std_logic_vector(EN1S_CONSTANT_c, en1s_cnt'length)) else '0';
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en1s_cnt <= (others => '0');
   elsif rising_edge(CLK_i) then
     if (p_en100ms = '1') then
@@ -456,9 +506,9 @@ end process;
 
 p_en1s <= en1s_cnt_tc and p_en100ms;
 
-process(CLK_i, rst_n)
+process(CLK_i, arst_n)
 begin
-  if (rst_n = '0') then
+  if (arst_n = '0') then
     en1s <= '0';
   elsif rising_edge(CLK_i) then
     en1s <= p_en1s;
@@ -467,14 +517,15 @@ end process;
 
 
 
-
 -- ---------------------------------------------------------------------------------------------------
 -- OUTPUTS
 
-RESET_o           <= rst;
-RESET_N_o         <= rst_n;
-PON_RESET_OUT_o   <= pon_reset;
-PON_RESET_N_OUT_o <= pon_reset_n;
+ARST_o          <= arst;
+ARST_N_o        <= arst_n;
+ARST_LONG_o     <= long_arst;
+ARST_LONG_N_o   <= long_arst_n;
+ARST_ULONG_o    <= ulong_arst;
+ARST_ULONG_N_o  <= ulong_arst_n;
 
 EN200NS_o         <= en200ns;
 EN1US_o           <= en1us;

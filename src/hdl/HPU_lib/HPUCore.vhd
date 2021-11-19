@@ -1,11 +1,9 @@
 -- ********************************************
--- Version 4.1 Rev 0:  
--- - Compatibility extended to zynquplus
---   (M. Casti - IIT)
--- 
--- ********************************************
 -- Version 4.0 Rev 0:  
--- - GTP Interface for Series 7
+-- - GTP Interface
+-- - Timestamp removable from data streaming
+-- - AXI Stream dedicate clock domain
+-- - Compatibility extended to zynquplus
 --   (M. Casti - IIT)
 -- 
 -- ********************************************
@@ -88,46 +86,6 @@ library HPU_lib;
 library neuserial_lib;
     use neuserial_lib.NSComponents_pkg.all;
 
-
---****************************
---   PORT DECLARATION
---****************************
-------------------------------------------------------------------------------
--- Definition of Generics:
---   C_S_AXI_DATA_WIDTH           -- AXI4LITE slave: Data width
---   C_S_AXI_ADDR_WIDTH           -- AXI4LITE slave: Address Width
---   C_SLV_DWIDTH                 -- Slave interface data bus width
---
--- Definition of Ports:
---   S_AXI_ACLK                   -- AXI4LITE slave: Clock
---   S_AXI_ARESETN                -- AXI4LITE slave: Reset
---   S_AXI_AWADDR                 -- AXI4LITE slave: Write address
---   S_AXI_AWVALID                -- AXI4LITE slave: Write address valid
---   S_AXI_WDATA                  -- AXI4LITE slave: Write data
---   S_AXI_WSTRB                  -- AXI4LITE slave: Write strobe
---   S_AXI_WVALID                 -- AXI4LITE slave: Write data valid
---   S_AXI_BREADY                 -- AXI4LITE slave: Response ready
---   S_AXI_ARADDR                 -- AXI4LITE slave: Read address
---   S_AXI_ARVALID                -- AXI4LITE slave: Read address valid
---   S_AXI_RREADY                 -- AXI4LITE slave: Read data ready
---   S_AXI_ARREADY                -- AXI4LITE slave: read addres ready
---   S_AXI_RDATA                  -- AXI4LITE slave: Read data
---   S_AXI_RRESP                  -- AXI4LITE slave: Read data response
---   S_AXI_RVALID                 -- AXI4LITE slave: Read data valid
---   S_AXI_WREADY                 -- AXI4LITE slave: Write data ready
---   S_AXI_BRESP                  -- AXI4LITE slave: Response
---   S_AXI_BVALID                 -- AXI4LITE slave: Resonse valid
---   S_AXI_AWREADY                -- AXI4LITE slave: Wrte address ready
---   S_AXIS_TREADY                -- Stream I/f: Ready to accept data in
---   S_AXIS_TDATA                 -- Stream I/f: Data in
---   S_AXIS_TLAST                 -- Stream I/f: Optional data in qualifier
---   S_AXIS_TVALID                -- Stream I/f: Data in is valid
---   M_AXIS_TVALID                -- Stream I/f: Data out is valid
---   M_AXIS_TDATA                 -- Stream I/f: Data Out
---   M_AXIS_TLAST                 -- Stream I/f: Optional data out qualifier
---   M_AXIS_TREADY                -- Stream I/f: Connected slave device is ready to accept data out
-------------------------------------------------------------------------------
-
 entity HPUCore is
   generic (
     -- -----------------------    
@@ -190,13 +148,12 @@ entity HPUCore is
     -- CORE
 --    C_SYSCLK_PERIOD_NS        : real                          := 10.0;           -- System Clock period
     C_SYSCLK_PERIOD_PS        : positive                      := 10000;          -- Positive (integer) because IP Packager doesn't support real generics 
-    C_DEBUG                   : boolean                       := true;          -- Debug Ports: if true the debug ports are exposed
     C_HAS_DEFAULT_LOOPBACK    : boolean                       := true;
     -- -----------------------
     -- BUS PROTOCOL PARAMETERS
     C_S_AXI_ADDR_WIDTH        : integer                       := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
     C_S_AXI_DATA_WIDTH        : integer                       := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
-    C_SLV_DWIDTH              : integer                       := 32;
+    C_SLV_DWIDTH              : integer                       := 32;            -- Slave interface data bus width
     -- -----------------------
     -- SIMULATION
     C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
@@ -204,13 +161,19 @@ entity HPUCore is
   port (
     
     -- SYNC Resetn
-    nSyncReset        : in  std_logic := 'X';
+    CLEAR_N_i                   : in  std_logic := 'X';    -- Asynchronous Clear
+    
+    -- Main Core Clock 
+    CLK_CORE_i                  : in  std_logic;
+    
+    -- AXI Stream Clock
+    CLK_AXIS_i                  : in  std_logic;
     
     -- Clocks for HSSAER interface
-    HSSAER_ClkLS_p    : in  std_logic := '0'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-    HSSAER_ClkLS_n    : in  std_logic := '1'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-    HSSAER_ClkHS_p    : in  std_logic := '0'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
-    HSSAER_ClkHS_n    : in  std_logic := '1'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+    CLK_HSSAER_LS_P_i           : in  std_logic := '0'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+    CLK_HSSAER_LS_N_i           : in  std_logic := '1'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+    CLK_HSSAER_HS_P_i           : in  std_logic := '0'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+    CLK_HSSAER_HS_N_i           : in  std_logic := '1'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
 
 
     --============================================
@@ -391,88 +354,44 @@ entity HPUCore is
     -- ADD USER PORTS ABOVE THIS LINE ------------------
     
     -- DO NOT EDIT BELOW THIS LINE ---------------------
-    -- Bus protocol ports, do not add to or delete
-    -- Axi lite I/f
-    S_AXI_ACLK        : in  std_logic;
-    S_AXI_ARESETN     : in  std_logic;
-    S_AXI_AWADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
-    S_AXI_AWVALID     : in  std_logic;
-    S_AXI_WDATA       : in  std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-    S_AXI_WSTRB       : in  std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
-    S_AXI_WVALID      : in  std_logic;
-    S_AXI_BREADY      : in  std_logic;
-    S_AXI_ARADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
-    S_AXI_ARVALID     : in  std_logic;
-    S_AXI_RREADY      : in  std_logic;
-    S_AXI_ARREADY     : out std_logic;
-    S_AXI_RDATA       : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-    S_AXI_RRESP       : out std_logic_vector(1 downto 0);
-    S_AXI_RVALID      : out std_logic;
-    S_AXI_WREADY      : out std_logic;
-    S_AXI_BRESP       : out std_logic_vector(1 downto 0);
-    S_AXI_BVALID      : out std_logic;
-    S_AXI_AWREADY     : out std_logic;
-    -- Axi Stream I/f
-    S_AXIS_TREADY     : out std_logic;
-    S_AXIS_TDATA      : in  std_logic_vector(31 downto 0);
-    S_AXIS_TLAST      : in  std_logic;
-    S_AXIS_TVALID     : in  std_logic;
-    M_AXIS_TVALID     : out std_logic;
-    M_AXIS_TDATA      : out std_logic_vector(31 downto 0);
-    M_AXIS_TLAST      : out std_logic;
-    M_AXIS_TREADY     : in  std_logic;
-    -- DO NOT EDIT ABOVE THIS LINE ---------------------
-    
-    DBG_din             : out std_logic_vector(63 downto 0);     
-    DBG_wr_en           : out std_logic;  
-    DBG_rd_en           : out std_logic;     
-    DBG_dout            : out std_logic_vector(63 downto 0);          
-    DBG_full            : out std_logic;    
-    DBG_almost_full     : out std_logic;    
-    DBG_overflow        : out std_logic;       
-    DBG_empty           : out std_logic;           
-    DBG_almost_empty    : out std_logic;    
-    DBG_underflow       : out std_logic;     
-    DBG_data_count      : out std_logic_vector(10 downto 0);
-    DBG_CH0_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH0_SRDY        : out std_logic;   
-    DBG_CH0_DRDY        : out std_logic;        
-    DBG_CH1_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH1_SRDY        : out std_logic;   
-    DBG_CH1_DRDY        : out std_logic;        
-    DBG_CH2_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH2_SRDY        : out std_logic;   
-    DBG_CH2_DRDY        : out std_logic;
-    DBG_Timestamp_xD    : out std_logic_vector(31 downto 0);       
-    DBG_MonInAddr_xD    : out std_logic_vector(31 downto 0); 
-    DBG_MonInSrcRdy_xS  : out std_logic;
-    DBG_MonInDstRdy_xS  : out std_logic;
-    DBG_RESETFIFO       : out std_logic;
-    DBG_CTRG_reg        : out std_logic_vector(C_SLV_DWIDTH-1 downto 0); 
-    DBG_ctrl_rd         : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    DBG_src_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_dst_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_err             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);  
-    DBG_run             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_RX              : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_AUXRxSaerChanEn : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    
-    DBG_shreg_aux0      : out std_logic_vector(3 downto 0);
-    DBG_shreg_aux1      : out std_logic_vector(3 downto 0);
-    DBG_shreg_aux2      : out std_logic_vector(3 downto 0);
-    DBG_FIFO_0          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_1          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_2          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_3          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_4          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0)
+    -- Bus protocol ports, do not add to or delete  
+    -- Axi lite I/f                                                                                                                                          
+--    S_AXI_ACLK        : in  std_logic;                                           --  AXI4LITE slave: Clock                                           
+    S_AXI_ARESETN     : in  std_logic;                                             --  AXI4LITE slave: Reset                                         
+    S_AXI_AWADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);       --  AXI4LITE slave: Write address                                 
+    S_AXI_AWVALID     : in  std_logic;                                             --  AXI4LITE slave: Write address valid                           
+    S_AXI_WDATA       : in  std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);       --  AXI4LITE slave: Write data                                    
+    S_AXI_WSTRB       : in  std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);   --  AXI4LITE slave: Write strobe                                  
+    S_AXI_WVALID      : in  std_logic;                                             --  AXI4LITE slave: Write data valid                              
+    S_AXI_BREADY      : in  std_logic;                                             --  AXI4LITE slave: Response ready                                
+    S_AXI_ARADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);       --  AXI4LITE slave: Read address                                  
+    S_AXI_ARVALID     : in  std_logic;                                             --  AXI4LITE slave: Read address valid                            
+    S_AXI_RREADY      : in  std_logic;                                             --  AXI4LITE slave: Read data ready                               
+    S_AXI_ARREADY     : out std_logic;                                             --  AXI4LITE slave: read addres ready                             
+    S_AXI_RDATA       : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);       --  AXI4LITE slave: Read data                                     
+    S_AXI_RRESP       : out std_logic_vector(1 downto 0);                          --  AXI4LITE slave: Read data response                            
+    S_AXI_RVALID      : out std_logic;                                             --  AXI4LITE slave: Read data valid                               
+    S_AXI_WREADY      : out std_logic;                                             --  AXI4LITE slave: Write data ready                              
+    S_AXI_BRESP       : out std_logic_vector(1 downto 0);                          --  AXI4LITE slave: Response                                      
+    S_AXI_BVALID      : out std_logic;                                             --  AXI4LITE slave: Resonse valid                                 
+    S_AXI_AWREADY     : out std_logic;                                             --  AXI4LITE slave: Wrte address ready                            
+    -- Axi Stream I/f                                                              
+    S_AXIS_TREADY     : out std_logic;                                             --  Stream I/f: Ready to accept data in                           
+    S_AXIS_TDATA      : in  std_logic_vector(31 downto 0);                         --  Stream I/f: Data in                                           
+    S_AXIS_TLAST      : in  std_logic;                                             --  Stream I/f: Optional data in qualifier                        
+    S_AXIS_TVALID     : in  std_logic;                                             --  Stream I/f: Data in is valid                                  
+    M_AXIS_TVALID     : out std_logic;                                             --  Stream I/f: Data out is valid                                 
+    M_AXIS_TDATA      : out std_logic_vector(31 downto 0);                         --  Stream I/f: Data Out                                          
+    M_AXIS_TLAST      : out std_logic;                                             --  Stream I/f: Optional data out qualifier                       
+    M_AXIS_TREADY     : in  std_logic                                              --  Stream I/f: Connected slave device is ready to accept data out
     );
 
   attribute MAX_FANOUT  : string;
   attribute SIGIS       : string;
   
-  attribute MAX_FANOUT of S_AXI_ACLK     : signal is "10000";
+--  attribute MAX_FANOUT of S_AXI_ACLK     : signal is "10000";
   attribute MAX_FANOUT of S_AXI_ARESETN  : signal is "10000";
-  attribute SIGIS      of S_AXI_ACLK     : signal is "Clk";
+--  attribute SIGIS      of S_AXI_ACLK     : signal is "Clk";
   attribute SIGIS      of S_AXI_ARESETN  : signal is "Rst";
   attribute SIGIS      of Interrupt_o    : signal is "Interrupt";
 
@@ -497,13 +416,13 @@ constant C_SYSCLK_PERIOD_NS        : real  := real(C_SYSCLK_PERIOD_PS) / 1000.0;
     
 -- -----------------------------------------------------------------------------
 -- Signals
-signal nClear                    : std_logic;
-signal nRst                      : std_logic;
+signal clear_n                   : std_logic;
+signal arst_n_clk_core           : std_logic;
+signal arst_n_clk_axis           : std_logic;
 
 signal i_dma_rxDataBuffer        : std_logic_vector(31 downto 0);
 signal i_dma_readRxBuffer        : std_logic;
 signal i_dma_rxBufferEmpty       : std_logic;
-signal i_dma_rxBufferReady       : std_logic;
 
 signal i_dma_txDataBuffer        : std_logic_vector(31 downto 0);
 signal i_dma_writeTxBuffer       : std_logic;
@@ -639,11 +558,8 @@ signal shreg_aux1                : std_logic_vector (3 downto 0);
 signal shreg_aux2                : std_logic_vector (3 downto 0);
 
 -- Signals for TimeMachine
-signal clear_n                   : std_logic;
 signal resync_clear_n            : std_logic;  
-signal init_reset                : std_logic; 
-signal init_reset_n              : std_logic; 
-signal timing                    : time_tick;	    
+signal timing_CoreClk            : time_tick;	    
 
 signal i_FifoCoreLastData        : std_logic;
 
@@ -673,35 +589,76 @@ begin
 
     -- Reset generation --
     ----------------------
-    nClear  <= S_AXI_ARESETN and nSyncReset;
+    clear_n  <= S_AXI_ARESETN and CLEAR_N_i;
 
-u_time_machine : time_machine 
-  generic map( 
-    CLK_PERIOD_NS_g         => C_SYSCLK_PERIOD_NS,    -- Main Clock period
-    CLEAR_POLARITY_g        => "LOW",                 -- Active "HIGH" or "LOW"
-    PON_RESET_DURATION_MS_g => 10,                    -- Duration of Power-On reset (ms)
-    SIM_TIME_COMPRESSION_g  => C_SIM_TIME_COMPRESSION -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+u_time_machine_CoreClk : time_machine 
+  generic map(
+  
+    CLK_PERIOD_NS_g           => C_SYSCLK_PERIOD_NS,    -- Main Clock period
+    CLR_POLARITY_g            => "LOW",                 -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   => 16,                    -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  => 10,                    -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 => TRUE,                  -- If TRUE a Power On Reset is generated 
+    SIM_TIME_COMPRESSION_g    => C_SIM_TIME_COMPRESSION -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     )
   port map(
     -- Clock in port
-    CLK_i                   => S_AXI_ACLK,      -- Input clock @ 50 MHz,
-    CLEAR_i                 => nClear,          -- Asynchronous active low reset
-  
-    -- Output reset
-    RESET_o                 => open,            -- Reset out (active high)
-    RESET_N_o               => nRst,            -- Reset out (active low)
-    PON_RESET_OUT_o         => open,            -- Power on Reset out (active high)
-    PON_RESET_N_OUT_o       => open,            -- Power on Reset out (active low)
-    
+    CLK_i                   => CLK_CORE_i,      -- Input clock,
+    MCM_LOCKED_i            => '1',             -- Clock locked flag
+    CLR_i                   => clear_n,          -- Polarity controlled Asyncronous Clear input
+
+    -- Reset output
+    ARST_o                  => open,            -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                => arst_n_clk_core, -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o             => open,            -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o           => open,            -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o            => open,            -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o          => open,            -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+
     -- Output ports for generated clock enables
-    EN200NS_o               => timing.en200ns,  -- Clock enable every 200 ns
-    EN1US_o                 => timing.en1us,	  -- Clock enable every 1 us
-    EN10US_o                => timing.en10us,	  -- Clock enable every 10 us
-    EN100US_o               => timing.en100us,	-- Clock enable every 100 us
-    EN1MS_o                 => timing.en1ms,	  -- Clock enable every 1 ms
-    EN10MS_o                => timing.en10ms,	  -- Clock enable every 10 ms
-    EN100MS_o               => timing.en100ms,	-- Clock enable every 100 ms
-    EN1S_o                  => timing.en1s 	    -- Clock enable every 1 s
+    EN200NS_o               => timing_CoreClk.en200ns,  -- Clock enable every 200 ns
+    EN1US_o                 => timing_CoreClk.en1us,	  -- Clock enable every 1 us
+    EN10US_o                => timing_CoreClk.en10us,	  -- Clock enable every 10 us
+    EN100US_o               => timing_CoreClk.en100us,	-- Clock enable every 100 us
+    EN1MS_o                 => timing_CoreClk.en1ms,	  -- Clock enable every 1 ms
+    EN10MS_o                => timing_CoreClk.en10ms,	  -- Clock enable every 10 ms
+    EN100MS_o               => timing_CoreClk.en100ms,	-- Clock enable every 100 ms
+    EN1S_o                  => timing_CoreClk.en1s 	    -- Clock enable every 1 s
+    );
+
+u_time_machine_AxisClk : time_machine 
+  generic map(
+  
+    CLK_PERIOD_NS_g           => C_SYSCLK_PERIOD_NS,    -- Main Clock period
+    CLR_POLARITY_g            => "LOW",                 -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   => 16,                    -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  => 10,                    -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 => TRUE,                  -- If TRUE a Power On Reset is generated 
+    SIM_TIME_COMPRESSION_g    => C_SIM_TIME_COMPRESSION -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+    )
+  port map(
+    -- Clock in port
+    CLK_i                   => CLK_AXIS_i,      -- Input clock,
+    MCM_LOCKED_i            => '1',             -- Clock locked flag
+    CLR_i                   => clear_n,          -- Polarity controlled Asyncronous Clear input
+
+    -- Reset output
+    ARST_o                  => open,            -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                => arst_n_clk_axis, -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o             => open,            -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o           => open,            -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o            => open,            -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o          => open,            -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+
+    -- Output ports for generated clock enables
+    EN200NS_o               => timing_CoreClk.en200ns,  -- Clock enable every 200 ns
+    EN1US_o                 => timing_CoreClk.en1us,	  -- Clock enable every 1 us
+    EN10US_o                => timing_CoreClk.en10us,	  -- Clock enable every 10 us
+    EN100US_o               => timing_CoreClk.en100us,	-- Clock enable every 100 us
+    EN1MS_o                 => timing_CoreClk.en1ms,	  -- Clock enable every 1 ms
+    EN10MS_o                => timing_CoreClk.en10ms,	  -- Clock enable every 10 ms
+    EN100MS_o               => timing_CoreClk.en100ms,	-- Clock enable every 100 ms
+    EN1S_o                  => timing_CoreClk.en1s 	    -- Clock enable every 1 s
     );
     
 ------------------------------------------------------
@@ -788,6 +745,7 @@ u_neuserial_axilite : neuserial_axilite
     ResetStream_o                 => i_uP_resetstream,                 -- out std_logic;
     DmaLength_o                   => i_uP_dmaLength,                   -- out std_logic_vector(10 downto 0);
     DMA_test_mode_o               => i_uP_DMA_test_mode,               -- out std_logic;
+    OnlyEvents_o                  => i_uP_OnlyEvents,                  -- out std_logic;
     fulltimestamp_o               => i_uP_fulltimestamp,               -- out std_logic;
     
     CleanTimer_o                  => i_uP_cleanTimer,              -- out std_logic;
@@ -886,16 +844,11 @@ u_neuserial_axilite : neuserial_axilite
     Spnn_rx_mask_o                => i_uP_SpnnRxMask,              -- out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
     Spnn_ctrl_o                   => i_uP_SpnnCtrl,                -- out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
     Spnn_status_i                 => i_uP_SpnnStatus,              -- in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
-        
-    -- DEBUG
-    -------------------------              
-    DBG_CTRL_reg                  => DBG_CTRG_reg,                 -- out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    DBG_ctrl_rd                   => DBG_ctrl_rd,                  -- out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     
     -- DO NOT EDIT BELOW THIS LINE ---------------------
     -- Bus protocol ports, do not add to or delete
     -- Axi lite I-f
-    S_AXI_ACLK                    => S_AXI_ACLK,                       -- in  std_logic;
+    S_AXI_ACLK                    => CLK_CORE_i,                       -- in  std_logic;
     S_AXI_ARESETN                 => S_AXI_ARESETN,                    -- in  std_logic;
     S_AXI_AWADDR                  => S_AXI_AWADDR,                     -- in  std_logic_vector(C_ADDR_WIDTH-1 downto 0);
     S_AXI_AWVALID                 => S_AXI_AWVALID,                    -- in  std_logic;
@@ -919,12 +872,9 @@ u_neuserial_axilite : neuserial_axilite
 
 
 u_neuserial_axistream : neuserial_axistream
-  generic map (
-    C_DEBUG => C_DEBUG
-    )
   port map (
-    Clk                            => S_AXI_ACLK,                       -- in  std_logic;
-    nRst                           => nRst,                             -- in  std_logic;
+    Clk                            => CLK_AXIS_i,                       -- in  std_logic;
+    nRst                           => arst_n_clk_core,                  -- in  std_logic;
     --
     DMA_test_mode_i                => i_uP_DMA_test_mode,               -- in  std_logic;
     EnableAxistreamIf_i            => i_uP_enableDmaIf,                 -- in  std_logic;
@@ -941,7 +891,6 @@ u_neuserial_axistream : neuserial_axistream
     FifoCoreDat_i                  => i_dma_rxDataBuffer,               -- in  std_logic_vector(31 downto 0);
     FifoCoreRead_o                 => i_dma_readRxBuffer,               -- out std_logic;
     FifoCoreEmpty_i                => i_dma_rxBufferEmpty,              -- in  std_logic;
-    FifoCoreBurstReady_i           => i_dma_rxBufferReady,              -- in  std_logic;
     FifoCoreLastData_i             => i_FifoCoreLastData,               -- in  std_logic;
     -- From core/dma to Fifo
     CoreFifoDat_o                  => i_dma_txDataBuffer,               -- out std_logic_vector(31 downto 0);
@@ -958,16 +907,7 @@ u_neuserial_axistream : neuserial_axistream
     M_AXIS_TREADY                  => M_AXIS_TREADY                      -- in  std_logic
     );
 
--- Removed DBG out port from AXIstream module
-DBG_data_written      <= '0';
-DBG_dma_burst_counter <= (others => '0');
-DBG_dma_test_mode     <= '0';
-DBG_dma_EnableDma     <= '0';
-DBG_dma_is_running    <= '0';
-DBG_dma_Length        <= (others => '0');
-DBG_dma_nedge_run     <= '0';
-
-i_FifoCoreLastData <= '1' when i_fifoCoreNumData="00000000001" else '0';
+-- i_FifoCoreLastData <= '1' when i_fifoCoreNumData="00000000001" else '0';
 
 -- Muxing AXI-Lite and AXI-Stream Fifo interfaces --
 ----------------------------------------------------
@@ -981,7 +921,6 @@ i_uP_rxBufferAlmostEmpty         <= i_fifoCoreAlmostEmpty;
 i_uP_rxBufferFull                <= i_fifoCoreFull;
 
 i_dma_rxDataBuffer               <= i_fifoCoreDat;
-i_dma_rxBufferReady              <= i_fifoCoreBurstReady;
 i_dma_rxBufferEmpty              <= i_fifoCoreEmpty;
 
 i_fifoCoreRead                   <= i_dma_readRxBuffer  when (i_uP_DMAIsRunning='1') else
@@ -1081,16 +1020,19 @@ u_neuserial_core : neuserial_core
     --
     -- Clocks & Reset
     ---------------------
-    -- Resets
-    nRst                    => nRst,                         -- in  std_logic;
     -- System Clock domain
-    Clk_i                   => S_AXI_ACLK,                   -- in  std_logic;
-    Timing_i                => timing,
+    CoreClk_i                   => CLK_CORE_i,                   -- in  std_logic;
+    nRst_CoreClk_i              => arst_n_clk_core,              -- in  std_logic;
+    Timing_i                    => timing_CoreClk,               -- in  time_tick;
+    -- DMA Clock Domain
+    AxisClk_i                   => CLK_AXIS_i,                   --     in  std_logic;
+    nRst_AxisClk_i              => arst_n_clk_axis,               --     in  std_logic;
+
     -- HSSAER Clocks domain
-    Clk_hs_p                => HSSAER_ClkHS_p,               -- in  std_logic;
-    Clk_hs_n                => HSSAER_ClkHS_n,               -- in  std_logic;
-    Clk_ls_p                => HSSAER_ClkLS_p,               -- in  std_logic;
-    Clk_ls_n                => HSSAER_ClkLS_n,               -- in  std_logic;
+    Clk_hs_p                    => CLK_HSSAER_HS_P_i,               -- in  std_logic;
+    Clk_hs_n                    => CLK_HSSAER_HS_N_i,               -- in  std_logic;
+    Clk_ls_p                    => CLK_HSSAER_LS_P_i,               -- in  std_logic;
+    Clk_ls_n                    => CLK_HSSAER_LS_N_i,               -- in  std_logic;
     
     --
     -- TX Interface
@@ -1220,7 +1162,7 @@ u_neuserial_core : neuserial_core
     FifoCoreRead_i          => i_fifoCoreRead,               -- in  std_logic;
     FifoCoreEmpty_o         => i_fifoCoreEmpty,              -- out std_logic;
     FifoCoreAlmostEmpty_o   => i_fifoCoreAlmostEmpty,        -- out std_logic;
-    FifoCoreBurstReady_o    => i_fifoCoreBurstReady,         -- out std_logic;
+    FifoCoreLastData_o      => i_fifoCoreLastData, 
     FifoCoreFull_o          => i_fifoCoreFull,               -- out std_logic;
     FifoCoreNumData_o       => i_fifoCoreNumData,            -- out std_logic_vector(10 downto 0);
     --
@@ -1249,6 +1191,7 @@ u_neuserial_core : neuserial_core
     
     -- Configurations
     DmaLength_i             => i_uP_dmaLength,               -- in  std_logic_vector(15 downto 0);
+    OnlyEvents_i            => i_uP_OnlyEvents,              -- in  std_logic;
     RemoteLoopback_i        => i_uP_RemoteLpbk,              -- in  std_logic;
     LocNearLoopback_i       => i_uP_LocalNearLpbk,           -- in  std_logic;
     LocFarLPaerLoopback_i   => i_uP_LocalFarLPaerLpbk,       -- in  std_logic;
@@ -1357,63 +1300,18 @@ u_neuserial_core : neuserial_core
     ---------------------
     LEDo_o                  => open,                         -- out std_logic;
     LEDr_o                  => open,                         -- out std_logic;
-    LEDy_o                  => open,                         -- out std_logic;
+    LEDy_o                  => open                          -- out std_logic;
     
-    --
-    -- DEBUG SIGNALS
-    ---------------------
-    DBG_dataOk              => DBG_dataOk,                   -- out std_logic
-    
-    DBG_din             => DBG_din,   
-    DBG_wr_en           => DBG_wr_en,       
-    DBG_rd_en           => DBG_rd_en,       
-    DBG_dout            => DBG_dout,            
-    DBG_full            => DBG_full,        
-    DBG_almost_full     => DBG_almost_full, 
-    DBG_overflow        => DBG_overflow,      
-    DBG_empty           => DBG_empty,            
-    DBG_almost_empty    => DBG_almost_empty,
-    DBG_underflow       => DBG_underflow,   
-    DBG_data_count      => DBG_data_count,
-    DBG_CH0_DATA        => DBG_CH0_DATA,
-    DBG_CH0_SRDY        => DBG_CH0_SRDY,
-    DBG_CH0_DRDY        => DBG_CH0_DRDY,
-    DBG_CH1_DATA        => DBG_CH1_DATA,
-    DBG_CH1_SRDY        => DBG_CH1_SRDY,
-    DBG_CH1_DRDY        => DBG_CH1_DRDY,
-    DBG_CH2_DATA        => DBG_CH2_DATA,
-    DBG_CH2_SRDY        => DBG_CH2_SRDY,
-    DBG_CH2_DRDY        => DBG_CH2_DRDY,
-    DBG_Timestamp_xD    => DBG_Timestamp_xD,
-    DBG_MonInAddr_xD    => DBG_MonInAddr_xD,
-    DBG_MonInSrcRdy_xS  => DBG_MonInSrcRdy_xS,
-    DBG_MonInDstRdy_xS  => DBG_MonInDstRdy_xS,
-    DBG_RESETFIFO       => DBG_RESETFIFO,
-    DBG_src_rdy         => DBG_src_rdy,
-    DBG_dst_rdy         => DBG_dst_rdy,
-    DBG_err             => DBG_err,     
-    DBG_run             => DBG_run,
-    DBG_RX              => DBG_RX,
-    DBG_FIFO_0          => DBG_FIFO_0,
-    DBG_FIFO_1          => DBG_FIFO_1,
-    DBG_FIFO_2          => DBG_FIFO_2,
-    DBG_FIFO_3          => DBG_FIFO_3,
-    DBG_FIFO_4          => DBG_FIFO_4
-);
+  );
 
-    process (HSSAER_ClkLS_p) is
+    process (CLK_HSSAER_LS_P_i) is
         begin
-        if (rising_edge(HSSAER_ClkLS_p)) then
+        if (rising_edge(CLK_HSSAER_LS_P_i)) then
             shreg_aux0 <= shreg_aux0(2 downto 0)& ARx_HSSAER_i(0);
             shreg_aux1 <= shreg_aux1(2 downto 0)& ARx_HSSAER_i(1);
             shreg_aux2 <= shreg_aux2(2 downto 0)& ARx_HSSAER_i(2);
         end if;
     end process ;
 
-DBG_shreg_aux0 <= shreg_aux0;
-DBG_shreg_aux1 <= shreg_aux1;
-DBG_shreg_aux2 <= shreg_aux2;
-
-DBG_AUXRxSaerChanEn <= i_uP_AUXRxSaerChanEn;
 
 end architecture str;

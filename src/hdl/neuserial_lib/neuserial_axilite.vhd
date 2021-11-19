@@ -81,6 +81,7 @@ entity neuserial_axilite is
     ResetStream_o                   : out std_logic;
     DmaLength_o                     : out std_logic_vector(15 downto 0);
     DMA_test_mode_o                 : out std_logic;
+    OnlyEvents_o                    : out std_logic;
     fulltimestamp_o                 : out std_logic;
     
     CleanTimer_o                    : out std_logic;
@@ -181,11 +182,6 @@ entity neuserial_axilite is
     Spnn_rx_mask_o                  : out std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
     Spnn_ctrl_o                     : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
     Spnn_status_i                   : in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
-    
-    -- DEBUG
-    -------------------------
-    DBG_CTRL_reg                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    DBG_ctrl_rd                     : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     
     -- DO NOT EDIT BELOW THIS LINE ---------------------
     -- Bus protocol ports, do not add to or delete
@@ -410,7 +406,8 @@ architecture rtl of neuserial_axilite is
 
 
     signal  i_DmaLength            : std_logic_vector(15 downto 0);
-
+ 
+    signal i_OnlyEvents            : std_logic;
 
     -- signal  i_LatchTime            : natural range 0 to 255;
     -- signal  i_ClockLowTime         : natural range 0 to 127;
@@ -1250,7 +1247,7 @@ begin
  -- i_ChipType             <= i_CTRL_reg(16);                               -- Reserved for back compatibility with neuelab
     i_fulltimestamp        <= i_CTRL_reg(15);
  --                        <= i_CTRL_reg(14);                               -- Available     
- --                        <= i_CTRL_reg(13);                               -- Available     
+    i_OnlyEvents           <= i_CTRL_reg(13);                                
     i_ResetStream          <= i_CTRL_reg(12);
  -- i_TxEnable             <= i_CTRL_reg(11) when C_TX_HAS_PAER else '0';   -- Reserved for future use
  -- i_RRxEnable            <= i_CTRL_reg(10) when C_RX_HAS_PAER else '0';   -- Reserved for future use
@@ -1277,9 +1274,10 @@ begin
                     c_zero_vect(21 downto 17)  &
                     c_zero_vect(16)            &   -- Reserved for back compatibility with neuelab
                     i_fulltimestamp            &
-                    c_zero_vect(14 downto 13)  &
+                    c_zero_vect(14)            &
+                    i_OnlyEvents               &  
                     i_ResetStream              &
-                    c_zero_vect(11 downto 10)  &                    
+                    c_zero_vect(11 downto 10)  &                  
                     i_LatTlast                 &
                     i_FlushTXFifos             &
                     i_AuxRxPaerFlushFifos      &
@@ -1412,6 +1410,11 @@ begin
 
     DMA_test_mode_o <= i_DMA_reg(16);
 
+
+    -- ------------------------------------------------------------------------
+    -- RX Timestamp ON/OFF
+    -- ------------------------------------------------------------------------
+    OnlyEvents_o <= i_OnlyEvents;
 
     -- ------------------------------------------------------------------------
     -- RAW Status register
@@ -1974,12 +1977,6 @@ begin
     -- ------------------------------------------------------------------------
     i_TDataCnt_rd <= TDataCnt_i;
 
-    -- ------------------------------------------------------------------------
-    -- DEBUG Registers
-    -- ------------------------------------------------------------------------
-
-    DBG_CTRL_reg <=  i_CTRL_reg;
-    DBG_ctrl_rd  <=  i_CTRL_rd;
 
 
 

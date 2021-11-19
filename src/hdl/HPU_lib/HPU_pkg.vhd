@@ -101,11 +101,13 @@ component neuserial_core is
     --
     -- Clocks & Reset
     ---------------------
-    -- Resets
-    nRst                        : in  std_logic;
     -- System Clock domain
-    Clk_i                       : in  std_logic;
+    CoreClk_i                   : in  std_logic;
+    nRst_CoreClk_i              : in  std_logic;
     Timing_i                    : in  time_tick;
+    -- DMA Clock Domain
+    AxisClk_i                   : in  std_logic;
+    nRst_AxisClk_i              : in  std_logic;
     -- HSSAER Clocks domain
     Clk_hs_p                    : in  std_logic;
     Clk_hs_n                    : in  std_logic;
@@ -239,10 +241,9 @@ component neuserial_core is
     FifoCoreRead_i            : in  std_logic;
     FifoCoreEmpty_o           : out std_logic;
     FifoCoreAlmostEmpty_o     : out std_logic;
-    FifoCoreBurstReady_o      : out std_logic;
+    FifoCoreLastData_o        : out std_logic;
     FifoCoreFull_o            : out std_logic;
     FifoCoreNumData_o         : out std_logic_vector(10 downto 0);
-    
     --
     CoreFifoDat_i             : in  std_logic_vector(31 downto 0);
     CoreFifoWrite_i           : in  std_logic;
@@ -268,6 +269,7 @@ component neuserial_core is
     
     -- Configurations
     DmaLength_i               : in  std_logic_vector(15 downto 0);
+    OnlyEvents_i              : in  std_logic;
     RemoteLoopback_i          : in  std_logic;
     LocNearLoopback_i         : in  std_logic;
     LocFarLPaerLoopback_i     : in  std_logic;
@@ -378,49 +380,8 @@ component neuserial_core is
     ---------------------
     LEDo_o                    : out std_logic;
     LEDr_o                    : out std_logic;
-    LEDy_o                    : out std_logic;
-    
-    --
-    -- DEBUG SIGNALS
-    ---------------------
-    DBG_dataOk                : out std_logic;
-    
-    DBG_din                   : out std_logic_vector(63 downto 0);     
-    DBG_wr_en                 : out std_logic;  
-    DBG_rd_en                 : out std_logic;     
-    DBG_dout                  : out std_logic_vector(63 downto 0);          
-    DBG_full                  : out std_logic;    
-    DBG_almost_full           : out std_logic;    
-    DBG_overflow              : out std_logic;       
-    DBG_empty                 : out std_logic;           
-    DBG_almost_empty          : out std_logic;    
-    DBG_underflow             : out std_logic;     
-    DBG_data_count            : out std_logic_vector(10 downto 0);
-    DBG_CH0_DATA              : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH0_SRDY              : out std_logic;   
-    DBG_CH0_DRDY              : out std_logic;        
-    DBG_CH1_DATA              : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH1_SRDY              : out std_logic;   
-    DBG_CH1_DRDY              : out std_logic;        
-    DBG_CH2_DATA              : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH2_SRDY              : out std_logic;   
-    DBG_CH2_DRDY              : out std_logic;
-    DBG_Timestamp_xD          : out std_logic_vector(31 downto 0);
-    DBG_MonInAddr_xD          : out std_logic_vector(31 downto 0);
-    DBG_MonInSrcRdy_xS        : out std_logic;
-    DBG_MonInDstRdy_xS        : out std_logic;
-    DBG_RESETFIFO             : out std_logic;
-    DBG_src_rdy               : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_dst_rdy               : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_err                   : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);  
-    DBG_run                   : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_RX                    : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_FIFO_0                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_1                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_2                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_3                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_4                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0)
-    );
+    LEDy_o                    : out std_logic
+  );
 end component neuserial_core;
 
 component neuserial_axilite is
@@ -474,6 +435,7 @@ component neuserial_axilite is
     ResetStream_o                   : out std_logic;
     DmaLength_o                     : out std_logic_vector(15 downto 0);
     DMA_test_mode_o                 : out std_logic;
+    OnlyEvents_o                    : out std_logic;
     fulltimestamp_o                 : out std_logic;
     
     CleanTimer_o                    : out std_logic;
@@ -575,11 +537,6 @@ component neuserial_axilite is
     Spnn_ctrl_o                     : out std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
     Spnn_status_i                   : in  std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
     
-    -- DEBUG
-    -------------------------
-    DBG_CTRL_reg                    : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    DBG_ctrl_rd                     : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    
     -- DO NOT EDIT BELOW THIS LINE ---------------------
     -- Bus protocol ports, do not add to or delete
     -- Axi lite I-f
@@ -607,10 +564,6 @@ component neuserial_axilite is
 end component neuserial_axilite;
 
 component neuserial_axistream is
-  generic (
-    C_NUMBER_OF_INPUT_WORDS : natural := 2048;
-    C_DEBUG                 : boolean := false
-    );
   port (
     Clk                    : in  std_logic;
     nRst                   : in  std_logic;
@@ -630,7 +583,6 @@ component neuserial_axistream is
     FifoCoreDat_i          : in  std_logic_vector(31 downto 0);
     FifoCoreRead_o         : out std_logic;
     FifoCoreEmpty_i        : in  std_logic;
-    FifoCoreBurstReady_i   : in  std_logic;
     FifoCoreLastData_i     : in  std_logic;
     -- From core/dma to Fifo
     CoreFifoDat_o          : out std_logic_vector(31 downto 0);
@@ -650,31 +602,36 @@ end component neuserial_axistream;
 
 component time_machine is
   generic ( 
-    CLK_PERIOD_NS_g         : real := 10.0;                   -- Main Clock period
-    CLEAR_POLARITY_g        : string := "LOW";                -- Active "HIGH" or "LOW"
-    PON_RESET_DURATION_MS_g : integer range 0 to 255 := 10;   -- Duration of Power-On reset (ms)
-    SIM_TIME_COMPRESSION_g  : in boolean := FALSE             -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+    CLK_PERIOD_NS_g           : real                   := 10.0;   -- Main Clock period
+    CLR_POLARITY_g            : string                 := "HIGH"; -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   : integer range 0 to 31  := 16;     -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  : integer range 0 to 255 := 10;     -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 : boolean                := TRUE;   -- If TRUE a Power On Reset is generated 
+    SIM_TIME_COMPRESSION_g    : boolean                := FALSE   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
   port (
     -- Clock in port
-    CLK_i                   : in  std_logic;   -- Input clock @ 50 MHz,
-    CLEAR_i                 : in  std_logic;   -- Asynchronous active low reset
+    CLK_i                     : in  std_logic;        -- Input Clock
+    MCM_LOCKED_i              : in  std_logic := 'H'; -- Clock locked flag
+    CLR_i                     : in  std_logic := 'L'; -- Polarity controlled Asyncronous Clear input
   
-    -- Output reset
-    RESET_o                 : out std_logic;    -- Reset out (active high)
-    RESET_N_o               : out std_logic;    -- Reset out (active low)
-    PON_RESET_OUT_o         : out std_logic;	  -- Power on Reset out (active high)
-    PON_RESET_N_OUT_o       : out std_logic;	  -- Power on Reset out (active low)
-    
+    -- Reset output
+    ARST_o                    : out std_logic;        -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                  : out std_logic;        -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o               : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o             : out std_logic; 	      -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o              : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o            : out std_logic;	      -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+      
     -- Output ports for generated clock enables
-    EN200NS_o               : out std_logic;	  -- Clock enable every 200 ns
-    EN1US_o                 : out std_logic;	  -- Clock enable every 1 us
-    EN10US_o                : out std_logic;	  -- Clock enable every 10 us
-    EN100US_o               : out std_logic;	  -- Clock enable every 100 us
-    EN1MS_o                 : out std_logic;	  -- Clock enable every 1 ms
-    EN10MS_o                : out std_logic;	  -- Clock enable every 10 ms
-    EN100MS_o               : out std_logic;	  -- Clock enable every 100 ms
-    EN1S_o                  : out std_logic 	  -- Clock enable every 1 s
+    EN200NS_o                 : out std_logic;	      -- Clock enable every 200 ns
+    EN1US_o                   : out std_logic;	      -- Clock enable every 1 us
+    EN10US_o                  : out std_logic;	      -- Clock enable every 10 us
+    EN100US_o                 : out std_logic;	      -- Clock enable every 100 us
+    EN1MS_o                   : out std_logic;	      -- Clock enable every 1 ms
+    EN10MS_o                  : out std_logic;	      -- Clock enable every 10 ms
+    EN100MS_o                 : out std_logic;	      -- Clock enable every 100 ms
+    EN1S_o                    : out std_logic 	      -- Clock enable every 1 s
     );
 end component;
        

@@ -99,11 +99,13 @@ entity neuserial_core is
     --
     -- Clocks & Reset
     ---------------------
-    -- Resets
-    nRst                        : in  std_logic;
     -- System Clock domain
-    Clk_i                       : in  std_logic;
+    CoreClk_i                   : in  std_logic;
+    nRst_CoreClk_i              : in  std_logic;
     Timing_i                    : in  time_tick;
+    -- DMA Clock Domain
+    AxisClk_i                   : in  std_logic;
+    nRst_AxisClk_i              : in  std_logic;
     -- HSSAER Clocks domain
     Clk_hs_p                    : in  std_logic;
     Clk_hs_n                    : in  std_logic;
@@ -237,10 +239,9 @@ entity neuserial_core is
     FifoCoreRead_i            : in  std_logic;
     FifoCoreEmpty_o           : out std_logic;
     FifoCoreAlmostEmpty_o     : out std_logic;
-    FifoCoreBurstReady_o      : out std_logic;
+    FifoCoreLastData_o        : out std_logic;
     FifoCoreFull_o            : out std_logic;
     FifoCoreNumData_o         : out std_logic_vector(10 downto 0);
-    
     --
     CoreFifoDat_i             : in  std_logic_vector(31 downto 0);
     CoreFifoWrite_i           : in  std_logic;
@@ -266,6 +267,7 @@ entity neuserial_core is
     
     -- Configurations
     DmaLength_i               : in  std_logic_vector(15 downto 0);
+    OnlyEvents_i              : in  std_logic;
     RemoteLoopback_i          : in  std_logic;
     LocNearLoopback_i         : in  std_logic;
     LocFarLPaerLoopback_i     : in  std_logic;
@@ -376,48 +378,7 @@ entity neuserial_core is
     ---------------------
     LEDo_o                    : out std_logic;
     LEDr_o                    : out std_logic;
-    LEDy_o                    : out std_logic;
-    
-    --
-    -- DEBUG SIGNALS
-    ---------------------
-    DBG_dataOk                : out std_logic;
-    
-    DBG_din                   : out std_logic_vector(63 downto 0);     
-    DBG_wr_en                 : out std_logic;  
-    DBG_rd_en                 : out std_logic;     
-    DBG_dout                  : out std_logic_vector(63 downto 0);          
-    DBG_full                  : out std_logic;    
-    DBG_almost_full           : out std_logic;    
-    DBG_overflow              : out std_logic;       
-    DBG_empty                 : out std_logic;           
-    DBG_almost_empty          : out std_logic;    
-    DBG_underflow             : out std_logic;     
-    DBG_data_count            : out std_logic_vector(10 downto 0);
-    DBG_CH0_DATA              : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH0_SRDY              : out std_logic;   
-    DBG_CH0_DRDY              : out std_logic;        
-    DBG_CH1_DATA              : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH1_SRDY              : out std_logic;   
-    DBG_CH1_DRDY              : out std_logic;        
-    DBG_CH2_DATA              : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH2_SRDY              : out std_logic;   
-    DBG_CH2_DRDY              : out std_logic;
-    DBG_Timestamp_xD          : out std_logic_vector(31 downto 0);
-    DBG_MonInAddr_xD          : out std_logic_vector(31 downto 0);
-    DBG_MonInSrcRdy_xS        : out std_logic;
-    DBG_MonInDstRdy_xS        : out std_logic;
-    DBG_RESETFIFO             : out std_logic;
-    DBG_src_rdy               : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_dst_rdy               : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_err                   : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);  
-    DBG_run                   : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_RX                    : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_FIFO_0                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_1                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_2                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_3                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_4                : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0)
+    LEDy_o                    : out std_logic
     );
 -- translate_off
 begin
@@ -505,7 +466,7 @@ architecture str of neuserial_core is
     -----------------------------------------------------------------------------
     -- signals
     -----------------------------------------------------------------------------
-	signal	Rst				 : std_logic;
+	  signal	Rst_CoreClk			: std_logic;
 	
     signal  i_rxMonSrc       : t_PaerSrc_array(2 downto 0);
     signal  i_rxMonDst       : t_PaerDst_array(2 downto 0);
@@ -640,7 +601,7 @@ attribute mark_debug of RRx_GTP_PllRefclklost_i   : signal is "true";
 
 begin
 
-Rst <= not nRst;
+Rst_CoreClk <= not nRst_CoreClk_i;
 
 -- PAER Req and acknowledge polarity
 --
@@ -783,9 +744,9 @@ u_tx_datapath : hpu_tx_datapath
     -- Barecontrol
     -- **********************************************
     -- Resets
-    nRst                => nRst,                        
+    nRst                => nRst_CoreClk_i,                        
     -- System Clock domain
-    Clk_i               => Clk_i,                          
+    Clk_i               => CoreClk_i,                          
     En1Sec_i            => timing_i.en1s,   
 		-- HSSAER Clocks domain
 		Clk_ls_p            => Clk_ls_p,                    
@@ -917,9 +878,9 @@ u_rx_left_datapath : hpu_rx_datapath
     -- Barecontrol
     -- **********************************************
     -- Resets
-    nRst                 => nRst,                         -- in  std_logic;
+    nRst                 => nRst_CoreClk_i,                         -- in  std_logic;
     -- System Clock domain
-    Clk_i                => Clk_i,                        -- in  std_logic;
+    Clk_i                => CoreClk_i,                        -- in  std_logic;
     En1Sec_i             => timing_i.en1s,                -- : in  std_logic;
 		-- HSSAER Clocks domain
 		Clk_hs_p             => Clk_hs_p,                     -- in  std_logic;
@@ -1088,9 +1049,9 @@ u_rx_right_datapath : hpu_rx_datapath
     -- Barecontrol
     -- **********************************************
     -- Resets
-    nRst                 => nRst,                        -- in  std_logic;
+    nRst                 => nRst_CoreClk_i,               -- in  std_logic;
     -- System Clock domain
-    Clk_i                => Clk_i,                    -- in  std_logic;
+    Clk_i                => CoreClk_i,                    -- in  std_logic;
     En1Sec_i             => timing_i.en1s,-- : in  std_logic;
 		-- HSSAER Clocks domain
 		Clk_hs_p             => Clk_hs_p,                     -- in  std_logic;
@@ -1260,9 +1221,9 @@ u_rx_aux_datapath : hpu_rx_datapath
     -- Barecontrol
     -- **********************************************
     -- Resets
-    nRst                 => nRst,                         -- in  std_logic;
+    nRst                 => nRst_CoreClk_i,               -- in  std_logic;
     -- System Clock domain
-    Clk_i                => Clk_i,                        -- in  std_logic;
+    Clk_i                => CoreClk_i,                    -- in  std_logic;
     En1Sec_i             => timing_i.en1s,                -- : in  std_logic;
 		-- HSSAER Clocks domain
 		Clk_hs_p             => Clk_hs_p,                     -- in  std_logic;
@@ -1495,8 +1456,8 @@ end generate;
             C_ODATA_WIDTH  => 32
         )
         port map (
-            Clk                => Clk_i,                  -- in  std_logic;
-            nRst               => nRst,                      -- in  std_logic;
+            Clk                => CoreClk_i,                 -- in  std_logic;
+            nRst               => nRst_CoreClk_i,            -- in  std_logic;
 
             SplittedPaerSrc_i  => i_rxMonSrc,                -- in  t_PaerSrc_array(0 to C_NUM_CHAN-1);
             SplittedPaerDst_o  => i_rxMonDst,                -- out t_PaerDst_array(0 to C_NUM_CHAN-1);
@@ -1547,81 +1508,73 @@ end generate;
             EnableMonitorControlsSequencerToo    => c_EnableMonitorControlsSequencerToo
         )
         port map (
-            Reset_xRBI              => nRst,                     -- in  std_logic;
-            CoreClk_xCI             => Clk_i,                    -- in  std_logic;
-            AxisClk_xCI             => Clk_i,                    -- in  std_logic;
-            --
-            FlushRXFifos_xSI        => FlushRXFifos_i,           -- in  std_logic;
-            FlushTXFifos_xSI        => FlushTXFifos_i,           -- in  std_logic;
-            --ChipType_xSI            => ChipType,                 -- in  std_logic;
-            DmaLength_xDI           => DmaLength_i,              -- in  std_logic_vector(15 downto 0);
-            --
-            Timing_xSI              => timing_i,                 -- in  time_tick;
-            --
-            MonInAddr_xDI           => i_monData,                -- in  std_logic_vector(31 downto 0);
-            MonInSrcRdy_xSI         => i_monSrcRdy,              -- in  std_logic;
-            MonInDstRdy_xSO         => i_monDstRdy,              -- out std_logic;
-            --
-            SeqOutAddr_xDO          => i_seqData,                -- out std_logic_vector(31 downto 0);
-            SeqOutSrcRdy_xSO        => i_seqSrcRdy,              -- out std_logic;
-            SeqOutDstRdy_xSI        => i_seqDstRdy,              -- in  std_logic;
-            -- Time stamper
-            CleanTimer_xSI          => CleanTimer_i,             -- in  std_logic;
-            WrapDetected_xSO        => WrapDetected_o,           -- out std_logic;
-            FullTimestamp_i         => FullTimestamp_i,          -- in  std_logic;  
-            --
-            EnableMonitor_xSI       => '1',                      -- in  std_logic;
-            CoreReady_xSI           => '1',                      -- in  std_logic;
-            --
-            TxTSMode_xDI            => TxTSMode_i,               -- in  std_logic_vector(1 downto 0);
-            TxTSTimeoutSel_xDI      => TxTSTimeoutSel_i,         -- in  std_logic_vector(3 downto 0);
-            TxTSRetrigCmd_xSI       => TxTSRetrigCmd_i,          -- in  std_logic;
-            TxTSRearmCmd_xSI        => TxTSRearmCmd_i,           -- in  std_logic;
-            TxTSRetrigStatus_xSO    => TxTSRetrigStatus_o,       -- out std_logic;
-            TxTSTimeoutCounts_xSO   => TxTSTimeoutCounts_o,      -- out std_logic;
-            TxTSMaskSel_xSI         => TxTSMaskSel_i,            -- in  std_logic_vector(1 downto 0);
-            --
-            FifoCoreDat_xDO         => FifoCoreDat_o,            -- out std_logic_vector(31 downto 0);
-            FifoCoreRead_xSI        => FifoCoreRead_i,           -- in  std_logic;
-            FifoCoreEmpty_xSO       => FifoCoreEmpty_o,          -- out std_logic;
-            FifoCoreAlmostEmpty_xSO => FifoCoreAlmostEmpty_o,    -- out std_logic;
-            FifoCoreBurstReady_xSO  => FifoCoreBurstReady_o,     -- out std_logic;
-            FifoCoreFull_xSO        => FifoCoreFull_o,           -- out std_logic;
-            FifoCoreNumData_o       => FifoCoreNumData_o,        -- out std_logic_vector(10 downto 0);
-            --
-            CoreFifoDat_xDI         => CoreFifoDat_i,            -- in  std_logic_vector(31 downto 0);
-            CoreFifoWrite_xSI       => CoreFifoWrite_i,          -- in  std_logic;
-            CoreFifoFull_xSO        => CoreFifoFull_o,           -- out std_logic;
-            CoreFifoAlmostFull_xSO  => CoreFifoAlmostFull_o,     -- out std_logic;
-            CoreFifoEmpty_xSO       => CoreFifoEmpty_o,          -- out std_logic;
-            --
-            --BiasFinished_xSO        => BiasFinished,             -- out std_logic;
-            --ClockLow_xDI            => ClockLow,                 -- in  natural;
-            --LatchTime_xDI           => LatchTime,                -- in  natural;
-            --SetupHold_xDI           => SetupHold,                -- in  natural;
-            --PrescalerValue_xDI      => PrescalerValue,           -- in  std_logic_vector(31 downto 0);
-            --BiasProgPins_xDO        => i_BiasProgPins_xD,        -- out std_logic_vector(7 downto 0);
+        
             ---------------------------------------------------------------------------
-            -- Output neurons threshold
-            --OutThresholdVal_xDI     => OutThresholdVal           -- in  std_logic_vector(31 downto 0)
-            DBG_din             => DBG_din,   
-            DBG_wr_en           => DBG_wr_en,       
-            DBG_rd_en           => DBG_rd_en,       
-            DBG_dout            => DBG_dout,            
-            DBG_full            => DBG_full,        
-            DBG_almost_full     => DBG_almost_full, 
-            DBG_overflow        => DBG_overflow,      
-            DBG_empty           => DBG_empty,            
-            DBG_almost_empty    => DBG_almost_empty,
-            DBG_underflow       => DBG_underflow,   
-            DBG_data_count      => DBG_data_count,
-            DBG_Timestamp_xD    => DBG_Timestamp_xD,
-            DBG_MonInAddr_xD    => DBG_MonInAddr_xD, 
-            DBG_MonInSrcRdy_xS  => DBG_MonInSrcRdy_xS,
-            DBG_MonInDstRdy_xS  => DBG_MonInDstRdy_xS,
-            DBG_RESETFIFO       => DBG_RESETFIFO
- 
- 
+            -- clock and reset
+            CoreClk_i             => CoreClk_i,                -- in  std_logic;
+            AxisClk_i             => AxisClk_i,                -- in  std_logic;
+            --
+            Reset_n_CoreClk_i     => nRst_CoreClk_i,           -- in  std_logic;
+            Reset_n_AxisClk_i     => nRst_AxisClk_i,           -- in  std_logic;
+            --
+            FlushRXFifos_i        => FlushRXFifos_i,           -- in  std_logic;
+            FlushTXFifos_i        => FlushTXFifos_i,           -- in  std_logic;
+            ---------------------------------------------------------------------------
+            -- controls and settings
+            --ChipType_xSI          => ChipType,                 -- in  std_logic;
+            DmaLength_i           => DmaLength_i,              -- in  std_logic_vector(15 downto 0);
+            OnlyEvents_i          => OnlyEvents_i,             -- in  std_logic;
+            --
+            ---------------------------------------------------------------------------
+            -- Enable per timing
+            Timing_i              => timing_i,                 -- in  time_tick;
+            --
+            ---------------------------------------------------------------------------
+            -- Input to Monitor
+            MonInAddr_i           => i_monData,                -- in  std_logic_vector(31 downto 0);
+            MonInSrcRdy_i         => i_monSrcRdy,              -- in  std_logic;
+            MonInDstRdy_o         => i_monDstRdy,              -- out std_logic;
+            --
+            -- Output from Sequencer
+            SeqOutAddr_o          => i_seqData,                -- out std_logic_vector(31 downto 0);
+            SeqOutSrcRdy_o        => i_seqSrcRdy,              -- out std_logic;
+            SeqOutDstRdy_i        => i_seqDstRdy,              -- in  std_logic;
+            --
+            ---------------------------------------------------------------------------
+            -- Time stamper
+            CleanTimer_i          => CleanTimer_i,             -- in  std_logic;
+            WrapDetected_o        => WrapDetected_o,           -- out std_logic;
+            FullTimestamp_i       => FullTimestamp_i,          -- in  std_logic;  
+            --
+            EnableMonitor_i       => '1',                      -- in  std_logic;
+            CoreReady_i           => '1',                      -- in  std_logic;
+            ---------------------------------------------------------------------------
+            -- TX Timestamp
+            TxTSMode_i            => TxTSMode_i,               -- in  std_logic_vector(1 downto 0);
+            TxTSTimeoutSel_i      => TxTSTimeoutSel_i,         -- in  std_logic_vector(3 downto 0);
+            TxTSRetrigCmd_i       => TxTSRetrigCmd_i,          -- in  std_logic;
+            TxTSRearmCmd_i        => TxTSRearmCmd_i,           -- in  std_logic;
+            TxTSRetrigStatus_o    => TxTSRetrigStatus_o,       -- out std_logic;
+            TxTSTimeoutCounts_o   => TxTSTimeoutCounts_o,      -- out std_logic;
+            TxTSMaskSel_i         => TxTSMaskSel_i,            -- in  std_logic_vector(1 downto 0);
+            --
+            ---------------------------------------------------------------------------
+            -- FIFO -> Core
+            FifoCoreDat_o         => FifoCoreDat_o,            -- out std_logic_vector(31 downto 0);
+            FifoCoreRead_i        => FifoCoreRead_i,           -- in  std_logic;
+            FifoCoreEmpty_o       => FifoCoreEmpty_o,          -- out std_logic;
+            FifoCoreAlmostEmpty_o => FifoCoreAlmostEmpty_o,    -- out std_logic;
+            FifoCoreLastData_o    => FifoCoreLastData_o,       -- out std_logic;
+            FifoCoreFull_o        => FifoCoreFull_o,           -- out std_logic;
+            FifoCoreNumData_o     => FifoCoreNumData_o,        -- out std_logic_vector(10 downto 0);
+            --
+
+            -- Core -> FIFO
+            CoreFifoDat_i         => CoreFifoDat_i,            -- in  std_logic_vector(31 downto 0);
+            CoreFifoWrite_i       => CoreFifoWrite_i,          -- in  std_logic;
+            CoreFifoFull_o        => CoreFifoFull_o,           -- out std_logic;
+            CoreFifoAlmostFull_o  => CoreFifoAlmostFull_o,     -- out std_logic;
+            CoreFifoEmpty_o       => CoreFifoEmpty_o
         );
 
 
@@ -1634,17 +1587,7 @@ end generate;
     LEDr_o <= '1';
     LEDy_o <= '1';
     
-    DBG_CH0_DATA <= i_rxMonSrc(0).idx;
-    DBG_CH0_SRDY <= i_rxMonSrc(0).vld;
-    DBG_CH0_DRDY <= i_rxMonDst(0).rdy;
 
-    DBG_CH1_DATA <= i_rxMonSrc(1).idx;
-    DBG_CH1_SRDY <= i_rxMonSrc(1).vld;
-    DBG_CH1_DRDY <= i_rxMonDst(1).rdy;
-
-    DBG_CH2_DATA <= i_rxMonSrc(2).idx;
-    DBG_CH2_SRDY <= i_rxMonSrc(2).vld;
-    DBG_CH2_DRDY <= i_rxMonDst(2).rdy;
     
 
 

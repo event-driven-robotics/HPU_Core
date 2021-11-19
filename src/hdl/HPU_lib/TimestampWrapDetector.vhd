@@ -13,10 +13,10 @@ library ieee;
 
 entity TimestampWrapDetector is
     port (
-        Resetn       : in  std_logic;
-        Clk          : in  std_logic;
-        MSB          : in  std_logic;
-        WrapDetected : out std_logic
+        Reset_n_i      : in  std_logic;
+        Clk_i          : in  std_logic;
+        MSB_i          : in  std_logic;
+        WrapDetected_o : out std_logic
     );
 end entity TimestampWrapDetector;
 
@@ -31,18 +31,18 @@ architecture beh of TimestampWrapDetector is
 
 begin
 
-    p_sample : process (Clk)
+    p_sample : process (Clk_i)
     begin
-        if (rising_edge(Clk)) then
-            if (Resetn = '0') then
+        if (rising_edge(Clk_i)) then
+            if (Reset_n_i = '0') then
                 msb_s <= '0';
             else
-                msb_s <= MSB;
+                msb_s <= MSB_i;
             end if;
         end if;
     end process p_sample;
 
-    WrapDetected <= msb_s and not(MSB);
+    WrapDetected_o <= msb_s and not(MSB_i);
 
 end architecture beh;
 

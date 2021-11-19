@@ -13,10 +13,6 @@ library ieee;
 --****************************
 
 entity neuserial_axistream is
-    generic (
-        C_NUMBER_OF_INPUT_WORDS : natural := 2048;
-        C_DEBUG                 : boolean := false
-    );
     port (
         Clk                    : in  std_logic;
         nRst                   : in  std_logic;
@@ -36,7 +32,6 @@ entity neuserial_axistream is
         FifoCoreDat_i          : in  std_logic_vector(31 downto 0);
         FifoCoreRead_o         : out std_logic;
         FifoCoreEmpty_i        : in  std_logic;
-        FifoCoreBurstReady_i   : in  std_logic; -- not used
         FifoCoreLastData_i     : in  std_logic;
         -- From core/dma to Fifo
         CoreFifoDat_o          : out std_logic_vector(31 downto 0);

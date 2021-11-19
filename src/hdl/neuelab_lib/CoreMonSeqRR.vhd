@@ -37,98 +37,69 @@ entity CoreMonSeqRR is
     port (
         ---------------------------------------------------------------------------
         -- clock and reset
-        Reset_xRBI              : in  std_logic;
-        CoreClk_xCI             : in  std_logic;
-        AxisClk_xCI             : in  std_logic;
+        CoreClk_i               : in  std_logic;
+        AxisClk_i               : in  std_logic;
         --
-        FlushRXFifos_xSI        : in  std_logic;
-        FlushTXFifos_xSI        : in  std_logic;
+        Reset_n_CoreClk_i       : in  std_logic;
+        Reset_n_AxisClk_i       : in  std_logic;
+        --
+        FlushRXFifos_i          : in  std_logic;
+        FlushTXFifos_i          : in  std_logic;
         ---------------------------------------------------------------------------
         -- controls and settings
-        -- ChipType_xSI         : in  std_logic;
-        DmaLength_xDI           : in  std_logic_vector(15 downto 0);
+        -- ChipType_i         : in  std_logic;
+        DmaLength_i             : in  std_logic_vector(15 downto 0);
         OnlyEvents_i            : in  std_logic;
         --
         ---------------------------------------------------------------------------
         -- Enable per timing
-        Timing_xSI          : in  time_tick;
+        Timing_i                : in  time_tick;
         --
         ---------------------------------------------------------------------------
-        -- Input to Monitor
-        MonInAddr_xDI           : in  std_logic_vector(31 downto 0);
-        MonInSrcRdy_xSI         : in  std_logic;
-        MonInDstRdy_xSO         : out std_logic;
-        --
+        -- Input to Monitor     
+        MonInAddr_i             : in  std_logic_vector(31 downto 0);
+        MonInSrcRdy_i           : in  std_logic;
+        MonInDstRdy_o           : out std_logic;
+        --                      
         -- Output from Sequencer
-        SeqOutAddr_xDO          : out std_logic_vector(31 downto 0);
-        SeqOutSrcRdy_xSO        : out std_logic;
-        SeqOutDstRdy_xSI        : in  std_logic;
+        SeqOutAddr_o            : out std_logic_vector(31 downto 0);
+        SeqOutSrcRdy_o          : out std_logic;
+        SeqOutDstRdy_i          : in  std_logic;
         --
         ---------------------------------------------------------------------------
         -- Time stamper
-        CleanTimer_xSI          : in  std_logic;
-        WrapDetected_xSO        : out std_logic;
+        CleanTimer_i            : in  std_logic;
+        WrapDetected_o          : out std_logic;
         FullTimestamp_i         : in  std_logic;  
-        --
-        EnableMonitor_xSI       : in  std_logic;
-        CoreReady_xSI           : in  std_logic;
+        --                      
+        EnableMonitor_i         : in  std_logic;
+        CoreReady_i             : in  std_logic;
         ---------------------------------------------------------------------------
         -- TX Timestamp
-        TxTSMode_xDI            : in  std_logic_vector(1 downto 0);
-        TxTSTimeoutSel_xDI      : in  std_logic_vector(3 downto 0);
-        TxTSRetrigCmd_xSI       : in  std_logic;
-        TxTSRearmCmd_xSI        : in  std_logic;
-        TxTSRetrigStatus_xSO    : out std_logic;
-        TxTSTimeoutCounts_xSO   : out std_logic;
-        TxTSMaskSel_xSI         : in  std_logic_vector(1 downto 0);
+        TxTSMode_i              : in  std_logic_vector(1 downto 0);
+        TxTSTimeoutSel_i        : in  std_logic_vector(3 downto 0);
+        TxTSRetrigCmd_i         : in  std_logic;
+        TxTSRearmCmd_i          : in  std_logic;
+        TxTSRetrigStatus_o      : out std_logic;
+        TxTSTimeoutCounts_o     : out std_logic;
+        TxTSMaskSel_i           : in  std_logic_vector(1 downto 0);
         --
         ---------------------------------------------------------------------------
         -- FIFO -> Core
-        FifoCoreDat_xDO         : out std_logic_vector(31 downto 0);
-        FifoCoreRead_xSI        : in  std_logic;
-        FifoCoreEmpty_xSO       : out std_logic;
-        FifoCoreAlmostEmpty_xSO : out std_logic;
-        FifoCoreBurstReady_xSO  : out std_logic;
-        FifoCoreFull_xSO        : out std_logic;
+        FifoCoreDat_o           : out std_logic_vector(31 downto 0);
+        FifoCoreRead_i          : in  std_logic;
+        FifoCoreEmpty_o         : out std_logic;
+        FifoCoreAlmostEmpty_o   : out std_logic;
+        FifoCoreLastData_o      : out std_logic;
+        FifoCoreFull_o          : out std_logic;
         FifoCoreNumData_o       : out std_logic_vector(10 downto 0);
         --
         -- Core -> FIFO
-        CoreFifoDat_xDI         : in  std_logic_vector(31 downto 0);
-        CoreFifoWrite_xSI       : in  std_logic;
-        CoreFifoFull_xSO        : out std_logic;
-        CoreFifoAlmostFull_xSO  : out std_logic;
-        CoreFifoEmpty_xSO       : out std_logic;
-
-        ---------------------------------------------------------------------------
-        -- BiasGen Controller Output
-        --
-        --BiasFinished_xSO        : out std_logic;
-        --ClockLow_xDI            : in  natural; -- 1   tick
-        --LatchTime_xDI           : in  natural; -- 1   tick
-        --SetupHold_xDI           : in  natural; -- 100 tick
-        --PrescalerValue_xDI      : in  std_logic_vector(31 downto 0);
-        --BiasProgPins_xDO        : out std_logic_vector(7 downto 0);
-        ---------------------------------------------------------------------------
-          -- Output neurons threshold
-        --OutThresholdVal_xDI     : in  std_logic_vector(31 downto 0)
-
-        DBG_din             : out std_logic_vector(63 downto 0);     
-        DBG_wr_en           : out std_logic;  
-        DBG_rd_en           : out std_logic;     
-        DBG_dout            : out std_logic_vector(63 downto 0);          
-        DBG_full            : out std_logic;    
-        DBG_almost_full     : out std_logic;    
-        DBG_overflow        : out std_logic;       
-        DBG_empty           : out std_logic;           
-        DBG_almost_empty    : out std_logic;    
-        DBG_underflow       : out std_logic;     
-        DBG_data_count      : out std_logic_vector(10 downto 0);
-        DBG_Timestamp_xD    : out std_logic_vector(31 downto 0);
-        DBG_MonInAddr_xD    : out std_logic_vector(31 downto 0);
-        DBG_MonInSrcRdy_xS  : out std_logic;
-        DBG_MonInDstRdy_xS  : out std_logic;
-        DBG_RESETFIFO       : out std_logic
-    
+        CoreFifoDat_i           : in  std_logic_vector(31 downto 0);
+        CoreFifoWrite_i         : in  std_logic;
+        CoreFifoFull_o          : out std_logic;
+        CoreFifoAlmostFull_o    : out std_logic;
+        CoreFifoEmpty_o         : out std_logic    
     );
 end entity CoreMonSeqRR;
 
@@ -144,49 +115,49 @@ architecture str of CoreMonSeqRR is
 -----------------------------------------------------------------------------
 
 -- CoreReady / EnableMonitor
-signal EnableSequencer_xS : std_logic;
+signal EnableSequencer : std_logic;
 
 -- Timestamp Counter
-signal EnableTimestampCounter_RX_xS  : std_logic;
-signal EnableTimestampCounter_RX_xSB : std_logic;
-signal EnableTimestampCounter_TX_xS  : std_logic;
-signal EnableTimestampCounter_TX_xSB : std_logic;    
-signal Timestamp_RX_xD            : std_logic_vector(31 downto 0);
-signal Timestamp_TX_xD            : std_logic_vector(31 downto 0);
-signal ShortTimestamp_TX_xD       : std_logic_vector(31 downto 0);
-signal LoadTimer_xS               : std_logic;
-signal LoadValue_xS               : std_logic_vector(31 downto 0);
+signal EnableTimestampCounter_RX  : std_logic;
+signal EnableTimestampCounter_RXB : std_logic;
+signal EnableTimestampCounter_TX  : std_logic;
+signal EnableTimestampCounter_TXB : std_logic;    
+signal Timestamp_RX            : std_logic_vector(31 downto 0);
+signal Timestamp_TX            : std_logic_vector(31 downto 0);
+signal ShortTimestamp_TX       : std_logic_vector(31 downto 0);
+signal LoadTimer               : std_logic;
+signal LoadValue               : std_logic_vector(31 downto 0);
 
 -- Monitor -> Core
-signal MonOutAddrEvt_xD     : std_logic_vector(63 downto 0);
-signal LiEnMonOutAddrEvt_xD : std_logic_vector(63 downto 0);
-signal MonOutWrite_xS       : std_logic;
-signal MonOutFull_xS        : std_logic;
+signal MonOutAddrEvt     : std_logic_vector(63 downto 0);
+signal LiEnMonOutAddrEvt : std_logic_vector(63 downto 0);
+signal MonOutWrite       : std_logic;
+signal MonOutFull        : std_logic;
 
 -- Core -> Sequencer
-signal SeqInAddrEvt_xD     : std_logic_vector(63 downto 0);
-signal LiEnSeqInAddrEvt_xD : std_logic_vector(63 downto 0);
-signal SeqInRead_xS        : std_logic;
-signal SeqInEmpty_xS       : std_logic;
+signal SeqInAddrEvt     : std_logic_vector(63 downto 0);
+signal LiEnSeqInAddrEvt : std_logic_vector(63 downto 0);
+signal SeqInRead        : std_logic;
+signal SeqInEmpty       : std_logic;
 
 -- Sequencer -> Config Logic
---signal ConfigAddr_xD : std_logic_vector(31 downto 0);
---signal ConfigReq_xS  : std_logic;
---signal ConfigAck_xS  : std_logic;
+--signal ConfigAddr : std_logic_vector(31 downto 0);
+--signal ConfigReq  : std_logic;
+--signal ConfigAck  : std_logic;
 
 -- Monitor Input
-signal MonInAddr_xD                   : std_logic_vector(31 downto 0);
-signal MonInSrcRdy_xS, MonInDstRdy_xS : std_logic;
+signal MonInAddr                   : std_logic_vector(31 downto 0);
+signal MonInSrcRdy, MonInDstRdy : std_logic;
 
 -- Sequencer Output
-signal SeqOutAddr_xD                    : std_logic_vector(31 downto 0);
-signal SeqOutSrcRdy_xS, SeqOutDstRdy_xS : std_logic;
+signal SeqOutAddr                    : std_logic_vector(31 downto 0);
+signal SeqOutSrcRdy, SeqOutDstRdy : std_logic;
 
 -- Reset high signal for FIFOs
-signal ResetRX_xR  : std_logic;
-signal ResetTX_xR  : std_logic;
-signal FlushRXFifos_sr : std_logic_vector(15 downto 0);
-signal FlushTXFifos_sr : std_logic_vector(15 downto 0);
+signal ResetRX            : std_logic;
+signal ResetTX            : std_logic;
+signal FlushRXFifos_sr    : std_logic_vector(15 downto 0);
+signal FlushTXFifos_sr    : std_logic_vector(15 downto 0);
 
 signal TxFifoWrEn         : std_logic;
 signal TxFifoRdEn         : std_logic;
@@ -215,15 +186,15 @@ signal RxFifoRdDataCount  : std_logic_vector(10 downto 0);
 --signal i_BGClk_xAS        : std_logic;
 --signal i_BGBitIn_xAD      : std_logic;
 
-signal enableFifoWriting_xS  : std_logic;
--- signal fifoWrDataCount_xD    : std_logic_vector(10 downto 0);
-signal i_fifoCoreDat_xD      : std_logic_vector(63 downto 0);
-signal dataRead_xS           : std_logic;
-signal effectiveRdEn_xS      : std_logic;
+signal enableFifoWriting  : std_logic;
+-- signal fifoWrDataCount    : std_logic_vector(10 downto 0);
+signal i_fifoCoreDat      : std_logic_vector(63 downto 0);
+signal dataRead           : std_logic;
+signal effectiveRdEn      : std_logic;
 
 
-signal i_FifoCoreEmpty_xSO : std_logic;
-signal i_FifoCoreAlmostEmpty_xSO : std_logic;
+signal i_FifoCoreEmpty_o : std_logic;
+signal i_FifoCoreAlmostEmpty_o : std_logic;
 signal MSB                 : std_logic;
 
 -- pragma synthesis_off
@@ -244,25 +215,7 @@ signal txfifo_rd_rst_busy : std_logic;
 
 attribute mark_debug : string;
 -- INFIFO
-attribute mark_debug of LiEnMonOutAddrEvt_xD      : signal is "true"; 
-attribute mark_debug of enableFifoWriting_xS      : signal is "true";
-attribute mark_debug of i_fifoCoreDat_xD          : signal is "true";
-attribute mark_debug of effectiveRdEn_xS          : signal is "true";
-attribute mark_debug of MonOutFull_xS             : signal is "true";
-attribute mark_debug of i_FifoCoreEmpty_xSO       : signal is "true";
-attribute mark_debug of ResetRX_xR                : signal is "true";
-attribute mark_debug of infifo_wr_rst_busy        : signal is "true";
-attribute mark_debug of infifo_rd_rst_busy        : signal is "true";
--- OUTFIFO
-attribute mark_debug of CoreFifoDat_xDI           : signal is "true";
-attribute mark_debug of CoreFifoWrite_xSI         : signal is "true";
-attribute mark_debug of LiEnSeqInAddrEvt_xD       : signal is "true";
-attribute mark_debug of SeqInRead_xS              : signal is "true";
-attribute mark_debug of CoreFifoFull_xSO          : signal is "true";
-attribute mark_debug of SeqInEmpty_xS             : signal is "true";
-attribute mark_debug of ResetTX_xR                : signal is "true";
--- attribute mark_debug of outfifo_wr_rst_busy        : signal is "true";
--- attribute mark_debug of outfifo_rd_rst_busy        : signal is "true";
+
 
 
 begin
@@ -270,21 +223,21 @@ begin
     -----------------------------------------------------------------------------
     -- special reset for Fifo
     -----------------------------------------------------------------------------
-    p_ResetForFifo : process (CoreClk_xCI, Reset_xRBI) is
+    p_ResetForFifo : process (CoreClk_i, Reset_n_CoreClk_i) is
         begin
-        if (Reset_xRBI = '0') then
+        if (Reset_n_CoreClk_i = '0') then
             FlushRXFifos_sr <= (others => '1');
             FlushTXFifos_sr <= (others => '1');
         end if;
-        if (rising_edge(CoreClk_xCI)) then
+        if (rising_edge(CoreClk_i)) then
         
-            if (FlushRXFifos_xSI = '1') then
+            if (FlushRXFifos_i = '1') then
                 FlushRXFifos_sr <= (others => '1');
             else 
                 FlushRXFifos_sr <= FlushRXFifos_sr(14 downto 0) & '0';
             end if;
 
-            if (FlushTXFifos_xSI = '1') then
+            if (FlushTXFifos_i = '1') then
                 FlushTXFifos_sr <= (others => '1');
             else 
                 FlushTXFifos_sr <= FlushTXFifos_sr(14 downto 0) & '0';
@@ -293,30 +246,30 @@ begin
         end if;
     end process p_ResetForFifo;
     
-    -- ResetRX_xR <=  not(Reset_xRBI) or FlushRXFifos_xSI;
-    -- ResetTX_xR <=  not(Reset_xRBI) or FlushTXFifos_xSI;
+    -- ResetRX <=  not(ResetBI) or FlushRXFifos_i;
+    -- ResetTX <=  not(ResetBI) or FlushTXFifos_i;
 
-    ResetRX_xR <=  FlushRXFifos_sr(15);
-    ResetTX_xR <=  FlushTXFifos_sr(15);
+    ResetRX <=  FlushRXFifos_sr(15);
+    ResetTX <=  FlushTXFifos_sr(15);
 
     -----------------------------------------------------------------------------
-    -- CoreReady_xSI, EnableMonitor_xSI, EnableTimestampCounter_RX_xS, EnableTimestampCounter_TX_xS
+    -- CoreReady_i, EnableMonitor_i, EnableTimestampCounter_RX, EnableTimestampCounter_TX
     -----------------------------------------------------------------------------
 
     -- timestamp counter -- run timestamp counter only if MonEn is active or
     -- the sequencer has pending data. otherwise we reset the counter to zero.
-    EnableTimestampCounter_RX_xS  <= (EnableMonitor_xSI and CoreReady_xSI) or not SeqInEmpty_xS;
-    EnableTimestampCounter_RX_xSB <= not EnableTimestampCounter_RX_xS;
+    EnableTimestampCounter_RX  <= (EnableMonitor_i and CoreReady_i) or not SeqInEmpty;
+    EnableTimestampCounter_RXB <= not EnableTimestampCounter_RX;
     
     -----------------------------------------------------------------------------
     -- enable sequencer controled by monitor:
     g_enseq : if EnableMonitorControlsSequencerToo generate
-        EnableSequencer_xS <= EnableMonitor_xSI;
+        EnableSequencer <= EnableMonitor_i;
     end generate g_enseq;
     -----------------------------------------------------------------------------
     -- or not:
     g_no_enseq : if not EnableMonitorControlsSequencerToo generate
-        EnableSequencer_xS <= '1';
+        EnableSequencer <= '1';
     end generate g_no_enseq;
 
 
@@ -327,88 +280,88 @@ begin
 
     u_Timestamp_TX : Timestamp
         port map (
-            Rst_xRBI       => Reset_xRBI,
-            Clk_xCI        => CoreClk_xCI,
-            Zero_xSI       => '0',
-            LoadTimer_xSI  => LoadTimer_xS,
-            LoadValue_xSI  => LoadValue_xS,
-            CleanTimer_xSI => '0',
-            Timestamp_xDO  => Timestamp_TX_xD
+            Rst_n_i        => Reset_n_CoreClk_i,
+            Clk_i          => CoreClk_i,
+            Zero_i         => '0',
+            LoadTimer_i    => LoadTimer,
+            LoadValue_i    => LoadValue,
+            CleanTimer_i   => '0',
+            Timestamp_o    => Timestamp_TX
         );
         
     u_Timestamp_RX : Timestamp
         port map (
-            Rst_xRBI       => Reset_xRBI,
-            Clk_xCI        => CoreClk_xCI,
-            Zero_xSI       => EnableTimestampCounter_RX_xSB,
-            LoadTimer_xSI  => '0',
-            LoadValue_xSI  => (others => '0'),
-            CleanTimer_xSI => CleanTimer_xSI,
-            Timestamp_xDO  => Timestamp_RX_xD
+            Rst_n_i        => Reset_n_CoreClk_i,
+            Clk_i          => CoreClk_i,
+            Zero_i         => EnableTimestampCounter_RXB,
+            LoadTimer_i    => '0',
+            LoadValue_i    => (others => '0'),
+            CleanTimer_i   => CleanTimer_i,
+            Timestamp_o  => Timestamp_RX
         );
 
     u_TimestampWrapDetector_RX: TimestampWrapDetector
         port map (
-            Resetn         => Reset_xRBI,
-            Clk            => CoreClk_xCI,
-            MSB            => MSB, 
-            WrapDetected   => WrapDetected_xSO
+            Reset_n_i      => Reset_n_CoreClk_i,
+            Clk_i          => CoreClk_i,
+            MSB_i          => MSB, 
+            WrapDetected_o => WrapDetected_o
         );
         
-    MSB <= Timestamp_RX_xD(23) when FullTimestamp_i='0' else
-           Timestamp_RX_xD(31);
+    MSB <= Timestamp_RX(23) when FullTimestamp_i='0' else
+           Timestamp_RX(31);
 
     u_MonitorRR : MonitorRR
         port map (
-            Rst_xRBI       => Reset_xRBI,
-            Clk_xCI        => CoreClk_xCI,
-            FullTimestamp_i=> FullTimestamp_i,
-            Timestamp_xDI  => Timestamp_RX_xD,
-            MonEn_xSAI     => EnableMonitor_xSI,
+            Rst_n_i         => Reset_n_CoreClk_i,
+            Clk_i           => CoreClk_i,
+            FullTimestamp_i => FullTimestamp_i,
+            Timestamp_i     => Timestamp_RX,
+            MonEn_i         => EnableMonitor_i,
             --
-            InAddr_xDI     => MonInAddr_xD,
-            InSrcRdy_xSI   => MonInSrcRdy_xS,
-            InDstRdy_xSO   => MonInDstRdy_xS,
+            InAddr_i        => MonInAddr,
+            InSrcRdy_i      => MonInSrcRdy,
+            InDstRdy_o      => MonInDstRdy,
             --
-            OutAddrEvt_xDO => MonOutAddrEvt_xD,
-            OutWrite_xSO   => MonOutWrite_xS,
-            OutFull_xSI    => MonOutFull_xS
+            OutAddrEvt_o    => MonOutAddrEvt,
+            OutWrite_o      => MonOutWrite,
+            OutFull_i       => MonOutFull
         );
 
-ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
+ShortTimestamp_TX <= x"0000" & Timestamp_TX(15 downto 0);
 
 
     u_AEXSsequencerRR : AEXSsequencerRR
         port map (
-            Rst_xRBI               => Reset_xRBI,
-            Clk_xCI                => CoreClk_xCI,
-            Enable_xSI             => EnableSequencer_xS,
+            Rst_n_i              => Reset_n_CoreClk_i,
+            Clk_i                => CoreClk_i,
+            Enable_i             => EnableSequencer,
             --
-            En100us_xSI            => Timing_xSI.en100us,
+            En100us_i            => Timing_i.en100us,
             -- 
-            TSMode_xDI             => TxTSMode_xDI,
-            TSTimeoutSel_xDI       => TxTSTimeoutSel_xDI,
-            TSMaskSel_xDI          => TxTSMaskSel_xSI,
+            TSMode_i             => TxTSMode_i,
+            TSTimeoutSel_i       => TxTSTimeoutSel_i,
+            TSMaskSel_i          => TxTSMaskSel_i,
             --
-            Timestamp_xDI          => Timestamp_TX_xD,  
-            LoadTimer_xSO          => LoadTimer_xS,        
-            LoadValue_xSO          => LoadValue_xS,        
-            TxTSRetrigCmd_xSI      => TxTSRetrigCmd_xSI,   
-            TxTSRearmCmd_xSI       => TxTSRearmCmd_xSI,
-            TxTSRetrigStatus_xSO   => TxTSRetrigStatus_xSO,
-            TxTSTimeoutCounts_xSO  => TxTSTimeoutCounts_xSO,  
+            Timestamp_i          => Timestamp_TX,  
+            LoadTimer_o          => LoadTimer,        
+            LoadValue_o          => LoadValue,        
+            TxTSRetrigCmd_i      => TxTSRetrigCmd_i,   
+            TxTSRearmCmd_i       => TxTSRearmCmd_i,
+            TxTSRetrigStatus_o   => TxTSRetrigStatus_o,
+            TxTSTimeoutCounts_o  => TxTSTimeoutCounts_o,  
             --
-            InAddrEvt_xDI          => SeqInAddrEvt_xD,
-            InRead_xSO             => SeqInRead_xS,
-            InEmpty_xSI            => SeqInEmpty_xS,
+            InAddrEvt_i          => SeqInAddrEvt,
+            InRead_o             => SeqInRead,
+            InEmpty_i            => SeqInEmpty,
             --
-            OutAddr_xDO            => SeqOutAddr_xD,
-            OutSrcRdy_xSO          => SeqOutSrcRdy_xS,
-            OutDstRdy_xSI          => SeqOutDstRdy_xS
+            OutAddr_o            => SeqOutAddr,
+            OutSrcRdy_o          => SeqOutSrcRdy,
+            OutDstRdy_i          => SeqOutDstRdy
             --
-            --ConfigAddr_xDO => ConfigAddr_xD,
-            --ConfigReq_xSO  => ConfigReq_xS,
-            --ConfigAck_xSI  => ConfigAck_xS
+            --ConfigAddr_o => ConfigAddr,
+            --ConfigReq_o  => ConfigReq,
+            --ConfigAck_i  => ConfigAck
         );
 
 
@@ -418,25 +371,25 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
 
     -- normal operation:
     g_loopback_disabled : if not TestEnableSequencerToMonitorLoopback generate
-        MonInAddr_xD     <= MonInAddr_xDI;
-        MonInSrcRdy_xS   <= MonInSrcRdy_xSI;
-        MonInDstRdy_xSO  <= MonInDstRdy_xS;
+        MonInAddr      <= MonInAddr_i;
+        MonInSrcRdy    <= MonInSrcRdy_i;
+        MonInDstRdy_o  <= MonInDstRdy;
         --
-        SeqOutAddr_xDO   <= SeqOutAddr_xD;
-        SeqOutSrcRdy_xSO <= SeqOutSrcRdy_xS;
-        SeqOutDstRdy_xS  <= SeqOutDstRdy_xSI;
+        SeqOutAddr_o   <= SeqOutAddr;
+        SeqOutSrcRdy_o <= SeqOutSrcRdy;
+        SeqOutDstRdy   <= SeqOutDstRdy_i;
     end generate g_loopback_disabled;
 
     -- loopback test enabled:
     g_loopback_enabled : if TestEnableSequencerToMonitorLoopback generate
         -- disable sequencer output port & sink on monitor input port:
-        SeqOutAddr_xDO   <= (others => '0');
-        SeqOutSrcRdy_xSO <= '0';
-        MonInDstRdy_xSO  <= '1';
+        SeqOutAddr_o   <= (others => '0');
+        SeqOutSrcRdy_o <= '0';
+        MonInDstRdy_o  <= '1';
         -- create loop:
-        MonInAddr_xD     <= SeqOutAddr_xD;
-        MonInSrcRdy_xS   <= SeqOutSrcRdy_xS;
-        SeqOutDstRdy_xS  <= MonInDstRdy_xS;
+        MonInAddr      <= SeqOutAddr;
+        MonInSrcRdy    <= SeqOutSrcRdy;
+        SeqOutDstRdy   <= MonInDstRdy;
     end generate g_loopback_enabled;
 
 
@@ -446,17 +399,17 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
 
     --u_BiasSerializer : BiasSerializer
     --    port map (
-    --        resetn            => Reset_xRBI,
-    --        clk               => CoreClk_xCI,
-    --        chip_type         => ChipType_xSI,
-    --        Data              => ConfigAddr_xD,
-    --        Req               => ConfigReq_xS,
-    --        Ack               => ConfigAck_xS,
-    --        prescaler_value   => PrescalerValue_xDI,
-    --        biasfinished      => BiasFinished_xSO,
-    --        ClockLow          => ClockLow_xDI,
-    --        LatchTime         => LatchTime_xDI,
-    --        SetupHold         => SetupHold_xDI,
+    --        resetn            => ResetBI,
+    --        clk               => CoreClk_i,
+    --        chip_type         => ChipType_i,
+    --        Data              => ConfigAddr,
+    --        Req               => ConfigReq,
+    --        Ack               => ConfigAck,
+    --        prescaler_value   => PrescalerValueI,
+    --        biasfinished      => BiasFinished_o,
+    --        ClockLow          => ClockLowI,
+    --        LatchTime         => LatchTimeI,
+    --        SetupHold         => SetupHoldI,
     --        BGMonitorSel_xASO => i_BGMonitorSel_xAS,
     --        BGAddrSel_xASO    => i_BGAddrSel_xAS,
     --        BGMonEn_xASO      => i_BGMonEn_xAS,
@@ -467,7 +420,7 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
     --        BBitout           => '0'
     --    );
     --
-    --BiasProgPins_xDO <= '0' & i_BGMonitorSel_xAS & i_BGAddrSel_xAS & i_BGMonEn_xAS & i_BGBiasOSel_xAS & i_BGLatch_xASB & i_BGClk_xAS & i_BGBitIn_xAD;
+    --BiasProgPins_o <= '0' & i_BGMonitorSel_xAS & i_BGAddrSel_xAS & i_BGMonEn_xAS & i_BGBiasOSel_xAS & i_BGLatch_xASB & i_BGClk_xAS & i_BGBitIn_xAD;
 
 
     -----------------------------------------------------------------------------
@@ -475,15 +428,15 @@ ShortTimestamp_TX_xD <= x"0000" & Timestamp_TX_xD(15 downto 0);
     -----------------------------------------------------------------------------
 
     -- timestamp
-    SeqInAddrEvt_xD(39 downto 32) <= LiEnSeqInAddrEvt_xD(39 downto 32);
-    SeqInAddrEvt_xD(47 downto 40) <= LiEnSeqInAddrEvt_xD(47 downto 40);
-    SeqInAddrEvt_xD(55 downto 48) <= LiEnSeqInAddrEvt_xD(55 downto 48);
-    SeqInAddrEvt_xD(63 downto 56) <= LiEnSeqInAddrEvt_xD(63 downto 56);
+    SeqInAddrEvt(39 downto 32) <= LiEnSeqInAddrEvt(39 downto 32);
+    SeqInAddrEvt(47 downto 40) <= LiEnSeqInAddrEvt(47 downto 40);
+    SeqInAddrEvt(55 downto 48) <= LiEnSeqInAddrEvt(55 downto 48);
+    SeqInAddrEvt(63 downto 56) <= LiEnSeqInAddrEvt(63 downto 56);
     -- address
-    SeqInAddrEvt_xD( 7 downto  0) <= LiEnSeqInAddrEvt_xD( 7 downto  0);
-    SeqInAddrEvt_xD(15 downto  8) <= LiEnSeqInAddrEvt_xD(15 downto  8);
-    SeqInAddrEvt_xD(23 downto 16) <= LiEnSeqInAddrEvt_xD(23 downto 16);
-    SeqInAddrEvt_xD(31 downto 24) <= LiEnSeqInAddrEvt_xD(31 downto 24);
+    SeqInAddrEvt( 7 downto  0) <= LiEnSeqInAddrEvt( 7 downto  0);
+    SeqInAddrEvt(15 downto  8) <= LiEnSeqInAddrEvt(15 downto  8);
+    SeqInAddrEvt(23 downto 16) <= LiEnSeqInAddrEvt(23 downto 16);
+    SeqInAddrEvt(31 downto 24) <= LiEnSeqInAddrEvt(31 downto 24);
     --
     
 OUTFIFO_FOR_ZYNQ : if C_FAMILY = "zynq"  generate -- "zynq", "zynquplus" 
@@ -491,17 +444,17 @@ begin
    
     u_OUTFIFO_32_2048_64_1024 : OUTFIFO_32_2048_64_1024_ZYNQ
         port map (
-            rst          => ResetTX_xR,    -- high-active reset
-            wr_clk       => CoreClk_xCI,
-            rd_clk       => CoreClk_xCI,
-            din          => CoreFifoDat_xDI,
-            wr_en        => CoreFifoWrite_xSI,
-            rd_en        => SeqInRead_xS,
-            dout         => LiEnSeqInAddrEvt_xD,
-            full         => CoreFifoFull_xSO,
-            almost_full  => CoreFifoAlmostFull_xSO,
+            rst          => ResetTX,    -- high-active reset
+            wr_clk       => CoreClk_i,
+            rd_clk       => CoreClk_i,
+            din          => CoreFifoDat_i,
+            wr_en        => CoreFifoWrite_i,
+            rd_en        => SeqInRead,
+            dout         => LiEnSeqInAddrEvt,
+            full         => CoreFifoFull_o,
+            almost_full  => CoreFifoAlmostFull_o,
             overflow     => open,
-            empty        => SeqInEmpty_xS,
+            empty        => SeqInEmpty,
             almost_empty => open,
             underflow    => open
         );
@@ -511,24 +464,24 @@ end generate;
 OUTFIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
 
-  TxFifoWrEn              <= CoreFifoWrite_xSI and not txfifo_wr_rst_busy;
-  CoreFifoFull_xSO        <= TxFifoFull or txfifo_wr_rst_busy;
-  CoreFifoAlmostFull_xSO  <= TxFifoAlmostFull or txfifo_wr_rst_busy;  
+  TxFifoWrEn              <= CoreFifoWrite_i and not txfifo_wr_rst_busy;
+  CoreFifoFull_o          <= TxFifoFull or txfifo_wr_rst_busy;
+  CoreFifoAlmostFull_o    <= TxFifoAlmostFull or txfifo_wr_rst_busy;  
   
-  TxFifoRdEn              <= SeqInRead_xS and not txfifo_rd_rst_busy;
-  SeqInEmpty_xS           <= TxFifoEmpty or txfifo_rd_rst_busy;
+  TxFifoRdEn              <= SeqInRead and not txfifo_rd_rst_busy;
+  SeqInEmpty              <= TxFifoEmpty or txfifo_rd_rst_busy;
 
 
 
   TXFIFO_HPU_ZYNQUPLUS_i : TXFIFO_HPU_ZYNQUPLUS
     PORT MAP (
-      rst           => ResetTX_xR,
-      wr_clk        => AxisClk_xCI,
-      rd_clk        => CoreClk_xCI,
-      din           => CoreFifoDat_xDI,
+      rst           => ResetTX,
+      wr_clk        => AxisClk_i,
+      rd_clk        => CoreClk_i,
+      din           => CoreFifoDat_i,
       wr_en         => TxFifoWrEn,
       rd_en         => TxFifoRdEn,
-      dout          => LiEnSeqInAddrEvt_xD,
+      dout          => LiEnSeqInAddrEvt,
       full          => TxFifoFull,
       almost_full   => TxFifoAlmostFull,
       overflow      => open,
@@ -543,17 +496,17 @@ begin
    
 --    u_OUTFIFO_32_2048_64_1024 : OUTFIFO_32_2048_64_1024_ZYNQUPLUS
 --        port map (
---            rst          => ResetTX_xR,    -- high-active reset
---            wr_clk       => CoreClk_xCI,
---            rd_clk       => CoreClk_xCI,
---            din          => CoreFifoDat_xDI,
---            wr_en        => CoreFifoWrite_xSI,
---            rd_en        => SeqInRead_xS,
---            dout         => LiEnSeqInAddrEvt_xD,
---            full         => CoreFifoFull_xSO,
---            almost_full  => CoreFifoAlmostFull_xSO,
+--            rst          => ResetTX,    -- high-active reset
+--            wr_clk       => CoreClk_i,
+--            rd_clk       => CoreClk_i,
+--            din          => CoreFifoDatI,
+--            wr_en        => CoreFifoWrite_i,
+--            rd_en        => SeqInRead,
+--            dout         => LiEnSeqInAddrEvt,
+--            full         => CoreFifoFull_o,
+--            almost_full  => CoreFifoAlmostFull_o,
 --            overflow     => open,
---            empty        => SeqInEmpty_xS,
+--            empty        => SeqInEmpty,
 --            almost_empty => open,
 --            underflow    => open
 --        );
@@ -563,7 +516,7 @@ end generate;
     
 
 
-    CoreFifoEmpty_xSO <= SeqInEmpty_xS;
+    CoreFifoEmpty_o <= SeqInEmpty;
 
 
     -----------------------------------------------------------------------------
@@ -571,15 +524,15 @@ end generate;
     -----------------------------------------------------------------------------
 
     -- to computer, timestamp
-    LiEnMonOutAddrEvt_xD(39 downto 32) <= MonOutAddrEvt_xD(39 downto 32);
-    LiEnMonOutAddrEvt_xD(47 downto 40) <= MonOutAddrEvt_xD(47 downto 40);
-    LiEnMonOutAddrEvt_xD(55 downto 48) <= MonOutAddrEvt_xD(55 downto 48);
-    LiEnMonOutAddrEvt_xD(63 downto 56) <= MonOutAddrEvt_xD(63 downto 56);
+    LiEnMonOutAddrEvt(39 downto 32) <= MonOutAddrEvt(39 downto 32);
+    LiEnMonOutAddrEvt(47 downto 40) <= MonOutAddrEvt(47 downto 40);
+    LiEnMonOutAddrEvt(55 downto 48) <= MonOutAddrEvt(55 downto 48);
+    LiEnMonOutAddrEvt(63 downto 56) <= MonOutAddrEvt(63 downto 56);
     -- to computer, address
-    LiEnMonOutAddrEvt_xD( 7 downto  0) <= MonOutAddrEvt_xD( 7 downto  0);
-    LiEnMonOutAddrEvt_xD(15 downto  8) <= MonOutAddrEvt_xD(15 downto  8);
-    LiEnMonOutAddrEvt_xD(23 downto 16) <= MonOutAddrEvt_xD(23 downto 16);
-    LiEnMonOutAddrEvt_xD(31 downto 24) <= MonOutAddrEvt_xD(31 downto 24);
+    LiEnMonOutAddrEvt( 7 downto  0) <= MonOutAddrEvt( 7 downto  0);
+    LiEnMonOutAddrEvt(15 downto  8) <= MonOutAddrEvt(15 downto  8);
+    LiEnMonOutAddrEvt(23 downto 16) <= MonOutAddrEvt(23 downto 16);
+    LiEnMonOutAddrEvt(31 downto 24) <= MonOutAddrEvt(31 downto 24);
     --
 
 INFIFO_FOR_ZYNQ : if C_FAMILY = "zynq"  generate -- "zynq", "zynquplus" 
@@ -587,18 +540,18 @@ begin
    
     u_INFIFO_64_1024 : INFIFO_64_1024_ZYNQ
         port map (
-            clk          => CoreClk_xCI,
-            srst         => ResetRX_xR,    -- high-active reset
-            din          => LiEnMonOutAddrEvt_xD,
-            wr_en        => enableFifoWriting_xS,
-            rd_en        => effectiveRdEn_xS,
-            dout         => i_fifoCoreDat_xD,
-            full         => MonOutFull_xS,
-            almost_full  => DBG_almost_full,
-            overflow     => DBG_overflow,
-            empty        => i_FifoCoreEmpty_xSO,
-            almost_empty => i_FifoCoreAlmostEmpty_xSO,
-            underflow    => DBG_underflow,
+            clk          => CoreClk_i,
+            srst         => ResetRX,    -- high-active reset
+            din          => LiEnMonOutAddrEvt,
+            wr_en        => enableFifoWriting,
+            rd_en        => effectiveRdEn,
+            dout         => i_fifoCoreDat,
+            full         => MonOutFull,
+            almost_full  => open,
+            overflow     => open,
+            empty        => i_FifoCoreEmpty_o,
+            almost_empty => i_FifoCoreAlmostEmpty_o,
+            underflow    => open,
             data_count   => RxFifoWrDataCount
         );
 
@@ -607,25 +560,22 @@ end generate;
 INFIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
 
-  RxFifoWrEn                <= enableFifoWriting_xS and not rxfifo_wr_rst_busy;
-  MonOutFull_xS             <= RxFifoFull or rxfifo_wr_rst_busy;
-  DBG_almost_full           <= RxFifoAlmostFull or rxfifo_wr_rst_busy;
-  DBG_overflow              <= RxFifoOverflow; -- or rxfifo_wr_rst_busy;
+  RxFifoWrEn                <= enableFifoWriting and not rxfifo_wr_rst_busy;
+  MonOutFull                <= RxFifoFull or rxfifo_wr_rst_busy;
   
-  RxFifoRdEn                <= effectiveRdEn_xS and not rxfifo_rd_rst_busy;
-  i_FifoCoreEmpty_xSO       <= RxFifoEmpty or rxfifo_rd_rst_busy;
-  i_FifoCoreAlmostEmpty_xSO <= RxFifoAlmostEmpty or rxfifo_rd_rst_busy;
-  DBG_underflow             <= RxFifoUnderflow; -- or rxfifo_rd_rst_busy;
+  RxFifoRdEn                <= effectiveRdEn and not rxfifo_rd_rst_busy;
+  i_FifoCoreEmpty_o         <= RxFifoEmpty or rxfifo_rd_rst_busy;
+  i_FifoCoreAlmostEmpty_o   <= RxFifoAlmostEmpty or rxfifo_rd_rst_busy;
   
   RXFIFO_HPU_ZYNQUPLUS_i : RXFIFO_HPU_ZYNQUPLUS
     PORT MAP (
-      rst           => ResetRX_xR,
-      wr_clk        => CoreClk_xCI,
-      rd_clk        => AxisClk_xCI,
-      din           => LiEnMonOutAddrEvt_xD,
+      rst           => ResetRX,
+      wr_clk        => CoreClk_i,
+      rd_clk        => AxisClk_i,
+      din           => LiEnMonOutAddrEvt,
       wr_en         => RxFifoWrEn,
       rd_en         => RxFifoRdEn,
-      dout          => i_fifoCoreDat_xD,
+      dout          => i_fifoCoreDat,
       full          => RxFifoFull,
       almost_full   => RxFifoAlmostFull,
       overflow      => RxFifoOverflow,
@@ -640,19 +590,19 @@ begin
     
 --     u_INFIFO_64_1024 : INFIFO_64_1024_ZYNQUPLUS
 --         port map (
---             clk          => CoreClk_xCI,
---             srst         => ResetRX_xR,    -- high-active reset
---             din          => LiEnMonOutAddrEvt_xD,
---             wr_en        => enableFifoWriting_xS,
---             rd_en        => effectiveRdEn_xS,
---             dout         => i_fifoCoreDat_xD,
---             full         => MonOutFull_xS,
+--             clk          => CoreClk_i,
+--             srst         => ResetRX,    -- high-active reset
+--             din          => LiEnMonOutAddrEvt,
+--             wr_en        => enableFifoWriting,
+--             rd_en        => effectiveRdEn,
+--             dout         => i_fifoCoreDat,
+--             full         => MonOutFull,
 --             almost_full  => DBG_almost_full,
 --             overflow     => DBG_overflow,
---             empty        => i_FifoCoreEmpty_xSO,
---             almost_empty => i_FifoCoreAlmostEmpty_xSO,
+--             empty        => i_FifoCoreEmpty_o,
+--             almost_empty => i_FifoCoreAlmostEmpty_o,
 --             underflow    => DBG_underflow,
---             data_count   => fifoWrDataCount_xD,
+--             data_count   => fifoWrDataCount,
 --             wr_rst_busy  => infifo_wr_rst_busy,
 --             rd_rst_busy  => infifo_rd_rst_busy
 --         );
@@ -661,32 +611,31 @@ end generate;
 
 
     FifoCoreNumData_o <= RxFifoRdDataCount;
-
-    -- It's DmaLength_xDI/2 because of the FIFO is 64 bit and the reading is 32 bit wide
-    FifoCoreBurstReady_xSO <= '1' when (to_integer(unsigned(RxFifoRdDataCount)) >= to_integer(unsigned('0'&DmaLength_xDI(15 downto 1)))) else '0';
-
-
-    p_ReadDataTimeSel : process (CoreClk_xCI) is
+    
+    p_ReadDataTimeSel : process (AxisClk_i, Reset_n_AxisClk_i) is
         begin
-        if (rising_edge(CoreClk_xCI)) then
-            if (Reset_xRBI = '0') then
-                dataRead_xS <= '0';
-            else
-                if (FifoCoreRead_xSI = '1') then
-                    dataRead_xS <= not(dataRead_xS);
-                end if;
+            if (Reset_n_AxisClk_i = '0') then
+                dataRead <= '0';
+            elsif (rising_edge(AxisClk_i)) then
+                if (OnlyEvents_i = '1') then
+                    dataRead <= '1';
+                elsif (FifoCoreRead_i = '0') then
+                    dataRead <= '0';
+                else
+                    dataRead <= not(dataRead);
+              end if;
             end if;
-        end if;
-    end process p_ReadDataTimeSel;
+        end process p_ReadDataTimeSel;
 
-    FifoCoreDat_xDO  <= i_fifoCoreDat_xD(63 downto 32) when (dataRead_xS = '0') else  -- i.e. Time
-                        i_fifoCoreDat_xD(31 downto  0);                               -- i.e. Data
-    effectiveRdEn_xS <= FifoCoreRead_xSI when (dataRead_xS = '1') else '0';
+    FifoCoreDat_o      <= i_fifoCoreDat(63 downto 32) when (dataRead = '0') else     -- i.e. Timestamp
+                         i_fifoCoreDat(31 downto  0);                                -- i.e. Event
+    effectiveRdEn      <=  '0' when (dataRead = '0') else FifoCoreRead_i;
 
-    FifoCoreFull_xSO <= MonOutFull_xS;
+    FifoCoreFull_o     <= MonOutFull;
+    FifoCoreLastData_o <= RxFifoAlmostEmpty and not RxFifoEmpty;
 
-    --enableFifoWriting_xS <= MonOutWrite_xS when (MonOutAddrEvt_xD(7 downto 0) >= OutThresholdVal_xDI(7 downto 0)) else '0';
-    enableFifoWriting_xS <= MonOutWrite_xS;
+    --enableFifoWriting <= MonOutWrite when (MonOutAddrEvt(7 downto 0) >= OutThresholdValI(7 downto 0)) else '0';
+    enableFifoWriting <= MonOutWrite;
 
 
     -----------------------------------------------------------------------------
@@ -699,30 +648,30 @@ end generate;
         write(v_buf_out, string'("time,ChipId,IntfId,Address"));
         writeline(logfile_ptr, v_buf_out);
         loop
-            wait until (rising_edge(CoreClk_xCI));
-            if (MonOutWrite_xS = '1') then
+            wait until (rising_edge(CoreClk_i));
+            if (MonOutWrite = '1') then
                 write(v_buf_out, now, right, 10); write(v_buf_out, string'(","));
-                if (LiEnMonOutAddrEvt_xD(C_PAER_DSIZE) = '1') then
+                if (LiEnMonOutAddrEvt(C_PAER_DSIZE) = '1') then
                     write(v_buf_out, string'("R,"));
                 else
                     write(v_buf_out, string'("L,"));
                 end if;
-                 if (LiEnMonOutAddrEvt_xD(C_PAER_DSIZE-1 downto C_PAER_DSIZE-1-3) = "0000") then
+                 if (LiEnMonOutAddrEvt(C_PAER_DSIZE-1 downto C_PAER_DSIZE-1-3) = "0000") then
                     write(v_buf_out, string'("TD,"));
                 else
                     write(v_buf_out, string'("APS,"));
                 end if;
-               case (LiEnMonOutAddrEvt_xD(C_INTERNAL_DSIZE-1 downto C_INTERNAL_DSIZE-2)) is
+               case (LiEnMonOutAddrEvt(C_INTERNAL_DSIZE-1 downto C_INTERNAL_DSIZE-2)) is
                     when "00" => write(v_buf_out, string'("PAER,"));
                     when "01" => write(v_buf_out, string'("SAER,"));
                     when "10" => write(v_buf_out, string'("GTP,"));
                     when others => write(v_buf_out, string'("Unknown"));
                 end case;
-                hwrite(v_buf_out, LiEnMonOutAddrEvt_xD(C_PAER_DSIZE-1 downto 0));
+                hwrite(v_buf_out, LiEnMonOutAddrEvt(C_PAER_DSIZE-1 downto 0));
                 write(v_buf_out, string'(", "));
-                hwrite(v_buf_out, LiEnMonOutAddrEvt_xD(63 downto 32));
+                hwrite(v_buf_out, LiEnMonOutAddrEvt(63 downto 32));
                 write(v_buf_out, string'(" ("));
-                hwrite(v_buf_out, LiEnMonOutAddrEvt_xD(31 downto 0));
+                hwrite(v_buf_out, LiEnMonOutAddrEvt(31 downto 0));
                 write(v_buf_out, string'(")"));
                 writeline(logfile_ptr, v_buf_out);
             end if;
@@ -731,26 +680,10 @@ end generate;
     -- pragma synthesis_on
 
 
-DBG_din             <= LiEnMonOutAddrEvt_xD;   
-DBG_wr_en           <= enableFifoWriting_xS;       
-DBG_rd_en           <= effectiveRdEn_xS;       
-DBG_dout            <= i_fifoCoreDat_xD;            
-DBG_full            <= MonOutFull_xS;        
--- DBG_almost_full     <= DBG_almost_full; 
---DBG_overflow        <= DBG_overflow;      
-DBG_empty           <= i_FifoCoreEmpty_xSO;            
-DBG_almost_empty    <= i_FifoCoreAlmostEmpty_xSO;
+FifoCoreEmpty_o       <= i_FifoCoreEmpty_o;
+FifoCoreAlmostEmpty_o <= i_FifoCoreAlmostEmpty_o;
 
-FifoCoreEmpty_xSO   <= i_FifoCoreEmpty_xSO;
-FifoCoreAlmostEmpty_xSO <= i_FifoCoreAlmostEmpty_xSO;
 
---DBG_underflow       <= DBG_underflow;   
-DBG_data_count     <= RxFifoRdDataCount;
-DBG_Timestamp_xD   <= Timestamp_RX_xD;
-DBG_MonInAddr_xD   <= MonInAddr_xD;
-DBG_MonInSrcRdy_xS <= MonInSrcRdy_xS;
-DBG_MonInDstRdy_xS <= MonInDstRdy_xS;
-DBG_RESETFIFO      <= ResetRX_xR;
 
 
 end architecture str;
