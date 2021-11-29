@@ -62,12 +62,12 @@ entity HPUcore_tb is
         NUM_OF_RECEIVER             : natural := 32;
         SPI_ADC_RES                 : natural := 12;
         C_GTP_DSIZE                 : natural := 16;
-        NORANDOM_DMA                : natural := 0
+        NORANDOM_DMA                : natural := 0 
         );
 end HPUcore_tb;
  
-architecture behavior of HPUcore_tb is   
- 
+architecture behavior of HPUcore_tb is     
+    
 -- Clock generation constants
 
 constant CLK_FREQ_c                    : real := 100.0; -- MHz                
@@ -82,7 +82,7 @@ constant CLK_HSSAER_HS_HALF_PERIOD_2_c : time := 1666 ps;
 constant CLK_HSSAER_HS_HALF_PERIOD_3_c : time := 1667 ps;  
 constant CLK_HSSAER_HS_HALF_PERIOD_4_c : time := 1667 ps;
 constant CLK_HSSAER_HS_HALF_PERIOD_5_c : time := 1666 ps;  
-constant CLK_HSSAER_HS_HALF_PERIOD_6_c : time := 1667 ps;
+constant CLK_HSSAER_HS_HALF_PERIOD_6_c : time := 1667 ps;    
  
 -- constant F_HSCLK : real := 300.0; -- MHz
 -- constant T_HSCLK : time := ((1.0/F_HSCLK)/2.0) * (1 us);
@@ -98,22 +98,22 @@ component HPUCore is
   generic (
     -- -----------------------    
     -- GENERAL
-    C_FAMILY                  : string                        := "zynq"; -- "zynq", "zynquplus" 
-    -- ----------------------- 
+    C_FAMILY                  : string                        := "zynquplus"; -- "zynq", "zynquplus" 
+    -- -----------------------    
     -- PAER        
-    C_RX_L_HAS_PAER           : boolean                       := false;
-    C_RX_R_HAS_PAER           : boolean                       := false;
-    C_RX_A_HAS_PAER           : boolean                       := false;
+    C_RX_L_HAS_PAER           : boolean                       := true;
+    C_RX_R_HAS_PAER           : boolean                       := true;
+    C_RX_A_HAS_PAER           : boolean                       := true;
     C_RX_PAER_L_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
     C_RX_PAER_R_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
     C_RX_PAER_A_SENS_ID       : std_logic_vector(2 downto 0)  := "001";
-    C_TX_HAS_PAER             : boolean                       := false;
+    C_TX_HAS_PAER             : boolean                       := true;
     C_PAER_DSIZE              : natural range 1 to 29         := 24;
     -- -----------------------        
     -- HSSAER
-    C_RX_L_HAS_HSSAER         : boolean                       := false;
-    C_RX_R_HAS_HSSAER         : boolean                       := false;
-    C_RX_A_HAS_HSSAER         : boolean                       := false;
+    C_RX_L_HAS_HSSAER         : boolean                       := true;
+    C_RX_R_HAS_HSSAER         : boolean                       := true;
+    C_RX_A_HAS_HSSAER         : boolean                       := true;
     C_RX_HSSAER_N_CHAN        : natural range 1 to 4          := 4;
     C_RX_SAER0_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
     C_RX_SAER1_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
@@ -127,42 +127,41 @@ component HPUCore is
     C_RX_SAER1_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
     C_RX_SAER2_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
     C_RX_SAER3_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-    C_TX_HAS_HSSAER           : boolean                       := false;
+    C_TX_HAS_HSSAER           : boolean                       := true;
     C_TX_HSSAER_N_CHAN        : natural range 1 to 4          := 4;
     -- -----------------------        
     -- GTP
-    C_RX_L_HAS_GTP            : boolean                       := false;
-    C_RX_R_HAS_GTP            : boolean                       := false;
-    C_RX_A_HAS_GTP            : boolean                       := false;
+    C_RX_L_HAS_GTP            : boolean                       := true;
+    C_RX_R_HAS_GTP            : boolean                       := true;
+    C_RX_A_HAS_GTP            : boolean                       := true;
 --    C_GTP_RXUSRCLK2_PERIOD_NS : real                          := 6.4;        
     C_GTP_RXUSRCLK2_PERIOD_PS : positive                      := 6400;        -- Positive (integer) because IP Packager doesn't support real generics 
-    C_TX_HAS_GTP              : boolean                       := false;
+    C_TX_HAS_GTP              : boolean                       := true;
 --    C_GTP_TXUSRCLK2_PERIOD_NS : real                          := 6.4;  
     C_GTP_TXUSRCLK2_PERIOD_PS : positive                      := 6400;        -- Positive (integer) because IP Packager doesn't support real generics    
     C_GTP_DSIZE               : positive                      := 16;
     -- -----------------------                
     -- SPINNLINK
-    C_RX_L_HAS_SPNNLNK        : boolean                       := false;
-    C_RX_R_HAS_SPNNLNK        : boolean                       := false;
-    C_RX_A_HAS_SPNNLNK        : boolean                       := false;
-    C_TX_HAS_SPNNLNK          : boolean                       := false;
+    C_RX_L_HAS_SPNNLNK        : boolean                       := true;
+    C_RX_R_HAS_SPNNLNK        : boolean                       := true;
+    C_RX_A_HAS_SPNNLNK        : boolean                       := true;
+    C_TX_HAS_SPNNLNK          : boolean                       := true;
     C_PSPNNLNK_WIDTH      	  : natural range 1 to 32         := 32;
     -- -----------------------
     -- INTERCEPTION
-    C_RX_L_INTERCEPTION       : boolean                       := false;
-    C_RX_R_INTERCEPTION       : boolean                       := false;
-    C_RX_A_INTERCEPTION       : boolean                       := false;
+    C_RX_L_INTERCEPTION       : boolean                       := true;
+    C_RX_R_INTERCEPTION       : boolean                       := true;
+    C_RX_A_INTERCEPTION       : boolean                       := true;
     -- -----------------------
     -- CORE
 --    C_SYSCLK_PERIOD_NS        : real                          := 10.0;           -- System Clock period
     C_SYSCLK_PERIOD_PS        : positive                      := 10000;          -- Positive (integer) because IP Packager doesn't support real generics 
-    C_DEBUG                   : boolean                       := false;          -- Debug Ports: if true the debug ports are exposed
-    C_HAS_DEFAULT_LOOPBACK    : boolean                       := false;
+    C_HAS_DEFAULT_LOOPBACK    : boolean                       := true;
     -- -----------------------
     -- BUS PROTOCOL PARAMETERS
     C_S_AXI_ADDR_WIDTH        : integer                       := 8;             -- AXI4 Lite Slave Address width: size of AXI4 Lite Address bus
     C_S_AXI_DATA_WIDTH        : integer                       := 32;            -- AXI4 Lite Slave Data width:    size of AXI4 Lite Data bus
-    C_SLV_DWIDTH              : integer                       := 32;
+    C_SLV_DWIDTH              : integer                       := 32;            -- Slave interface data bus width
     -- -----------------------
     -- SIMULATION
     C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
@@ -170,13 +169,19 @@ component HPUCore is
   port (
     
     -- SYNC Resetn
-    nSyncReset        : in  std_logic := 'X';
+    CLEAR_N_i                   : in  std_logic := 'X';    -- Asynchronous Clear
+    
+    -- Main Core Clock 
+    CLK_CORE_i                  : in  std_logic;
+    
+    -- AXI Stream Clock
+    CLK_AXIS_i                  : in  std_logic;
     
     -- Clocks for HSSAER interface
-    HSSAER_ClkLS_p    : in  std_logic := '0'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-    HSSAER_ClkLS_n    : in  std_logic := '1'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-    HSSAER_ClkHS_p    : in  std_logic := '0'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
-    HSSAER_ClkHS_n    : in  std_logic := '1'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+    CLK_HSSAER_LS_P_i           : in  std_logic := '0'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+    CLK_HSSAER_LS_N_i           : in  std_logic := '1'; -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+    CLK_HSSAER_HS_P_i           : in  std_logic := '0'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+    CLK_HSSAER_HS_N_i           : in  std_logic := '1'; -- 300 Mhz clock p it must 3x HSSAER_ClkLS
 
 
     --============================================
@@ -357,80 +362,36 @@ component HPUCore is
     -- ADD USER PORTS ABOVE THIS LINE ------------------
     
     -- DO NOT EDIT BELOW THIS LINE ---------------------
-    -- Bus protocol ports, do not add to or delete
-    -- Axi lite I/f
-    S_AXI_ACLK        : in  std_logic;
-    S_AXI_ARESETN     : in  std_logic;
-    S_AXI_AWADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
-    S_AXI_AWVALID     : in  std_logic;
-    S_AXI_WDATA       : in  std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-    S_AXI_WSTRB       : in  std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
-    S_AXI_WVALID      : in  std_logic;
-    S_AXI_BREADY      : in  std_logic;
-    S_AXI_ARADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
-    S_AXI_ARVALID     : in  std_logic;
-    S_AXI_RREADY      : in  std_logic;
-    S_AXI_ARREADY     : out std_logic;
-    S_AXI_RDATA       : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-    S_AXI_RRESP       : out std_logic_vector(1 downto 0);
-    S_AXI_RVALID      : out std_logic;
-    S_AXI_WREADY      : out std_logic;
-    S_AXI_BRESP       : out std_logic_vector(1 downto 0);
-    S_AXI_BVALID      : out std_logic;
-    S_AXI_AWREADY     : out std_logic;
-    -- Axi Stream I/f
-    S_AXIS_TREADY     : out std_logic;
-    S_AXIS_TDATA      : in  std_logic_vector(31 downto 0);
-    S_AXIS_TLAST      : in  std_logic;
-    S_AXIS_TVALID     : in  std_logic;
-    M_AXIS_TVALID     : out std_logic;
-    M_AXIS_TDATA      : out std_logic_vector(31 downto 0);
-    M_AXIS_TLAST      : out std_logic;
-    M_AXIS_TREADY     : in  std_logic;
-    -- DO NOT EDIT ABOVE THIS LINE ---------------------
-    
-    DBG_din             : out std_logic_vector(63 downto 0);     
-    DBG_wr_en           : out std_logic;  
-    DBG_rd_en           : out std_logic;     
-    DBG_dout            : out std_logic_vector(63 downto 0);          
-    DBG_full            : out std_logic;    
-    DBG_almost_full     : out std_logic;    
-    DBG_overflow        : out std_logic;       
-    DBG_empty           : out std_logic;           
-    DBG_almost_empty    : out std_logic;    
-    DBG_underflow       : out std_logic;     
-    DBG_data_count      : out std_logic_vector(10 downto 0);
-    DBG_CH0_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH0_SRDY        : out std_logic;   
-    DBG_CH0_DRDY        : out std_logic;        
-    DBG_CH1_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH1_SRDY        : out std_logic;   
-    DBG_CH1_DRDY        : out std_logic;        
-    DBG_CH2_DATA        : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_CH2_SRDY        : out std_logic;   
-    DBG_CH2_DRDY        : out std_logic;
-    DBG_Timestamp_xD    : out std_logic_vector(31 downto 0);       
-    DBG_MonInAddr_xD    : out std_logic_vector(31 downto 0); 
-    DBG_MonInSrcRdy_xS  : out std_logic;
-    DBG_MonInDstRdy_xS  : out std_logic;
-    DBG_RESETFIFO       : out std_logic;
-    DBG_CTRG_reg        : out std_logic_vector(C_SLV_DWIDTH-1 downto 0); 
-    DBG_ctrl_rd         : out std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    DBG_src_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_dst_rdy         : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_err             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);  
-    DBG_run             : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_RX              : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    DBG_AUXRxSaerChanEn : out std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    
-    DBG_shreg_aux0      : out std_logic_vector(3 downto 0);
-    DBG_shreg_aux1      : out std_logic_vector(3 downto 0);
-    DBG_shreg_aux2      : out std_logic_vector(3 downto 0);
-    DBG_FIFO_0          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_1          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_2          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_3          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    DBG_FIFO_4          : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0)
+    -- Bus protocol ports, do not add to or delete  
+    -- Axi lite I/f                                                                                                                                          
+--    S_AXI_ACLK        : in  std_logic;                                           --  AXI4LITE slave: Clock                                           
+    S_AXI_ARESETN     : in  std_logic;                                             --  AXI4LITE slave: Reset                                         
+    S_AXI_AWADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);       --  AXI4LITE slave: Write address                                 
+    S_AXI_AWVALID     : in  std_logic;                                             --  AXI4LITE slave: Write address valid                           
+    S_AXI_WDATA       : in  std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);       --  AXI4LITE slave: Write data                                    
+    S_AXI_WSTRB       : in  std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);   --  AXI4LITE slave: Write strobe                                  
+    S_AXI_WVALID      : in  std_logic;                                             --  AXI4LITE slave: Write data valid                              
+    S_AXI_BREADY      : in  std_logic;                                             --  AXI4LITE slave: Response ready                                
+    S_AXI_ARADDR      : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);       --  AXI4LITE slave: Read address                                  
+    S_AXI_ARVALID     : in  std_logic;                                             --  AXI4LITE slave: Read address valid                            
+    S_AXI_RREADY      : in  std_logic;                                             --  AXI4LITE slave: Read data ready                               
+    S_AXI_ARREADY     : out std_logic;                                             --  AXI4LITE slave: read addres ready                             
+    S_AXI_RDATA       : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);       --  AXI4LITE slave: Read data                                     
+    S_AXI_RRESP       : out std_logic_vector(1 downto 0);                          --  AXI4LITE slave: Read data response                            
+    S_AXI_RVALID      : out std_logic;                                             --  AXI4LITE slave: Read data valid                               
+    S_AXI_WREADY      : out std_logic;                                             --  AXI4LITE slave: Write data ready                              
+    S_AXI_BRESP       : out std_logic_vector(1 downto 0);                          --  AXI4LITE slave: Response                                      
+    S_AXI_BVALID      : out std_logic;                                             --  AXI4LITE slave: Resonse valid                                 
+    S_AXI_AWREADY     : out std_logic;                                             --  AXI4LITE slave: Wrte address ready                            
+    -- Axi Stream I/f                                                              
+    S_AXIS_TREADY     : out std_logic;                                             --  Stream I/f: Ready to accept data in                           
+    S_AXIS_TDATA      : in  std_logic_vector(31 downto 0);                         --  Stream I/f: Data in                                           
+    S_AXIS_TLAST      : in  std_logic;                                             --  Stream I/f: Optional data in qualifier                        
+    S_AXIS_TVALID     : in  std_logic;                                             --  Stream I/f: Data in is valid                                  
+    M_AXIS_TVALID     : out std_logic;                                             --  Stream I/f: Data out is valid                                 
+    M_AXIS_TDATA      : out std_logic_vector(31 downto 0);                         --  Stream I/f: Data Out                                          
+    M_AXIS_TLAST      : out std_logic;                                             --  Stream I/f: Optional data out qualifier                       
+    M_AXIS_TREADY     : in  std_logic                                              --  Stream I/f: Connected slave device is ready to accept data out
     );
 
 --    attribute MAX_FANOUT  : string;
@@ -859,7 +820,7 @@ signal ARx_GTP_Rxbyterealign      : std_logic;
 signal ARx_GTP_PllLock            : std_logic;                                      
 signal ARx_GTP_PllRefclklost      : std_logic; 
 
-
+ 
 -- 
 signal M_Axis_TREADY_HPU        : std_logic;
 
@@ -1235,7 +1196,6 @@ HPUCORE_i : HPUCore
         -- CORE
         --C_SYSCLK_PERIOD_NS          => 10.0,               
         C_SYSCLK_PERIOD_PS          => 10000,               
-        C_DEBUG                     => false,                
         C_HAS_DEFAULT_LOOPBACK      => false,
         -- -----------------------
         -- BUS PROTOCOL PARAMETERS
@@ -1249,13 +1209,19 @@ HPUCORE_i : HPUCore
     port map(
 
         -- SYNC Resetn
-        nSyncReset        			    => i_resetn,
+        CLEAR_N_i        			      => i_resetn,
+        
+        -- Main Core Clock 
+        CLK_CORE_i                  => HSSAER_ClkLS_p,
+        
+        -- AXI Stream Clock
+        CLK_AXIS_i                  => HSSAER_ClkLS_p,
 
         -- Clocks for HSSAER interface
-        HSSAER_ClkLS_p   			      => HSSAER_ClkLS_p, -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-        HSSAER_ClkLS_n   			      => HSSAER_ClkLS_n, -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
-        HSSAER_ClkHS_p   			      => HSSAER_ClkHS_p, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
-        HSSAER_ClkHS_n   			      => HSSAER_ClkHS_n, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+        CLK_HSSAER_LS_P_i 			    => HSSAER_ClkLS_p, -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+        CLK_HSSAER_LS_N_i 			    => HSSAER_ClkLS_n, -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
+        CLK_HSSAER_HS_P_i 			    => HSSAER_ClkHS_p, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
+        CLK_HSSAER_HS_N_i 			    => HSSAER_ClkHS_n, -- 300 Mhz clock p it must 3x HSSAER_ClkLS
 
 
         --============================================
@@ -1353,7 +1319,7 @@ HPUCORE_i : HPUCore
 
         --============================================
         -- Rx Auxiliary Interface
-        --============================================
+        --============================================ 
 
         -- Parallel AER 
         ARx_PAER_Addr_i           	=> data_from_AER_Aux,
@@ -1435,7 +1401,7 @@ HPUCORE_i : HPUCore
         -- DO NOT EDIT BELOW THIS LINE ---------------------
         -- Bus protocol ports, do not add to or delete
         -- Axi lite I/f
-        S_AXI_ACLK        			=> HSSAER_ClkLS_p,
+--        S_AXI_ACLK        			=> HSSAER_ClkLS_p,
         S_AXI_ARESETN     			=> i_resetn,
         S_AXI_AWADDR      			=> s_axi_awaddr(C_S_AXI_ADDR_WIDTH-1 downto 0),
         S_AXI_AWVALID     			=> s_axi_awvalid,
@@ -1462,51 +1428,7 @@ HPUCORE_i : HPUCore
         M_AXIS_TVALID     			=>  m_axis_tvalid, -- open, 			  -- : out std_logic;
         M_AXIS_TDATA      			=>  m_axis_tdata,  -- open, 			  -- : out std_logic_vector(31 downto 0);
         M_AXIS_TLAST      			=>  m_axis_tlast,  -- open, 			  -- : out std_logic;
-        M_AXIS_TREADY     			=>  M_Axis_TREADY_HPU, -- : in  std_logic;
-        -- DO NOT EDIT ABOVE THIS LINE ---------------------
-
-        DBG_din             		=> open,
-        DBG_wr_en           		=> open,
-        DBG_rd_en           		=> open,
-        DBG_dout            		=> open,
-        DBG_full            		=> open,
-        DBG_almost_full     		=> open,
-        DBG_overflow        		=> open,
-        DBG_empty           		=> open,
-        DBG_almost_empty    		=> open,
-        DBG_underflow       		=> open,
-        DBG_data_count      		=> open,
-        DBG_CH0_DATA        		=> open,
-        DBG_CH0_SRDY        		=> open,
-        DBG_CH0_DRDY        		=> open,
-        DBG_CH1_DATA        		=> open,
-        DBG_CH1_SRDY        		=> open,
-        DBG_CH1_DRDY        		=> open,
-        DBG_CH2_DATA        		=> open,
-        DBG_CH2_SRDY        		=> open,
-        DBG_CH2_DRDY        		=> open,
-        DBG_Timestamp_xD    		=> open,
-        DBG_MonInAddr_xD    		=> open,
-        DBG_MonInSrcRdy_xS  		=> open,
-        DBG_MonInDstRdy_xS  		=> open,
-        DBG_RESETFIFO       		=> open,
-        DBG_CTRG_reg        		=> open,
-        DBG_ctrl_rd         		=> open,
-        DBG_src_rdy         		=> open,
-        DBG_dst_rdy         		=> open,
-        DBG_err             		=> open, 
-        DBG_run             		=> open,
-        DBG_RX              		=> open,
-        DBG_AUXRxSaerChanEn 		=> open,
-
-        DBG_shreg_aux0      		=> open,
-        DBG_shreg_aux1      		=> open,
-        DBG_shreg_aux2      		=> open,
-        DBG_FIFO_0          		=> open,
-        DBG_FIFO_1          		=> open,
-        DBG_FIFO_2          		=> open,
-        DBG_FIFO_3          		=> open,
-        DBG_FIFO_4          		=> open
+        M_AXIS_TREADY     			=>  M_Axis_TREADY_HPU
     );
 
 

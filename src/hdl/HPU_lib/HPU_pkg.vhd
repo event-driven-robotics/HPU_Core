@@ -237,7 +237,7 @@ component neuserial_core is
     --
     -- FIFOs interfaces
     ---------------------
-    FifoCoreDat_o             : out std_logic_vector(31 downto 0);
+    FifoCoreDat_o             : out std_logic_vector(63 downto 0);
     FifoCoreRead_i            : in  std_logic;
     FifoCoreEmpty_o           : out std_logic;
     FifoCoreAlmostEmpty_o     : out std_logic;
@@ -384,7 +384,7 @@ component neuserial_core is
   );
 end component neuserial_core;
 
-component neuserial_axilite is
+component axilite is
   generic (
     C_DATA_WIDTH                    : integer range 16 to 32  := 32;   -- HPU_libs only when  C_DATA_WIDTH = 32 !!!
     C_ADDR_WIDTH                    : integer range  5 to 32  :=  8;
@@ -561,9 +561,9 @@ component neuserial_axilite is
     S_AXI_AWREADY                   : out std_logic
     -- DO NOT EDIT ABOVE THIS LINE ---------------------
     );
-end component neuserial_axilite;
+end component axilite;
 
-component neuserial_axistream is
+component axistream is
   port (
     Clk                    : in  std_logic;
     nRst                   : in  std_logic;
@@ -580,7 +580,7 @@ component neuserial_axistream is
     TlastTOwritten_i       : in  std_logic;
     TDataCnt_o             : out std_logic_vector(31 downto 0);
     -- From Fifo to core/dma
-    FifoCoreDat_i          : in  std_logic_vector(31 downto 0);
+    FifoCoreDat_i          : in  std_logic_vector(63 downto 0);
     FifoCoreRead_o         : out std_logic;
     FifoCoreEmpty_i        : in  std_logic;
     FifoCoreLastData_i     : in  std_logic;
@@ -598,7 +598,7 @@ component neuserial_axistream is
     M_AXIS_TLAST           : out std_logic;
     M_AXIS_TREADY          : in  std_logic
     );
-end component neuserial_axistream;
+end component axistream;
 
 component time_machine is
   generic ( 

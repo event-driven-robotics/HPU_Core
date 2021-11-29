@@ -326,14 +326,11 @@ component hpu_tx_datapath is
 end component hpu_tx_datapath;
 
 
-component CoreMonSeqRR is
+component CoreMonSeq is
     generic (
-        C_FAMILY                              : string := "zynq"; -- "zynq", "zynquplus" 
+        C_FAMILY                : string := "zynq"; -- "zynq", "zynquplus" 
         --
-        C_PAER_DSIZE                         : integer;
-        TestEnableSequencerNoWait            : boolean;
-        TestEnableSequencerToMonitorLoopback : boolean;
-        EnableMonitorControlsSequencerToo    : boolean
+        C_PAER_DSIZE            : integer 
     );
     port (
         ---------------------------------------------------------------------------
@@ -373,8 +370,6 @@ component CoreMonSeqRR is
         WrapDetected_o          : out std_logic;
         FullTimestamp_i         : in  std_logic;  
         --
-        EnableMonitor_i         : in  std_logic;
-        CoreReady_i             : in  std_logic;
         ---------------------------------------------------------------------------
         -- TX Timestamp
         TxTSMode_i              : in  std_logic_vector(1 downto 0);
@@ -387,7 +382,7 @@ component CoreMonSeqRR is
         --
         ---------------------------------------------------------------------------
         -- FIFO -> Core
-        FifoCoreDat_o           : out std_logic_vector(31 downto 0);
+        FifoCoreDat_o           : out std_logic_vector(63 downto 0);
         FifoCoreRead_i          : in  std_logic;
         FifoCoreEmpty_o         : out std_logic;
         FifoCoreAlmostEmpty_o   : out std_logic;
@@ -403,10 +398,10 @@ component CoreMonSeqRR is
         CoreFifoEmpty_o         : out std_logic
     
     );
-end component CoreMonSeqRR;
+end component CoreMonSeq;
 
     
-component neuserial_loopback is
+component loopback is
   generic (
     C_PAER_DSIZE          : natural;
     C_RX_HSSAER_N_CHAN    : natural range 1 to 4;
@@ -498,7 +493,7 @@ component neuserial_loopback is
     CoreRx3_data_2of7_from_spinnaker_o   : out std_logic_vector(6 downto 0); 
     CoreRx3_ack_to_spinnaker_i           : in  std_logic
     );
-end component neuserial_loopback;
+end component loopback;
 
 
     --component neuserial_tx_splitter is

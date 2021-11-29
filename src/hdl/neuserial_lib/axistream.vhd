@@ -12,7 +12,7 @@ library ieee;
 --   PORT DECLARATION
 --****************************
 
-entity neuserial_axistream is
+entity axistream is
     port (
         Clk                    : in  std_logic;
         nRst                   : in  std_logic;
@@ -29,7 +29,7 @@ entity neuserial_axistream is
         TlastTOwritten_i       : in  std_logic;
         TDataCnt_o             : out std_logic_vector(31 downto 0);
         -- From Fifo to core/dma
-        FifoCoreDat_i          : in  std_logic_vector(31 downto 0);
+        FifoCoreDat_i          : in  std_logic_vector(63 downto 0);
         FifoCoreRead_o         : out std_logic;
         FifoCoreEmpty_i        : in  std_logic;
         FifoCoreLastData_i     : in  std_logic;
@@ -47,9 +47,9 @@ entity neuserial_axistream is
         M_AXIS_TLAST           : out std_logic;
         M_AXIS_TREADY          : in  std_logic
     );
-end entity neuserial_axistream;
+end entity axistream;
 
-architecture rtl of neuserial_axistream is
+architecture rtl of axistream is
 
     constant DUMMY_DATA : std_logic_vector(31 downto 0) := X"F0CACC1A";
 -- ASM
@@ -226,13 +226,24 @@ end process EVENT_SENT_PROC;
    i_valid_lastread <= i_valid_read and i_M_AXIS_TLAST;
    M_AXIS_TVALID  <= i_M_AXIS_TVALID ;
    M_AXIS_TLAST   <= i_M_AXIS_TLAST;
+   
+   -- M_AXIS_TDATA   <= DUMMY_DATA when (state = premature_end) else 
+   --                   FifoCoreDat_i when (DMA_test_mode_i = '0') else
+   --                   counterTest;
+
    M_AXIS_TDATA   <= DUMMY_DATA when (state = premature_end) else 
-                     FifoCoreDat_i when (DMA_test_mode_i = '0') else
+                     FifoCoreDat_i (63 downto 32) when (DMA_test_mode_i = '0' and state = timeval) else
+                     FifoCoreDat_i (31 downto  0) when (DMA_test_mode_i = '0' and state = dataval) else
                      counterTest;
 
+   -- FifoCoreRead_o   <= '0' when (state = premature_end) else 
+   --                     i_valid_read when (i_enable_ip = '1' and DMA_test_mode_i = '0') else
+   --                     '0';
+   
    FifoCoreRead_o   <= '0' when (state = premature_end) else 
-                       i_valid_read when (i_enable_ip = '1' and DMA_test_mode_i = '0') else
+                       i_valid_read when (i_enable_ip = '1' and DMA_test_mode_i = '0' and state = dataval) else
                        '0';
+     
    DMA_is_running_o <= i_enable_ip;
    
    -- Process counting data to be sent in test_mode

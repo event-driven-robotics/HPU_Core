@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- AEXSsequencerRR
+-- Sequencer
 -------------------------------------------------------------------------------
 
 
@@ -24,7 +24,7 @@ library ieee;
 --   PORT DECLARATION
 --****************************
 
-entity AEXSsequencerRR is
+entity sequencer is
     port (
         Rst_n_i             : in  std_logic;
         Clk_i               : in  std_logic;
@@ -57,14 +57,14 @@ entity AEXSsequencerRR is
         -- ConfigAck_i      : in  std_logic
     );
 
-end entity AEXSsequencerRR;
+end entity sequencer;
 
 
 --****************************
 --   IMPLEMENTATION
 --****************************
 
-architecture beh of AEXSsequencerRR is
+architecture beh of sequencer is
 
 
   

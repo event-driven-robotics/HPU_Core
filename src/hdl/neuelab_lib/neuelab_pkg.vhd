@@ -49,7 +49,6 @@ package NEComponents_pkg is
             rd_rst_busy  : out std_logic
         );
     end component INFIFO_64_1024_ZYNQUPLUS;
-
         
     component OUTFIFO_32_2048_64_1024_ZYNQ is
         port (
@@ -131,10 +130,6 @@ package NEComponents_pkg is
         );
     end component;    
     
-    
-    
-
-   
     component Timestamp is 
         port (
             Rst_n_i        : in  std_logic;
@@ -146,7 +141,6 @@ package NEComponents_pkg is
             Timestamp_o    : out std_logic_vector(31 downto 0)
         );
     end component Timestamp;
-
     
     component TimestampWrapDetector is
         port (
@@ -156,9 +150,8 @@ package NEComponents_pkg is
             WrapDetected_o : out std_logic
         );
     end component TimestampWrapDetector;
-
     
-    component MonitorRR is
+    component timetagger is
         port (
             Rst_n_i         : in  std_logic;
             Clk_i           : in  std_logic;
@@ -175,10 +168,9 @@ package NEComponents_pkg is
             OutWrite_o      : out std_logic;
             OutFull_i       : in  std_logic
         );
-    end component MonitorRR;
+    end component timetagger;
 
-
-    component AEXSsequencerRR is
+    component sequencer is
         port (
             Rst_n_i             : in  std_logic;
             Clk_i               : in  std_logic;
@@ -210,7 +202,6 @@ package NEComponents_pkg is
             -- ConfigReq_o      : out std_logic;
             -- ConfigAck_i      : in  std_logic
         );
-    end component AEXSsequencerRR;
-
+    end component sequencer;
 
 end package NEComponents_pkg;

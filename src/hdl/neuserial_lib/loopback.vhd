@@ -6,7 +6,7 @@ library HPU_lib;
     use HPU_lib.aer_pkg.all;
 
 
-entity neuserial_loopback is
+entity loopback is
     generic (
         C_PAER_DSIZE          : natural;
         C_RX_HSSAER_N_CHAN    : natural range 1 to 4;
@@ -99,10 +99,10 @@ entity neuserial_loopback is
         CoreRx3_data_2of7_from_spinnaker_o   : out std_logic_vector(6 downto 0); 
         CoreRx3_ack_to_spinnaker_i           : in  std_logic
     );
-end entity neuserial_loopback;
+end entity loopback;
 
 
-architecture beh of neuserial_loopback is
+architecture beh of loopback is
 
     signal i_CoreRxLpbk_Ack : std_logic;
 

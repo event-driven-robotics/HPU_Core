@@ -8,7 +8,7 @@ WAT 1000
 
 ##  Control Register
 ## WRD CTRL    00E01002   ## Con Loopback
-WRD CTRL    00001002   ## Senza Loopback
+WRD CTRL    00000002   ## Senza Loopback
 WAT 100
 
 ##  Abilitazione e configurazione PAER Left
@@ -17,17 +17,13 @@ WAT 100
 WRD RX_CTRL 00000002
 WAT 100
 
-##  Reset della fifo TX
+##  Reset della fifo RX e streaming
 WRD CTRL    00001012
-WAT 100
-WRD CTRL    00001002
 WAT 100
 
 ##  Reset della fifo TX
-WRD CTRL    00001102
-WAT 100
-WRD CTRL    00001002
-WAT 100
+## WRD CTRL    00001102
+## WAT 100
 
 ##  Abilitazione Rx GTP Left
 ##  WRD RX_CTRL 00000004

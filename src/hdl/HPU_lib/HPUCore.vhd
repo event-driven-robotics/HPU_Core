@@ -420,7 +420,7 @@ signal clear_n                   : std_logic;
 signal arst_n_clk_core           : std_logic;
 signal arst_n_clk_axis           : std_logic;
 
-signal i_dma_rxDataBuffer        : std_logic_vector(31 downto 0);
+signal i_dma_rxDataBuffer        : std_logic_vector(63 downto 0);
 signal i_dma_readRxBuffer        : std_logic;
 signal i_dma_rxBufferEmpty       : std_logic;
 
@@ -428,7 +428,7 @@ signal i_dma_txDataBuffer        : std_logic_vector(31 downto 0);
 signal i_dma_writeTxBuffer       : std_logic;
 signal i_dma_txBufferFull        : std_logic;
 
-signal i_fifoCoreDat             : std_logic_vector(31 downto 0);
+signal i_fifoCoreDat             : std_logic_vector(63 downto 0);
 signal i_fifoCoreRead            : std_logic;
 signal i_fifoCoreEmpty           : std_logic;
 signal i_fifoCoreAlmostEmpty     : std_logic;
@@ -591,7 +591,7 @@ begin
     ----------------------
     clear_n  <= S_AXI_ARESETN and CLEAR_N_i;
 
-u_time_machine_CoreClk : time_machine 
+TIME_MACHINE_CORECLK_m : time_machine 
   generic map(
   
     CLK_PERIOD_NS_g           => C_SYSCLK_PERIOD_NS,    -- Main Clock period
@@ -626,7 +626,7 @@ u_time_machine_CoreClk : time_machine
     EN1S_o                  => timing_CoreClk.en1s 	    -- Clock enable every 1 s
     );
 
-u_time_machine_AxisClk : time_machine 
+TIME_MACHINE_AXISCLK_m : time_machine 
   generic map(
   
     CLK_PERIOD_NS_g           => C_SYSCLK_PERIOD_NS,    -- Main Clock period
@@ -694,7 +694,7 @@ begin
     DefLocNearLpbk <= '0';
 end generate;
 
-u_neuserial_axilite : neuserial_axilite
+AXILITE_m : axilite
   generic map (
     C_DATA_WIDTH                  => C_S_AXI_DATA_WIDTH,    -- HPU_libs only when  C_SLV_DWIDTH = 32 !!!
     C_ADDR_WIDTH                  => C_S_AXI_ADDR_WIDTH,
@@ -870,8 +870,7 @@ u_neuserial_axilite : neuserial_axilite
     -- DO NOT EDIT ABOVE THIS LINE ---------------------
     );
 
-
-u_neuserial_axistream : neuserial_axistream
+AXISTREAM_m : axistream
   port map (
     Clk                            => CLK_AXIS_i,                       -- in  std_logic;
     nRst                           => arst_n_clk_core,                  -- in  std_logic;
@@ -888,7 +887,7 @@ u_neuserial_axistream : neuserial_axistream
     TlastTOwritten_i               => i_up_TlastTOwritten,              -- in  std_logic;
     TDataCnt_o                     => i_up_TDataCnt,                    -- out std_logic_vector(31 downto 0);
     -- From Fifo to core/dma
-    FifoCoreDat_i                  => i_dma_rxDataBuffer,               -- in  std_logic_vector(31 downto 0);
+    FifoCoreDat_i                  => i_dma_rxDataBuffer,               -- in  std_logic_vector(63 downto 0);
     FifoCoreRead_o                 => i_dma_readRxBuffer,               -- out std_logic;
     FifoCoreEmpty_i                => i_dma_rxBufferEmpty,              -- in  std_logic;
     FifoCoreLastData_i             => i_FifoCoreLastData,               -- in  std_logic;
@@ -913,8 +912,8 @@ u_neuserial_axistream : neuserial_axistream
 ----------------------------------------------------
 
 i_uP_rxFifoDataAF                <= '1' when (i_fifoCoreNumData >= i_up_rxFifoThresholdNumData) else '0';
-i_uP_rxDataBuffer                <= i_fifoCoreDat;
-i_uP_rxTimeBuffer                <= i_fifoCoreDat;
+i_uP_rxDataBuffer                <= i_fifoCoreDat(31 downto 0);
+i_uP_rxTimeBuffer                <= i_fifoCoreDat(63 downto 32);
 i_uP_rxBufferReady               <= i_fifoCoreBurstReady;
 i_uP_rxBufferEmpty               <= i_fifoCoreEmpty;
 i_uP_rxBufferAlmostEmpty         <= i_fifoCoreAlmostEmpty;
@@ -956,7 +955,7 @@ tx_hssaer_bus : for i in 0 to C_TX_HSSAER_N_CHAN-1 generate
   Tx_HSSAER_o(i)   <= tx_hssaer(i);    
 end generate;
 
-u_neuserial_core : neuserial_core
+NEUSERIAL_CORE_m : neuserial_core
   generic map (
     -- -----------------------    
     -- GENERIC
@@ -1158,7 +1157,7 @@ u_neuserial_core : neuserial_core
     --
     -- FIFOs interfaces
     ---------------------
-    FifoCoreDat_o           => i_fifoCoreDat,                -- out std_logic_vector(31 downto 0);
+    FifoCoreDat_o           => i_fifoCoreDat,                -- out std_logic_vector(63 downto 0);
     FifoCoreRead_i          => i_fifoCoreRead,               -- in  std_logic;
     FifoCoreEmpty_o         => i_fifoCoreEmpty,              -- out std_logic;
     FifoCoreAlmostEmpty_o   => i_fifoCoreAlmostEmpty,        -- out std_logic;

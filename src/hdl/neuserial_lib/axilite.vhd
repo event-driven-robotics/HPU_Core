@@ -30,7 +30,7 @@ library HPU_lib;
 --   PORT DECLARATION
 --****************************
 
-entity neuserial_axilite is
+entity axilite is
   generic (
     C_DATA_WIDTH                    : integer range 16 to 32  := 32;   -- HPU_libs only when  C_DATA_WIDTH = 32 !!!
     C_ADDR_WIDTH                    : integer range  5 to 32  :=  8;
@@ -215,14 +215,14 @@ entity neuserial_axilite is
     attribute SIGIS of S_AXI_ACLK          : signal is "Clk";
     attribute SIGIS of S_AXI_ARESETN       : signal is "Rst";
 
-end entity neuserial_axilite;
+end entity axilite;
 
 
 --****************************
 --   IMPLEMENTATION
 --****************************
 
-architecture rtl of neuserial_axilite is
+architecture rtl of axilite is
 
     constant cVer   : string(3 downto 1) := "HPU";
     constant cMAJOR : std_logic_vector(3 downto 0) :="0011";

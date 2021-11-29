@@ -48,31 +48,36 @@ architecture Behavioral of GTP_Emulator is
 
 component time_machine is
   generic ( 
-    CLK_PERIOD_NS_g         : real := 10.0;                   -- Main Clock period
-    CLEAR_POLARITY_g        : string := "LOW";                -- Active "HIGH" or "LOW"
-    PON_RESET_DURATION_MS_g : integer range 0 to 255 := 10;   -- Duration of Power-On reset  
-    SIM_TIME_COMPRESSION_g  : in boolean := FALSE             -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+    CLK_PERIOD_NS_g           : real                   := 10.0;   -- Main Clock period
+    CLR_POLARITY_g            : string                 := "HIGH"; -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   : integer range 0 to 31  := 16;     -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  : integer range 0 to 255 := 10;     -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 : boolean                := TRUE;   -- If TRUE a Power On Reset is generated 
+    SIM_TIME_COMPRESSION_g    : boolean                := FALSE   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
   port (
     -- Clock in port
-    CLK_i                   : in  std_logic;   -- Input clock @ 50 MHz,
-    CLEAR_i                 : in  std_logic;   -- Asynchronous active low reset
+    CLK_i                     : in  std_logic;        -- Input Clock
+    MCM_LOCKED_i              : in  std_logic := 'H'; -- Clock locked flag
+    CLR_i                     : in  std_logic := 'L'; -- Polarity controlled Asyncronous Clear input
   
-    -- Output reset
-    RESET_o                 : out std_logic;    -- Reset out (active high)
-    RESET_N_o               : out std_logic;    -- Reset out (active low)
-    PON_RESET_OUT_o         : out std_logic;	  -- Power on Reset out (active high)
-    PON_RESET_N_OUT_o       : out std_logic;	  -- Power on Reset out (active low)
-    
+    -- Reset output
+    ARST_o                    : out std_logic;        -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                  : out std_logic;        -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o               : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o             : out std_logic; 	      -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o              : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o            : out std_logic;	      -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+      
     -- Output ports for generated clock enables
-    EN200NS_o               : out std_logic;	  -- Clock enable every 200 ns
-    EN1US_o                 : out std_logic;	  -- Clock enable every 1 us
-    EN10US_o                : out std_logic;	  -- Clock enable every 10 us
-    EN100US_o               : out std_logic;	  -- Clock enable every 100 us
-    EN1MS_o                 : out std_logic;	  -- Clock enable every 1 ms
-    EN10MS_o                : out std_logic;	  -- Clock enable every 10 ms
-    EN100MS_o               : out std_logic;	  -- Clock enable every 100 ms
-    EN1S_o                  : out std_logic 	  -- Clock enable every 1 s
+    EN200NS_o                 : out std_logic;	      -- Clock enable every 200 ns
+    EN1US_o                   : out std_logic;	      -- Clock enable every 1 us
+    EN10US_o                  : out std_logic;	      -- Clock enable every 10 us
+    EN100US_o                 : out std_logic;	      -- Clock enable every 100 us
+    EN1MS_o                   : out std_logic;	      -- Clock enable every 1 ms
+    EN10MS_o                  : out std_logic;	      -- Clock enable every 10 ms
+    EN100MS_o                 : out std_logic;	      -- Clock enable every 100 ms
+    EN1S_o                    : out std_logic 	      -- Clock enable every 1 s
     );
 end component;
 
@@ -457,26 +462,30 @@ end process proc_gen_en;
 
 
 
-
-
 TIME_MACHINE_CLK_i : time_machine
-  generic map( 
-    CLK_PERIOD_NS_g         =>  10.0, -- Main Clock period
-    CLEAR_POLARITY_g        => "HIGH", -- Active "HIGH" or "LOW"
-    PON_RESET_DURATION_MS_g =>   3,  -- Duration of Power-On reset (ms)
-    SIM_TIME_COMPRESSION_g  => true  -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+  generic map(
+  
+    CLK_PERIOD_NS_g           => 10.0,    -- Main Clock period
+    CLR_POLARITY_g            => "HIGH",  -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   => 16,      -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  =>  3,      -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 => true,    -- If TRUE a Power On Reset is generated 
+    SIM_TIME_COMPRESSION_g    => true     -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     )
   port map(
     -- Clock in port
-    CLK_i                   => clk_100,
-    CLEAR_i                 => clear,
-  
-    -- Output reset
-    RESET_o                 => rst,
-    RESET_N_o               => rst_n,
-    PON_RESET_OUT_o         => open,
-    PON_RESET_N_OUT_o       => pon_reset_n,
-    
+    CLK_i                   => clk_100,   -- Input clock,
+    MCM_LOCKED_i            => '1',       -- Clock locked flag
+    CLR_i                   => clear,     -- Polarity controlled Asyncronous Clear input
+
+    -- Reset output
+    ARST_o                  => rst,         -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                => rst_n,       -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o             => open,        -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o           => open,        -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o            => open,        -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o          => pon_reset_n, -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+
     -- Output ports for generated clock enables
     EN200NS_o               => open,
     EN1US_o                 => open,

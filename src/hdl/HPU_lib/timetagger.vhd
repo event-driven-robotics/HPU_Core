@@ -10,7 +10,7 @@ library ieee;
 --   PORT DECLARATION
 --****************************
 
-entity MonitorRR is
+entity timetagger is
     port (
         Rst_n_i         : in  std_logic;
         Clk_i           : in  std_logic;
@@ -27,14 +27,14 @@ entity MonitorRR is
         OutWrite_o      : out std_logic;
         OutFull_i       : in  std_logic
     );
-end entity MonitorRR;
+end entity timetagger;
 
 
 --****************************
 --   IMPLEMENTATION
 --****************************
 
-architecture beh of MonitorRR is
+architecture beh of timetagger is
 
     signal MonEn_xS, MonEn_xSAA : std_logic;
 

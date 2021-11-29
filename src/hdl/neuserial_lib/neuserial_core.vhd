@@ -235,7 +235,7 @@ entity neuserial_core is
     --
     -- FIFOs interfaces
     ---------------------
-    FifoCoreDat_o             : out std_logic_vector(31 downto 0);
+    FifoCoreDat_o             : out std_logic_vector(63 downto 0);
     FifoCoreRead_i            : in  std_logic;
     FifoCoreEmpty_o           : out std_logic;
     FifoCoreAlmostEmpty_o     : out std_logic;
@@ -410,9 +410,6 @@ architecture str of neuserial_core is
     --
     --constant c_DVS_SCX                              : boolean  := false;
     --
-    constant c_TestEnableSequencerNoWait            : boolean  := false;
-    constant c_TestEnableSequencerToMonitorLoopback : boolean  := false;
-    constant c_EnableMonitorControlsSequencerToo    : boolean  := false;
     --
     --constant cTestEnableNoGaepButGenCounter        : boolean  := false;
     --constant c_LRxPaerHighBits : std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE) :=  "0000";
@@ -621,7 +618,7 @@ AuxRx_PAER_Ack_o <= ii_AuxRxPaerAck  xnor RxPaerAckActLevel_i;
 -- Local Far Loopback
 ------------------------
 
-u_neuserial_loopback : neuserial_loopback
+LOOPBACK_m : loopback
   generic map (
     C_PAER_DSIZE          => C_PAER_DSIZE,
     C_RX_HSSAER_N_CHAN    => C_RX_HSSAER_N_CHAN,
@@ -722,7 +719,7 @@ u_neuserial_loopback : neuserial_loopback
 i_Spnn_offload_on  <= i_Spnn_cmd_stop or  SpnnCtrl_i(2);
 i_Spnn_offload_off <= i_Spnn_cmd_start or SpnnCtrl_i(1);
 
-u_tx_datapath : hpu_tx_datapath
+TX_DATAPATH_m : hpu_tx_datapath
   generic map (
     C_FAMILY                  => C_FAMILY,
     --
@@ -855,7 +852,7 @@ u_tx_datapath : hpu_tx_datapath
 -- RX paths
 ---------------------
 
-u_rx_left_datapath : hpu_rx_datapath
+RX_LEFT_DATAPATH_m : hpu_rx_datapath
   generic map (
     C_FAMILY                  => C_FAMILY,
     --
@@ -1026,7 +1023,7 @@ u_rx_left_datapath : hpu_rx_datapath
     );
 
 
-u_rx_right_datapath : hpu_rx_datapath
+RX_RIGHT_DATAPATH_m : hpu_rx_datapath
   generic map (
     C_FAMILY                  => C_FAMILY,
     --
@@ -1198,7 +1195,7 @@ u_rx_right_datapath : hpu_rx_datapath
     );
 
 
-u_rx_aux_datapath : hpu_rx_datapath
+RX_AUX_DATAPATH_m : hpu_rx_datapath
   generic map (
     C_FAMILY                  => C_FAMILY,
     --
@@ -1450,7 +1447,7 @@ end generate;
 --        AuxRxBypassDstRdy_o     : out std_logic;            
         
 
-    u_RxArbiter : neuserial_PAER_arbiter
+    RXARBITER_m : neuserial_PAER_arbiter
         generic map (
             C_NUM_CHAN     => 3,
             C_ODATA_WIDTH  => 32
@@ -1498,14 +1495,11 @@ end generate;
     -- Sequencer & Monitor core
     -------------------------------
 
-    u_CoreMonSeqRR : CoreMonSeqRR
+    COREMONSEQ_m : CoreMonSeq
         generic map (
-            C_FAMILY                             => C_FAMILY,
+            C_FAMILY              => C_FAMILY,
             --
-            C_PAER_DSIZE                         => C_PAER_DSIZE,
-            TestEnableSequencerNoWait            => c_TestEnableSequencerNoWait,
-            TestEnableSequencerToMonitorLoopback => c_TestEnableSequencerToMonitorLoopback,
-            EnableMonitorControlsSequencerToo    => c_EnableMonitorControlsSequencerToo
+            C_PAER_DSIZE          => C_PAER_DSIZE
         )
         port map (
         
@@ -1546,8 +1540,6 @@ end generate;
             WrapDetected_o        => WrapDetected_o,           -- out std_logic;
             FullTimestamp_i       => FullTimestamp_i,          -- in  std_logic;  
             --
-            EnableMonitor_i       => '1',                      -- in  std_logic;
-            CoreReady_i           => '1',                      -- in  std_logic;
             ---------------------------------------------------------------------------
             -- TX Timestamp
             TxTSMode_i            => TxTSMode_i,               -- in  std_logic_vector(1 downto 0);
@@ -1560,7 +1552,7 @@ end generate;
             --
             ---------------------------------------------------------------------------
             -- FIFO -> Core
-            FifoCoreDat_o         => FifoCoreDat_o,            -- out std_logic_vector(31 downto 0);
+            FifoCoreDat_o         => FifoCoreDat_o,            -- out std_logic_vector(63 downto 0);
             FifoCoreRead_i        => FifoCoreRead_i,           -- in  std_logic;
             FifoCoreEmpty_o       => FifoCoreEmpty_o,          -- out std_logic;
             FifoCoreAlmostEmpty_o => FifoCoreAlmostEmpty_o,    -- out std_logic;
