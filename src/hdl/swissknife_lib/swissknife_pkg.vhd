@@ -24,7 +24,8 @@ package swissknife_pkg is
 
 component signal_cdc is
   generic (
-    IN_FF_SYNC_g    : boolean := TRUE
+    IN_FF_SYNC_g    : boolean   := TRUE;  -- If TRUE, "SIG_IN_A_i" is sychronized again with CLK_A_i (in order to bypass glitches)
+    RESVALUE_g      : std_logic := '0'    -- RESET Value of B signal (should be equal to reset value of A signal)
   );
   port ( 
     CLK_A_i     : in  std_logic := 'L';

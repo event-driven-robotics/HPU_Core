@@ -66,23 +66,26 @@ entity HPUcore_tb is
         );
 end HPUcore_tb;
  
-architecture behavior of HPUcore_tb is     
+architecture behavior of HPUcore_tb is        
     
 -- Clock generation constants
 
-constant CLK_FREQ_c                    : real := 100.0; -- MHz                
-constant CLK_HALF_PERIOD_c             : time := 5.0 ns;
+constant CLK_CORE_FREQ_MHZ_c              : real := 100.0; -- MHz                
+constant CLK_CORE_HALF_PERIOD_NS_c        : time := 5.0 ns;    
 
-constant CLK_HSSAER_LS_FREQ_c          : real := 100.0; -- MHz                
-constant CLK_HSSAER_LS_HALF_PERIOD_c   : time := 5.0 ns;
+constant CLK_AXIS_FREQ_MHZ_c              : real := 160.0; -- MHz                
+constant CLK_AXIS_HALF_PERIOD_NS_c        : time := 3.125 ns;
 
-constant CLK_HSSAER_HS_FREQ_c          : real := 300.0; -- MHz           
-constant CLK_HSSAER_HS_HALF_PERIOD_1_c : time := 1667 ps;  
-constant CLK_HSSAER_HS_HALF_PERIOD_2_c : time := 1666 ps;
-constant CLK_HSSAER_HS_HALF_PERIOD_3_c : time := 1667 ps;  
-constant CLK_HSSAER_HS_HALF_PERIOD_4_c : time := 1667 ps;
-constant CLK_HSSAER_HS_HALF_PERIOD_5_c : time := 1666 ps;  
-constant CLK_HSSAER_HS_HALF_PERIOD_6_c : time := 1667 ps;    
+constant CLK_HSSAER_LS_FREQ_c             : real := 100.0; -- MHz                
+constant CLK_HSSAER_LS_HALF_PERIOD_c      : time := 5.0 ns;
+
+constant CLK_HSSAER_HS_FREQ_MHZ_c         : real := 300.0; -- MHz           
+constant CLK_HSSAER_HS_HALF_PERIOD_1_NS_c : time := 1.667 ns;  
+constant CLK_HSSAER_HS_HALF_PERIOD_2_NS_c : time := 1.666 ns;
+constant CLK_HSSAER_HS_HALF_PERIOD_3_NS_c : time := 1.667 ns;  
+constant CLK_HSSAER_HS_HALF_PERIOD_4_NS_c : time := 1.666 ns;
+constant CLK_HSSAER_HS_HALF_PERIOD_5_NS_c : time := 1.667 ns;  
+constant CLK_HSSAER_HS_HALF_PERIOD_6_NS_c : time := 1.666 ns;    
  
 -- constant F_HSCLK : real := 300.0; -- MHz
 -- constant T_HSCLK : time := ((1.0/F_HSCLK)/2.0) * (1 us);
@@ -92,8 +95,8 @@ constant CLK_HSSAER_HS_HALF_PERIOD_6_c : time := 1667 ps;
  
 -- --------------------------------------------------
 --  Unit Under Test: HPUcore
--- --------------------------------------------------
-
+-- --------------------------------------------------  
+  
 component HPUCore is
   generic (
     -- -----------------------    
@@ -638,11 +641,12 @@ signal SPNN_device_enable_Tx    : std_logic;
 signal SPNN_device_reset_Tx	    : std_logic;
 
 -- Clocks
-signal Clk                		: std_logic;
-signal HSSAER_ClkLS_p      		: std_logic;
-signal HSSAER_ClkLS_n      		: std_logic;
-signal HSSAER_ClkHS_p      		: std_logic;
-signal HSSAER_ClkHS_n      		: std_logic;
+signal ClkCore              		: std_logic;
+signal ClkAxis              		: std_logic;
+signal HSSAER_ClkLS_p           : std_logic;
+signal HSSAER_ClkLS_n           : std_logic;
+signal HSSAER_ClkHS_p           : std_logic;
+signal HSSAER_ClkHS_n           : std_logic;
 
 -- AXI
 signal s_axi_aclk               : std_logic;
@@ -1212,10 +1216,10 @@ HPUCORE_i : HPUCore
         CLEAR_N_i        			      => i_resetn,
         
         -- Main Core Clock 
-        CLK_CORE_i                  => HSSAER_ClkLS_p,
+        CLK_CORE_i                  => ClkCore,
         
         -- AXI Stream Clock
-        CLK_AXIS_i                  => HSSAER_ClkLS_p,
+        CLK_AXIS_i                  => ClkAxis,
 
         -- Clocks for HSSAER interface
         CLK_HSSAER_LS_P_i 			    => HSSAER_ClkLS_p, -- 100 Mhz clock p it must be at the same frequency of the clock of the transmitter
@@ -1548,15 +1552,25 @@ end process log_file_writing;
 -- ---------------------------------------------
 -- CLOCKs
 
-Sys_Clock_Proc : process
+Core_Clock_Proc : process
 	begin
-		Clk <= '0';
-    wait for CLK_HALF_PERIOD_c;
+		ClkCore <= '0';
+    wait for CLK_CORE_HALF_PERIOD_NS_c;
 		loop
-			Clk <= not Clk;
-			wait for CLK_HALF_PERIOD_c;
+			ClkCore <= not ClkCore;
+			wait for CLK_CORE_HALF_PERIOD_NS_c;
 		end loop;
-end process Sys_Clock_Proc;
+end process Core_Clock_Proc;
+
+Axis_Clock_Proc : process
+	begin
+		ClkAxis <= '0';
+    wait for CLK_AXIS_HALF_PERIOD_NS_c;
+		loop
+			ClkAxis <= not ClkAxis;
+			wait for CLK_AXIS_HALF_PERIOD_NS_c;
+		end loop;
+end process Axis_Clock_Proc;
 
 LS_Clock_Proc : process
 	begin
@@ -1579,22 +1593,22 @@ HS_Clock_Proc : process
 		loop
 			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
 			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
-			wait for CLK_HSSAER_HS_HALF_PERIOD_1_c;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_1_NS_c;
 			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
 			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
-			wait for CLK_HSSAER_HS_HALF_PERIOD_2_c;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_2_NS_c;
 			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
 			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
-			wait for CLK_HSSAER_HS_HALF_PERIOD_3_c;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_3_NS_c;
 			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
 			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
-			wait for CLK_HSSAER_HS_HALF_PERIOD_4_c;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_4_NS_c;
 			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
 			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
-			wait for CLK_HSSAER_HS_HALF_PERIOD_5_c;
+			wait for CLK_HSSAER_HS_HALF_PERIOD_5_NS_c;
 			HSSAER_ClkHS_p <= not HSSAER_ClkHS_p;
 			HSSAER_ClkHS_n <= not HSSAER_ClkHS_n;
-			wait for CLK_HSSAER_HS_HALF_PERIOD_6_c;			
+			wait for CLK_HSSAER_HS_HALF_PERIOD_6_NS_c;			
 		end loop;
 end process HS_Clock_Proc;
 

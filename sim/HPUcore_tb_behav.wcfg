@@ -15,20 +15,21 @@
             <top_module name="necomponents_pkg" />
             <top_module name="nscomponents_pkg" />
             <top_module name="spinn_neu_pkg" />
+            <top_module name="swissknife_pkg" />
             <top_module name="utilities_pkg" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="1493227fs"></ZoomEndTime>
-      <Cursor1Time time="1000000fs"></Cursor1Time>
+      <ZoomStartTime time="23108174fs"></ZoomStartTime>
+      <ZoomEndTime time="23425538fs"></ZoomEndTime>
+      <Cursor1Time time="23305000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="292"></NameColumnWidth>
-      <ValueColumnWidth column_width="70"></ValueColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="83" />
+   <WVObjectSize size="75" />
    <wave_markers>
       <marker time="99484800000" label="" />
    </wave_markers>
@@ -958,84 +959,121 @@
       </wvobject>
    </wvobject>
    <wvobject type="divider" fp_name="divider354">
-      <obj_property name="label">Detailed</obj_property>
+      <obj_property name="label">DETAILED</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/i_fifoCoreDat" type="array">
-      <obj_property name="ElementShortName">i_fifoCoreDat[63:0]</obj_property>
-      <obj_property name="ObjectShortName">i_fifoCoreDat[63:0]</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/CoreClk_i" type="logic">
+      <obj_property name="ElementShortName">CoreClk_i</obj_property>
+      <obj_property name="ObjectShortName">CoreClk_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/FifoCoreDat_o" type="array">
-      <obj_property name="ElementShortName">FifoCoreDat_o[63:0]</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreDat_o[63:0]</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/AxisClk_i" type="logic">
+      <obj_property name="ElementShortName">AxisClk_i</obj_property>
+      <obj_property name="ObjectShortName">AxisClk_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/dataRead" type="logic">
-      <obj_property name="ElementShortName">dataRead</obj_property>
-      <obj_property name="ObjectShortName">dataRead</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/Reset_n_CoreClk_i" type="logic">
+      <obj_property name="ElementShortName">Reset_n_CoreClk_i</obj_property>
+      <obj_property name="ObjectShortName">Reset_n_CoreClk_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/FifoCoreRead_i" type="logic">
-      <obj_property name="ElementShortName">FifoCoreRead_i</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreRead_i</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/Reset_n_AxisClk_i" type="logic">
+      <obj_property name="ElementShortName">Reset_n_AxisClk_i</obj_property>
+      <obj_property name="ObjectShortName">Reset_n_AxisClk_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/FifoCoreEmpty_o" type="logic">
-      <obj_property name="ElementShortName">FifoCoreEmpty_o</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreEmpty_o</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/FlushRXFifos_i" type="logic">
+      <obj_property name="ElementShortName">FlushRXFifos_i</obj_property>
+      <obj_property name="ObjectShortName">FlushRXFifos_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/FifoCoreAlmostEmpty_o" type="logic">
-      <obj_property name="ElementShortName">FifoCoreAlmostEmpty_o</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreAlmostEmpty_o</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoReset" type="logic">
+      <obj_property name="ElementShortName">RxFifoReset</obj_property>
+      <obj_property name="ObjectShortName">RxFifoReset</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/FifoCoreLastData_o" type="logic">
-      <obj_property name="ElementShortName">FifoCoreLastData_o</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreLastData_o</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/FifoCoreFull_o" type="logic">
-      <obj_property name="ElementShortName">FifoCoreFull_o</obj_property>
-      <obj_property name="ObjectShortName">FifoCoreFull_o</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoWrEn" type="logic">
-      <obj_property name="ElementShortName">RxFifoWrEn</obj_property>
-      <obj_property name="ObjectShortName">RxFifoWrEn</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoRdEn" type="logic">
-      <obj_property name="ElementShortName">RxFifoRdEn</obj_property>
-      <obj_property name="ObjectShortName">RxFifoRdEn</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoEmpty" type="logic">
-      <obj_property name="ElementShortName">RxFifoEmpty</obj_property>
-      <obj_property name="ObjectShortName">RxFifoEmpty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoAlmostempty" type="logic">
-      <obj_property name="ElementShortName">RxFifoAlmostempty</obj_property>
-      <obj_property name="ObjectShortName">RxFifoAlmostempty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoFull" type="logic">
-      <obj_property name="ElementShortName">RxFifoFull</obj_property>
-      <obj_property name="ObjectShortName">RxFifoFull</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoAlmostFull" type="logic">
-      <obj_property name="ElementShortName">RxFifoAlmostFull</obj_property>
-      <obj_property name="ObjectShortName">RxFifoAlmostFull</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoOverflow" type="logic">
-      <obj_property name="ElementShortName">RxFifoOverflow</obj_property>
-      <obj_property name="ObjectShortName">RxFifoOverflow</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoUnderflow" type="logic">
-      <obj_property name="ElementShortName">RxFifoUnderflow</obj_property>
-      <obj_property name="ObjectShortName">RxFifoUnderflow</obj_property>
-   </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/rxfifo_wr_rst_busy" type="logic">
-      <obj_property name="ElementShortName">rxfifo_wr_rst_busy</obj_property>
-      <obj_property name="ObjectShortName">rxfifo_wr_rst_busy</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoResetting" type="logic">
+      <obj_property name="ElementShortName">RxFifoResetting</obj_property>
+      <obj_property name="ObjectShortName">RxFifoResetting</obj_property>
    </wvobject>
    <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/rxfifo_rd_rst_busy" type="logic">
       <obj_property name="ElementShortName">rxfifo_rd_rst_busy</obj_property>
       <obj_property name="ObjectShortName">rxfifo_rd_rst_busy</obj_property>
    </wvobject>
-   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RxFifoReset" type="logic">
-      <obj_property name="ElementShortName">RxFifoReset</obj_property>
-      <obj_property name="ObjectShortName">RxFifoReset</obj_property>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/rxfifo_rd_rst_busy_CoreClk" type="logic">
+      <obj_property name="ElementShortName">rxfifo_rd_rst_busy_CoreClk</obj_property>
+      <obj_property name="ObjectShortName">rxfifo_rd_rst_busy_CoreClk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/rxfifo_rd_rst_busy_CoreClk_d" type="logic">
+      <obj_property name="ElementShortName">rxfifo_rd_rst_busy_CoreClk_d</obj_property>
+      <obj_property name="ObjectShortName">rxfifo_rd_rst_busy_CoreClk_d</obj_property>
+   </wvobject>
+   <wvobject fp_name="group511" type="group">
+      <obj_property name="label">FIFO_RX</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/rst" type="logic">
+         <obj_property name="ElementShortName">rst</obj_property>
+         <obj_property name="ObjectShortName">rst</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/wr_clk" type="logic">
+         <obj_property name="ElementShortName">wr_clk</obj_property>
+         <obj_property name="ObjectShortName">wr_clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/rd_clk" type="logic">
+         <obj_property name="ElementShortName">rd_clk</obj_property>
+         <obj_property name="ObjectShortName">rd_clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/din" type="array">
+         <obj_property name="ElementShortName">din[63:0]</obj_property>
+         <obj_property name="ObjectShortName">din[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/wr_en" type="logic">
+         <obj_property name="ElementShortName">wr_en</obj_property>
+         <obj_property name="ObjectShortName">wr_en</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/rd_en" type="logic">
+         <obj_property name="ElementShortName">rd_en</obj_property>
+         <obj_property name="ObjectShortName">rd_en</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/dout" type="array">
+         <obj_property name="ElementShortName">dout[63:0]</obj_property>
+         <obj_property name="ObjectShortName">dout[63:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/full" type="logic">
+         <obj_property name="ElementShortName">full</obj_property>
+         <obj_property name="ObjectShortName">full</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/almost_full" type="logic">
+         <obj_property name="ElementShortName">almost_full</obj_property>
+         <obj_property name="ObjectShortName">almost_full</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/overflow" type="logic">
+         <obj_property name="ElementShortName">overflow</obj_property>
+         <obj_property name="ObjectShortName">overflow</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/empty" type="logic">
+         <obj_property name="ElementShortName">empty</obj_property>
+         <obj_property name="ObjectShortName">empty</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/almost_empty" type="logic">
+         <obj_property name="ElementShortName">almost_empty</obj_property>
+         <obj_property name="ObjectShortName">almost_empty</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/underflow" type="logic">
+         <obj_property name="ElementShortName">underflow</obj_property>
+         <obj_property name="ObjectShortName">underflow</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/rd_data_count" type="array">
+         <obj_property name="ElementShortName">rd_data_count[10:0]</obj_property>
+         <obj_property name="ObjectShortName">rd_data_count[10:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/wr_data_count" type="array">
+         <obj_property name="ElementShortName">wr_data_count[10:0]</obj_property>
+         <obj_property name="ObjectShortName">wr_data_count[10:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/wr_rst_busy" type="logic">
+         <obj_property name="ElementShortName">wr_rst_busy</obj_property>
+         <obj_property name="ObjectShortName">wr_rst_busy</obj_property>
+      </wvobject>
+      <wvobject fp_name="/HPUcore_tb/HPUCORE_i/NEUSERIAL_CORE_m/COREMONSEQ_m/RXFIFO_HPU_ZYNQUPLUS_i/rd_rst_busy" type="logic">
+         <obj_property name="ElementShortName">rd_rst_busy</obj_property>
+         <obj_property name="ObjectShortName">rd_rst_busy</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject type="divider" fp_name="divider1117">
       <obj_property name="label">AXISTREAM</obj_property>

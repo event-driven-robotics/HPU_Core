@@ -183,15 +183,22 @@ file logfile_ptr   : text open WRITE_MODE is "monitor_activity.csv";
 signal infifo_wr_rst_busy   : std_logic;
 signal infifo_rd_rst_busy   : std_logic;
 
-signal rxfifo_wr_rst_busy   : std_logic;
-signal rxfifo_wr_rst_busy_d : std_logic;
-signal rxfifo_rd_rst_busy   : std_logic;
-signal rxfifo_rd_rst_busy_d : std_logic;
 
-signal txfifo_wr_rst_busy   : std_logic;
-signal txfifo_wr_rst_busy_d : std_logic;
-signal txfifo_rd_rst_busy   : std_logic;
-signal txfifo_rd_rst_busy_d : std_logic;
+signal txfifo_arst_n                : std_logic;
+signal txfifo_wr_rst_busy           : std_logic;
+signal txfifo_wr_rst_busy_AxisClk   : std_logic;
+signal txfifo_wr_rst_busy_AxisClk_d : std_logic;
+signal txfifo_rd_rst_busy           : std_logic;
+signal txfifo_rd_rst_busy_CoreClk   : std_logic;
+signal txfifo_rd_rst_busy_CoreClk_d : std_logic;
+
+signal rxfifo_arst_n                : std_logic;
+signal rxfifo_wr_rst_busy           : std_logic;
+signal rxfifo_wr_rst_busy_AxisClk   : std_logic;
+signal rxfifo_wr_rst_busy_AxisClk_d : std_logic;
+signal rxfifo_rd_rst_busy           : std_logic;
+signal rxfifo_rd_rst_busy_CoreClk   : std_logic;
+signal rxfifo_rd_rst_busy_CoreClk_d : std_logic;
 
 
 signal RxFifoReset_cnt      : std_logic_vector(3 downto 0);
@@ -440,25 +447,67 @@ CoreFifoEmpty_o <= SeqInEmpty;
 --   end if;
 -- end process;
 
+RXFIFO_RD_RST_BUSY_CDC_i : signal_cdc 
+  generic map (
+    IN_FF_SYNC_g  => FALSE, -- If TRUE, "SIG_IN_A_i" is sychronized again with CLK_A_i (in order to bypass glitches)
+    RESVALUE_g    => '0'    -- RESET Value of B signal (should be equal to reset value of A signal)
+  )
+  port map ( 
+    CLK_A_i       => '0',                 
+    ARST_N_A_i    => '0',                 
+    SIG_IN_A_i    => rxfifo_rd_rst_busy,  
+    --
+    CLK_B_i       => CoreClk_i,           
+    ARST_N_B_i    => Reset_n_CoreClk_i,           
+    SIG_OUT_B_i   => rxfifo_rd_rst_busy_CoreClk    
+  );
+
+
 process(CoreClk_i, Reset_n_CoreClk_i)
 begin
   if (Reset_n_CoreClk_i = '0') then
-    RxFifoReset     <= '1';
-    RxFifoResetting <= '1';
+    RxFifoReset                   <= '1';
+    RxFifoResetting               <= '1';
+    rxfifo_rd_rst_busy_CoreClk_d  <= '0';
   elsif rising_edge(CoreClk_i) then
+    rxfifo_rd_rst_busy_CoreClk_d <= rxfifo_rd_rst_busy_CoreClk;
+    --
     if (FlushRXFifos_i = '1') then
       RxFifoReset     <= '1';
-    elsif (rxfifo_rd_rst_busy = '1' and rxfifo_rd_rst_busy_d = '0') then
+    elsif (rxfifo_rd_rst_busy_CoreClk = '1' and rxfifo_rd_rst_busy_CoreClk_d = '0') then
       RxFifoReset     <= '0';
     end if;
     --
     if (FlushRXFifos_i = '1') then
       RxFifoResetting <= '1';
-    elsif (rxfifo_rd_rst_busy = '0' and rxfifo_rd_rst_busy_d = '1') then
-      RxFifoReset     <= '0';
+    elsif (rxfifo_rd_rst_busy_CoreClk = '0' and rxfifo_rd_rst_busy_CoreClk_d = '1') then
+      RxFifoResetting <= '0';
     end if;
   end if;
 end process;
+
+-- rxfifo_arst_n <= Reset_n_CoreClk_i and not FlushRXFifos_i;
+-- 
+-- process(CoreClk_i, rxfifo_arst_n)
+-- begin
+--   if (rxfifo_arst_n = '0') then
+--     RxFifoReset                   <= '1';
+--     RxFifoResetting               <= '1';
+--     rxfifo_rd_rst_busy_CoreClk_d  <= '0';
+--   elsif rising_edge(CoreClk_i) then
+--     rxfifo_rd_rst_busy_CoreClk_d <= rxfifo_rd_rst_busy_CoreClk;
+--     --
+--     if (rxfifo_rd_rst_busy_CoreClk = '1' and rxfifo_rd_rst_busy_CoreClk_d = '0') then
+--       RxFifoReset     <= '0';
+--     end if;
+--     --
+--     if (rxfifo_rd_rst_busy_CoreClk = '0' and rxfifo_rd_rst_busy_CoreClk_d = '1') then
+--       RxFifoResetting <= '0';
+--     end if;
+--   end if;
+-- end process;
+
+
 
 RXFIFO_FOR_ZYNQ : if C_FAMILY = "zynq"  generate -- "zynq", "zynquplus" 
 begin
