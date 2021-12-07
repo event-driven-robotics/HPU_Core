@@ -66,7 +66,8 @@ component neuserial_axistream is
         --                    
         DMA_test_mode_i        : in  std_logic;
         EnableAxistreamIf_i    : in  std_logic;
-        OnlyEvents_i           : in  std_logic;
+        OnlyEventsRx_i         : in  std_logic;
+        OnlyEventsTx_i         : in  std_logic;
         DMA_is_running_o       : out std_logic;
         DmaLength_i            : in  std_logic_vector(15 downto 0);
         ResetStream_i          : in  std_logic;
@@ -172,8 +173,10 @@ signal rx_timestamp : std_logic_vector(31 downto 0);
  signal dataRead    : std_logic;
  signal FifoCoreDat : std_logic_vector(31 downto 0);
 
- signal uP_OnlyEvents : std_logic;  
- signal OnlyEvents_i  : std_logic;  
+ signal uP_OnlyEventsRx : std_logic;  
+ signal uP_OnlyEventsTx : std_logic;  
+ signal OnlyEventsRx_i  : std_logic;  
+ signal OnlyEventsTx_i  : std_logic;  
 
  signal dummy : std_logic;
  
@@ -303,7 +306,8 @@ u_neuserial_axistream : neuserial_axistream
     --
     DMA_test_mode_i                => uP_DMA_test_mode,               -- in  std_logic;
     EnableAxistreamIf_i            => uP_enableDmaIf,                 -- in  std_logic;
-    OnlyEvents_i                   => uP_OnlyEvents,                  -- in  std_logic;
+    OnlyEventsRx_i                 => uP_OnlyEventsRx,                  -- in  std_logic;
+    OnlyEventsTx_i                 => uP_OnlyEventsTx,                  -- in  std_logic;
     DMA_is_running_o               => uP_DMAIsRunning,                -- out std_logic;
     DmaLength_i                    => uP_dmaLength,                   -- in  std_logic_vector(15 downto 0);
     ResetStream_i                  => uP_resetstream,                 -- in  std_logic;
@@ -361,7 +365,7 @@ begin
   if (dma_rst_n = '0') then
     dataRead <= '0';
   elsif (rising_edge(clk_dma)) then
-    if (OnlyEvents_i = '1') then
+    if (OnlyEventsRx_i = '1') then
       dataRead <= '1';
     elsif (dma_readRxBuffer = '0') then
       dataRead <= '0';
@@ -401,7 +405,7 @@ rx_rd_clk <= clk_dma;
 rx_din <= rx_timestamp & rx_event;
 
   
-OnlyEvents_i <= uP_OnlyEvents;
+OnlyEventsRx_i <= uP_OnlyEventsRx;
 
 proc_axistream : process  
 begin
@@ -430,16 +434,17 @@ end process proc_axistream;
 proc_dma_to_hpu : process  
 begin
 
-  uP_OnlyEvents <= '0'; 
+  uP_OnlyEventsRx <= '0'; 
+  uP_OnlyEventsTx <= '0'; 
 
   wait for CLK_RD_PERIOD_NS_c - 2 ns;
   wait for 18 us;   
 
   wait for CLK_RD_PERIOD_NS_c;  
   wait for CLK_RD_PERIOD_NS_c;  
-  uP_OnlyEvents <= '1';  
+  uP_OnlyEventsRx <= '1';  
   wait for 2 us;
-  uP_OnlyEvents <= '0';  
+  uP_OnlyEventsRx <= '0';  
 
 --  wait for CLK_WR_PERIOD_NS_c;
 --  uP_OnlyEvents <= '0';  

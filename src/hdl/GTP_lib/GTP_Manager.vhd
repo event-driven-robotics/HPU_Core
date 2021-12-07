@@ -156,7 +156,7 @@ architecture Behavioral of GTP_Manager is
 
 attribute ASYNC_REG : string;
 
-component GTP_DATA_SYNC_FIFO_ZYNQ
+component FIFO_GTP_DATA_ZYNQ
   port (
     rst : in std_logic;
     wr_clk : in std_logic;
@@ -172,7 +172,7 @@ component GTP_DATA_SYNC_FIFO_ZYNQ
   );
 end component;
 
-component GTP_DATA_SYNC_FIFO_ZYNQUPLUS
+component FIFO_GTP_DATA_ZYNQUPLUS
   port (
     rst : in std_logic;
     wr_clk : in std_logic;
@@ -188,7 +188,7 @@ component GTP_DATA_SYNC_FIFO_ZYNQUPLUS
   );
 end component;
 
-component GTP_MSG_SYNC_FIFO_ZYNQ
+component FIFO_GTP_MSG_ZYNQ
   port (
     rst : in std_logic;
     wr_clk : in std_logic;
@@ -204,7 +204,7 @@ component GTP_MSG_SYNC_FIFO_ZYNQ
   );
 end component;
 
-component GTP_MSG_SYNC_FIFO_ZYNQUPLUS
+component FIFO_GTP_MSG_ZYNQUPLUS
   port (
     rst : in std_logic;
     wr_clk : in std_logic;
@@ -679,10 +679,10 @@ tx_data_fifo_wr_en       <= not tx_data_fifo_full and TX_DATA_SRC_RDY_i;
 tx_data_fifo_rd_en_gcktx <= tx_data_w0_flag_gcktx and not tx_data_fifo_empty_gcktx;
 tx_data_fifo_rst         <= tx_rst_gcktx;
 
-TX_DATA_SYNC_FIFO_FOR_ZYNQ : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
+TX_DATA_FIFO_FOR_ZYNQ_gen : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
-  TX_DATA_SYNC_FIFO_i :  GTP_DATA_SYNC_FIFO_ZYNQ
+  TX_DATA_FIFO_m :  FIFO_GTP_DATA_ZYNQ
     port map (
       rst       => tx_data_fifo_rst,               
       wr_clk    => CLK_i,         
@@ -699,10 +699,10 @@ begin
   
   end generate;    
 
-TX_DATA_SYNC_FIFO_FOR_ZYNQUPLUS : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
+TX_DATA_FIFO_FOR_ZYNQUPLUS_gen : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
    
-  TX_DATA_SYNC_FIFO_i :  GTP_DATA_SYNC_FIFO_ZYNQUPLUS
+  TX_DATA_FIFO_m :  FIFO_GTP_DATA_ZYNQUPLUS
     port map (
       rst       => tx_data_fifo_rst,               
       wr_clk    => CLK_i,         
@@ -726,10 +726,10 @@ tx_msg_fifo_wr_en       <= not tx_msg_fifo_full and TX_MSG_SRC_RDY_i;
 tx_msg_fifo_rd_en_gcktx <= tx_msg_flag_gcktx and not tx_msg_fifo_empty_gcktx;
 tx_msg_fifo_rst         <= tx_rst_gcktx;
 
-TX_MSG_SYNC_FIFO_FOR_ZYNQ : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
+TX_MSG_FIFO_FOR_ZYNQ_gen : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
-  TX_MSG_SYNC_FIFO_i :  GTP_MSG_SYNC_FIFO_ZYNQ
+  TX_MSG_FIFO_m :  FIFO_GTP_MSG_ZYNQ
     port map (
       rst       => tx_msg_fifo_rst,               
       wr_clk    => CLK_i,        
@@ -746,10 +746,10 @@ begin
   
   end generate;    
 
-TX_MSG_SYNC_FIFO_FOR_ZYNQUPLUS : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
+TX_MSG_FIFO_FOR_ZYNQUPLUS_gen : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
    
-  TX_MSG_SYNC_FIFO_i :  GTP_MSG_SYNC_FIFO_ZYNQUPLUS
+  TX_MSG_FIFO_m :  FIFO_GTP_MSG_ZYNQUPLUS
     port map (
       rst       => tx_msg_fifo_rst,               
       wr_clk    => CLK_i,        
@@ -1217,7 +1217,7 @@ rx_data_fifo_rst         <= rx_rst_gckrx;
 RX_DATA_SYNC_FIFO_FOR_ZYNQ : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
-  DATA_FIFO_RX_i :  GTP_DATA_SYNC_FIFO_ZYNQ
+  DATA_FIFO_RX_i :  FIFO_GTP_DATA_ZYNQ
     port map (
       rst       => rx_data_fifo_rst,               
       wr_clk    => GTP_RXUSRCLK2_i,        
@@ -1234,10 +1234,10 @@ begin
   
   end generate;    
 
-RX_DATA_SYNC_FIFO_FOR_ZYNQUPLUS : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
+RX_DATA_FIFO_SAER_m : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
    
-  DATA_FIFO_RX_i :  GTP_DATA_SYNC_FIFO_ZYNQUPLUS
+  DATA_FIFO_RX_i :  FIFO_GTP_DATA_ZYNQUPLUS
     port map (
       rst       => rx_data_fifo_rst,               
       wr_clk    => GTP_RXUSRCLK2_i,        
@@ -1262,7 +1262,7 @@ rx_msg_fifo_rst   <= rx_rst_gckrx;
 RX_MSG_SYNC_FIFO_FOR_ZYNQ : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
-  MSG_FIFO_RX_i :  GTP_MSG_SYNC_FIFO_ZYNQ
+  MSG_FIFO_RX_i :  FIFO_GTP_MSG_ZYNQ
     port map (
       rst       => rx_msg_fifo_rst,               
       wr_clk    => GTP_RXUSRCLK2_i,        
@@ -1279,10 +1279,10 @@ begin
   
   end generate;    
 
-RX_MSG_SYNC_FIFO_FOR_ZYNQUPLUS : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
+RX_MSG_FIFO_SAER_m : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
    
-  DATA_FIFO_RX_i :  GTP_DATA_SYNC_FIFO_ZYNQUPLUS
+  DATA_FIFO_RX_i :  FIFO_GTP_DATA_ZYNQUPLUS
     port map (
       rst       => rx_data_fifo_rst,               
       wr_clk    => GTP_RXUSRCLK2_i,        

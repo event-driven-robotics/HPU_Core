@@ -26,7 +26,6 @@ library HPU_lib;
 
 package NSComponents_pkg is
 
-
 component hpu_rx_datapath is
   generic (
     C_FAMILY                  : string                        := "zynquplus"; -- "zynq", "zynquplus" 
@@ -197,7 +196,6 @@ port (
     );
 end component;
 
-
 component hpu_tx_datapath is
   generic (
     C_FAMILY                  : string                        := "zynquplus"; -- "zynq", "zynquplus" 
@@ -325,7 +323,6 @@ component hpu_tx_datapath is
     );
 end component hpu_tx_datapath;
 
-
 component CoreMonSeq is
     generic (
         C_FAMILY                : string := "zynq"; -- "zynq", "zynquplus" 
@@ -347,7 +344,8 @@ component CoreMonSeq is
         -- controls and settings
         -- ChipType_xSI         : in  std_logic;
         DmaLength_i             : in  std_logic_vector(15 downto 0);
-        OnlyEvents_i            : in  std_logic;
+        OnlyEventsRx_i          : in  std_logic;
+        OnlyEventsTx_i          : in  std_logic;
         --
         ---------------------------------------------------------------------------
         -- Enable per timing
@@ -381,26 +379,27 @@ component CoreMonSeq is
         TxTSMaskSel_i           : in  std_logic_vector(1 downto 0);
         --
         ---------------------------------------------------------------------------
-        -- FIFO -> Core
-        FifoCoreDat_o           : out std_logic_vector(63 downto 0);
-        FifoCoreRead_i          : in  std_logic;
-        FifoCoreEmpty_o         : out std_logic;
-        FifoCoreAlmostEmpty_o   : out std_logic;
-        FifoCoreLastData_o      : out std_logic;
-        FifoCoreFull_o          : out std_logic;
-        FifoCoreNumData_o       : out std_logic_vector(10 downto 0);
+        -- Data Received
+        FifoRxDat_o             : out std_logic_vector(63 downto 0);
+        FifoRxRead_i            : in  std_logic;
+        FifoRxEmpty_o           : out std_logic;
+        FifoRxAlmostEmpty_o     : out std_logic;
+        FifoRxLastData_o        : out std_logic;
+        FifoRxFull_o            : out std_logic;
+        FifoRxNumData_o         : out std_logic_vector(10 downto 0);
+        FifoRxResetBusy_o       : out std_logic;
         --
-        -- Core -> FIFO
-        CoreFifoDat_i           : in  std_logic_vector(31 downto 0);
-        CoreFifoWrite_i         : in  std_logic;
-        CoreFifoFull_o          : out std_logic;
-        CoreFifoAlmostFull_o    : out std_logic;
-        CoreFifoEmpty_o         : out std_logic
-    
-    );
+        -- Data to be transmitted
+        FifoTxDat_i             : in  std_logic_vector(31 downto 0);
+        FifoTxWrite_i           : in  std_logic;
+        FifoTxLastData_i        : in  std_logic;
+        FifoTxFull_o            : out std_logic;
+        FifoTxAlmostFull_o      : out std_logic;
+        FifoTxEmpty_o           : out std_logic;
+        FifoTxResetBusy_o       : out std_logic   
+        );
 end component CoreMonSeq;
 
-    
 component loopback is
   generic (
     C_PAER_DSIZE          : natural;
@@ -494,105 +493,6 @@ component loopback is
     CoreRx3_ack_to_spinnaker_i           : in  std_logic
     );
 end component loopback;
-
-
-    --component neuserial_tx_splitter is
-    --    generic (
-    --        C_NUM_CHAN_SAER_TX : natural range 1 to 4 := 1
-    --    );
-    --    port (
-    --        Clk                : in  std_logic;
-    --        nRst               : in  std_logic;
-    --        --
-    --        SplitCfg           : in  t_SplitterCfg;
-    --        --
-    --        PaerDataIn         : in  std_logic_vector(31 downto 0);
-    --        PaerSrcRdy         : in  std_logic;
-    --        PaerDstRdy         : out std_logic;
-    --        --
-    --        SplittedPaerSrc    : out t_PaerSrc_array(0 to C_NUM_CHAN_SAER_TX-1);
-    --        SplittedPaerDst    : in  t_PaerDst_array(0 to C_NUM_CHAN_SAER_TX-1)
-    --    );
-    --end component neuserial_tx_splitter;
-
-
-    --component neuserial_rx_arbiter is
-    --    generic (
-    --        C_NUM_CHAN_SAER_RX : natural range 1 to 4 := 1
-    --    );
-    --    port (
-    --        Clk                : in  std_logic;
-    --        nRst               : in  std_logic;
-    --
-    --        ArbCfg             : in  t_ArbiterCfg;
-    --
-    --        PaerDataOut        : out std_logic_vector(31 downto 0);
-    --        PaerSrcRdy         : out std_logic;
-    --        PaerDstRdy         : in  std_logic;
-    --
-    --        MergedPaerSrc      : in  t_PaerSrc_array(0 to C_NUM_CHAN_SAER_RX-1);
-    --        MergedPaerDst      : out t_PaerDst_array(0 to C_NUM_CHAN_SAER_RX-1)
-    --    );
-    --end component neuserial_rx_arbiter;
-
-
-    --component neuserial_par_xcon is
-    --    generic (
-    --        C_NUM_CHAN_SAER_RX : natural range 1 to 4 := 1;
-    --        C_NUM_CHAN_SAER_TX : natural range 1 to 4 := 1
-    --    );
-    --    port (
-    --        XConParCfg         : in  t_XConCfg;
-    --        -- Interfaces towards core
-    --        Tx_FromCoreSrc     : in  t_PaerSrc_array(0 to C_NUM_CHAN_SAER_TX-1);
-    --        Tx_FromCoreDst     : out t_PaerDst_array(0 to C_NUM_CHAN_SAER_TX-1);
-    --        Rx_ToCoreSrc       : out t_PaerSrc_array(0 to C_NUM_CHAN_SAER_RX-1);
-    --        Rx_ToCoreDst       : in  t_PaerDst_array(0 to C_NUM_CHAN_SAER_RX-1);
-    --        -- Interfaces towards extern
-    --        Tx_ToExtSrc        : out t_PaerSrc_array(0 to C_NUM_CHAN_SAER_TX-1);
-    --        Tx_ToExtDst        : in  t_PaerDst_array(0 to C_NUM_CHAN_SAER_TX-1);
-    --        Rx_FromExtSrc      : in  t_PaerSrc_array(0 to C_NUM_CHAN_SAER_RX-1);
-    --        Rx_FromExtDst      : out t_PaerDst_array(0 to C_NUM_CHAN_SAER_RX-1)
-    --    );
-    --end component neuserial_par_xcon;
-
-
-    --component neuserial_ser_xcon is
-    --    generic (
-    --        C_NUM_CHAN_SAER_RX  : natural range 1 to 4 := 1;
-    --        C_NUM_CHAN_SAER_TX  : natural range 1 to 4 := 1
-    --    );
-    --    port (
-    --        XConSerCfg                     : in  t_XConCfg;
-    --        -- Interfaces towards core
-    --        Tx_FromCore                    : in  std_logic_vector(0 to C_NUM_CHAN_SAER_TX-1);
-    --        Rx_ToCore                      : out std_logic_vector(0 to C_NUM_CHAN_SAER_RX-1);
-    --        -- Interfaces towards extern
-    --        Tx_ToExt                       : out std_logic_vector(0 to C_NUM_CHAN_SAER_TX-1);
-    --        Rx_FromExt                     : in  std_logic_vector(0 to C_NUM_CHAN_SAER_RX-1)
-    --    );
-    --end component neuserial_ser_xcon;
-
-    
-    --component serialize_req is
-    --    generic (
-    --        C_DATA_WIDTH : natural;         -- Number of input request lines
-    --        C_IDX_WIDTH  : natural;         -- Width of the index bus in output (should be at least log2(C_DATA_WIDTH)
-    --        C_FIFO_DEPTH : natural          -- Number of cells of the FIFO
-    --    );
-    --    port (
-    --        Clk         : in  std_logic;
-    --        nRst        : in  std_logic;
-    --        ReqVect_i   : in  std_logic_vector(C_DATA_WIDTH-1 downto 0);
-    --        Pop_i       : in  std_logic;
-    --        Idx_o       : out std_logic_vector(C_IDX_WIDTH-1 downto 0);
-    --        Empty_o     : out std_logic;
-    --        Full_o      : out std_logic;
-    --        Underflow_o : out std_logic;
-    --        Overflow_o  : out std_logic
-    --    );
-    --end component serialize_req;
-
 
  end package NSComponents_pkg;
 

@@ -49,7 +49,8 @@ entity CoreMonSeq is
     -- controls and settings
     -- ChipType_i         : in  std_logic;
     DmaLength_i             : in  std_logic_vector(15 downto 0);
-    OnlyEvents_i            : in  std_logic;
+    OnlyEventsRx_i          : in  std_logic;
+    OnlyEventsTx_i          : in  std_logic;
     --
     ---------------------------------------------------------------------------
     -- Enable per timing
@@ -83,21 +84,24 @@ entity CoreMonSeq is
     TxTSMaskSel_i           : in  std_logic_vector(1 downto 0);
     --
     ---------------------------------------------------------------------------
-    -- FIFO -> Core
-    FifoCoreDat_o           : out std_logic_vector(63 downto 0);
-    FifoCoreRead_i          : in  std_logic;
-    FifoCoreEmpty_o         : out std_logic;
-    FifoCoreAlmostEmpty_o   : out std_logic;
-    FifoCoreLastData_o      : out std_logic;
-    FifoCoreFull_o          : out std_logic;
-    FifoCoreNumData_o       : out std_logic_vector(10 downto 0);
+    -- Data Received
+    FifoRxDat_o             : out std_logic_vector(63 downto 0);
+    FifoRxRead_i            : in  std_logic;
+    FifoRxEmpty_o           : out std_logic;
+    FifoRxAlmostEmpty_o     : out std_logic;
+    FifoRxLastData_o        : out std_logic;
+    FifoRxFull_o            : out std_logic;
+    FifoRxNumData_o         : out std_logic_vector(10 downto 0);
+    FifoRxResetBusy_o       : out std_logic;
     --
-    -- Core -> FIFO
-    CoreFifoDat_i           : in  std_logic_vector(31 downto 0);
-    CoreFifoWrite_i         : in  std_logic;
-    CoreFifoFull_o          : out std_logic;
-    CoreFifoAlmostFull_o    : out std_logic;
-    CoreFifoEmpty_o         : out std_logic    
+    -- Data to be transmitted
+    FifoTxDat_i             : in  std_logic_vector(31 downto 0);
+    FifoTxWrite_i           : in  std_logic;
+    FifoTxLastData_i        : in  std_logic;
+    FifoTxFull_o            : out std_logic;
+    FifoTxAlmostFull_o      : out std_logic;
+    FifoTxEmpty_o           : out std_logic;
+    FifoTxResetBusy_o       : out std_logic   
   );
 end entity CoreMonSeq;
 
@@ -157,22 +161,19 @@ signal RxFifoRdEn         : std_logic;
 signal RxFifoEmpty        : std_logic;
 signal RxFifoAlmostempty  : std_logic;
 signal RxFifoFull         : std_logic;
-signal RxFifoAlmostFull   : std_logic;
-signal RxFifoOverflow     : std_logic;
-signal RxFifoUnderflow    : std_logic;
-signal RxFifoWrDataCount  : std_logic_vector(10 downto 0);
-signal RxFifoRdDataCount  : std_logic_vector(10 downto 0);
+-- signal RxFifoAlmostFull   : std_logic;
+-- signal RxFifoOverflow     : std_logic;
+-- signal RxFifoUnderflow    : std_logic;
+-- signal RxFifoWrDataCount  : std_logic_vector(10 downto 0);
+-- signal RxFifoRdDataCount  : std_logic_vector(10 downto 0);
 
 
-signal enableFifoWriting  : std_logic;
--- signal fifoWrDataCount    : std_logic_vector(10 downto 0);
-signal i_fifoCoreDat      : std_logic_vector(63 downto 0);
+-- signal i_FifoRxDat      : std_logic_vector(63 downto 0);
 signal dataRead           : std_logic;
+signal timeWrite           : std_logic;
 signal effectiveRdEn      : std_logic;
 
 
-signal i_FifoCoreEmpty_o        : std_logic;
-signal i_FifoCoreAlmostEmpty_o  : std_logic;
 signal msb                      : std_logic;
 signal msb_d                    : std_logic;
 
@@ -185,21 +186,18 @@ signal infifo_rd_rst_busy   : std_logic;
 
 
 signal txfifo_arst_n                : std_logic;
-signal txfifo_wr_rst_busy           : std_logic;
-signal txfifo_wr_rst_busy_AxisClk   : std_logic;
-signal txfifo_wr_rst_busy_AxisClk_d : std_logic;
-signal txfifo_rd_rst_busy           : std_logic;
-signal txfifo_rd_rst_busy_CoreClk   : std_logic;
-signal txfifo_rd_rst_busy_CoreClk_d : std_logic;
+signal TxFifoWrRstBusy              : std_logic;
+signal TxFifoWrRstBusy_CoreClk      : std_logic;
+signal TxFifoRdRstBusy              : std_logic;
+signal txfifo_rst_busy              : std_logic;
+signal txfifo_rst_busy_d            : std_logic;
 
 signal rxfifo_arst_n                : std_logic;
-signal rxfifo_wr_rst_busy           : std_logic;
-signal rxfifo_wr_rst_busy_AxisClk   : std_logic;
-signal rxfifo_wr_rst_busy_AxisClk_d : std_logic;
-signal rxfifo_rd_rst_busy           : std_logic;
-signal rxfifo_rd_rst_busy_CoreClk   : std_logic;
-signal rxfifo_rd_rst_busy_CoreClk_d : std_logic;
-
+signal RxFifoWrRstBusy              : std_logic;
+signal RxFifoRdRstBusy              : std_logic;
+signal RxFifoRdRstBusy_CoreClk      : std_logic;
+signal rxfifo_rst_busy              : std_logic;
+signal rxfifo_rst_busy_d            : std_logic;
 
 signal RxFifoReset_cnt      : std_logic_vector(3 downto 0);
 signal RxFifoReset_cnt_en   : std_logic;
@@ -209,6 +207,9 @@ signal TxFifoReset_cnt      : std_logic_vector(3 downto 0);
 signal TxFifoReset_cnt_en   : std_logic;
 signal TxFifoResetting      : std_logic;
 
+signal TxFifoDin            : std_logic_vector(63 downto 0);
+signal TxFifoDinMsB         : std_logic_vector(63 downto 32);
+signal TxFifoDinLsB         : std_logic_vector(31 downto 0);
 -----------------------------------------------------------------------------
 -- Debug attributes
 attribute mark_debug : string;
@@ -272,63 +273,88 @@ SEQUENCER_m : sequencer
 -----------------
 -- FIFO 
 -- Reset for FIFO
-TxFifoReset_cnt_en <= '1' when (TxFifoReset_cnt /= conv_std_logic_vector(0, TxFifoReset_cnt'length)) else '0';
+
+TXFIFOWRRSTBUSY_CDC_m : signal_cdc 
+  generic map (
+    IN_FF_SYNC_g  => FALSE, -- If TRUE, "SIG_IN_A_i" is sychronized again with CLK_A_i (in owrer to bypass glitches)
+    RESVALUE_g    => '0'    -- RESET Value of B signal (should be equal to reset value of A signal)
+  )
+  port map ( 
+    CLK_A_i       => '0',                 
+    ARST_N_A_i    => '0',                 
+    SIG_IN_A_i    => TxFifoWrRstBusy,  
+    --
+    CLK_B_i       => CoreClk_i,           
+    ARST_N_B_i    => Reset_n_CoreClk_i,           
+    SIG_OUT_B_i   => TxFifoWrRstBusy_CoreClk    
+  );
+
+txfifo_rst_busy <= TxFifoRdRstBusy or TxFifoWrRstBusy_CoreClk; -- Note: as reset is done, TxFifoRdRstBusy and TxFifoWrRstBusy_CoreClk have always a "both to '1' time" 
 
 process(CoreClk_i, Reset_n_CoreClk_i)
 begin
   if (Reset_n_CoreClk_i = '0') then
-    TxFifoReset_cnt <= (others => '1');
-    TxFifoReset     <= '1';
+    TxFifoReset                   <= '1';
+    TxFifoResetting               <= '1';
+    txfifo_rst_busy_d             <= '0';
   elsif rising_edge(CoreClk_i) then
-    if (FlushTxFifos_i = '1') then
-      TxFifoReset_cnt <= (others => '1');
-    elsif (TxFifoReset_cnt_en = '1') then
-      TxFifoReset_cnt <= TxFifoReset_cnt - 1;
+    txfifo_rst_busy_d <= txfifo_rst_busy;
+    --
+    if (FlushTXFifos_i = '1') then
+      TxFifoReset     <= '1';
+    elsif (TxFifoRdRstBusy = '1' and TxFifoWrRstBusy_CoreClk = '1') then
+      TxFifoReset     <= '0';
     end if;
-    TxFifoReset <= TxFifoReset_cnt_en; 
+    --
+    if (FlushTXFifos_i = '1') then
+      TxFifoResetting <= '1';
+    elsif (txfifo_rst_busy = '0' and  txfifo_rst_busy_d /= '0') then  -- Note: txfifo_rst_busy_d /= '0' because of "unknown" in simulation for TxFifoRdRstBusy
+      TxFifoResetting <= '0';
+    end if;
   end if;
 end process;
 
+
+p_WriteEventsTX : process (AxisClk_i, Reset_n_AxisClk_i) is
+begin
+  if (TxFifoReset = '1') then
+    TxFifoDinMsb <= (others => '0');
+    timeWrite <= '1'; 
+  elsif (rising_edge(AxisClk_i)) then
+    if (FifoTxWrite_i = '1') then
+      if (FifoTxLastData_i = '1') then
+        timeWrite <= '1';
+      else 
+        timeWrite <= not(timeWrite);
+      end if;
+      --
+      if (timeWrite = '1') then
+        TxFifoDinMsb(63 downto 32) <= FifoTxDat_i;
+      end if;
+    end if;
+  end if;
+end process p_WriteEventsTX; 
+
+-- Write side
+TxFifoDin             <= TxFifoDinMsb & FifoTxDat_i; 
+TxFifoWrEn            <= FifoTxWrite_i and (not timeWrite or OnlyEventsTx_i) and not TxFifoWrRstBusy; 
+FifoTxAlmostFull_o    <= TxFifoAlmostFull or TxFifoWrRstBusy;
+FifoTxFull_o          <= TxFifoFull or TxFifoWrRstBusy; 
+
+-- Read side
+TxFifoRdEn            <= SeqInRead and not TxFifoRdRstBusy;
+SeqInEmpty            <= TxFifoEmpty or TxFifoRdRstBusy;
+FifoTxEmpty_o         <= TxFifoEmpty or TxFifoRdRstBusy;
+
 TXFIFO_FOR_ZYNQ : if C_FAMILY = "zynq"  generate -- "zynq", "zynquplus" 
 begin
-   
-  OUTFIFO_32_2048_64_1024_m : OUTFIFO_32_2048_64_1024_ZYNQ
-    port map (
-      rst          => ResetTX,    -- high-active reset
-      wr_clk       => CoreClk_i,
-      rd_clk       => CoreClk_i,
-      din          => CoreFifoDat_i,
-      wr_en        => CoreFifoWrite_i,
-      rd_en        => SeqInRead,
-      dout         => SeqInAddrEvt,
-      full         => CoreFifoFull_o,
-      almost_full  => CoreFifoAlmostFull_o,
-      overflow     => open,
-      empty        => SeqInEmpty,
-      almost_empty => open,
-      underflow    => open
-    );
-    
-end generate;
 
-TXFIFO_FOR_ZYNQUPLUS_m : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
-begin
-
-  TxFifoWrEn              <= CoreFifoWrite_i and not txfifo_wr_rst_busy;
-  CoreFifoFull_o          <= TxFifoFull or txfifo_wr_rst_busy;
-  CoreFifoAlmostFull_o    <= TxFifoAlmostFull or txfifo_wr_rst_busy;  
-  
-  TxFifoRdEn              <= SeqInRead and not txfifo_rd_rst_busy;
-  SeqInEmpty              <= TxFifoEmpty or txfifo_rd_rst_busy;
-
-
-
-  TXFIFO_HPU_ZYNQUPLUS_m : TXFIFO_HPU_ZYNQUPLUS
+  TXFIFO_HPU_ZYNQ_m : TXFIFO_HPU_ZYNQ
     PORT MAP (
       rst           => TxFifoReset,
       wr_clk        => AxisClk_i,
       rd_clk        => CoreClk_i,
-      din           => CoreFifoDat_i,
+      din           => TxFifoDin, -- FifoTxDat_i,
       wr_en         => TxFifoWrEn,
       rd_en         => TxFifoRdEn,
       dout          => SeqInAddrEvt,
@@ -340,26 +366,35 @@ begin
       underflow     => open,
       rd_data_count => open,
       wr_data_count => open,      
-      wr_rst_busy   => txfifo_wr_rst_busy,
-      rd_rst_busy   => txfifo_rd_rst_busy
-    );
+      wr_rst_busy   => TxFifoWrRstBusy,
+      rd_rst_busy   => TxFifoRdRstBusy
+    );   
    
---    u_OUTFIFO_32_2048_64_1024 : OUTFIFO_32_2048_64_1024_ZYNQUPLUS
---        port map (
---            rst          => ResetTX,    -- high-active reset
---            wr_clk       => CoreClk_i,
---            rd_clk       => CoreClk_i,
---            din          => CoreFifoDatI,
---            wr_en        => CoreFifoWrite_i,
---            rd_en        => SeqInRead,
---            dout         => LiEnSeqInAddrEvt,
---            full         => CoreFifoFull_o,
---            almost_full  => CoreFifoAlmostFull_o,
---            overflow     => open,
---            empty        => SeqInEmpty,
---            almost_empty => open,
---            underflow    => open
---        );
+end generate;
+
+TXFIFO_FOR_ZYNQUPLUS_m : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
+begin
+
+  TXFIFO_HPU_ZYNQUPLUS_m : TXFIFO_HPU_ZYNQUPLUS
+    PORT MAP (
+      rst           => TxFifoReset,
+      wr_clk        => AxisClk_i,
+      rd_clk        => CoreClk_i,
+      din           => TxFifoDin, -- FifoTxDat_i,
+      wr_en         => TxFifoWrEn,
+      rd_en         => TxFifoRdEn,
+      dout          => SeqInAddrEvt,
+      full          => TxFifoFull,
+      almost_full   => TxFifoAlmostFull,
+      overflow      => open,
+      empty         => TxFifoEmpty,
+      almost_empty  => open,
+      underflow     => open,
+      rd_data_count => open,
+      wr_data_count => open,      
+      wr_rst_busy   => TxFifoWrRstBusy,
+      rd_rst_busy   => TxFifoRdRstBusy
+    );    
 
 end generate;
 
@@ -385,18 +420,16 @@ msb <= Timestamp_RX(23) when FullTimestamp_i='0' else
 
 p_sample : process (CoreClk_i)
 begin
-    if (rising_edge(CoreClk_i)) then
-        if (Reset_n_CoreClk_i = '0') then
-            msb_d <= '0';
-        else
-            msb_d <= msb;
-        end if;
+  if (rising_edge(CoreClk_i)) then
+    if (Reset_n_CoreClk_i = '0') then
+      msb_d <= '0';
+    else
+      msb_d <= msb;
     end if;
+  end if;
 end process p_sample;
 
 WrapDetected_o <= msb_d and not(msb);
- 
-
 
 TIMETAGGER_m : timetagger
   port map (
@@ -417,37 +450,10 @@ TIMETAGGER_m : timetagger
 
 ShortTimestamp_TX <= x"0000" & Timestamp_TX(15 downto 0);
 
-
-
-
-
-CoreFifoEmpty_o <= SeqInEmpty;
-
-
-
-
 -----------------------------------------------------------------------------
 -- RX FIFO
 
--- Reset for FIFO
--- RxFifoReset_cnt_en <= '1' when (RxFifoReset_cnt /= conv_std_logic_vector(0, RxFifoReset_cnt'length)) else '0';
--- 
--- process(CoreClk_i, Reset_n_CoreClk_i)
--- begin
---   if (Reset_n_CoreClk_i = '0') then
---     RxFifoReset_cnt <= (others => '1');
---     RxFifoReset     <= '1';
---   elsif rising_edge(CoreClk_i) then
---     if (FlushRXFifos_i = '1') then
---       RxFifoReset_cnt <= (others => '1');
---     elsif (RxFifoReset_cnt_en = '1') then
---       RxFifoReset_cnt <= RxFifoReset_cnt - 1;
---     end if;
---     RxFifoReset <= RxFifoReset_cnt_en; 
---   end if;
--- end process;
-
-RXFIFO_RD_RST_BUSY_CDC_i : signal_cdc 
+RXFIFORDRSTBUSY_CDC_m : signal_cdc 
   generic map (
     IN_FF_SYNC_g  => FALSE, -- If TRUE, "SIG_IN_A_i" is sychronized again with CLK_A_i (in order to bypass glitches)
     RESVALUE_g    => '0'    -- RESET Value of B signal (should be equal to reset value of A signal)
@@ -455,92 +461,81 @@ RXFIFO_RD_RST_BUSY_CDC_i : signal_cdc
   port map ( 
     CLK_A_i       => '0',                 
     ARST_N_A_i    => '0',                 
-    SIG_IN_A_i    => rxfifo_rd_rst_busy,  
+    SIG_IN_A_i    => RxFifoRdRstBusy,  
     --
     CLK_B_i       => CoreClk_i,           
     ARST_N_B_i    => Reset_n_CoreClk_i,           
-    SIG_OUT_B_i   => rxfifo_rd_rst_busy_CoreClk    
+    SIG_OUT_B_i   => RxFifoRdRstBusy_CoreClk    
   );
 
+rxfifo_rst_busy <= RxFifoWrRstBusy or RxFifoRdRstBusy_CoreClk; -- Note: as reset is done, RxFifoWrRstBusy and RxFifoRdRstBusy_CoreClk have always a "both to '1' time" 
 
 process(CoreClk_i, Reset_n_CoreClk_i)
 begin
   if (Reset_n_CoreClk_i = '0') then
     RxFifoReset                   <= '1';
     RxFifoResetting               <= '1';
-    rxfifo_rd_rst_busy_CoreClk_d  <= '0';
+    rxfifo_rst_busy_d             <= '0';
   elsif rising_edge(CoreClk_i) then
-    rxfifo_rd_rst_busy_CoreClk_d <= rxfifo_rd_rst_busy_CoreClk;
+    rxfifo_rst_busy_d <= rxfifo_rst_busy;
     --
     if (FlushRXFifos_i = '1') then
       RxFifoReset     <= '1';
-    elsif (rxfifo_rd_rst_busy_CoreClk = '1' and rxfifo_rd_rst_busy_CoreClk_d = '0') then
+    elsif (RxFifoWrRstBusy = '1' and RxFifoRdRstBusy_CoreClk = '1') then
       RxFifoReset     <= '0';
     end if;
     --
     if (FlushRXFifos_i = '1') then
       RxFifoResetting <= '1';
-    elsif (rxfifo_rd_rst_busy_CoreClk = '0' and rxfifo_rd_rst_busy_CoreClk_d = '1') then
+    elsif (rxfifo_rst_busy = '0' and  rxfifo_rst_busy_d /= '0') then  -- Note: rxfifo_rst_busy_d /= '0' because of "unknown" in simulation for RxFifoWrRstBusy
       RxFifoResetting <= '0';
     end if;
   end if;
 end process;
 
--- rxfifo_arst_n <= Reset_n_CoreClk_i and not FlushRXFifos_i;
--- 
--- process(CoreClk_i, rxfifo_arst_n)
--- begin
---   if (rxfifo_arst_n = '0') then
---     RxFifoReset                   <= '1';
---     RxFifoResetting               <= '1';
---     rxfifo_rd_rst_busy_CoreClk_d  <= '0';
---   elsif rising_edge(CoreClk_i) then
---     rxfifo_rd_rst_busy_CoreClk_d <= rxfifo_rd_rst_busy_CoreClk;
---     --
---     if (rxfifo_rd_rst_busy_CoreClk = '1' and rxfifo_rd_rst_busy_CoreClk_d = '0') then
---       RxFifoReset     <= '0';
---     end if;
---     --
---     if (rxfifo_rd_rst_busy_CoreClk = '0' and rxfifo_rd_rst_busy_CoreClk_d = '1') then
---       RxFifoResetting <= '0';
---     end if;
---   end if;
--- end process;
+-- Write side
+RxFifoWrEn            <= MonOutWrite and not RxFifoWrRstBusy;
+MonOutFull            <= RxFifoFull or RxFifoWrRstBusy;
+FifoRxFull_o          <= RxFifoFull or RxFifoWrRstBusy;  
+
+-- Read side
+RxFifoRdEn            <= FifoRxRead_i and not RxFifoRdRstBusy;
+FifoRxEmpty_o         <= RxFifoEmpty or RxFifoRdRstBusy;
+FifoRxAlmostEmpty_o   <= RxFifoAlmostEmpty or RxFifoRdRstBusy;
+FifoRxResetBusy_o     <= RxFifoRdRstBusy;
+FifoRxLastData_o      <= RxFifoAlmostEmpty and not RxFifoEmpty;
 
 
 
 RXFIFO_FOR_ZYNQ : if C_FAMILY = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
-  u_INFIFO_64_1024 : INFIFO_64_1024_ZYNQ
-    port map (
-      clk          => CoreClk_i,
-      srst         => ResetRX,    -- high-active reset
-      din          => MonOutAddrEvt,
-      wr_en        => enableFifoWriting,
-      rd_en        => effectiveRdEn,
-      dout         => i_fifoCoreDat,
-      full         => MonOutFull,
-      almost_full  => open,
-      overflow     => open,
-      empty        => i_FifoCoreEmpty_o,
-      almost_empty => i_FifoCoreAlmostEmpty_o,
-      underflow    => open,
-      data_count   => RxFifoWrDataCount
-    );
+  RXFIFO_HPU_ZYNQU_i : RXFIFO_HPU_ZYNQ
+    PORT MAP (
+      rst           => RxFifoReset,
+      wr_clk        => CoreClk_i,
+      rd_clk        => AxisClk_i,
+      din           => MonOutAddrEvt,
+      wr_en         => RxFifoWrEn,
+      rd_en         => RxFifoRdEn,
+      dout          => FifoRxDat_o,
+      full          => RxFifoFull,
+      almost_full   => open, -- RxFifoAlmostFull,
+      overflow      => open, -- RxFifoOverflow,
+      empty         => RxFifoEmpty,
+      almost_empty  => RxFifoAlmostEmpty,
+      underflow     => open, -- RxFifoUnderflow,
+      rd_data_count => FifoRxNumData_o,
+      wr_data_count => open, -- RxFifoWrDataCount,
+      wr_rst_busy   => RxFifoWrRstBusy,
+      rd_rst_busy   => RxFifoRdRstBusy
+      );
     
 end generate;
 
 RXFIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
-
-  RxFifoWrEn                <= MonOutWrite and not rxfifo_wr_rst_busy;
-  MonOutFull                <= RxFifoFull or rxfifo_wr_rst_busy;
-  
-  RxFifoRdEn                <= effectiveRdEn and not rxfifo_rd_rst_busy;
-  i_FifoCoreEmpty_o         <= RxFifoEmpty or rxfifo_rd_rst_busy;
-  i_FifoCoreAlmostEmpty_o   <= RxFifoAlmostEmpty or rxfifo_rd_rst_busy;
-  
+ 
   RXFIFO_HPU_ZYNQUPLUS_i : RXFIFO_HPU_ZYNQUPLUS
     PORT MAP (
       rst           => RxFifoReset,
@@ -549,88 +544,28 @@ begin
       din           => MonOutAddrEvt,
       wr_en         => RxFifoWrEn,
       rd_en         => RxFifoRdEn,
-      dout          => i_fifoCoreDat,
+      dout          => FifoRxDat_o,
       full          => RxFifoFull,
-      almost_full   => RxFifoAlmostFull,
-      overflow      => RxFifoOverflow,
+      almost_full   => open, -- RxFifoAlmostFull,
+      overflow      => open, -- RxFifoOverflow,
       empty         => RxFifoEmpty,
       almost_empty  => RxFifoAlmostEmpty,
-      underflow     => RxFifoUnderflow,
-      rd_data_count => RxFifoRdDataCount,
-      wr_data_count => RxFifoWrDataCount,
-      wr_rst_busy   => rxfifo_wr_rst_busy,
-      rd_rst_busy   => rxfifo_rd_rst_busy
-        );
-    
---     u_INFIFO_64_1024 : INFIFO_64_1024_ZYNQUPLUS
---         port map (
---             clk          => CoreClk_i,
---             srst         => ResetRX,    -- high-active reset
---             din          => LiEnMonOutAddrEvt,
---             wr_en        => enableFifoWriting,
---             rd_en        => effectiveRdEn,
---             dout         => i_fifoCoreDat,
---             full         => MonOutFull,
---             almost_full  => DBG_almost_full,
---             overflow     => DBG_overflow,
---             empty        => i_FifoCoreEmpty_o,
---             almost_empty => i_FifoCoreAlmostEmpty_o,
---             underflow    => DBG_underflow,
---             data_count   => fifoWrDataCount,
---             wr_rst_busy  => infifo_wr_rst_busy,
---             rd_rst_busy  => infifo_rd_rst_busy
---         );
+      underflow     => open, -- RxFifoUnderflow,
+      rd_data_count => FifoRxNumData_o,
+      wr_data_count => open, -- RxFifoWrDataCount,
+      wr_rst_busy   => RxFifoWrRstBusy,
+      rd_rst_busy   => RxFifoRdRstBusy
+      );
 
 end generate;
 
 
-FifoCoreNumData_o <= RxFifoRdDataCount;
 
--- p_ReadDataTimeSel : process (AxisClk_i, Reset_n_AxisClk_i) is
--- begin
---   if (Reset_n_AxisClk_i = '0') then
---     dataRead <= '0';
---   elsif (rising_edge(AxisClk_i)) then
---     if (OnlyEvents_i = '1') then
---       dataRead <= '1';
---     elsif (FifoCoreRead_i = '0') then
---       dataRead <= '0';
---     else
---       dataRead <= not(dataRead);
---     end if;
---   end if;
--- end process p_ReadDataTimeSel;
 
--- p_ReadDataTimeSel : process (AxisClk_i, Reset_n_AxisClk_i) is
--- begin
---   if (Reset_n_AxisClk_i = '0') then
---     dataRead <= '0';
---   elsif (rising_edge(AxisClk_i)) then
---     if (FifoCoreRead_i = '1') then
---       dataRead <= not(dataRead);
---     end if;
---   end if;
--- end process p_ReadDataTimeSel;
-
--- FifoCoreDat_o      <= i_fifoCoreDat(63 downto 32) when (dataRead = '0') else      -- i.e. Timestamp
---                       i_fifoCoreDat(31 downto  0);                                -- i.e. Event
-
-FifoCoreDat_o      <=  i_fifoCoreDat;    
-                      
--- effectiveRdEn      <=  '0' when (dataRead = '0') else FifoCoreRead_i;
-effectiveRdEn      <=  FifoCoreRead_i;
-
-FifoCoreFull_o     <= MonOutFull;
-FifoCoreLastData_o <= RxFifoAlmostEmpty and not RxFifoEmpty;
-
---enableFifoWriting <= MonOutWrite when (MonOutAddrEvt(7 downto 0) >= OutThresholdValI(7 downto 0)) else '0';
-enableFifoWriting <= MonOutWrite;
-
-FifoCoreEmpty_o       <= i_FifoCoreEmpty_o;
-FifoCoreAlmostEmpty_o <= i_FifoCoreAlmostEmpty_o;
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
+-- FOR SIMULATION
 
 -- pragma synthesis_off
 p_log_file_writing : process

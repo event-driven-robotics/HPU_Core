@@ -338,22 +338,8 @@ entity HPUCore is
     -- Processor interface
     --============================================
     Interrupt_o       : out std_logic;
-    
-    -- Debug signals interface
-    DBG_dataOk        : out std_logic;
-    DBG_rawi          : out std_logic_vector(15 downto 0);
-    DBG_data_written  : out std_logic;
-    DBG_dma_burst_counter : out std_logic_vector(10 downto 0);
-    DBG_dma_test_mode      : out std_logic;
-    DBG_dma_EnableDma      : out std_logic;
-    DBG_dma_is_running     : out std_logic;
-    DBG_dma_Length         : out std_logic_vector(10 downto 0);
-    DBG_dma_nedge_run      : out std_logic;
-    
-    
-    -- ADD USER PORTS ABOVE THIS LINE ------------------
-    
-    -- DO NOT EDIT BELOW THIS LINE ---------------------
+   
+
     -- Bus protocol ports, do not add to or delete  
     -- Axi lite I/f                                                                                                                                          
 --    S_AXI_ACLK        : in  std_logic;                                           --  AXI4LITE slave: Clock                                           
@@ -428,19 +414,22 @@ signal i_dma_txDataBuffer        : std_logic_vector(31 downto 0);
 signal i_dma_writeTxBuffer       : std_logic;
 signal i_dma_txBufferFull        : std_logic;
 
-signal i_fifoCoreDat             : std_logic_vector(63 downto 0);
-signal i_fifoCoreRead            : std_logic;
-signal i_fifoCoreEmpty           : std_logic;
-signal i_fifoCoreAlmostEmpty     : std_logic;
-signal i_fifoCoreBurstReady      : std_logic;
-signal i_fifoCoreFull            : std_logic;
-signal i_fifoCoreNumData         : std_logic_vector(10 downto 0);
+signal i_FifoRxDat               : std_logic_vector(63 downto 0);
+signal i_FifoRxRead              : std_logic;
+signal i_FifoRxEmpty             : std_logic;
+signal i_FifoRxAlmostEmpty       : std_logic;
+signal i_FifoRxBurstReady        : std_logic;
+signal i_FifoRxFull              : std_logic;
+signal i_FifoRxNumData           : std_logic_vector(10 downto 0);
+signal i_FifoRxResetBusy         : std_logic;
 
-signal i_coreFifoDat             : std_logic_vector(31 downto 0);
-signal i_coreFifoWrite           : std_logic;
-signal i_coreFifoFull            : std_logic;
-signal i_coreFifoAlmostFull      : std_logic;
-signal i_coreFifoEmpty           : std_logic;
+signal i_FifoTxDat               : std_logic_vector(31 downto 0);
+signal i_FifoTxWrite             : std_logic;
+signal i_FifoTxLastData          : std_logic;
+signal i_FifoTxFull              : std_logic;
+signal i_FifoTxAlmostFull        : std_logic;
+signal i_FifoTxEmpty             : std_logic;
+signal i_FifoTxResetBusy         : std_logic;
 
 signal i_uP_spinnlnk_dump_mode   : std_logic;
 signal i_uP_spinnlnk_parity_err  : std_logic;
@@ -448,7 +437,8 @@ signal i_uP_spinnlnk_rx_err      : std_logic;
 
 signal i_uP_DMAIsRunning         : std_logic;
 signal i_uP_enableDmaIf          : std_logic;
-signal i_uP_OnlyEvents           : std_logic;
+signal i_uP_OnlyEventsRx         : std_logic;
+signal i_uP_OnlyEventsTx         : std_logic;
 signal i_uP_resetstream          : std_logic;
 signal i_uP_dmaLength            : std_logic_vector(15 downto 0);
 signal i_uP_DMA_test_mode        : std_logic;
@@ -560,8 +550,9 @@ signal shreg_aux2                : std_logic_vector (3 downto 0);
 -- Signals for TimeMachine
 signal resync_clear_n            : std_logic;  
 signal timing_CoreClk            : time_tick;	    
+signal timing_AxisClk            : time_tick;	    
 
-signal i_FifoCoreLastData        : std_logic;
+signal i_FifoRxLastData        : std_logic;
 
 signal rrx_hssaer                : std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
 signal lrx_hssaer                : std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
@@ -581,10 +572,6 @@ begin
 
     Interrupt_o <= i_interrupt;
 
-
-    -- Debug assignments --
-    -----------------------
-    DBG_rawi <= i_rawInterrupt;
 
 
     -- Reset generation --
@@ -651,14 +638,14 @@ TIME_MACHINE_AXISCLK_m : time_machine
     ARST_ULONG_N_o          => open,            -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
 
     -- Output ports for generated clock enables
-    EN200NS_o               => timing_CoreClk.en200ns,  -- Clock enable every 200 ns
-    EN1US_o                 => timing_CoreClk.en1us,	  -- Clock enable every 1 us
-    EN10US_o                => timing_CoreClk.en10us,	  -- Clock enable every 10 us
-    EN100US_o               => timing_CoreClk.en100us,	-- Clock enable every 100 us
-    EN1MS_o                 => timing_CoreClk.en1ms,	  -- Clock enable every 1 ms
-    EN10MS_o                => timing_CoreClk.en10ms,	  -- Clock enable every 10 ms
-    EN100MS_o               => timing_CoreClk.en100ms,	-- Clock enable every 100 ms
-    EN1S_o                  => timing_CoreClk.en1s 	    -- Clock enable every 1 s
+    EN200NS_o               => timing_AxisClk.en200ns,  -- Clock enable every 200 ns
+    EN1US_o                 => timing_AxisClk.en1us,	  -- Clock enable every 1 us
+    EN10US_o                => timing_AxisClk.en10us,	  -- Clock enable every 10 us
+    EN100US_o               => timing_AxisClk.en100us,	-- Clock enable every 100 us
+    EN1MS_o                 => timing_AxisClk.en1ms,	  -- Clock enable every 1 ms
+    EN10MS_o                => timing_AxisClk.en10ms,	  -- Clock enable every 10 ms
+    EN100MS_o               => timing_AxisClk.en100ms,	-- Clock enable every 100 ms
+    EN1S_o                  => timing_AxisClk.en1s 	    -- Clock enable every 1 s
     );
     
 ------------------------------------------------------
@@ -745,7 +732,8 @@ AXILITE_m : axilite
     ResetStream_o                 => i_uP_resetstream,                 -- out std_logic;
     DmaLength_o                   => i_uP_dmaLength,                   -- out std_logic_vector(10 downto 0);
     DMA_test_mode_o               => i_uP_DMA_test_mode,               -- out std_logic;
-    OnlyEvents_o                  => i_uP_OnlyEvents,                  -- out std_logic;
+    OnlyEventsRx_o                => i_uP_OnlyEventsRx,                -- out std_logic;
+    OnlyEventsTx_o                => i_uP_OnlyEventsTx,                -- out std_logic;
     fulltimestamp_o               => i_uP_fulltimestamp,               -- out std_logic;
     
     CleanTimer_o                  => i_uP_cleanTimer,              -- out std_logic;
@@ -877,7 +865,8 @@ AXISTREAM_m : axistream
     --
     DMA_test_mode_i                => i_uP_DMA_test_mode,               -- in  std_logic;
     EnableAxistreamIf_i            => i_uP_enableDmaIf,                 -- in  std_logic;
-    OnlyEvents_i                   => i_uP_OnlyEvents,                  -- in  std_logic;
+    OnlyEventsRx_i                 => i_uP_OnlyEventsRx,                -- in  std_logic;
+    OnlyEventsTx_i                 => i_uP_OnlyEventsTx,                -- in  std_logic;
     DMA_is_running_o               => i_uP_DMAIsRunning,                -- out std_logic;
     DmaLength_i                    => i_uP_dmaLength,                   -- in  std_logic_vector(15 downto 0);
     ResetStream_i                  => i_uP_resetstream,                 -- in  std_logic;
@@ -887,14 +876,17 @@ AXISTREAM_m : axistream
     TlastTOwritten_i               => i_up_TlastTOwritten,              -- in  std_logic;
     TDataCnt_o                     => i_up_TDataCnt,                    -- out std_logic_vector(31 downto 0);
     -- From Fifo to core/dma
-    FifoCoreDat_i                  => i_dma_rxDataBuffer,               -- in  std_logic_vector(63 downto 0);
-    FifoCoreRead_o                 => i_dma_readRxBuffer,               -- out std_logic;
-    FifoCoreEmpty_i                => i_dma_rxBufferEmpty,              -- in  std_logic;
-    FifoCoreLastData_i             => i_FifoCoreLastData,               -- in  std_logic;
+    FifoRxDat_i                    => i_dma_rxDataBuffer,               -- in  std_logic_vector(63 downto 0);
+    FifoRxRead_o                   => i_dma_readRxBuffer,               -- out std_logic;
+    FifoRxEmpty_i                  => i_dma_rxBufferEmpty,              -- in  std_logic;
+    FifoRxLastData_i               => i_FifoRxLastData,               -- in  std_logic;
+    FifoRxResetBusy_i              => i_FifoRxResetBusy,               -- in  std_logic;
     -- From core/dma to Fifo
-    CoreFifoDat_o                  => i_dma_txDataBuffer,               -- out std_logic_vector(31 downto 0);
-    CoreFifoWrite_o                => i_dma_writeTxBuffer,              -- out std_logic;
-    CoreFifoFull_i                 => i_dma_txBufferFull,               -- in  std_logic;
+    FifoTxDat_o                    => i_dma_txDataBuffer,               -- out std_logic_vector(31 downto 0);
+    FifoTxWrite_o                  => i_dma_writeTxBuffer,              -- out std_logic;
+    FifoTxLastData_o               => i_FifoTxLastData,                -- out std_logic;
+    FifoTxFull_i                   => i_dma_txBufferFull,               -- in  std_logic;
+    FifoTxResetBusy_i              => i_FifoTxResetBusy,               -- in  std_logic;
     -- Axi Stream I/f
     S_AXIS_TREADY                  => S_AXIS_TREADY,                    -- out std_logic;
     S_AXIS_TDATA                   => S_AXIS_TDATA,                     -- in  std_logic_vector(31 downto 0);
@@ -906,35 +898,35 @@ AXISTREAM_m : axistream
     M_AXIS_TREADY                  => M_AXIS_TREADY                      -- in  std_logic
     );
 
--- i_FifoCoreLastData <= '1' when i_fifoCoreNumData="00000000001" else '0';
+-- i_FifoRxLastData <= '1' when i_FifoRxNumData="00000000001" else '0';
 
 -- Muxing AXI-Lite and AXI-Stream Fifo interfaces --
 ----------------------------------------------------
 
-i_uP_rxFifoDataAF                <= '1' when (i_fifoCoreNumData >= i_up_rxFifoThresholdNumData) else '0';
-i_uP_rxDataBuffer                <= i_fifoCoreDat(31 downto 0);
-i_uP_rxTimeBuffer                <= i_fifoCoreDat(63 downto 32);
-i_uP_rxBufferReady               <= i_fifoCoreBurstReady;
-i_uP_rxBufferEmpty               <= i_fifoCoreEmpty;
-i_uP_rxBufferAlmostEmpty         <= i_fifoCoreAlmostEmpty;
-i_uP_rxBufferFull                <= i_fifoCoreFull;
+i_uP_rxFifoDataAF                <= '1' when (i_FifoRxNumData >= i_up_rxFifoThresholdNumData) else '0';
+i_uP_rxDataBuffer                <= i_FifoRxDat(31 downto 0);
+i_uP_rxTimeBuffer                <= i_FifoRxDat(63 downto 32);
+i_uP_rxBufferReady               <= i_FifoRxBurstReady;
+i_uP_rxBufferEmpty               <= i_FifoRxEmpty;
+i_uP_rxBufferAlmostEmpty         <= i_FifoRxAlmostEmpty;
+i_uP_rxBufferFull                <= i_FifoRxFull;
 
-i_dma_rxDataBuffer               <= i_fifoCoreDat;
-i_dma_rxBufferEmpty              <= i_fifoCoreEmpty;
+i_dma_rxDataBuffer               <= i_FifoRxDat;
+i_dma_rxBufferEmpty              <= i_FifoRxEmpty;
 
-i_fifoCoreRead                   <= i_dma_readRxBuffer  when (i_uP_DMAIsRunning='1') else
+i_FifoRxRead                   <= i_dma_readRxBuffer  when (i_uP_DMAIsRunning='1') else
                                     i_uP_readRxBuffer;
 
 
-i_uP_txBufferEmpty               <= i_coreFifoEmpty;
-i_uP_txBufferAlmostFull          <= i_coreFifoAlmostFull;
-i_uP_txBufferFull                <= i_coreFifoFull;
+i_uP_txBufferEmpty               <= i_FifoTxEmpty;
+i_uP_txBufferAlmostFull          <= i_FifoTxAlmostFull;
+i_uP_txBufferFull                <= i_FifoTxFull;
 
-i_dma_txBufferFull               <= i_coreFifoFull;
+i_dma_txBufferFull               <= i_FifoTxFull;
 
-i_coreFifoDat                    <= i_dma_txDataBuffer  when (i_uP_DMAIsRunning='1') else
+i_FifoTxDat                    <= i_dma_txDataBuffer  when (i_uP_DMAIsRunning='1') else
                                     i_uP_txDataBuffer;
-i_coreFifoWrite                  <= i_dma_writeTxBuffer when (i_uP_DMAIsRunning='1') else
+i_FifoTxWrite                  <= i_dma_writeTxBuffer when (i_uP_DMAIsRunning='1') else
                                     i_uP_writeTxBuffer;
 
 
@@ -1157,19 +1149,22 @@ NEUSERIAL_CORE_m : neuserial_core
     --
     -- FIFOs interfaces
     ---------------------
-    FifoCoreDat_o           => i_fifoCoreDat,                -- out std_logic_vector(63 downto 0);
-    FifoCoreRead_i          => i_fifoCoreRead,               -- in  std_logic;
-    FifoCoreEmpty_o         => i_fifoCoreEmpty,              -- out std_logic;
-    FifoCoreAlmostEmpty_o   => i_fifoCoreAlmostEmpty,        -- out std_logic;
-    FifoCoreLastData_o      => i_fifoCoreLastData, 
-    FifoCoreFull_o          => i_fifoCoreFull,               -- out std_logic;
-    FifoCoreNumData_o       => i_fifoCoreNumData,            -- out std_logic_vector(10 downto 0);
+    FifoRxDat_o           => i_FifoRxDat,                -- out std_logic_vector(63 downto 0);
+    FifoRxRead_i          => i_FifoRxRead,               -- in  std_logic;
+    FifoRxEmpty_o         => i_FifoRxEmpty,              -- out std_logic;
+    FifoRxAlmostEmpty_o   => i_FifoRxAlmostEmpty,        -- out std_logic;
+    FifoRxLastData_o      => i_FifoRxLastData,           -- out std_logic;
+    FifoRxFull_o          => i_FifoRxFull,               -- out std_logic;
+    FifoRxNumData_o       => i_FifoRxNumData,            -- out std_logic_vector(10 downto 0);
+    FifoRxResetBusy_o     => i_FifoRxResetBusy,          -- out std_logic;
     --
-    CoreFifoDat_i           => i_coreFifoDat,                -- in  std_logic_vector(31 downto 0);
-    CoreFifoWrite_i         => i_coreFifoWrite,              -- in  std_logic;
-    CoreFifoFull_o          => i_coreFifoFull,               -- out std_logic;
-    CoreFifoAlmostFull_o    => i_coreFifoAlmostFull,         -- out std_logic;
-    CoreFifoEmpty_o         => i_coreFifoEmpty,              -- out std_logic;
+    FifoTxDat_i           => i_FifoTxDat,                -- in  std_logic_vector(31 downto 0);
+    FifoTxWrite_i         => i_FifoTxWrite,              -- in  std_logic;
+    FifoTxLastData_i      => i_FifoTxLastData,           -- in  std_logic;
+    FifoTxFull_o          => i_FifoTxFull,               -- out std_logic;
+    FifoTxAlmostFull_o    => i_FifoTxAlmostFull,         -- out std_logic;
+    FifoTxEmpty_o         => i_FifoTxEmpty,              -- out std_logic;
+    FifoTxResetBusy_o     => i_FifoTxResetBusy,          -- out std_logic;
     
     -----------------------------------------------------------------------
     -- uController Interface
@@ -1190,7 +1185,8 @@ NEUSERIAL_CORE_m : neuserial_core
     
     -- Configurations
     DmaLength_i             => i_uP_dmaLength,               -- in  std_logic_vector(15 downto 0);
-    OnlyEvents_i            => i_uP_OnlyEvents,              -- in  std_logic;
+    OnlyEventsRx_i          => i_uP_OnlyEventsRx,              -- in  std_logic;
+    OnlyEventsTx_i          => i_uP_OnlyEventsTx,              -- in  std_logic;
     RemoteLoopback_i        => i_uP_RemoteLpbk,              -- in  std_logic;
     LocNearLoopback_i       => i_uP_LocalNearLpbk,           -- in  std_logic;
     LocFarLPaerLoopback_i   => i_uP_LocalFarLPaerLpbk,       -- in  std_logic;

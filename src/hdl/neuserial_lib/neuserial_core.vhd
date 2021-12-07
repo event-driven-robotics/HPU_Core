@@ -229,156 +229,160 @@ entity neuserial_core is
     AuxRx_GTP_PllLock_i         : in  std_logic;                                           
     AuxRx_GTP_PllRefclklost_i   : in  std_logic;   
     -- SpiNNaker Interface 
-    AuxRx_SPNN_Data_i             : in  std_logic_vector(6 downto 0); 
-    AuxRx_SPNN_Ack_o              : out std_logic;              
+    AuxRx_SPNN_Data_i           : in  std_logic_vector(6 downto 0); 
+    AuxRx_SPNN_Ack_o            : out std_logic;              
     
     --
     -- FIFOs interfaces
     ---------------------
-    FifoCoreDat_o             : out std_logic_vector(63 downto 0);
-    FifoCoreRead_i            : in  std_logic;
-    FifoCoreEmpty_o           : out std_logic;
-    FifoCoreAlmostEmpty_o     : out std_logic;
-    FifoCoreLastData_o        : out std_logic;
-    FifoCoreFull_o            : out std_logic;
-    FifoCoreNumData_o         : out std_logic_vector(10 downto 0);
+    FifoRxDat_o                 : out std_logic_vector(63 downto 0);
+    FifoRxRead_i                : in  std_logic;
+    FifoRxEmpty_o               : out std_logic;
+    FifoRxAlmostEmpty_o         : out std_logic;
+    FifoRxLastData_o            : out std_logic;
+    FifoRxFull_o                : out std_logic;
+    FifoRxNumData_o             : out std_logic_vector(10 downto 0);
+    FifoRxResetBusy_o           : out std_logic;
     --
-    CoreFifoDat_i             : in  std_logic_vector(31 downto 0);
-    CoreFifoWrite_i           : in  std_logic;
-    CoreFifoFull_o            : out std_logic;
-    CoreFifoAlmostFull_o      : out std_logic;
-    CoreFifoEmpty_o           : out std_logic;
+    FifoTxDat_i                 : in  std_logic_vector(31 downto 0);
+    FifoTxWrite_i               : in  std_logic;
+    FifoTxLastData_i            : in  std_logic; 
+    FifoTxFull_o                : out std_logic;
+    FifoTxAlmostFull_o          : out std_logic;
+    FifoTxEmpty_o               : out std_logic;
+    FifoTxResetBusy_o           : out std_logic;
     
     -----------------------------------------------------------------------
     -- uController Interface
     ---------------------
     -- Control
-    CleanTimer_i              : in  std_logic;
-    FlushRXFifos_i            : in  std_logic;
-    FlushTXFifos_i            : in  std_logic;        
-    --TxEnable_i              : in  std_logic;
-    --TxPaerFlushFifos_i      : in  std_logic;
-    --LRxEnable_i             : in  std_logic;
-    --RRxEnable_i             : in  std_logic;
-    LRxPaerFlushFifos_i       : in  std_logic;
-    RRxPaerFlushFifos_i       : in  std_logic;
-    AuxRxPaerFlushFifos_i     : in  std_logic;
-    FullTimestamp_i           : in  std_logic;
+    CleanTimer_i                : in  std_logic;
+    FlushRXFifos_i              : in  std_logic;
+    FlushTXFifos_i              : in  std_logic;        
+    --TxEnable_i                : in  std_logic;
+    --TxPaerFlushFifos_i        : in  std_logic;
+    --LRxEnable_i               : in  std_logic;
+    --RRxEnable_i               : in  std_logic;
+    LRxPaerFlushFifos_i         : in  std_logic;
+    RRxPaerFlushFifos_i         : in  std_logic;
+    AuxRxPaerFlushFifos_i       : in  std_logic;
+    FullTimestamp_i             : in  std_logic;
     
     -- Configurations
-    DmaLength_i               : in  std_logic_vector(15 downto 0);
-    OnlyEvents_i              : in  std_logic;
-    RemoteLoopback_i          : in  std_logic;
-    LocNearLoopback_i         : in  std_logic;
-    LocFarLPaerLoopback_i     : in  std_logic;
-    LocFarRPaerLoopback_i     : in  std_logic;
-    LocFarAuxPaerLoopback_i   : in  std_logic;
-    LocFarLSaerLoopback_i     : in  std_logic;
-    LocFarRSaerLoopback_i     : in  std_logic;
-    LocFarAuxSaerLoopback_i   : in  std_logic;
-    LocFarSaerLpbkCfg_i       : in  t_XConCfg;
-    LocFarSpnnLnkLoopbackSel_i : in  std_logic_vector(1 downto 0);
+    DmaLength_i                 : in  std_logic_vector(15 downto 0);
+    OnlyEventsRx_i              : in  std_logic;
+    OnlyEventsTx_i              : in  std_logic;
+    RemoteLoopback_i            : in  std_logic;
+    LocNearLoopback_i           : in  std_logic;
+    LocFarLPaerLoopback_i       : in  std_logic;
+    LocFarRPaerLoopback_i       : in  std_logic;
+    LocFarAuxPaerLoopback_i     : in  std_logic;
+    LocFarLSaerLoopback_i       : in  std_logic;
+    LocFarRSaerLoopback_i       : in  std_logic;
+    LocFarAuxSaerLoopback_i     : in  std_logic;
+    LocFarSaerLpbkCfg_i         : in  t_XConCfg;
+    LocFarSpnnLnkLoopbackSel_i  : in  std_logic_vector(1 downto 0);
     
-    TxPaerEn_i                : in  std_logic;
-    TxHSSaerEn_i              : in  std_logic;
-    TxGtpEn_i                 : in  std_logic;
-    TxSpnnLnkEn_i             : in  std_logic;
-    TxDestSwitch_i            : in  std_logic_vector(2 downto 0);
-    --TxPaerIgnoreFifoFull_i  : in  std_logic;
-    TxPaerReqActLevel_i       : in  std_logic;
-    TxPaerAckActLevel_i       : in  std_logic;
-    TxSaerChanEn_i            : in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
-    --TxSaerChanCfg_i         : in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
+    TxPaerEn_i                  : in  std_logic;
+    TxHSSaerEn_i                : in  std_logic;
+    TxGtpEn_i                   : in  std_logic;
+    TxSpnnLnkEn_i               : in  std_logic;
+    TxDestSwitch_i              : in  std_logic_vector(2 downto 0);
+    --TxPaerIgnoreFifoFull_i    : in  std_logic;
+    TxPaerReqActLevel_i         : in  std_logic;
+    TxPaerAckActLevel_i         : in  std_logic;
+    TxSaerChanEn_i              : in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
+    --TxSaerChanCfg_i           : in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
     
     -- TX Timestamp
-    TxTSMode_i                : in  std_logic_vector(1 downto 0);
-    TxTSTimeoutSel_i          : in  std_logic_vector(3 downto 0);
-    TxTSRetrigCmd_i           : in  std_logic;
-    TxTSRearmCmd_i            : in  std_logic;
-    TxTSRetrigStatus_o        : out std_logic;
-    TxTSTimeoutCounts_o       : out std_logic;
-    TxTSMaskSel_i             : in  std_logic_vector(1 downto 0);
+    TxTSMode_i                  : in  std_logic_vector(1 downto 0);
+    TxTSTimeoutSel_i            : in  std_logic_vector(3 downto 0);
+    TxTSRetrigCmd_i             : in  std_logic;
+    TxTSRearmCmd_i              : in  std_logic;
+    TxTSRetrigStatus_o          : out std_logic;
+    TxTSTimeoutCounts_o         : out std_logic;
+    TxTSMaskSel_i               : in  std_logic_vector(1 downto 0);
     
     --
-    LRxPaerEn_i               : in  std_logic;
-    RRxPaerEn_i               : in  std_logic;
-    AuxRxPaerEn_i             : in  std_logic;
-    LRxHSSaerEn_i             : in  std_logic;
-    RRxHSSaerEn_i             : in  std_logic;
-    AuxRxHSSaerEn_i           : in  std_logic;
-    LRxGtpEn_i                : in  std_logic;
-    RRxGtpEn_i                : in  std_logic;
-    AuxRxGtpEn_i              : in  std_logic;
-    LRxSpnnLnkEn_i            : in  std_logic;
-    RRxSpnnLnkEn_i            : in  std_logic;
-    AuxRxSpnnLnkEn_i          : in  std_logic;
-    LRxSaerChanEn_i           : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    RRxSaerChanEn_i           : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    AuxRxSaerChanEn_i         : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    RxPaerReqActLevel_i       : in  std_logic;
-    RxPaerAckActLevel_i       : in  std_logic;
-    RxPaerIgnoreFifoFull_i    : in  std_logic;
-    RxPaerAckSetDelay_i       : in  std_logic_vector(7 downto 0);
-    RxPaerSampleDelay_i       : in  std_logic_vector(7 downto 0);
-    RxPaerAckRelDelay_i       : in  std_logic_vector(7 downto 0);
+    LRxPaerEn_i                 : in  std_logic;
+    RRxPaerEn_i                 : in  std_logic;
+    AuxRxPaerEn_i               : in  std_logic;
+    LRxHSSaerEn_i               : in  std_logic;
+    RRxHSSaerEn_i               : in  std_logic;
+    AuxRxHSSaerEn_i             : in  std_logic;
+    LRxGtpEn_i                  : in  std_logic;
+    RRxGtpEn_i                  : in  std_logic;
+    AuxRxGtpEn_i                : in  std_logic;
+    LRxSpnnLnkEn_i              : in  std_logic;
+    RRxSpnnLnkEn_i              : in  std_logic;
+    AuxRxSpnnLnkEn_i            : in  std_logic;
+    LRxSaerChanEn_i             : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    RRxSaerChanEn_i             : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    AuxRxSaerChanEn_i           : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    RxPaerReqActLevel_i         : in  std_logic;
+    RxPaerAckActLevel_i         : in  std_logic;
+    RxPaerIgnoreFifoFull_i      : in  std_logic;
+    RxPaerAckSetDelay_i         : in  std_logic_vector(7 downto 0);
+    RxPaerSampleDelay_i         : in  std_logic_vector(7 downto 0);
+    RxPaerAckRelDelay_i         : in  std_logic_vector(7 downto 0);
     
     -- Status
-    WrapDetected_o            : out   std_logic;
+    WrapDetected_o              : out   std_logic;
     
-    --TxPaerFifoEmpty_o       : out std_logic;
-    TxSaerStat_o              : out t_TxSaerStat_array(C_TX_HSSAER_N_CHAN-1 downto 0);
+    --TxPaerFifoEmpty_o         : out std_logic;
+    TxSaerStat_o                : out t_TxSaerStat_array(C_TX_HSSAER_N_CHAN-1 downto 0);
     
-    LRxPaerFifoFull_o         : out std_logic;
-    RRxPaerFifoFull_o         : out std_logic;
-    AuxRxPaerFifoFull_o       : out std_logic;
-    LRxSaerStat_o             : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-    RRxSaerStat_o             : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-    AUXRxSaerStat_o           : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-    LRxGtpStat_o              : out t_RxGtpStat;
-    RRxGtpStat_o              : out t_RxGtpStat;
-    AUXRxGtpStat_o            : out t_RxGtpStat;
-    TxSpnnlnkStat_o           : out t_TxSpnnlnkStat;
-    LRxSpnnlnkStat_o          : out t_RxSpnnlnkStat;
-    RRxSpnnlnkStat_o          : out t_RxSpnnlnkStat;
-    AuxRxSpnnlnkStat_o        : out t_RxSpnnlnkStat;
+    LRxPaerFifoFull_o           : out std_logic;
+    RRxPaerFifoFull_o           : out std_logic;
+    AuxRxPaerFifoFull_o         : out std_logic;
+    LRxSaerStat_o               : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    RRxSaerStat_o               : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    AUXRxSaerStat_o             : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    LRxGtpStat_o                : out t_RxGtpStat;
+    RRxGtpStat_o                : out t_RxGtpStat;
+    AUXRxGtpStat_o              : out t_RxGtpStat;
+    TxSpnnlnkStat_o             : out t_TxSpnnlnkStat;
+    LRxSpnnlnkStat_o            : out t_RxSpnnlnkStat;
+    RRxSpnnlnkStat_o            : out t_RxSpnnlnkStat;
+    AuxRxSpnnlnkStat_o          : out t_RxSpnnlnkStat;
     
-    SpnnStartKey_i            : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command key
-    SpnnStopKey_i             : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command key
-    SpnnTxMask_i              : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
-    SpnnRxMask_i              : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
-    SpnnCtrl_i                : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
-    SpnnStatus_o              : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
+    SpnnStartKey_i              : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command key
+    SpnnStopKey_i               : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command key
+    SpnnTxMask_i                : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+    SpnnRxMask_i                : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+    SpnnCtrl_i                  : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+    SpnnStatus_o                : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
     
     --
     -- INTERCEPTION
     ---------------------
-    RRxData_o                 : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    RRxSrcRdy_o               : out std_logic;
-    RRxDstRdy_i               : in  std_logic;
-    RRxBypassData_i           : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    RRxBypassSrcRdy_i         : in  std_logic;
-    RRxBypassDstRdy_o         : out std_logic;
+    RRxData_o                   : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    RRxSrcRdy_o                 : out std_logic;
+    RRxDstRdy_i                 : in  std_logic;
+    RRxBypassData_i             : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    RRxBypassSrcRdy_i           : in  std_logic;
+    RRxBypassDstRdy_o           : out std_logic;
     --
-    LRxData_o                 : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    LRxSrcRdy_o               : out std_logic;
-    LRxDstRdy_i               : in  std_logic;
-    LRxBypassData_i           : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    LRxBypassSrcRdy_i         : in  std_logic;
-    LRxBypassDstRdy_o         : out std_logic;
+    LRxData_o                   : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    LRxSrcRdy_o                 : out std_logic;
+    LRxDstRdy_i                 : in  std_logic;
+    LRxBypassData_i             : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    LRxBypassSrcRdy_i           : in  std_logic;
+    LRxBypassDstRdy_o           : out std_logic;
     --
-    AuxRxData_o               : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    AuxRxSrcRdy_o             : out std_logic;
-    AuxRxDstRdy_i             : in  std_logic;
-    AuxRxBypassData_i         : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    AuxRxBypassSrcRdy_i       : in  std_logic;
-    AuxRxBypassDstRdy_o       : out std_logic;        
+    AuxRxData_o                 : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    AuxRxSrcRdy_o               : out std_logic;
+    AuxRxDstRdy_i               : in  std_logic;
+    AuxRxBypassData_i           : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    AuxRxBypassSrcRdy_i         : in  std_logic;
+    AuxRxBypassDstRdy_o         : out std_logic;        
     
     --
     -- LED drivers
     ---------------------
-    LEDo_o                    : out std_logic;
-    LEDr_o                    : out std_logic;
-    LEDy_o                    : out std_logic
+    LEDo_o                      : out std_logic;
+    LEDr_o                      : out std_logic;
+    LEDy_o                      : out std_logic
     );
 -- translate_off
 begin
@@ -1517,7 +1521,8 @@ end generate;
             -- controls and settings
             --ChipType_xSI          => ChipType,                 -- in  std_logic;
             DmaLength_i           => DmaLength_i,              -- in  std_logic_vector(15 downto 0);
-            OnlyEvents_i          => OnlyEvents_i,             -- in  std_logic;
+            OnlyEventsRx_i        => OnlyEventsRx_i,             -- in  std_logic;
+            OnlyEventsTx_i        => OnlyEventsTx_i,             -- in  std_logic;
             --
             ---------------------------------------------------------------------------
             -- Enable per timing
@@ -1551,22 +1556,24 @@ end generate;
             TxTSMaskSel_i         => TxTSMaskSel_i,            -- in  std_logic_vector(1 downto 0);
             --
             ---------------------------------------------------------------------------
-            -- FIFO -> Core
-            FifoCoreDat_o         => FifoCoreDat_o,            -- out std_logic_vector(63 downto 0);
-            FifoCoreRead_i        => FifoCoreRead_i,           -- in  std_logic;
-            FifoCoreEmpty_o       => FifoCoreEmpty_o,          -- out std_logic;
-            FifoCoreAlmostEmpty_o => FifoCoreAlmostEmpty_o,    -- out std_logic;
-            FifoCoreLastData_o    => FifoCoreLastData_o,       -- out std_logic;
-            FifoCoreFull_o        => FifoCoreFull_o,           -- out std_logic;
-            FifoCoreNumData_o     => FifoCoreNumData_o,        -- out std_logic_vector(10 downto 0);
+            -- Data Received
+            FifoRxDat_o         => FifoRxDat_o,            -- out std_logic_vector(63 downto 0);
+            FifoRxRead_i        => FifoRxRead_i,           -- in  std_logic;
+            FifoRxEmpty_o       => FifoRxEmpty_o,          -- out std_logic;
+            FifoRxAlmostEmpty_o => FifoRxAlmostEmpty_o,    -- out std_logic;
+            FifoRxLastData_o    => FifoRxLastData_o,       -- out std_logic;
+            FifoRxFull_o        => FifoRxFull_o,           -- out std_logic;
+            FifoRxNumData_o     => FifoRxNumData_o,        -- out std_logic_vector(10 downto 0);
+            FifoRxResetBusy_o   => FifoRxResetBusy_o,      -- out std_logic;
             --
-
-            -- Core -> FIFO
-            CoreFifoDat_i         => CoreFifoDat_i,            -- in  std_logic_vector(31 downto 0);
-            CoreFifoWrite_i       => CoreFifoWrite_i,          -- in  std_logic;
-            CoreFifoFull_o        => CoreFifoFull_o,           -- out std_logic;
-            CoreFifoAlmostFull_o  => CoreFifoAlmostFull_o,     -- out std_logic;
-            CoreFifoEmpty_o       => CoreFifoEmpty_o
+            -- Data to be transmitted
+            FifoTxDat_i         => FifoTxDat_i,            -- in  std_logic_vector(31 downto 0);
+            FifoTxWrite_i       => FifoTxWrite_i,          -- in  std_logic;
+            FifoTxLastData_i    => FifoTxLastData_i,       -- in  std_logic;
+            FifoTxFull_o        => FifoTxFull_o,           -- out std_logic;
+            FifoTxAlmostFull_o  => FifoTxAlmostFull_o,     -- out std_logic;
+            FifoTxEmpty_o       => FifoTxEmpty_o,          -- out std_logic;
+            FifoTxResetBusy_o   => FifoTxResetBusy_o       -- out std_logic;
         );
 
 

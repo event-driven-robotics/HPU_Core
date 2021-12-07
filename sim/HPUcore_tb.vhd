@@ -66,9 +66,9 @@ entity HPUcore_tb is
         );
 end HPUcore_tb;
  
-architecture behavior of HPUcore_tb is        
+architecture behavior of HPUcore_tb is          
     
--- Clock generation constants
+-- Clock generation constants   
 
 constant CLK_CORE_FREQ_MHZ_c              : real := 100.0; -- MHz                
 constant CLK_CORE_HALF_PERIOD_NS_c        : time := 5.0 ns;    
@@ -79,7 +79,7 @@ constant CLK_AXIS_HALF_PERIOD_NS_c        : time := 3.125 ns;
 constant CLK_HSSAER_LS_FREQ_c             : real := 100.0; -- MHz                
 constant CLK_HSSAER_LS_HALF_PERIOD_c      : time := 5.0 ns;
 
-constant CLK_HSSAER_HS_FREQ_MHZ_c         : real := 300.0; -- MHz           
+constant CLK_HSSAER_HS_FREQ_MHZ_c         : real := 300.0; -- MHz                    
 constant CLK_HSSAER_HS_HALF_PERIOD_1_NS_c : time := 1.667 ns;  
 constant CLK_HSSAER_HS_HALF_PERIOD_2_NS_c : time := 1.666 ns;
 constant CLK_HSSAER_HS_HALF_PERIOD_3_NS_c : time := 1.667 ns;  
@@ -412,72 +412,74 @@ end component;
 --  AXI Lite Emulator
 -- --------------------------------------------------	
 component axi4lite_bfm_v00 
-    generic(
-  		limit                       : integer := 1000;
-  		NORANDOM_DMA                : integer := 0;
-        SPI_ADC_RES                 : integer := 12;
-        NUM_OF_RECEIVER             : natural := NUM_OF_RECEIVER;
-        AXI4LM_CMD_FILE             : string  := "AXI4LM_bfm.cmd";  -- Command file name
-        AXI4LM_LOG_FILE             : string  := "AXI4LM_bfm.log"   -- Log file name
+  generic(
+		limit : integer := 1000;
+		NORANDOM_DMA : integer := 0;
+    SPI_ADC_RES : integer := 24;
+    NUM_OF_RECEIVER    : natural := 32;
+    AXI4LM_CMD_FILE    : string        := "AXI4LM_bfm.cmd";  -- Command file name
+    AXI4LM_LOG_FILE    : string        := "AXI4LM_bfm.log"   -- Log file name
 		);
-    port ( 
-        S_AXI_ACLK :in  STD_LOGIC;
-        S_AXI_ARESETN               : in  STD_LOGIC;
-        S_AXI_AWVALID               : out  STD_LOGIC;
-        S_AXI_AWREADY               : in  STD_LOGIC;
-        S_AXI_AWADDR                : out  STD_LOGIC_VECTOR (31 downto 0);
-        S_AXI_WVALID                : out  STD_LOGIC;
-        S_AXI_WREADY                : in  STD_LOGIC;
-        S_AXI_WDATA                 : out  STD_LOGIC_VECTOR (31 downto 0);
-        S_AXI_WSTRB                 : out  STD_LOGIC_VECTOR (3 downto 0);
-        S_AXI_BVALID                : in  STD_LOGIC;
-        S_AXI_BREADY                : out  STD_LOGIC;
-        S_AXI_BRESP                 : in  STD_LOGIC_VECTOR (1 downto 0);
-        S_AXI_ARVALID               : inout  STD_LOGIC;
-        S_AXI_ARREADY               : in  STD_LOGIC;
-        S_AXI_ARADDR                : out  STD_LOGIC_VECTOR (31 downto 0);
-        S_AXI_RVALID                : in  STD_LOGIC;
-        S_AXI_RREADY                : out  STD_LOGIC;
-        S_AXI_RDATA                 : in  STD_LOGIC_VECTOR (31 downto 0);
-        S_AXI_RRESP                 : in  STD_LOGIC_VECTOR (1 downto 0);
-        M_Axis_TVALID               : in  std_logic;
-        M_Axis_TLAST                : in  std_logic;
-        M_Axis_TDATA                : in  std_logic_vector (31 downto 0);
-        M_Axis_TREADY               : out std_logic;
-        S_AXIS_TREADY               : in  std_logic;
-        S_AXIS_TDATA                : out std_logic_vector(31 downto 0);
-        S_AXIS_TLAST                : out std_logic;
-        S_AXIS_TVALID               : out std_logic;
-        -- Axi Master I-f
-        M_AXI_ACLK                  : in  std_logic;
-        -- Axi master
-        M_AXI_AWADDR                : in  std_logic_vector(31 downto 0);
-        M_AXI_AWLEN                 : in  std_logic_vector(7 downto 0); 
-        M_AXI_AWSIZE                : in  std_logic_vector(2 downto 0);
-        M_AXI_AWBURST               : in  std_logic_vector(1 downto 0);
-        M_AXI_AWCACHE               : in  std_logic_vector(3 downto 0);
-        M_AXI_AWVALID               : in  std_logic; 
-        M_AXI_AWREADY               : out std_logic; 
-        --       master interface write data
-        M_AXI_WDATA                 : in  std_logic_vector(31 downto 0); 
-        M_AXI_WSTRB                 : in  std_logic_vector(3 downto 0);
-        M_AXI_WLAST                 : in  std_logic;  
-        M_AXI_WVALID                : in  std_logic;   
-        M_AXI_WREADY                : out std_logic;  
-        --       master interface write response
-        M_AXI_BRESP                 : out std_logic_vector(1 downto 0); 
-        M_AXI_BVALID                : out std_logic;   
-        M_AXI_BREADY                : in  std_logic;
-
-        start_dmas                  : out std_logic;
-        dma_done                    : in  std_logic;
-
-        ocp_o                       : out std_logic;
-        ext_fault_o                 : out std_logic;
-         
-        interrupt  	                : in std_logic;			  
-        start                       : in std_logic
-);
+  port ( -- AXI Slave
+    S_AXI_ACLK : in  STD_LOGIC;
+    S_AXI_ARESETN : in  STD_LOGIC;
+    S_AXI_AWVALID : out  STD_LOGIC;
+    S_AXI_AWREADY : in  STD_LOGIC;
+    S_AXI_AWADDR : out  STD_LOGIC_VECTOR (31 downto 0);
+    S_AXI_WVALID : out  STD_LOGIC;
+    S_AXI_WREADY : in  STD_LOGIC;
+    S_AXI_WDATA : out  STD_LOGIC_VECTOR (31 downto 0);
+    S_AXI_WSTRB : out  STD_LOGIC_VECTOR (3 downto 0);
+    S_AXI_BVALID : in  STD_LOGIC;
+    S_AXI_BREADY : out  STD_LOGIC;
+    S_AXI_BRESP : in  STD_LOGIC_VECTOR (1 downto 0);
+    S_AXI_ARVALID : inout  STD_LOGIC;
+    S_AXI_ARREADY : in  STD_LOGIC;
+    S_AXI_ARADDR : out  STD_LOGIC_VECTOR (31 downto 0);
+    S_AXI_RVALID : in  STD_LOGIC;
+    S_AXI_RREADY : out  STD_LOGIC;
+    S_AXI_RDATA : in  STD_LOGIC_VECTOR (31 downto 0);
+    S_AXI_RRESP : in  STD_LOGIC_VECTOR (1 downto 0);
+    -- AXI Stream
+    M_AXIS_ACLK    : in  std_logic;
+    M_AXIS_TVALID  : in  std_logic;
+    M_AXIS_TLAST   : in  std_logic;
+    M_AXIS_TDATA   : in  std_logic_vector (31 downto 0);
+    M_AXIS_TREADY  : out std_logic;
+    S_AXIS_ACLK    : in  std_logic;
+    S_AXIS_TREADY  : in  std_logic;
+    S_AXIS_TDATA   : out std_logic_vector(31 downto 0);
+    S_AXIS_TLAST   : out std_logic;
+    S_AXIS_TVALID  : out std_logic;
+    -- AXI Master
+    M_AXI_ACLK : in  STD_LOGIC;
+    M_AXI_AWADDR   : in  std_logic_vector(31 downto 0);
+    M_AXI_AWLEN    : in  std_logic_vector(7 downto 0); 
+    M_AXI_AWSIZE   : in  std_logic_vector(2 downto 0);
+    M_AXI_AWBURST  : in  std_logic_vector(1 downto 0);
+    M_AXI_AWCACHE  : in  std_logic_vector(3 downto 0);
+    M_AXI_AWVALID  : in  std_logic; 
+    M_AXI_AWREADY  : out std_logic; 
+    --       master interface write data
+    M_AXI_WDATA    : in  std_logic_vector(31 downto 0); 
+    M_AXI_WSTRB    : in  std_logic_vector(3 downto 0);
+    M_AXI_WLAST    : in  std_logic;  
+    M_AXI_WVALID   : in  std_logic;   
+    M_AXI_WREADY   : out std_logic;  
+    --       master interface write response
+    M_AXI_BRESP    : out std_logic_vector(1 downto 0); 
+    M_AXI_BVALID   : out std_logic;   
+    M_AXI_BREADY   : in  std_logic;
+    
+    start_dmas     : out std_logic;
+    dma_done       : in  std_logic;
+    
+    ocp_o          : out std_logic;
+    ext_fault_o    : out std_logic;
+    
+    interrupt  	: in std_logic;
+    start        : in std_logic
+  );
 end component;
 
 -- --------------------------------------------------
@@ -957,7 +959,7 @@ AXI_EMULATOR_i : axi4lite_bfm_v00
         NORANDOM_DMA => NORANDOM_DMA
         )
 	port map (				
-        S_AXI_ACLK      => HSSAER_ClkLS_p,
+        S_AXI_ACLK      => ClkCore,
         S_AXI_ARESETN   => i_resetn,
         S_AXI_AWVALID   => s_axi_awvalid,
         S_AXI_AWREADY   => s_axi_awready,
@@ -976,10 +978,13 @@ AXI_EMULATOR_i : axi4lite_bfm_v00
         S_AXI_RREADY    => s_axi_rready,
         S_AXI_RDATA     => s_axi_rdata,
         S_AXI_RRESP     => s_axi_rresp,
+        -- AXI Stream
+        M_AXIS_ACLK     => ClkAxis,
         M_Axis_TVALID   => m_axis_tvalid,
         M_Axis_TLAST    => m_axis_tlast,
         M_Axis_TDATA    => m_axis_tdata,
         M_Axis_TREADY   => m_axis_tready,
+        S_AXIS_ACLK     => ClkAxis,
         S_AXIS_TREADY   => s_axis_tready,
         S_AXIS_TDATA    => s_axis_tdata,
         S_AXIS_TLAST    => s_axis_tlast,
@@ -1138,7 +1143,7 @@ ARx_GTP_PllRefclklost   <= GTP_PllRefclklost;
 Tx_GTP_PllLock          <= GTP_PllLock;
 Tx_GTP_PllRefclklost    <= GTP_PllRefclklost;
 
-HPUCORE_i : HPUCore  
+HPUCORE_i : HPUCore    
     generic map (
         -- -----------------------    
         -- GENERAL
@@ -1151,7 +1156,7 @@ HPUCORE_i : HPUCore
         C_RX_PAER_L_SENS_ID         => "000",
         C_RX_PAER_R_SENS_ID         => "000",
         C_RX_PAER_A_SENS_ID         => "001",
-        C_TX_HAS_PAER               => false,
+        C_TX_HAS_PAER               => true,
         C_PAER_DSIZE                => 24,   
         -- -----------------------        
         -- HSSAER
@@ -1436,10 +1441,10 @@ HPUCORE_i : HPUCore
     );
 
 
--- s_axis_tready <= '1';
+-- s_axis_tready <= '1';  
  
 
-i_resetn <= not i_reset;
+i_resetn <= not i_reset; 
 
 		-- Stimulus process
     
@@ -1510,10 +1515,10 @@ Axis_HPU_proc : process
 
     	if (int_rand>0) then
             for i in 0 to int_rand loop
-                wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+                wait until (ClkAxis'event and ClkAxis='1');
             end loop;
         end if;
-        wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+        wait until (ClkAxis'event and ClkAxis='1');
 
 		M_Axis_TREADY_HPU   <= '0';
         uniform(seed1, seed2, rand);
@@ -1521,10 +1526,10 @@ Axis_HPU_proc : process
 
         if (int_rand>0) then
             for i in 0 to int_rand loop
-                wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+                wait until (ClkAxis'event and ClkAxis='1');
             end loop;
         end if;
-        wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+        wait until (ClkAxis'event and ClkAxis='1');
     end loop;
 --		wait for 2000 us;
 --		M_Axis_TREADY_HPU   <= '0';
@@ -1535,17 +1540,17 @@ log_file_writing : process
    variable v_buf_out: line;
 begin
     loop
-        wait until HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1';
+        wait until ClkAxis'event and ClkAxis='1';
         if (M_Axis_TREADY_HPU='1' and m_axis_tvalid='1') then
             write (v_buf_out, now);write (v_buf_out, string'(", "));
             hwrite (v_buf_out, m_axis_tdata);
             if (m_axis_tlast='1') then
                 write (v_buf_out, string'(" TLAST"));
             end if;
-            writeline (logfile_ptr, v_buf_out);
+            writeline (logfile_ptr, v_buf_out); 
         end if;
     end loop;
-end process log_file_writing;
+end process log_file_writing;   
 
 
 

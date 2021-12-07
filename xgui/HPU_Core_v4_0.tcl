@@ -170,13 +170,7 @@ proc init_gui { IPINST } {
   set_property tooltip {If checked, the AUX RX Interception port is exposed} ${C_RX_A_INTERCEPTION}
 
   #Adding Group
-  set Debug [ipgui::add_group $IPINST -name "Debug" -parent ${Interception_and_Debug}]
-  ipgui::add_param $IPINST -name "C_DEBUG" -parent ${Debug}
-
-  #Adding Group
-  set Simulation [ipgui::add_group $IPINST -name "Simulation" -parent ${Interception_and_Debug}]
-  set C_SIM_TIME_COMPRESSION [ipgui::add_param $IPINST -name "C_SIM_TIME_COMPRESSION" -parent ${Simulation}]
-  set_property tooltip {When checked, the internal timing is compressed} ${C_SIM_TIME_COMPRESSION}
+  ipgui::add_group $IPINST -name "Debug" -parent ${Interception_and_Debug}
 
 
 
@@ -580,15 +574,6 @@ proc validate_PARAM_VALUE.C_TX_HSSAER_N_CHAN { PARAM_VALUE.C_TX_HSSAER_N_CHAN } 
 	return true
 }
 
-proc update_PARAM_VALUE.C_DEBUG { PARAM_VALUE.C_DEBUG } {
-	# Procedure called to update C_DEBUG when any of the dependent parameters in the arguments change
-}
-
-proc validate_PARAM_VALUE.C_DEBUG { PARAM_VALUE.C_DEBUG } {
-	# Procedure called to validate C_DEBUG
-	return true
-}
-
 proc update_PARAM_VALUE.C_FAMILY { PARAM_VALUE.C_FAMILY } {
 	# Procedure called to update C_FAMILY when any of the dependent parameters in the arguments change
 }
@@ -880,11 +865,6 @@ proc update_MODELPARAM_VALUE.C_TX_HAS_SPNNLNK { MODELPARAM_VALUE.C_TX_HAS_SPNNLN
 proc update_MODELPARAM_VALUE.C_PSPNNLNK_WIDTH { MODELPARAM_VALUE.C_PSPNNLNK_WIDTH PARAM_VALUE.C_PSPNNLNK_WIDTH } {
 	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
 	set_property value [get_property value ${PARAM_VALUE.C_PSPNNLNK_WIDTH}] ${MODELPARAM_VALUE.C_PSPNNLNK_WIDTH}
-}
-
-proc update_MODELPARAM_VALUE.C_DEBUG { MODELPARAM_VALUE.C_DEBUG PARAM_VALUE.C_DEBUG } {
-	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
-	set_property value [get_property value ${PARAM_VALUE.C_DEBUG}] ${MODELPARAM_VALUE.C_DEBUG}
 }
 
 proc update_MODELPARAM_VALUE.C_S_AXI_DATA_WIDTH { MODELPARAM_VALUE.C_S_AXI_DATA_WIDTH PARAM_VALUE.C_S_AXI_DATA_WIDTH } {

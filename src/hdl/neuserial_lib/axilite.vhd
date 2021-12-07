@@ -81,7 +81,8 @@ entity axilite is
     ResetStream_o                   : out std_logic;
     DmaLength_o                     : out std_logic_vector(15 downto 0);
     DMA_test_mode_o                 : out std_logic;
-    OnlyEvents_o                    : out std_logic;
+    OnlyEventsRx_o                  : out std_logic;
+    OnlyEventsTx_o                  : out std_logic;
     fulltimestamp_o                 : out std_logic;
     
     CleanTimer_o                    : out std_logic;
@@ -407,7 +408,8 @@ architecture rtl of axilite is
 
     signal  i_DmaLength            : std_logic_vector(15 downto 0);
  
-    signal i_OnlyEvents            : std_logic;
+    signal i_OnlyEventsRx          : std_logic;
+    signal i_OnlyEventsTx          : std_logic;
 
     -- signal  i_LatchTime            : natural range 0 to 255;
     -- signal  i_ClockLowTime         : natural range 0 to 127;
@@ -713,17 +715,17 @@ begin
                 i_cleanTimer <= '0';     -- i_WRAPTime_reg cleared on write
 
                 -- Ctrl register
-                i_CTRL_reg( 4) <= '0';   -- FlushRXFifos_o          (WO: monostable)
-                i_CTRL_reg( 5) <= '0';   -- LRxPaerFlushFifos_o     (WO: monostable)
-                i_CTRL_reg( 6) <= '0';   -- RRxPaerFlushFifos_o     (WO: monostable)
-                i_CTRL_reg( 7) <= '0';   -- AuxRxPaerFlushFifos_o   (WO: monostable)
-                i_CTRL_reg( 8) <= '0';   -- FlushTXFifos_o          (WO: monostable)
-                i_CTRL_reg(12) <= '0';   -- ResetStream_o           (WO: monostable)
+                i_CTRL_reg( 4) <= '0';      -- FlushRXFifos_o          (WO: monostable)
+                i_CTRL_reg( 5) <= '0';      -- LRxPaerFlushFifos_o     (WO: monostable)
+                i_CTRL_reg( 6) <= '0';      -- RRxPaerFlushFifos_o     (WO: monostable)
+                i_CTRL_reg( 7) <= '0';      -- AuxRxPaerFlushFifos_o   (WO: monostable)
+                i_CTRL_reg( 8) <= '0';      -- FlushTXFifos_o          (WO: monostable)
+                i_CTRL_reg(12) <= '0';      -- ResetStream_o           (WO: monostable)
 				
-                i_TX_CTRL_reg(14) <= '0'; -- TxTSRetrigCmd_o        (Cleared after Write)
-				i_TX_CTRL_reg(15) <= '0'; -- TxTSRearmCmd_o         (Cleared after Write)
-				i_SPNN_CTRL_reg(1) <= '0'; -- Force START Command   (Cleared after Write)
-				i_SPNN_CTRL_reg(2) <= '0'; -- Force STOP Command    (Cleared after Write)
+                i_TX_CTRL_reg(14) <= '0';   -- TxTSRetrigCmd_o        (Cleared after Write)
+				        i_TX_CTRL_reg(15) <= '0';   -- TxTSRearmCmd_o         (Cleared after Write)
+				        i_SPNN_CTRL_reg(1) <= '0';  -- Force START Command    (Cleared after Write)
+				        i_SPNN_CTRL_reg(2) <= '0';  -- Force STOP Command     (Cleared after Write)
 				
                 -- TlastTO register
                 i_TlastTowritten <= '0';
@@ -1246,8 +1248,8 @@ begin
  --                        <= i_CTRL_reg(17);                               -- Available     
  -- i_ChipType             <= i_CTRL_reg(16);                               -- Reserved for back compatibility with neuelab
     i_fulltimestamp        <= i_CTRL_reg(15);
- --                        <= i_CTRL_reg(14);                               -- Available     
-    i_OnlyEvents           <= i_CTRL_reg(13);                                
+    i_OnlyEventsTx         <= i_CTRL_reg(14);                               -- Available     
+    i_OnlyEventsRx         <= i_CTRL_reg(13);                                
     i_ResetStream          <= i_CTRL_reg(12);
  -- i_TxEnable             <= i_CTRL_reg(11) when C_TX_HAS_PAER else '0';   -- Reserved for future use
  -- i_RRxEnable            <= i_CTRL_reg(10) when C_RX_HAS_PAER else '0';   -- Reserved for future use
@@ -1274,8 +1276,8 @@ begin
                     c_zero_vect(21 downto 17)  &
                     c_zero_vect(16)            &   -- Reserved for back compatibility with neuelab
                     i_fulltimestamp            &
-                    c_zero_vect(14)            &
-                    i_OnlyEvents               &  
+                    i_OnlyEventsTx             &
+                    i_OnlyEventsRx             &  
                     i_ResetStream              &
                     c_zero_vect(11 downto 10)  &                  
                     i_LatTlast                 &
@@ -1414,7 +1416,8 @@ begin
     -- ------------------------------------------------------------------------
     -- RX Timestamp ON/OFF
     -- ------------------------------------------------------------------------
-    OnlyEvents_o <= i_OnlyEvents;
+    OnlyEventsRx_o <= i_OnlyEventsRx;
+    OnlyEventsTx_o <= i_OnlyEventsTx;
 
     -- ------------------------------------------------------------------------
     -- RAW Status register

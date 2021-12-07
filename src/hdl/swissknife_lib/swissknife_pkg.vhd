@@ -38,4 +38,15 @@ component signal_cdc is
   );
 end component;
 
+component enable_signal_cdc is
+ port (
+  CLEAR_N_i           : in     std_logic;                      -- System Reset 
+  CLK_SOURCE_i        : in     std_logic;                      -- Origin Clock 
+  CLK_DEST_i          : in     std_logic;                      -- Destination Clock
+  EN_SIG_SOURCE_i     : in     std_logic;                      -- "Enable Signal" in origin clock domain 
+  EN_SIG_DEST_o       : out    std_logic;                      -- "Enable Signal" in destination clock domain 
+  EN_SIG_SHORT_DEST_o : out    std_logic := '0'                -- Derivation of "EN_SIG_DEST" in destination clock domain 
+  );                                                           -- NOTE: Use EN_DEST if SIG_ORIGIN is a one clock duration enable to be transferred
+end component;
+
 end package swissknife_pkg;

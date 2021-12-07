@@ -23,7 +23,7 @@ use IEEE.MATH_REAL.ALL;
 USE IEEE.numeric_STD.ALL;
 
 library ieee_proposed;
-use ieee_proposed.fixed_pkg.all;
+-- use ieee_proposed.fixed_pkg.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -40,71 +40,74 @@ library work;
 	use work.AXI4LiteMasterBFM_pkg.all;
 
 entity axi4lite_bfm_v00 is
-   generic(
+  generic(
 		limit : integer := 1000;
 		NORANDOM_DMA : integer := 0;
-        SPI_ADC_RES : integer := 24;
-        NUM_OF_RECEIVER    : natural := 32;
-      AXI4LM_CMD_FILE    : string        := "AXI4LM_bfm.cmd";  -- Command file name
-      AXI4LM_LOG_FILE    : string        := "AXI4LM_bfm.log"   -- Log file name
+    SPI_ADC_RES : integer := 24;
+    NUM_OF_RECEIVER    : natural := 32;
+    AXI4LM_CMD_FILE    : string        := "AXI4LM_bfm.cmd";  -- Command file name
+    AXI4LM_LOG_FILE    : string        := "AXI4LM_bfm.log"   -- Log file name
 		);
-    Port ( S_AXI_ACLK : in  STD_LOGIC;
-           S_AXI_ARESETN : in  STD_LOGIC;
-           S_AXI_AWVALID : out  STD_LOGIC;
-           S_AXI_AWREADY : in  STD_LOGIC;
-           S_AXI_AWADDR : out  STD_LOGIC_VECTOR (31 downto 0);
-           S_AXI_WVALID : out  STD_LOGIC;
-           S_AXI_WREADY : in  STD_LOGIC;
-           S_AXI_WDATA : out  STD_LOGIC_VECTOR (31 downto 0);
-           S_AXI_WSTRB : out  STD_LOGIC_VECTOR (3 downto 0);
-           S_AXI_BVALID : in  STD_LOGIC;
-           S_AXI_BREADY : out  STD_LOGIC;
-           S_AXI_BRESP : in  STD_LOGIC_VECTOR (1 downto 0);
-           S_AXI_ARVALID : inout  STD_LOGIC;
-           S_AXI_ARREADY : in  STD_LOGIC;
-           S_AXI_ARADDR : out  STD_LOGIC_VECTOR (31 downto 0);
-           S_AXI_RVALID : in  STD_LOGIC;
-           S_AXI_RREADY : out  STD_LOGIC;
-           S_AXI_RDATA : in  STD_LOGIC_VECTOR (31 downto 0);
-           S_AXI_RRESP : in  STD_LOGIC_VECTOR (1 downto 0);
-           M_Axis_TVALID  : in  std_logic;
-           M_Axis_TLAST   : in  std_logic;
-           M_Axis_TDATA   : in  std_logic_vector (31 downto 0);
-           M_Axis_TREADY  : out std_logic;
-           S_AXIS_TREADY  : in  std_logic;
-           S_AXIS_TDATA   : out std_logic_vector(31 downto 0);
-           S_AXIS_TLAST   : out std_logic;
-           S_AXIS_TVALID  : out std_logic;
-           -- axi master
-           M_AXI_ACLK : in  STD_LOGIC;
-           M_AXI_AWADDR   : in  std_logic_vector(31 downto 0);
-           M_AXI_AWLEN    : in  std_logic_vector(7 downto 0); 
-           M_AXI_AWSIZE   : in  std_logic_vector(2 downto 0);
-           M_AXI_AWBURST  : in  std_logic_vector(1 downto 0);
-           M_AXI_AWCACHE  : in  std_logic_vector(3 downto 0);
-           M_AXI_AWVALID  : in  std_logic; 
-           M_AXI_AWREADY  : out std_logic; 
-           --       master interface write data
-           M_AXI_WDATA    : in  std_logic_vector(31 downto 0); 
-           M_AXI_WSTRB    : in  std_logic_vector(3 downto 0);
-           M_AXI_WLAST    : in  std_logic;  
-           M_AXI_WVALID   : in  std_logic;   
-           M_AXI_WREADY   : out std_logic;  
-           --       master interface write response
-           M_AXI_BRESP    : out std_logic_vector(1 downto 0); 
-           M_AXI_BVALID   : out std_logic;   
-           M_AXI_BREADY   : in  std_logic;
-
-           start_dmas     : out std_logic;
-           dma_done       : in  std_logic;
-
-           ocp_o          : out std_logic;
-           ext_fault_o    : out std_logic;
-           
-           interrupt  	: in std_logic;
-           start        : in std_logic
-
-          );
+  port ( -- AXI Slave
+    S_AXI_ACLK : in  STD_LOGIC;
+    S_AXI_ARESETN : in  STD_LOGIC;
+    S_AXI_AWVALID : out  STD_LOGIC;
+    S_AXI_AWREADY : in  STD_LOGIC;
+    S_AXI_AWADDR : out  STD_LOGIC_VECTOR (31 downto 0);
+    S_AXI_WVALID : out  STD_LOGIC;
+    S_AXI_WREADY : in  STD_LOGIC;
+    S_AXI_WDATA : out  STD_LOGIC_VECTOR (31 downto 0);
+    S_AXI_WSTRB : out  STD_LOGIC_VECTOR (3 downto 0);
+    S_AXI_BVALID : in  STD_LOGIC;
+    S_AXI_BREADY : out  STD_LOGIC;
+    S_AXI_BRESP : in  STD_LOGIC_VECTOR (1 downto 0);
+    S_AXI_ARVALID : inout  STD_LOGIC;
+    S_AXI_ARREADY : in  STD_LOGIC;
+    S_AXI_ARADDR : out  STD_LOGIC_VECTOR (31 downto 0);
+    S_AXI_RVALID : in  STD_LOGIC;
+    S_AXI_RREADY : out  STD_LOGIC;
+    S_AXI_RDATA : in  STD_LOGIC_VECTOR (31 downto 0);
+    S_AXI_RRESP : in  STD_LOGIC_VECTOR (1 downto 0);
+    -- AXI Stream
+    M_AXIS_ACLK    : in  std_logic;
+    M_AXIS_TVALID  : in  std_logic;
+    M_AXIS_TLAST   : in  std_logic;
+    M_AXIS_TDATA   : in  std_logic_vector (31 downto 0);
+    M_AXIS_TREADY  : out std_logic;
+    S_AXIS_ACLK    : in  std_logic;
+    S_AXIS_TREADY  : in  std_logic;
+    S_AXIS_TDATA   : out std_logic_vector(31 downto 0);
+    S_AXIS_TLAST   : out std_logic;
+    S_AXIS_TVALID  : out std_logic;
+    -- AXI Master
+    M_AXI_ACLK : in  STD_LOGIC;
+    M_AXI_AWADDR   : in  std_logic_vector(31 downto 0);
+    M_AXI_AWLEN    : in  std_logic_vector(7 downto 0); 
+    M_AXI_AWSIZE   : in  std_logic_vector(2 downto 0);
+    M_AXI_AWBURST  : in  std_logic_vector(1 downto 0);
+    M_AXI_AWCACHE  : in  std_logic_vector(3 downto 0);
+    M_AXI_AWVALID  : in  std_logic; 
+    M_AXI_AWREADY  : out std_logic; 
+    --       master interface write data
+    M_AXI_WDATA    : in  std_logic_vector(31 downto 0); 
+    M_AXI_WSTRB    : in  std_logic_vector(3 downto 0);
+    M_AXI_WLAST    : in  std_logic;  
+    M_AXI_WVALID   : in  std_logic;   
+    M_AXI_WREADY   : out std_logic;  
+    --       master interface write response
+    M_AXI_BRESP    : out std_logic_vector(1 downto 0); 
+    M_AXI_BVALID   : out std_logic;   
+    M_AXI_BREADY   : in  std_logic;
+    
+    start_dmas     : out std_logic;
+    dma_done       : in  std_logic;
+    
+    ocp_o          : out std_logic;
+    ext_fault_o    : out std_logic;
+    
+    interrupt  	: in std_logic;
+    start        : in std_logic
+  );
 end axi4lite_bfm_v00;
 
 architecture Behavioral of axi4lite_bfm_v00 is
@@ -196,10 +199,10 @@ procedure  DMARead_old(
    signal    aclk           : in  std_logic;
    constant  lenghtOfBurst  : in  natural;
    constant  repeatedBurst  : in  natural;
-   signal    M_Axis_TVALID  : in  std_logic;
-   signal    M_Axis_TLAST   : in  std_logic;
-   signal    M_Axis_TDATA   : in  std_logic_vector (31 downto 0);
-   signal    M_Axis_TREADY  : out std_logic
+   signal    M_AXIS_TVALID  : in  std_logic;
+   signal    M_AXIS_TLAST   : in  std_logic;
+   signal    M_AXIS_TDATA   : in  std_logic_vector (31 downto 0);
+   signal    M_AXIS_TREADY  : out std_logic
    ) is
    variable v_buf_out: line;
    variable v_looptimes : natural;
@@ -213,7 +216,7 @@ begin
   
   while (v_looptimes>0) loop
       wait until (aclk'event and aclk='1');
-      M_Axis_TREADY <= '1';
+      M_AXIS_TREADY <= '1';
 
       write (v_buf_out, now);
       write (v_buf_out, string'(" DMA Read. ") );
@@ -225,10 +228,10 @@ begin
       write (v_buf_out, repeatedBurst-v_looptimes);
       writeline (logfile_ptr, v_buf_out);
      
-      while (v_Burst>0 and M_Axis_TLAST='0') loop
+      while (v_Burst>0 and M_AXIS_TLAST='0') loop
         wait until (aclk'event and aclk='1');
-        if (M_Axis_TVALID='1') then
-            TDATA:=M_Axis_TDATA;
+        if (M_AXIS_TVALID='1') then
+            TDATA:=M_AXIS_TDATA;
             data_type:=v_Burst mod 2;
     	    
             write (v_buf_out, string'("  ") );
@@ -245,12 +248,12 @@ begin
             
             v_burst := v_burst - 1;
         end if;
-        if (M_Axis_TLAST='1') then
-            M_Axis_TREADY <= '0';
+        if (M_AXIS_TLAST='1') then
+            M_AXIS_TREADY <= '0';
         end if;
       end loop;
       v_Burst := lenghtOfBurst;
-      M_Axis_TREADY<= '0';
+      M_AXIS_TREADY<= '0';
       v_looptimes:=v_looptimes-1;
   end loop;
 end procedure DMARead_old;
@@ -258,10 +261,10 @@ end procedure DMARead_old;
 procedure  DMARead(
    signal    aclk           : in  std_logic;
    constant  repeatedBurst  : in  natural;
-   signal    M_Axis_TVALID  : in  std_logic;
-   signal    M_Axis_TLAST   : in  std_logic;
-   signal    M_Axis_TDATA   : in  std_logic_vector (31 downto 0);
-   signal    M_Axis_TREADY  : out std_logic
+   signal    M_AXIS_TVALID  : in  std_logic;
+   signal    M_AXIS_TLAST   : in  std_logic;
+   signal    M_AXIS_TDATA   : in  std_logic_vector (31 downto 0);
+   signal    M_AXIS_TREADY  : out std_logic
    ) is
    variable v_buf_out: line;
    variable v_Burst : natural;
@@ -270,7 +273,7 @@ procedure  DMARead(
 begin
 
   wait until (aclk'event and aclk='1');
-  M_Axis_TREADY <= '1';
+  M_AXIS_TREADY <= '1';
   write (v_buf_out, now);
   write (v_buf_out, string'(" DMA Read. ") );
   writeline (output, v_buf_out);
@@ -283,8 +286,8 @@ begin
   i:=0;
   while (v_Burst>0) loop
       wait until (aclk'event and aclk='1');
-        if (M_Axis_TVALID='1') then
-            TDATA:=M_Axis_TDATA;
+        if (M_AXIS_TVALID='1') then
+            TDATA:=M_AXIS_TDATA;
     	    
             write (v_buf_out, string'("  ") );
     	    write (v_buf_out, repeatedBurst-v_Burst );
@@ -305,7 +308,7 @@ begin
             i:=i+1;
         end if;
             
-        if (M_Axis_TLAST='1') then
+        if (M_AXIS_TLAST='1') then
     	    write (v_buf_out, string'(">>> End burst") );
             writeline (output, v_buf_out);
     	    write (v_buf_out, string'(">>> End burst") );
@@ -315,7 +318,7 @@ begin
         end if;
   end loop;
   
-  M_Axis_TREADY<= '0' after 0.1 ns;
+  M_AXIS_TREADY<= '0' after 0.1 ns;
 end procedure DMARead;
 
 ------------------------------------------------------------------
@@ -326,10 +329,10 @@ procedure  DMAWrite(
    constant  lenghtOfBurst  : in  natural;
    constant  DMAData        : in  DMADataType;
    constant  repeatedBurst  : in  natural;
-   signal    S_Axis_TVALID  : out std_logic;
-   signal    S_Axis_TLAST   : out std_logic;
-   signal    S_Axis_TDATA   : out std_logic_vector (31 downto 0);
-   signal    S_Axis_TREADY  : in std_logic
+   signal    S_AXIS_TVALID  : out std_logic;
+   signal    S_AXIS_TLAST   : out std_logic;
+   signal    S_AXIS_TDATA   : out std_logic_vector (31 downto 0);
+   signal    S_AXIS_TREADY  : in std_logic
    ) is
    variable v_buf_out: line;
    variable v_looptimes : natural;
@@ -343,7 +346,7 @@ begin
   while (v_looptimes>0) loop
       wait_ok: loop
           wait until (aclk'event and aclk='1');
-          exit wait_ok when S_Axis_TREADY = '1';
+          exit wait_ok when S_AXIS_TREADY = '1';
       end loop;
 
       write (v_buf_out, now);
@@ -358,9 +361,9 @@ begin
      
       wait until (aclk'event and aclk='1');
       while (v_Burst>0) loop
-        if (S_Axis_TREADY='1') then
-            S_Axis_TDATA<=DMAData(lenghtOfBurst-v_Burst);
-            S_Axis_TVALID<= '1';
+        if (S_AXIS_TREADY='1') then
+            S_AXIS_TDATA<=DMAData(lenghtOfBurst-v_Burst);
+            S_AXIS_TVALID<= '1';
     	    
             write (v_buf_out, string'("  ") );
     	    write (v_buf_out, lenghtOfBurst-v_Burst );
@@ -378,17 +381,17 @@ begin
             
             v_burst := v_burst - 1;
         else
-            S_Axis_TVALID<= '0';
+            S_AXIS_TVALID<= '0';
         end if;
         if (v_Burst=0) then
-            S_Axis_TLAST <= '1';
+            S_AXIS_TLAST <= '1';
         end if;
         wait until (aclk'event and aclk='1');
       end loop;
       v_Burst := lenghtOfBurst;
-      S_Axis_TVALID <= '0';
-      S_Axis_TLAST <= '0';
-      S_Axis_TDATA<=(others=>'0');
+      S_AXIS_TVALID <= '0';
+      S_AXIS_TLAST <= '0';
+      S_AXIS_TDATA<=(others=>'0');
       v_looptimes:=v_looptimes-1;
   end loop;
 end procedure DMAWrite;
@@ -1116,13 +1119,13 @@ begin
 	S_AXI_AWVALID <= '0';
     S_AXI_WVALID  <= '0';
     S_AXI_WDATA   <= (others => '0');
-	S_AXI_WSTRB   <= "1111";
+	  S_AXI_WSTRB   <= "1111";
     S_AXI_BREADY  <= '0';
     S_AXI_ARVALID <= '0';
     S_AXI_ARADDR  <= (others => '0');
-	S_AXI_RREADY  <= '0';
-	S_AXI_AWADDR  <= (others => '0');
-    M_Axis_TREADY <= '0';
+	  S_AXI_RREADY  <= '0';
+	  S_AXI_AWADDR  <= (others => '0');
+    M_AXIS_TREADY <= '0';
     S_AXIS_TDATA  <= (others => '0');
     S_AXIS_TLAST  <= '0';
     S_AXIS_TVALID <= '0';
@@ -1154,9 +1157,9 @@ begin
             when WIN => WaitInterrupt(S_AXI_ACLK, interrupt);
             when FIN => FinishSimulation(S_AXI_ACLK);
 --			when CUR => Voltage(S_AXI_ACLK,v_access.Voltage,adc_val);
-            --when DMR => DMARead_old(S_AXI_ACLK,v_access.DMALENGTH,v_access.RPTBURST,M_Axis_TVALID,M_Axis_TLAST,M_Axis_TDATA,M_Axis_TREADY);
-            when DMR => DMARead(S_AXI_ACLK,v_access.RPTBURST,M_Axis_TVALID,M_Axis_TLAST,M_Axis_TDATA,M_Axis_TREADY);
-            when DMW => DMAWrite(S_AXI_ACLK,v_access.DMALENGTH,v_access.DMADATA,v_access.RPTBURST,S_Axis_TVALID,S_Axis_TLAST,S_Axis_TDATA,S_Axis_TREADY);
+            --when DMR => DMARead_old(S_AXI_ACLK,v_access.DMALENGTH,v_access.RPTBURST,M_AXIS_TVALID,M_AXIS_TLAST,M_AXIS_TDATA,M_AXIS_TREADY);
+            when DMR => DMARead(M_AXIS_ACLK,v_access.RPTBURST,M_AXIS_TVALID,M_AXIS_TLAST,M_AXIS_TDATA,M_AXIS_TREADY);
+            when DMW => DMAWrite(S_AXIS_ACLK,v_access.DMALENGTH,v_access.DMADATA,v_access.RPTBURST,S_AXIS_TVALID,S_AXIS_TLAST,S_AXIS_TDATA,S_AXIS_TREADY);
 --            when RST => Reset(S_AXI_ACLK,Async_reset);
             when SDM => StartDMA(S_AXI_ACLK,v_access.ENABLEDMA,start_dmas);
             when OCP => OverCurrent(S_AXI_ACLK,v_access.ocp,ocp_o);

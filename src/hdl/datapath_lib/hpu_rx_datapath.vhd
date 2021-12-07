@@ -351,10 +351,10 @@ begin
         aux_channel => Aux_Channel_i             -- in  std_logic;
         );
     
-SYNC_FIFO_FOR_ZYNQ : if C_FAMILY = "zynq"  generate -- "zynq", "zynquplus" 
+FIFO_SAER_FOR_ZYNQ : if C_FAMILY = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
-    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_ZYNQ
+    FIFO_SAER_m : FIFO_SAER_ZYNQ
       port map (
         rst     => i_reset_synch_fifos,
         wr_clk  => Clk_ls_p,
@@ -369,10 +369,10 @@ begin
 
 end generate;    
 
-SYNC_FIFO_FOR_ZYNQUPLUS : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
+FIFO_SAER_FOR_ZYNQUPLUS_gen : if C_FAMILY = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
    
-    i_SYNC_FIFO_32_16 : SYNC_FIFO_32_16_ZYNQUPLUS
+    FIFO_SAER_m : FIFO_SAER_ZYNQUPLUS
       port map (
         rst     => i_reset_synch_fifos,
         wr_clk  => Clk_ls_p,

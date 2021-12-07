@@ -334,7 +334,7 @@ package DPComponents_pkg is
     end component hssaer_paer_rx_wrapper;
 
 
-    component SYNC_FIFO_32_16_ZYNQ
+    component FIFO_SAER_ZYNQ
       port (
         rst : in std_logic;
         wr_clk : in std_logic;
@@ -349,7 +349,7 @@ package DPComponents_pkg is
     end component;
 
 
-    component SYNC_FIFO_32_16_ZYNQUPLUS
+    component FIFO_SAER_ZYNQUPLUS
       port (
         rst : in std_logic;
         wr_clk : in std_logic;
