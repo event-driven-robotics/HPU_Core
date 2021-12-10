@@ -855,7 +855,7 @@ static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *re
 	dma_sync_single_for_cpu(&priv->pdev->dev, buffer->phys, priv->dma_rx_pool.ps,
 				DMA_FROM_DEVICE);
 #endif
-	if ((len / 4) & 1) {
+	if (len != priv->dma_rx_pool.ps) {
 		priv->early_tlast++;
 		len -= 4;
 		word = ((u32*)buffer->virt)[len / 4];
