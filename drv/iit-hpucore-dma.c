@@ -126,6 +126,8 @@
 #define HPU_CTRL_AXIS_LAT		BIT(9)
 #define HPU_CTRL_RESETDMASTREAM 	0x1000
 #define HPU_CTRL_FULLTS			0x8000
+#define HPU_CTRL_DISABLE_RX_TS		BIT(13)
+#define HPU_CTRL_DISABLE_TX_TS		BIT(14)
 #define HPU_CTRL_LOOP_SPINN		(BIT(22) | BIT(23))
 #define HPU_CTRL_LOOP_LNEAR		BIT(25)
 
@@ -262,6 +264,8 @@
 #define HPU_IOCTL_SET_SPINN_RX_MASK		37
 #define HPU_IOCTL_GET_HW_STATUS			38
 #define HPU_IOCTL_SET_SPINN_KEYS_EN_EX		39
+#define HPU_IOCTL_SET_RX_TS_ENABLE		40
+#define HPU_IOCTL_SET_TX_TS_ENABLE		41
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
@@ -522,6 +526,9 @@ struct hpu_priv {
 	unsigned int rx_tlast_count;
 	unsigned int rx_data_count;
 	bool thread_exit;
+	bool can_disable_ts;
+	bool tx_ts_disable;
+	bool rx_ts_disable;
 };
 
 static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
@@ -1950,6 +1957,28 @@ static void hpu_get_hw_status(struct hpu_priv *priv, hpu_hw_status_t *status)
 		status->auxspinn_parity_err = 1;
 }
 
+static int hpu_set_rx_ts_enable(struct hpu_priv *priv, unsigned int val)
+{
+	if (val)
+		priv->ctrl_reg &= ~HPU_CTRL_DISABLE_RX_TS;
+	else
+		priv->ctrl_reg |= HPU_CTRL_DISABLE_RX_TS;
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+
+	return 0;
+}
+
+static int hpu_set_tx_ts_enable(struct hpu_priv *priv, unsigned int val)
+{
+	if (val)
+		priv->ctrl_reg &= ~HPU_CTRL_DISABLE_TX_TS;
+	else
+		priv->ctrl_reg |= HPU_CTRL_DISABLE_TX_TS;
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+
+	return 0;
+}
+
 static int hpu_chardev_open(struct inode *i, struct file *f)
 {
 	int ret = 0;
@@ -2485,6 +2514,18 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 					    keys_enable.enable_r,
 					    keys_enable.enable_aux);
 		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_RX_TS_ENABLE, unsigned int *):
+		  if (copy_from_user(&val, arg, sizeof(unsigned int)))
+			  goto cfuser_err;
+		  res = hpu_set_rx_ts_enable(priv, val);
+		  break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_TX_TS_ENABLE, unsigned int *):
+		  if (copy_from_user(&val, arg, sizeof(unsigned int)))
+			  goto cfuser_err;
+		  res = hpu_set_tx_ts_enable(priv, val);
+		  break;
 
 	default:
 		res = -EINVAL;
