@@ -116,7 +116,7 @@
 #define HPU_DATA_COUNT		0xA8
 
 /* magic constants */
-#define HPU_VER_MAGIC			0x48505536
+#define HPU_MAGIC			0x485055
 
 #define HPU_CTRL_DMA_RUNNING		0x0001
 #define HPU_CTRL_ENDMA			0x0002
@@ -2608,17 +2608,31 @@ static int hpu_probe(struct platform_device *pdev)
 	ver = hpu_reg_read(priv, HPU_VER_REG);
 	hpu_clk_disable(priv);
 
-	if (ver != HPU_VER_MAGIC) {
-		if ((ver >> 24) == 'B') {
-			dev_warn(&pdev->dev,
-				 "HPU IP is a _BETA_ version (0x%x)\n", ver);
-		} else {
-			dev_err(&pdev->dev,
-				"HPU IP has wrong version: 0x%x\n", ver);
-			kfree(priv);
-			return -ENODEV;
-		}
+	if ((ver >> 8) != HPU_MAGIC) {
+		dev_err(&pdev->dev, "HPU IP Magic not recognized (0x%x)", ver);
+		kfree(priv);
+		return -ENODEV;
 	}
+
+	switch (ver & 0xFF) {
+
+	case 'B':
+		dev_warn(&pdev->dev,
+			 "HPU IP is a _BETA_ version (0x%x)\n", ver);
+		break;
+	case 0x36:
+		dev_notice(&pdev->dev, "HPU ip version (0x%x) doesn't support all features\n", ver);
+		break;
+	case 0x40:
+		priv->can_disable_ts = true;
+		break; /* current version */
+	default:
+		dev_err(&pdev->dev,
+			"HPU IP has wrong version: 0x%x\n", ver);
+		kfree(priv);
+		return -ENODEV;
+	}
+
 
 	priv->irq = platform_get_irq(pdev, 0);
 	if (priv->irq < 0) {
