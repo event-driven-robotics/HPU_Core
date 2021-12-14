@@ -1833,7 +1833,7 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 	}
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
-	dev_info(&priv->pdev->dev, "set loop %d - bits: 0x%x, CTRL 0x%x",
+	dev_dbg(&priv->pdev->dev, "set loop %d - bits: 0x%x, CTRL 0x%x",
 		 loop, priv->loop_bits, priv->ctrl_reg);
 
 	if (loop == LOOP_LSAER_LEFT)
