@@ -2548,16 +2548,22 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_RX_TS_ENABLE, unsigned int *):
-		  if (copy_from_user(&val, arg, sizeof(unsigned int)))
-			  goto cfuser_err;
-		  res = hpu_set_rx_ts_enable(priv, val);
-		  break;
+		if (!priv->can_disable_ts)
+			return -ENOTSUPP;
+
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
+			goto cfuser_err;
+		res = hpu_set_rx_ts_enable(priv, val);
+		break;
 
 	case _IOW(0x0, HPU_IOCTL_SET_TX_TS_ENABLE, unsigned int *):
-		  if (copy_from_user(&val, arg, sizeof(unsigned int)))
+		if (!priv->can_disable_ts)
+			return -ENOTSUPP;
+
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
 			  goto cfuser_err;
-		  res = hpu_set_tx_ts_enable(priv, val);
-		  break;
+		res = hpu_set_tx_ts_enable(priv, val);
+		break;
 
 	default:
 		res = -EINVAL;
