@@ -562,6 +562,7 @@ struct hpu_priv {
 	bool can_disable_ts;
 	bool tx_ts_disable;
 	bool rx_ts_disable;
+	u32 can_loop;
 };
 
 static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
@@ -1820,6 +1821,9 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 		return -EINVAL;
 	}
 
+	if (! (loop_bits[loop] & priv->can_loop))
+	    return -ENOTSUPP;
+
 	spin_lock_irqsave(&priv->irq_lock, flags);
 	priv->loop_bits = loop_bits[loop];
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
@@ -2724,6 +2728,16 @@ static int hpu_probe(struct platform_device *pdev)
 		 ((tmp >> HPU_IPCONFIG_TXSAERCH) & 3) + 1,
 		 !!(tmp & HPU_IPCONFIG_TXSPINN),
 		 !!(tmp & HPU_IPCONFIG_TXGTP));
+
+	priv->can_loop = HPU_CTRL_LOOP_LNEAR;
+	if ((tmp & HPU_IPCONFIG_TXPAER) && (tmp & HPU_IPCONFIG_RXPAER))
+		priv->can_loop |= HPU_CTRL_LOOP_SPINNAUX | HPU_CTRL_LOOP_SPINNL | HPU_CTRL_LOOP_SPINNR;
+
+	if ((tmp & HPU_IPCONFIG_TXSAER) && (tmp & HPU_IPCONFIG_RXSAER))
+		priv->can_loop |= HPU_CTRL_LOOP_SAERAUX | HPU_CTRL_LOOP_SAERL | HPU_CTRL_LOOP_SAERR;
+
+	if ((tmp & HPU_IPCONFIG_TXSPINN) && (tmp & HPU_IPCONFIG_RXSPINN))
+		priv->can_loop |= HPU_CTRL_LOOP_PAERAUX | HPU_CTRL_LOOP_PAERL | HPU_CTRL_LOOP_PAERR;
 
 	priv->irq = platform_get_irq(pdev, 0);
 	if (priv->irq < 0) {
