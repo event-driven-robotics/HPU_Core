@@ -2731,13 +2731,13 @@ static int hpu_probe(struct platform_device *pdev)
 
 	priv->can_loop = HPU_CTRL_LOOP_LNEAR;
 	if ((tmp & HPU_IPCONFIG_TXPAER) && (tmp & HPU_IPCONFIG_RXPAER))
-		priv->can_loop |= HPU_CTRL_LOOP_SPINNAUX | HPU_CTRL_LOOP_SPINNL | HPU_CTRL_LOOP_SPINNR;
+		priv->can_loop |= HPU_CTRL_LOOP_PAERAUX | HPU_CTRL_LOOP_PAERL | HPU_CTRL_LOOP_PAERR;
 
 	if ((tmp & HPU_IPCONFIG_TXSAER) && (tmp & HPU_IPCONFIG_RXSAER))
 		priv->can_loop |= HPU_CTRL_LOOP_SAERAUX | HPU_CTRL_LOOP_SAERL | HPU_CTRL_LOOP_SAERR;
 
 	if ((tmp & HPU_IPCONFIG_TXSPINN) && (tmp & HPU_IPCONFIG_RXSPINN))
-		priv->can_loop |= HPU_CTRL_LOOP_PAERAUX | HPU_CTRL_LOOP_PAERL | HPU_CTRL_LOOP_PAERR;
+		priv->can_loop |= HPU_CTRL_LOOP_SPINNAUX | HPU_CTRL_LOOP_SPINNL | HPU_CTRL_LOOP_SPINNR;
 
 	priv->irq = platform_get_irq(pdev, 0);
 	if (priv->irq < 0) {
