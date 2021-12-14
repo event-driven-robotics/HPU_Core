@@ -95,7 +95,17 @@
 #define HPU_TXCTRL_REG		0x44
 #define HPU_RXPAERCNFG_REG	0x48
 #define HPU_TXPAERCNFG_REG	0x4C
-#define HPU_IPCFONFIG_REG	0x50
+#define HPU_IPCONFIG_REG	0x50
+#define HPU_IPCONFIG_RXSAER	BIT(0)
+#define HPU_IPCONFIG_RXPAER	BIT(1)
+#define HPU_IPCONFIG_RXGTP	BIT(2)
+#define HPU_IPCONFIG_RXSPINN	BIT(3)
+#define HPU_IPCONFIG_RXSAERCH	4
+#define HPU_IPCONFIG_TXSAER	BIT(8)
+#define HPU_IPCONFIG_TXPAER	BIT(9)
+#define HPU_IPCONFIG_TXGTP	BIT(10)
+#define HPU_IPCONFIG_TXSPINN	BIT(11)
+#define HPU_IPCONFIG_TXSAERCH	12
 #define HPU_FIFOTHRESHOLD_REG	0x54
 #define HPU_VER_REG		0x5C
 #define HPU_AUX_RXCTRL_REG	0x60
@@ -283,7 +293,7 @@ static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_TXCTRL_REG",		0x44},
 	{"HPU_RXPAERCNFG_REG",		0x48},
 	{"HPU_TXPAERCNFG_REG",		0x4C},
-	{"HPU_IPCFONFIG_REG",		0x50},
+	{"HPU_IPCONFIG_REG",		0x50},
 	{"HPU_FIFOTHRESHOLD_REG",	0x54},
 	{"HPU_VER_REG",			0x5C},
 	{"HPU_AUX_RXCTRL_REG",		0x60},
@@ -2601,7 +2611,7 @@ static int hpu_probe(struct platform_device *pdev)
 	struct resource *res;
 	struct debugfs_regset32 *regset;
 	unsigned int result;
-	u32 ver;
+	u32 ver, tmp;
 	char buf[128];
 
 	/* FIXME: handle error path resource free */
@@ -2674,6 +2684,19 @@ static int hpu_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
+	tmp = hpu_reg_read(priv, HPU_IPCONFIG_REG);
+	dev_info(&pdev->dev, "RX - PAER: %d, SAER: %d (ch %d), SPIN: %d, GTP: %d",
+		 !!(tmp & HPU_IPCONFIG_RXPAER),
+		 !!(tmp & HPU_IPCONFIG_RXSAER),
+		 ((tmp >> HPU_IPCONFIG_RXSAERCH) & 3) + 1,
+		 !!(tmp & HPU_IPCONFIG_RXSPINN),
+		 !!(tmp & HPU_IPCONFIG_RXGTP));
+	dev_info(&pdev->dev, "TX - PAER: %d, SAER: %d (ch %d), SPIN: %d, GTP: %d",
+		 !!(tmp & HPU_IPCONFIG_TXPAER),
+		 !!(tmp & HPU_IPCONFIG_TXSAER),
+		 ((tmp >> HPU_IPCONFIG_TXSAERCH) & 3) + 1,
+		 !!(tmp & HPU_IPCONFIG_TXSPINN),
+		 !!(tmp & HPU_IPCONFIG_TXGTP));
 
 	priv->irq = platform_get_irq(pdev, 0);
 	if (priv->irq < 0) {
