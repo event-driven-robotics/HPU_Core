@@ -301,7 +301,11 @@ int main(int argc, char * argv[])
 	else
 		printf("TX Pool size = %d\n", tx_ps);
 
-	ioctl(iit_hpu, IOC_SET_LOOP_CFG, &loop_type);
+	ret = ioctl(iit_hpu, IOC_SET_LOOP_CFG, &loop_type);
+	if (ret < 0) {
+		printf("loop cfg ioctl failed with err %d\n", ret);
+		return ret;
+	}
 
 	memset((void*)&rxiface, 0, sizeof(rxiface));
 	memset((void*)&txiface, 0, sizeof(txiface));
