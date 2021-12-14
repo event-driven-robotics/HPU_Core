@@ -154,14 +154,16 @@ void _read_data(int chunk_size, int chunk_num, int magic)
 
 	for (i = 0; i < chunk_num; i++) {
 		ret = read(iit_hpu, data,  8 * chunk_size);
-		if (ret != 8 * chunk_size)
+		if (ret != 8 * chunk_size) {
 			printf("read returned %d\n", ret);
-		for (j = 0; j < chunk_size; j++) {
-			tmp = (magic << 16) | ((i * chunk_size + j) & 0xffff);
-			tmp2 = data[j * 2 + 1];
-			tmp3 = data[j * 2];
-			if (tmp2 != tmp)
-				printf("error at %d,%d: rcv: %x (ts %x) exp: %x\n", i, j,tmp2, tmp3, tmp);
+		} else {
+			for (j = 0; j < chunk_size; j++) {
+				tmp = (magic << 16) | ((i * chunk_size + j) & 0xffff);
+				tmp2 = data[j * 2 + 1];
+				tmp3 = data[j * 2];
+				if (tmp2 != tmp)
+					printf("error at %d,%d: rcv: %x (ts %x) exp: %x\n", i, j,tmp2, tmp3, tmp);
+			}
 		}
 	}
 }
