@@ -15,6 +15,7 @@
 #include <signal.h>
 #include <termios.h>
 #include <time.h>
+#include <stdint.h>
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -109,7 +110,7 @@ typedef struct {
 } hpu_tx_interface_ioctl_t;
 
 
-unsigned int data[65536], wdata[65536];
+uint32_t data[65536], wdata[65536];
 int iit_hpu;
 
 
@@ -139,7 +140,7 @@ void _write_data(int chunk_size, int chunk_num, int magic)
 void _read_data(int chunk_size, int chunk_num, int magic)
 {
 	int i, j;
-	unsigned int tmp, tmp2;
+	uint32_t tmp, tmp2, tmp3;
 	int ret;
 
 	for (i = 0; i < chunk_num; i++) {
