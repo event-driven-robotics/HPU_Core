@@ -76,9 +76,18 @@
 #define IOC_GET_RX_PN			_IOR(IOC_MAGIC_NUMBER, 29, unsigned int *)
 
 typedef enum {
+	/* order matters here! Must be consistent with the following array */
 	LOOP_NONE,
 	LOOP_LNEAR,
-	LOOP_LSPINN,
+	LOOP_LSPINN_AUX,
+	LOOP_LSPINN_LEFT,
+	LOOP_LSPINN_RIGHT,
+	LOOP_LPAER_AUX,
+	LOOP_LPAER_LEFT,
+	LOOP_LPAER_RIGHT,
+	LOOP_LSAER_AUX,
+	LOOP_LSAER_LEFT,
+	LOOP_LSAER_RIGHT
 } spinn_loop_t;
 
 typedef enum {
@@ -199,7 +208,6 @@ void read_thr_data(int chunk_size, int chunk_num)
 	}
 }
 
-const int loop_near = 0;
 double time_diff(struct timespec *start, struct timespec *stop)
 {
 	double ret;
@@ -209,6 +217,14 @@ double time_diff(struct timespec *start, struct timespec *stop)
 	return ret;
 }
 
+int help_bail(char **argv)
+{
+	fprintf(stderr, "usage:\n");
+	fprintf(stderr, "%s near\n", argv[0]);
+	fprintf(stderr, "%s [spinn|paer|saer] [L|R|aux]\n", argv[0]);
+	return -1;
+}
+
 int main(int argc, char * argv[])
 {
 	int ret;
@@ -216,7 +232,7 @@ int main(int argc, char * argv[])
 	unsigned int timestamp = 0;
 	unsigned int rx_ps, tx_ps, rx_pn;
 	int val;
-	spinn_loop_t loop;
+	spinn_loop_t loop_type;
 	struct timespec ts1, ts2;
 	double time_sec = 0;
 	unsigned int size;
@@ -235,6 +251,30 @@ int main(int argc, char * argv[])
 	mlockall(MCL_CURRENT|MCL_FUTURE);
 	memset(wdata, 0, sizeof(wdata));
 	memset(data, 0, sizeof(data));
+
+	if (argc < 2)
+		return help_bail(argv);
+
+	if (0 == strcmp(argv[1], "near")) {
+		loop_type = LOOP_LNEAR;
+	} else {
+		if (argc != 3)
+			return help_bail(argv);
+		if (0 == strcmp(argv[1], "spinn"))
+			loop_type = LOOP_LSPINN_AUX;
+		else if (0 == strcmp(argv[1], "paer"))
+			loop_type = LOOP_LPAER_AUX;
+		else if (0 == strcmp(argv[1], "saer"))
+			loop_type = LOOP_LSAER_AUX;
+		else return help_bail(argv);
+
+		if (0 == strcmp(argv[2], "L"))
+			loop_type++;
+		else if (0 == strcmp(argv[2], "R"))
+			loop_type += 2;
+		else if (strcmp(argv[2], "aux"))
+			return help_bail(argv);
+	}
 
 	iit_hpu = open("/dev/iit-hpu0",O_RDWR);
 	if(iit_hpu < 0) {
@@ -259,24 +299,69 @@ int main(int argc, char * argv[])
 	else
 		printf("TX Pool size = %d\n", tx_ps);
 
-	if (loop_near) {
-		loop = LOOP_LNEAR;
-		ioctl(iit_hpu, IOC_SET_LOOP_CFG, &loop);
-	} else {
-		loop = LOOP_LSPINN;
-		ioctl(iit_hpu, IOC_SET_LOOP_CFG, &loop);
+	ioctl(iit_hpu, IOC_SET_LOOP_CFG, &loop_type);
 
-		memset((void*)&rxiface, 0, sizeof(rxiface));
-		memset((void*)&txiface, 0, sizeof(txiface));
+	memset((void*)&rxiface, 0, sizeof(rxiface));
+	memset((void*)&txiface, 0, sizeof(txiface));
+	val = 0;
+	txiface.route = ROUTE_FIXED;
+
+	switch (loop_type) {
+	case LOOP_LSPINN_AUX:
+	case LOOP_LSAER_AUX:
+	case LOOP_LPAER_AUX:
 		rxiface.interface = INTERFACE_AUX;
-		rxiface.cfg.spinn = 1;
-		ioctl(iit_hpu, IOC_SET_RX_INTERFACE, &rxiface);
-		txiface.cfg.spinn = 1;
-		txiface.route = ROUTE_FIXED;
-		ioctl(iit_hpu, IOC_SET_TX_INTERFACE, &txiface);
-		val = 1;
-		ioctl(iit_hpu, IOC_SET_SPINN_STARTSTOP, &val);
+		break;
+	case LOOP_LSPINN_LEFT:
+	case LOOP_LSAER_LEFT:
+	case LOOP_LPAER_LEFT:
+		rxiface.interface = INTERFACE_EYE_L;
+		break;
+	case LOOP_LSPINN_RIGHT:
+	case LOOP_LSAER_RIGHT:
+	case LOOP_LPAER_RIGHT:
+		rxiface.interface = INTERFACE_EYE_R;
+		break;
+	case LOOP_NONE:
+		fprintf(stderr, "BUG!\n");
+		break;
+	case LOOP_LNEAR:
+		break;
 	}
+
+	switch (loop_type) {
+	case LOOP_LSPINN_AUX:
+	case LOOP_LSPINN_RIGHT:
+	case LOOP_LSPINN_LEFT:
+		rxiface.cfg.spinn = 1;
+		txiface.cfg.spinn = 1;
+		val = 1;
+		break;
+
+	case LOOP_LSAER_AUX:
+	case LOOP_LSAER_RIGHT:
+	case LOOP_LSAER_LEFT:
+		rxiface.cfg.hssaer[0] = 1;
+		txiface.cfg.hssaer[0] = 1;
+		break;
+
+	case LOOP_LPAER_AUX:
+	case LOOP_LPAER_RIGHT:
+	case LOOP_LPAER_LEFT:
+		rxiface.cfg.paer = 1;
+		txiface.cfg.paer = 1;
+		break;
+
+	case LOOP_LNEAR:
+		break;
+	case LOOP_NONE:
+		fprintf(stderr, "BUG!\n");
+		break;
+	}
+
+	ioctl(iit_hpu, IOC_SET_RX_INTERFACE, &rxiface);
+	ioctl(iit_hpu, IOC_SET_TX_INTERFACE, &txiface);
+	ioctl(iit_hpu, IOC_SET_SPINN_STARTSTOP, &val);
 	// Set TimeStamp size
 	timestamp = 1;
 	ioctl(iit_hpu, IOC_SET_TS_TYPE, &timestamp);
