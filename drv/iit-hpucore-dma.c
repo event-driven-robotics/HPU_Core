@@ -81,6 +81,7 @@
 
 /* registers */
 #define HPU_CTRL_REG 		0x00
+#define HPU_LPBK_LR_CNFG_REG 	0x04
 #define HPU_RXDATA_REG 		0x08
 #define HPU_RXTIME_REG 		0x0C
 #define HPU_DMA_REG 		0x14
@@ -138,9 +139,17 @@
 #define HPU_CTRL_FULLTS			0x8000
 #define HPU_CTRL_DISABLE_RX_TS		BIT(13)
 #define HPU_CTRL_DISABLE_TX_TS		BIT(14)
-#define HPU_CTRL_LOOP_SPINN		(BIT(22) | BIT(23))
+#define HPU_CTRL_LOOP_SPINNL		BIT(22)
+#define HPU_CTRL_LOOP_SPINNR		BIT(23)
+#define HPU_CTRL_LOOP_SPINNAUX		(BIT(22) | BIT(23))
 #define HPU_CTRL_LOOP_LNEAR		BIT(25)
-
+#define HPU_CTRL_LOOP_SAERAUX		BIT(26)
+#define HPU_CTRL_LOOP_PAERAUX		BIT(27)
+#define HPU_CTRL_LOOP_SAERL       	BIT(28)
+#define HPU_CTRL_LOOP_SAERR		BIT(29)
+#define HPU_CTRL_LOOP_PAERL		BIT(30)
+#define HPU_CTRL_LOOP_PAERR		BIT(31)
+#define HPU_CTRL_LOOP_MASK              GENMASK(31, 25) | GENMASK(23, 22)
 #define HPU_DMA_LENGTH_MASK		0xFFFF
 #define HPU_DMA_TEST_ON			0x10000
 
@@ -279,6 +288,7 @@
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
+	{"HPU_LPBK_LR_CNFG_REG",        0x04},
 	{"HPU_RXDATA_REG",		0x08},
 	{"HPU_RXTIME_REG",		0x0C},
 	{"HPU_DMA_REG",			0x14},
@@ -393,10 +403,24 @@ typedef struct {
 } spinn_keys_enable_t;
 
 typedef enum {
+	/* order matters here! Must be consistent with the following array */
 	LOOP_NONE,
 	LOOP_LNEAR,
-	LOOP_LSPINN,
+	LOOP_LSPINN_AUX,
+	LOOP_LSPINN_LEFT,
+	LOOP_LSPINN_RIGHT,
+	LOOP_LPAER_AUX,
+	LOOP_LPAER_LEFT,
+	LOOP_LPAER_RIGHT,
+	LOOP_LSAER_AUX,
+	LOOP_LSAER_LEFT,
+	LOOP_LSAER_RIGHT
 } spinn_loop_t;
+u32 loop_bits[] = {0, HPU_CTRL_LOOP_LNEAR,
+	    HPU_CTRL_LOOP_SPINNAUX, HPU_CTRL_LOOP_SPINNL, HPU_CTRL_LOOP_SPINNR,
+	    HPU_CTRL_LOOP_PAERAUX, HPU_CTRL_LOOP_PAERL, HPU_CTRL_LOOP_PAERR,
+	    HPU_CTRL_LOOP_SAERAUX, HPU_CTRL_LOOP_SAERL, HPU_CTRL_LOOP_SAERR };
+
 
 typedef enum {
 	MASK_20BIT,
@@ -1791,36 +1815,34 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 {
 	unsigned long flags;
 
-	spin_lock_irqsave(&priv->irq_lock, flags);
-	switch (loop) {
-	case LOOP_LSPINN:
-		priv->loop_bits = HPU_CTRL_LOOP_SPINN;
-		break;
-
-	case LOOP_LNEAR:
-		priv->loop_bits = HPU_CTRL_LOOP_LNEAR;
-		break;
-
-	case LOOP_NONE:
-		priv->loop_bits = 0;
-		break;
-	default:
-		spin_unlock_irqrestore(&priv->irq_lock, flags);
+	if (loop >= ARRAY_SIZE(loop_bits)) {
 		dev_notice(&priv->pdev->dev,
 			   "set loop - invalid arg %d\n", loop);
 		return -EINVAL;
-		break;
 	}
 
+	spin_lock_irqsave(&priv->irq_lock, flags);
+	priv->loop_bits = loop_bits[loop];
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
+
+
 	if (!hpu_rx_is_suspended(priv)) {
-		priv->ctrl_reg &= ~(HPU_CTRL_LOOP_LNEAR | HPU_CTRL_LOOP_SPINN);
+		priv->ctrl_reg &= ~HPU_CTRL_LOOP_MASK;
 		priv->ctrl_reg |= priv->loop_bits;
 		hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 	}
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
-	dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
-		priv->ctrl_reg);
+	dev_info(&priv->pdev->dev, "set loop %d - bits: 0x%x, CTRL 0x%x",
+		 loop, priv->loop_bits, priv->ctrl_reg);
+
+	if (loop == LOOP_LSAER_LEFT)
+		hpu_reg_write(priv, 0xba98, HPU_LPBK_LR_CNFG_REG);
+
+	else if (loop == LOOP_LSAER_RIGHT)
+		hpu_reg_write(priv, 0xba980000, HPU_LPBK_LR_CNFG_REG);
+	else
+		hpu_reg_write(priv, 0x0, HPU_LPBK_LR_CNFG_REG);
 
 	return 0;
 }
