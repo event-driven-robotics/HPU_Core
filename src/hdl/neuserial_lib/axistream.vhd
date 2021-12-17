@@ -63,7 +63,6 @@ architecture rtl of axistream is
     signal i_M_AXIS_TVALID  : std_logic;
     signal i_M_AXIS_TLAST   : std_logic;  
     signal counterData      : std_logic_vector(15 downto 0);
-    signal i_DMA_running    : std_logic;
     signal i_TlastCntRx     : std_logic_vector(15 downto 0);
     signal i_TlastCntTx     : std_logic_vector(15 downto 0);
     signal i_valid_read     : std_logic;
@@ -73,13 +72,44 @@ architecture rtl of axistream is
     signal i_TDataCntRx     : std_logic_vector(15 downto 0);
     signal i_TDataCntTx     : std_logic_vector(15 downto 0);
     signal i_enable_ip      : std_logic;
-    signal i_TlastTimer     : std_logic_vector(31 downto 0);   
-    signal i_TlastTimerLock : std_logic;   
+    signal i_TlastTimer     : std_logic_vector(31 downto 0);
+--    signal i_TlastTimerLock : std_logic;   
     signal i_timeexpired    : std_logic; 
     signal counterTest      : std_logic_vector(31 downto 0);
 --    signal i_sent_a_couple  : std_logic;
     signal i_sent_an_event  : std_logic;
-    
+
+-- -----------------------------------------------------------------------------
+-- DEBUG
+attribute mark_debug : string;
+attribute mark_debug of counterData               : signal is "true";
+attribute mark_debug of i_timeexpired             : signal is "true";
+attribute mark_debug of state                     : signal is "true";
+attribute mark_debug of i_enable_ip               : signal is "true";
+attribute mark_debug of i_sent_an_event           : signal is "true";
+attribute mark_debug of EnableAxistreamIf_i       : signal is "true";
+attribute mark_debug of S_AXIS_TREADY             : signal is "true";
+attribute mark_debug of S_AXIS_TDATA              : signal is "true";
+attribute mark_debug of S_AXIS_TLAST              : signal is "true";
+attribute mark_debug of S_AXIS_TVALID             : signal is "true";
+attribute mark_debug of M_AXIS_TVALID             : signal is "true";
+attribute mark_debug of M_AXIS_TDATA              : signal is "true";
+attribute mark_debug of M_AXIS_TLAST              : signal is "true";
+attribute mark_debug of M_AXIS_TREADY             : signal is "true";
+attribute mark_debug of FifoRxDat_i               : signal is "true";
+attribute mark_debug of FifoRxRead_o              : signal is "true";
+attribute mark_debug of FifoRxEmpty_i             : signal is "true";
+attribute mark_debug of FifoRxLastData_i          : signal is "true";
+
+-- attribute mark_debug of i_TlastTimerLock          : signal is "true";
+attribute mark_debug of i_TlastTimer              : signal is "true";
+attribute mark_debug of LatTlat_i                 : signal is "true";
+attribute mark_debug of TlastTO_i                 : signal is "true";
+attribute mark_debug of TlastTOwritten_i          : signal is "true";
+
+
+
+-- -----------------------------------------------------------------------------
 
     
   begin 
@@ -158,7 +188,8 @@ end process EVENT_SENT_PROC;
    end process SYNC_PROC;
  
    NEXT_STATE_DECODE: process (state, i_enable_ip, FifoRxEmpty_i, i_valid_read, EnableAxistreamIf_i,
-                               i_valid_lastread, FifoRxLastData_i, i_timeexpired, DMA_test_mode_i, i_sent_an_event)
+                               i_valid_lastread, FifoRxLastData_i, i_timeexpired, DMA_test_mode_i, i_sent_an_event,
+                               OnlyEventsRx_i, FifoRxResetBusy_i)
    begin
       case (state) is
       
@@ -323,33 +354,60 @@ end process EVENT_SENT_PROC;
      
    TDataCnt_o <= i_TDataCntRx & i_TDataCntTx;
    
+--   -- Issue a premature end of a burst is the timeout expires and we have sent at least one data couple
+--   -- When no data have been received but the timeout expired, then sent the received data and then the dummy data
+--   tlasttimerlock_p : process (Clk)
+--   begin
+--   if (Clk'event and Clk = '1') then
+--        if (nRst = '0' or i_enable_ip='0' or TlastTOwritten_i='1') then
+--            i_TlastTimerLock <= '1';
+--        elsif (LatTlat_i='1') then
+--            if (i_valid_read='1') then
+--                i_TlastTimerLock <= '0';
+--            end if;
+--        end if;
+--       end if;
+--   end process tlasttimerlock_p;
+--
+--   tlasttimer_p : process (Clk)
+--   begin
+--   if (Clk'event and Clk = '1') then
+--        if (nRst = '0' or i_enable_ip='0' or TlastTOwritten_i='1') then
+--            i_TlastTimer <= (others => '1');
+--            i_timeexpired <= '0';
+--        elsif (LatTlat_i='1') then
+--            if (i_valid_lastread='1' or i_TlastTimerLock='1') then
+--                i_TlastTimer <= TlastTO_i;
+--                i_timeexpired <= '0';
+--            elsif (i_TlastTimer/=x"00000000") then
+--                i_TlastTimer <= i_TlastTimer - "01";
+--                i_timeexpired <= '0';
+--            else
+--                i_timeexpired <= '1';
+--            end if;
+--        end if;
+--       end if;
+--   end process tlasttimer_p;
+
+
+
+
+
    -- Issue a premature end of a burst is the timeout expires and we have sent at least one data couple
    -- When no data have been received but the timeout expired, then sent the received data and then the dummy data
-   tlasttimerlock_p : process (Clk)
-   begin
-   if (Clk'event and Clk = '1') then
-        if (nRst = '0' or i_enable_ip='0' or TlastTOwritten_i='1') then
-            i_TlastTimerLock <= '1';
-        elsif (LatTlat_i='1') then
-            if (i_valid_read='1') then
-                i_TlastTimerLock <= '0';
-            end if;
-        end if;
-       end if;
-   end process tlasttimerlock_p;
-
    tlasttimer_p : process (Clk)
    begin
-   if (Clk'event and Clk = '1') then
+      
+       if (Clk'event and Clk = '1') then
         if (nRst = '0' or i_enable_ip='0' or TlastTOwritten_i='1') then
-            i_TlastTimer <= (others => '1');
+            i_TlastTimer <= (others => '0');
             i_timeexpired <= '0';
         elsif (LatTlat_i='1') then
-            if (i_valid_lastread='1' or i_TlastTimerLock='1') then
-                i_TlastTimer <= TlastTO_i;
+            if (i_valid_lastread='1') then
+                i_TlastTimer <= (others => '0');
                 i_timeexpired <= '0';
-            elsif (i_TlastTimer/=x"00000000") then
-                i_TlastTimer <= i_TlastTimer - "01";
+            elsif (i_TlastTimer/=TlastTO_i) then
+                i_TlastTimer <= i_TlastTimer + "01";
                 i_timeexpired <= '0';
             else
                 i_timeexpired <= '1';
@@ -357,6 +415,9 @@ end process EVENT_SENT_PROC;
         end if;
        end if;
    end process tlasttimer_p;
+
+
+
    
 -- For TX FIFO
     i_S_AXIS_TREADY  <= not(FifoTxFull_i) and i_enable_ip;

@@ -482,11 +482,11 @@ signal rx_data_w1_gckrx            : std_logic_vector(GTP_DATA_WIDTH_g-1 downto 
 
 
 -- DEBUG
-attribute mark_debug : string;
-attribute mark_debug of RX_DATA_o               : signal is "true";
-attribute mark_debug of RX_DATA_SRC_RDY_o       : signal is "true";
-attribute mark_debug of RX_DATA_DST_RDY_i       : signal is "true";
-attribute mark_debug of RX_ALIGN_REQUEST_o      : signal is "true";
+-- attribute mark_debug : string;
+-- attribute mark_debug of RX_DATA_o               : signal is "true";
+-- attribute mark_debug of RX_DATA_SRC_RDY_o       : signal is "true";
+-- attribute mark_debug of RX_DATA_DST_RDY_i       : signal is "true";
+-- attribute mark_debug of RX_ALIGN_REQUEST_o      : signal is "true";
 
 
 
@@ -1214,7 +1214,7 @@ rx_data_fifo_wr_en_gckrx <= rx_data_w0_exp_gckrx and not rx_data_fifo_full_gckrx
 rx_data_fifo_rd_en       <= not rx_data_fifo_empty and RX_DATA_DST_RDY_i;
 rx_data_fifo_rst         <= rx_rst_gckrx;
 
-RX_DATA_SYNC_FIFO_FOR_ZYNQ : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
+RX_DATA_SYNC_FIFO_FOR_ZYNQ_gen : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
   DATA_FIFO_RX_i :  FIFO_GTP_DATA_ZYNQ
@@ -1234,7 +1234,7 @@ begin
   
   end generate;    
 
-RX_DATA_FIFO_SAER_m : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
+RX_DATA_SYNC_FIFO_FOR_ZYNQUPLUS_gen : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
    
   DATA_FIFO_RX_i :  FIFO_GTP_DATA_ZYNQUPLUS
@@ -1259,7 +1259,7 @@ rx_msg_fifo_wr_en_gckrx <= rx_msg_flag_gckrx and not rx_msg_fifo_full_gckrx;
 rx_msg_fifo_rd_en <= not rx_msg_fifo_empty and RX_MSG_DST_RDY_i;
 rx_msg_fifo_rst   <= rx_rst_gckrx;
   
-RX_MSG_SYNC_FIFO_FOR_ZYNQ : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
+RX_MSG_SYNC_FIFO_FOR_ZYNQ_gen : if FAMILY_g = "zynq"  generate -- "zynq", "zynquplus" 
 begin
    
   MSG_FIFO_RX_i :  FIFO_GTP_MSG_ZYNQ
@@ -1279,22 +1279,22 @@ begin
   
   end generate;    
 
-RX_MSG_FIFO_SAER_m : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
+RX_MSG_SYNC_FIFO_FOR_ZYNQUPLUS_gen : if FAMILY_g = "zynquplus"  generate -- "zynq", "zynquplus" 
 begin
    
-  DATA_FIFO_RX_i :  FIFO_GTP_DATA_ZYNQUPLUS
+  MSG_FIFO_RX_i :  FIFO_GTP_MSG_ZYNQUPLUS
     port map (
-      rst       => rx_data_fifo_rst,               
+      rst       => rx_msg_fifo_rst,               
       wr_clk    => GTP_RXUSRCLK2_i,        
       rd_clk    => CLK_i,         
-      din       => rx_data_fifo_din_gckrx,      
-      wr_en     => rx_data_fifo_wr_en_gckrx,        
-      rd_en     => rx_data_fifo_rd_en,        
-      dout      => rx_data_fifo_dout,  
-      full      => rx_data_fifo_full_gckrx,         
-      overflow  => rx_data_fifo_overflow_gckrx,     
-      empty     => rx_data_fifo_empty,        
-      valid     => rx_data_fifo_valid         
+      din       => rx_msg_fifo_din_gckrx,      
+      wr_en     => rx_msg_fifo_wr_en_gckrx,        
+      rd_en     => rx_msg_fifo_rd_en,        
+      dout      => rx_msg_fifo_dout,  
+      full      => rx_msg_fifo_full_gckrx,         
+      overflow  => rx_msg_fifo_overflow_gckrx,     
+      empty     => rx_msg_fifo_empty,        
+      valid     => rx_msg_fifo_valid         
     );
 
 end generate;

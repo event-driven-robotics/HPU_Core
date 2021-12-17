@@ -349,22 +349,8 @@ component HPUCore is
     -- Processor interface
     --============================================
     Interrupt_o       : out std_logic;
-    
-    -- Debug signals interface
-    DBG_dataOk        : out std_logic;
-    DBG_rawi          : out std_logic_vector(15 downto 0);
-    DBG_data_written  : out std_logic;
-    DBG_dma_burst_counter : out std_logic_vector(10 downto 0);
-    DBG_dma_test_mode      : out std_logic;
-    DBG_dma_EnableDma      : out std_logic;
-    DBG_dma_is_running     : out std_logic;
-    DBG_dma_Length         : out std_logic_vector(10 downto 0);
-    DBG_dma_nedge_run      : out std_logic;
-    
-    
-    -- ADD USER PORTS ABOVE THIS LINE ------------------
-    
-    -- DO NOT EDIT BELOW THIS LINE ---------------------
+   
+
     -- Bus protocol ports, do not add to or delete  
     -- Axi lite I/f                                                                                                                                          
 --    S_AXI_ACLK        : in  std_logic;                                           --  AXI4LITE slave: Clock                                           
@@ -396,6 +382,7 @@ component HPUCore is
     M_AXIS_TLAST      : out std_logic;                                             --  Stream I/f: Optional data out qualifier                       
     M_AXIS_TREADY     : in  std_logic                                              --  Stream I/f: Connected slave device is ready to accept data out
     );
+
 
 --    attribute MAX_FANOUT  : string;
 --    attribute SIGIS       : string;
@@ -927,7 +914,7 @@ AUX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
 	);
 
 
-TX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator
+TX_SPINNAKER_EMULATOR_i : SpiNNaker_Emulator 
     generic map (
     HAS_ID     => "false",
     ID         => 0,
@@ -1194,7 +1181,7 @@ HPUCORE_i : HPUCore
         C_RX_L_HAS_SPNNLNK          => false, 
         C_RX_R_HAS_SPNNLNK          => false, 
         C_RX_A_HAS_SPNNLNK          => false, 
-        C_TX_HAS_SPNNLNK            => false,
+        C_TX_HAS_SPNNLNK            => true, 
         C_PSPNNLNK_WIDTH		        => 32,
         -- -----------------------
         -- INTERCEPTION
@@ -1393,21 +1380,6 @@ HPUCORE_i : HPUCore
         --============================================
         Interrupt_o       			=> open,
 
-        -- Debug signals interface
-        DBG_dataOk        			=> open,
-        DBG_rawi          			=> open,
-        DBG_data_written  			=> open,
-        DBG_dma_burst_counter 		=> open,
-        DBG_dma_test_mode      		=> open,
-        DBG_dma_EnableDma      		=> open,
-        DBG_dma_is_running     		=> open,
-        DBG_dma_Length         		=> open,
-        DBG_dma_nedge_run      		=> open,
-                                    
-
-        -- ADD USER PORTS ABOVE THIS LINE ------------------
-
-        -- DO NOT EDIT BELOW THIS LINE ---------------------
         -- Bus protocol ports, do not add to or delete
         -- Axi lite I/f
 --        S_AXI_ACLK        			=> HSSAER_ClkLS_p,
@@ -1452,55 +1424,7 @@ i_rst_in    <= '0', '1' after 150 ns;
 i_en        <= '0', '1' after 300 ns;
 i_FromSpeed <= 0.0, 2000.0 after 400 ns;
 
-Reset_Proc : process
-	begin
-		i_reset <= '0';
-		wait for 1 us;
-		i_reset <= '1';
-		wait for 1 us;
-		wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
-		i_reset <= '0';
-		wait;
-end process Reset_Proc;
 
-Start_Proc : process
-	begin
-		i_start <= '0';
-		wait for 10 us;
-		wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
-		i_start <= '1';
-		wait;
-end process Start_Proc;
-
-Enable_AER_Proc : process
-	begin
-		AER_device_enable_L   <= '1';
-		AER_device_enable_R   <= '1';
-		AER_device_enable_Aux <= '1';
-		AER_device_enable_Tx  <= '1';
-
-		wait for 30 us;
-		AER_device_enable_L   <= '1';
-		AER_device_enable_R   <= '1';
-		AER_device_enable_Aux <= '1';
-		AER_device_enable_Tx  <= '1';
-		wait;
-end process Enable_AER_Proc;
-
-Enable_SPNN_Proc : process
-	begin
-		SPNN_device_reset_L    <= '1';
-		SPNN_device_reset_R    <= '1';
-		SPNN_device_reset_Aux  <= '1';
-		SPNN_device_reset_Tx   <= '1';
-		
-		SPNN_device_enable_L   <= '0';
-    SPNN_device_enable_R   <= '0';
-    SPNN_device_enable_Tx  <= '0';
-    SPNN_device_enable_Aux <= '0';
- 
-		wait;
-end process Enable_SPNN_Proc;
 
 Axis_HPU_proc : process
 	variable seed1, seed2 : positive;
@@ -1617,6 +1541,54 @@ HS_Clock_Proc : process
 		end loop;
 end process HS_Clock_Proc;
 
+Reset_Proc : process
+	begin
+		i_reset <= '0';
+		wait for 1 us;
+		i_reset <= '1';
+		wait for 1 us;
+		wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+		i_reset <= '0';
+		wait;
+end process Reset_Proc;
 
+Start_Proc : process
+	begin
+		i_start <= '0';
+		wait for 10 us;
+		wait until (HSSAER_ClkLS_p'event and HSSAER_ClkLS_p='1');
+		i_start <= '1';
+		wait;
+end process Start_Proc;
 
-END;
+Enable_AER_Proc : process
+	begin
+		AER_device_enable_L   <= '0';
+		AER_device_enable_R   <= '0';
+		AER_device_enable_Aux <= '0';
+		AER_device_enable_Tx  <= '1';
+
+		wait for 30 us;
+		AER_device_enable_L   <= '0';
+		AER_device_enable_R   <= '0';
+		AER_device_enable_Aux <= '0';
+		AER_device_enable_Tx  <= '1';
+		wait;
+end process Enable_AER_Proc;
+
+Enable_SPNN_Proc : process
+	begin
+		SPNN_device_reset_L    <= '0';
+		SPNN_device_reset_R    <= '0';
+		SPNN_device_reset_Aux  <= '0';
+		SPNN_device_reset_Tx   <= '0';
+		
+		SPNN_device_enable_L   <= '0';
+    SPNN_device_enable_R   <= '0';
+    SPNN_device_enable_Tx  <= '1';
+    SPNN_device_enable_Aux <= '0';
+ 
+		wait;
+end process Enable_SPNN_Proc;
+
+end;

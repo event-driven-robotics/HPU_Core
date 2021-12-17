@@ -226,8 +226,8 @@ end entity axilite;
 architecture rtl of axilite is
 
     constant cVer   : string(3 downto 1) := "HPU";
-    constant cMAJOR : std_logic_vector(3 downto 0) :="0011";
-    constant cMINOR : std_logic_vector(3 downto 0) :="0110";
+    constant cMAJOR : std_logic_vector(3 downto 0) :="0100";
+    constant cMINOR : std_logic_vector(3 downto 0) :="0000";
 
     constant c_zero_vect : std_logic_vector(31 downto 0) := (others => '0');
 

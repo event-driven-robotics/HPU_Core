@@ -8,61 +8,64 @@ WAT 1000
 
 
 ## -------------------------------------------------------------------------------------------------------------------------------------------
-## RX
-
-
-## ##  Control Register
-## WRD CTRL    00000002   ## Abilitazione DMA
-## WAT 100
-## 
-## ##  Abilitazione e configurazione PAER Left
-## WRD RXPAERCF 02000103
-## WAT 100
-## WRD RX_CTRL 00000002
-## WAT 100
-## 
-## ##  Abilitazione Rx GTP Left
-## ##  WRD RX_CTRL 00000004
-## ##  WAT 100
-## 
-## ##  Control Register
-## WRD CTRL    00001002  ##  Reset dello streaming
-## WAT 100
-## 
-## ##  Reset della Fifo RX
-## WRD CTRL    00000012
-## WAT 100
-
-## -------------------------------------------------------------------------------------------------------------------------------------------
-## TX
+## COMMON
 
 ## Control Register
 WRD CTRL    00000002   ## Abilitazione DMA
 WAT 100
 
 ## Control Register
-WRD CTRL    00000112   ## Reset della fifo TX e RX
+WRD CTRL    00000112   ## Reset della fifo TX, RX e dello Streaming
 WAT 100
 
-## Control Register
-WRD CTRL    00001002   ## Reset dello Streaming
-WAT 100
 
-## PAER Configuration Register
+
+## -------------------------------------------------------------------------------------------------------------------------------------------
+## RX
+
+##       RX PAER Configuration register 
+##       WRD RXPAERCF 02000103    ## Configurazione PAER Left
+##       WAT 100
+##       
+##       RX Control register      ## Abilitazione PAER Left
+##       WRD RX_CTRL 00000002
+##       WAT 100
+ 
+
+
+## -------------------------------------------------------------------------------------------------------------------------------------------
+## TX
+
+## TX PAER Configuration Register
 WRD TXPAERCF 00000003  ## Configurazione PAER
 WAT 100
 
-## Abilitazione Tx GTP
-## WRD TX_CTRL 00002074
+## TX Control Register
+WRD TX_CTRL 00001002  ## Abilitazione Tx PAER, Timing mode ASAP
+WAT 100
+     
+
+
+##       ## TX Control Register
+##       WRD TX_CTRL 00001068  ## Abilitazione Tx SpiNNaker, Timing mode ASAP
+##       WAT 100
+##       
+##       ## SpiNNlink Control Register 
+##       WRD SPNCTRL 00000003  ## force START, Timeout Disable
+##       
+##       
+
+
+## -------------------------------------------------------------------------------------------------------------------------------------------
+## Others
+
+## Control Register
+## WRD CTRL    02000002   ## Abilitazione Near Loopback
+## WRD CTRL    40000002   ## Abilitazione Far Loopback
 ## WAT 100
 
-## TX Control Register
-WRD TX_CTRL 00001002  ## Abilitazione Tx PAER
-WAT 100
 
-## TX Control Register
-WRD CTRL    00004002  ## Abilitazione Only Events Tx 
-WAT 100
+
 
 
 
@@ -101,6 +104,11 @@ DMW	16	1		00000E78	000000E0	00000E88	000000E1	00000E98	000000E2	00000EA8	000000E
 DMW	16	1		00000EF8	000000E8	00000F08	000000E9	00000F18	000000EA	00000F28	000000EB	00000F38	000000EC	00000F48	000000ED	00000F58	000000EE	00000F68	000000EF
 DMW	16	1		00000F78	000000F0	00000F88	000000F1	00000F98	000000F2	00000FA8	000000F3	00000FB8	000000F4	00000FC8	000000F5	00000FD8	000000F6	00000FE8	000000F7
 DMW	16	1		00000FF8	000000F8	00001008	000000F9	00001018	000000FA	00001028	000000FB	00001038	000000FC	00001048	000000FD	00001058	000000FE	00001068	000000FF
+
+WAT 5000
+## TX Control Register
+WRD TX_CTRL 00001000  ## Disabilitazione Tx PAER, Timing mode ASAP
+
 
 
 
