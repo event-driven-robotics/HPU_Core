@@ -108,6 +108,7 @@
 #define HPU_IPCONFIG_TXSPINN	BIT(11)
 #define HPU_IPCONFIG_TXSAERCH	12
 #define HPU_FIFOTHRESHOLD_REG	0x54
+#define HPU_LPBK_AUX_CNFG_REG 	0x58
 #define HPU_VER_REG		0x5C
 #define HPU_AUX_RXCTRL_REG	0x60
 #define HPU_AUX_RX_ERR_REG	0x64
@@ -305,6 +306,7 @@ static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_TXPAERCNFG_REG",		0x4C},
 	{"HPU_IPCONFIG_REG",		0x50},
 	{"HPU_FIFOTHRESHOLD_REG",	0x54},
+	{"HPU_LPBK_AUX_CNFG_REG", 	0x58},
 	{"HPU_VER_REG",			0x5C},
 	{"HPU_AUX_RXCTRL_REG",		0x60},
 	{"HPU_AUX_RX_ERR_REG",		0x64},
@@ -1846,6 +1848,11 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 		hpu_reg_write(priv, 0xba980000, HPU_LPBK_LR_CNFG_REG);
 	else
 		hpu_reg_write(priv, 0x0, HPU_LPBK_LR_CNFG_REG);
+
+	if (loop == LOOP_LSAER_AUX)
+		hpu_reg_write(priv, 0xba90, HPU_LPBK_AUX_CNFG_REG);
+	else
+		hpu_reg_write(priv, 0x0, HPU_LPBK_AUX_CNFG_REG);
 
 	return 0;
 }
