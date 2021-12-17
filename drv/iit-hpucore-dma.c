@@ -2035,6 +2035,9 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		return -EBUSY;
 	}
 
+#ifdef HPU_DMA_DEFER_SUBMIT
+	hpu_rx_dma_thread_create(priv);
+#endif
 	hpu_clk_enable(priv);
 
 	priv->rx_blocking_threshold = ~0;
@@ -2188,6 +2191,13 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 
 	cancel_work_sync(&priv->rx_housekeeping_work);
+
+#ifdef HPU_DMA_DEFER_SUBMIT
+	hpu_rx_dma_thread_terminate(priv);
+#endif
+
+	dmaengine_terminate_sync(priv->dma_rx_chan);
+	dmaengine_terminate_sync(priv->dma_tx_chan);
 
 	hpu_dma_release(priv);
 	priv->hpu_is_opened = 0;
@@ -2632,9 +2642,6 @@ static int hpu_register_chardev(struct hpu_priv *priv)
 
 static int hpu_unregister_chardev(struct hpu_priv *priv)
 {
-#ifdef HPU_DMA_DEFER_SUBMIT
-	hpu_rx_dma_thread_terminate(priv);
-#endif
 	cdev_del(&priv->cdev);
 	device_destroy(hpu_class, priv->devt);
 	ida_simple_remove(&hpu_ida, priv->id);
@@ -2785,9 +2792,6 @@ static int hpu_probe(struct platform_device *pdev)
 	init_completion(&priv->dma_rx_pool.completion);
 	init_completion(&priv->dma_tx_pool.completion);
 
-#ifdef HPU_DMA_DEFER_SUBMIT
-	hpu_rx_dma_thread_create(priv);
-#endif
 	hpu_register_chardev(priv);
 
 	if (hpu_debugfsdir) {
