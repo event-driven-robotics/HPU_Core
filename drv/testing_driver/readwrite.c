@@ -75,6 +75,9 @@
 #define IOC_SET_AXIS_LATENCY		_IOW(IOC_MAGIC_NUMBER, 28, unsigned int *)
 #define IOC_GET_RX_PN			_IOR(IOC_MAGIC_NUMBER, 29, unsigned int *)
 
+#define IOC_SET_RX_TS_ENABLE		_IOW(IOC_MAGIC_NUMBER, 40, unsigned int *)
+#define IOC_SET_TX_TS_ENABLE		_IOW(IOC_MAGIC_NUMBER, 41, unsigned int *)
+
 typedef enum {
 	/* order matters here! Must be consistent with the following array */
 	LOOP_NONE,
@@ -146,6 +149,22 @@ void _write_data(int chunk_size, int chunk_num, int magic)
 	}
 }
 
+void _write_data_nots(int chunk_size, int chunk_num, int magic)
+{
+	int i, j;
+	int ret;
+
+	for (i = 0; i < chunk_num; i++) {
+		for (j = 0; j < chunk_size; j++) {
+			wdata[j] = (magic << 16) |
+				((i * chunk_size + j) & 0xffff);
+		}
+		ret = write(iit_hpu, wdata, 4 * chunk_size);
+		if (ret != 4 * chunk_size)
+			fprintf(stderr, "Written only %d insted of %d\n", ret, 8 * chunk_size);
+	}
+}
+
 void _read_data(int chunk_size, int chunk_num, int magic)
 {
 	int i, j;
@@ -177,6 +196,29 @@ void read_data(int chunk_size, int chunk_num)
 {
 	_read_data(chunk_size, chunk_num, 0x5a);
 }
+
+void _read_data_nots(int chunk_size, int chunk_num, int magic)
+{
+	int i, j;
+	uint32_t tmp, tmp2;
+	int ret;
+
+	for (i = 0; i < chunk_num; i++) {
+		ret = read(iit_hpu, data,  4 * chunk_size);
+		if (ret != 4 * chunk_size) {
+			printf("read returned %d\n", ret);
+		} else {
+			for (j = 0; j < chunk_size; j++) {
+				tmp = (magic << 16) | ((i * chunk_size + j) & 0xffff);
+				tmp2 = data[j];
+				if (tmp2 != tmp)
+					printf("error at %d,%d: rcv: %x exp: %x\n",
+					       i, j, tmp2, tmp);
+			}
+		}
+	}
+}
+
 
 void read_thr_data(int chunk_size, int chunk_num)
 {
@@ -306,6 +348,10 @@ int main(int argc, char * argv[])
 		printf("loop cfg ioctl failed with err %d\n", ret);
 		return ret;
 	}
+
+	val = 1;
+	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
+	ioctl(iit_hpu, IOC_SET_TX_TS_ENABLE, &val);
 
 	memset((void*)&rxiface, 0, sizeof(rxiface));
 	memset((void*)&txiface, 0, sizeof(txiface));
@@ -450,6 +496,27 @@ int main(int argc, char * argv[])
 		_read_data(rx_size, rx_n, 0x55);
 	}
 	printf("phase 6 OK\n");
+
+	val = 0;
+	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
+
+	for (i = 0; i < iter_count; i++) {
+		_write_data(tx_size, tx_n, 0x57);
+		_read_data_nots(rx_size, rx_n, 0x57);
+	}
+	printf("disabling RX TS is OK\n");
+
+	val = 0;
+	ioctl(iit_hpu, IOC_SET_TX_TS_ENABLE, &val);
+
+	val = 1;
+	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
+
+	for (i = 0; i < iter_count; i++) {
+		_write_data_nots(tx_size, tx_n, 0x58);
+		_read_data(rx_size, rx_n, 0x58);
+	}
+	printf("disabling TX TS is OK\n");
 
 	return 0;
 }
