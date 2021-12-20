@@ -1827,8 +1827,6 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 
 	spin_lock_irqsave(&priv->irq_lock, flags);
 	priv->loop_bits = loop_bits[loop];
-	spin_unlock_irqrestore(&priv->irq_lock, flags);
-
 
 	if (!hpu_rx_is_suspended(priv)) {
 		priv->ctrl_reg &= ~HPU_CTRL_LOOP_MASK;
