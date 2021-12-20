@@ -1998,22 +1998,31 @@ static void hpu_get_hw_status(struct hpu_priv *priv, hpu_hw_status_t *status)
 
 static int hpu_set_rx_ts_enable(struct hpu_priv *priv, unsigned int val)
 {
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->irq_lock, flags);
 	if (val)
 		priv->ctrl_reg &= ~HPU_CTRL_DISABLE_RX_TS;
 	else
 		priv->ctrl_reg |= HPU_CTRL_DISABLE_RX_TS;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
 	return 0;
 }
 
 static int hpu_set_tx_ts_enable(struct hpu_priv *priv, unsigned int val)
 {
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->irq_lock, flags);
 	if (val)
 		priv->ctrl_reg &= ~HPU_CTRL_DISABLE_TX_TS;
 	else
 		priv->ctrl_reg |= HPU_CTRL_DISABLE_TX_TS;
+
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
 	return 0;
 }
