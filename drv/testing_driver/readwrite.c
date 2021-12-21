@@ -487,6 +487,20 @@ int main(int argc, char * argv[])
 
 	printf("fifo full %s\n", (ret < 0) ? "OK" : "not detected");
 
+	/*
+	 * If the IP has been synthesized with at least one "real"
+	 * interface (e.g. paer), then during near-loop fifo-overflow
+	 * RX-suspend state, the TXFIFO discards data, i.e TXDATA is
+	 * discarded until the fifo-full condition is is recovered
+	 * (i.e. a read is attempted).
+	 * Do a dummy one without blocking, then go on.
+	 */
+	if (loop_type = LOOP_LNEAR) {
+		size = 0x0;
+		ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
+		read(iit_hpu, data,  8);
+	}
+
 	size = 0x7fff0000;
 	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
 
