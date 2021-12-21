@@ -365,10 +365,10 @@ typedef enum {
 ```
 
 ## HPU_IOCTL_SET_RX_TS_ENABLE
-Enables/disables RX timestamping. When disabled all RX words contains events; timestamp are othewise interleaved.
+Enables/disables RX timestamping. When disabled all RX words contain events; timestamps are othewise interleaved.
 
 ## HPU_IOCTL_SET_TX_TS_ENABLE
-Enables/disable specifying TX time in TX buffer. When disabled all TX words contains data; TX time is otherwise interleaved.
+Enables/disable specifying TX time in TX buffer. When disabled all TX words contain data; TX time is otherwise interleaved.
 
 
 Module parameters
