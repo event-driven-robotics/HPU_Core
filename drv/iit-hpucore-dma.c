@@ -2374,7 +2374,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		hpu_reg_write(priv, 0, HPU_WRAP_REG);
 		break;
 
-	case _IOR(0x0, HPU_IOCTL_READVERSION, unsigned int):
+	case _IOR(0x0, HPU_IOCTL_READVERSION, unsigned int *):
 		ret = hpu_reg_read(priv, HPU_VER_REG);
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
