@@ -1822,7 +1822,8 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 		return -EINVAL;
 	}
 
-	if (! (loop_bits[loop] & priv->can_loop))
+	if (! ((loop_bits[loop] & priv->can_loop) ||
+	       (loop == LOOP_NONE)))
 	    return -ENOTSUPP;
 
 	spin_lock_irqsave(&priv->irq_lock, flags);
