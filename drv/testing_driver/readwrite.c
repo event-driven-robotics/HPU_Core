@@ -495,7 +495,7 @@ int main(int argc, char * argv[])
 	 * (i.e. a read is attempted).
 	 * Do a dummy one without blocking, then go on.
 	 */
-	if (loop_type = LOOP_LNEAR) {
+	if (loop_type == LOOP_LNEAR) {
 		size = 0x0;
 		ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
 		read(iit_hpu, data,  8);
