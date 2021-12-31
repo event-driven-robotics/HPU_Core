@@ -216,6 +216,14 @@ signal DBG_FIFO1 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
 signal DBG_FIFO2 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
 signal DBG_FIFO3 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
 signal DBG_FIFO4 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+
+
+-- -----------------------------------------------------------------------------
+-- DEBUG
+attribute mark_debug : string;
+attribute mark_debug of i_InPaerSrc               : signal is "true";
+attribute mark_debug of i_InPaerDst               : signal is "true";
+
    
 
 begin

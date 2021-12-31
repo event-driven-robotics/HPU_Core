@@ -66,7 +66,7 @@ entity HPUcore_tb is
         );
 end HPUcore_tb;
  
-architecture behavior of HPUcore_tb is          
+architecture behavior of HPUcore_tb is           
     
 -- Clock generation constants   
 
@@ -1566,13 +1566,13 @@ Enable_AER_Proc : process
 		AER_device_enable_L   <= '0';
 		AER_device_enable_R   <= '0';
 		AER_device_enable_Aux <= '0';
-		AER_device_enable_Tx  <= '1';
+		AER_device_enable_Tx  <= '0';
 
 		wait for 30 us;
 		AER_device_enable_L   <= '0';
 		AER_device_enable_R   <= '0';
 		AER_device_enable_Aux <= '0';
-		AER_device_enable_Tx  <= '1';
+		AER_device_enable_Tx  <= '0';
 		wait;
 end process Enable_AER_Proc;
 
@@ -1585,7 +1585,7 @@ Enable_SPNN_Proc : process
 		
 		SPNN_device_enable_L   <= '0';
     SPNN_device_enable_R   <= '0';
-    SPNN_device_enable_Tx  <= '1';
+    SPNN_device_enable_Tx  <= '0';
     SPNN_device_enable_Aux <= '0';
  
 		wait;

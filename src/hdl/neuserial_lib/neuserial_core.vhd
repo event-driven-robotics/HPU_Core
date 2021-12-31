@@ -585,7 +585,10 @@ signal i_AuxRxGtpMessageRate  : std_logic_vector( 7 downto 0);
 
 
 -- DEBUG
--- attribute mark_debug : string;
+attribute mark_debug : string;
+attribute mark_debug of LRxHSSaerEn_i       : signal is "true";
+attribute mark_debug of RRxHSSaerEn_i       : signal is "true";
+
 -- attribute mark_debug of RRx_GTP_RxUsrClk2_i       : signal is "true";
 -- attribute mark_debug of RRx_GTP_SoftResetRx_o     : signal is "true";         
 -- attribute mark_debug of RRx_GTP_DataValid_o       : signal is "true";           

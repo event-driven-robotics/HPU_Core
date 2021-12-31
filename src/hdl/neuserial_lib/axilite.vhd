@@ -1673,7 +1673,7 @@ begin
     i_TxTSTimeoutSel  <= i_TX_CTRL_reg(19 downto 16);
     i_TxTSRearmCmd    <= i_TX_CTRL_reg(15); -- **** NOTE: Cleared after Write
     i_TxTSRetrigCmd   <= i_TX_CTRL_reg(14); -- **** NOTE: Cleared after Write
-    i_TxTSMode        <= i_TX_CTRL_reg(13 downto 12);
+    i_TxTSMode        <= i_TX_CTRL_reg(13 downto 12)   when (i_OnlyEventsTx = '0') else "01"; -- When data doesn't contain Timestamp, the timing mode is set to "Asap"
     i_TxSaerChanEn    <= i_TX_CTRL_reg(11 downto  8)   when C_TX_HAS_HSSAER  else (others => '0');
 --                    <= i_TX_CTRL_reg(7);               -- Available   
     i_TxDestSwitch    <= i_TX_CTRL_reg(6 downto 4)     when (C_TX_HAS_HSSAER or C_TX_HAS_SPNNLNK or C_TX_HAS_GTP or C_TX_HAS_PAER) else "000";

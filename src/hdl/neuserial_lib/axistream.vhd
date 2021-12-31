@@ -96,10 +96,7 @@ attribute mark_debug of M_AXIS_TVALID             : signal is "true";
 attribute mark_debug of M_AXIS_TDATA              : signal is "true";
 attribute mark_debug of M_AXIS_TLAST              : signal is "true";
 attribute mark_debug of M_AXIS_TREADY             : signal is "true";
-attribute mark_debug of FifoRxDat_i               : signal is "true";
-attribute mark_debug of FifoRxRead_o              : signal is "true";
-attribute mark_debug of FifoRxEmpty_i             : signal is "true";
-attribute mark_debug of FifoRxLastData_i          : signal is "true";
+
 
 -- attribute mark_debug of i_TlastTimerLock          : signal is "true";
 attribute mark_debug of i_TlastTimer              : signal is "true";

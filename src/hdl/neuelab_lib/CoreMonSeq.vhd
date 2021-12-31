@@ -213,6 +213,17 @@ signal TxFifoDinLsB         : std_logic_vector(31 downto 0);
 -----------------------------------------------------------------------------
 -- Debug attributes
 attribute mark_debug : string;
+attribute mark_debug of RxFifoReset              : signal is "true";
+attribute mark_debug of RxFifoWrEn              : signal is "true";
+attribute mark_debug of RxFifoRdEn              : signal is "true";
+attribute mark_debug of RxFifoEmpty              : signal is "true";
+attribute mark_debug of RxFifoFull              : signal is "true";
+attribute mark_debug of RxFifoAlmostEmpty              : signal is "true";
+attribute mark_debug of FifoRxNumData_o              : signal is "true";
+attribute mark_debug of RxFifoWrRstBusy              : signal is "true";
+attribute mark_debug of RxFifoRdRstBusy              : signal is "true";
+attribute mark_debug of MonOutAddrEvt              : signal is "true";
+attribute mark_debug of FifoRxDat_o              : signal is "true";
 
 
 begin
@@ -245,7 +256,7 @@ SEQUENCER_m : sequencer
     --
     En100us_i            => Timing_i.en100us,
     -- 
-    TSMode_i             => TxTSMode_i,
+    TSMode_i             => TxTSMode_i,         -- NOTE: When data doesn't contain Timestamp, the timing mode is set to "Asap" in "axilite" module
     TSTimeoutSel_i       => TxTSTimeoutSel_i,
     TSMaskSel_i          => TxTSMaskSel_i,
     --
