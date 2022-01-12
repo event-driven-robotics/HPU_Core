@@ -1148,8 +1148,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			/* if we have read enough not to block then return now */
 			if (read >= priv->rx_blocking_threshold) {
 				spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
-				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
-				return read;
+				goto exit;
 			}
 
 			/* drain away any completion leftover */
@@ -1160,12 +1159,12 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			ret = wait_for_completion_killable_timeout(&priv->dma_rx_pool.completion,
 									msecs_to_jiffies(rx_to));
 			if (unlikely(ret < 0)) {
-				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
-				return ret;
+				read = ret;
+				goto exit;
 			} else if (unlikely(ret == 0)) {
 				dev_err(&priv->pdev->dev, "DMA timed out\n");
-				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
-				return -ETIMEDOUT;
+				read = -ETIMEDOUT;
+				goto exit;
 			}
 		}
 
@@ -1240,6 +1239,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			break;
 	}
 
+exit:
 	if (submitted) {
 #ifdef HPU_DMA_DEFER_SUBMIT
 		hpu_rx_dma_wake_deferred(priv);
