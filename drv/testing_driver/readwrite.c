@@ -16,6 +16,7 @@
 #include <termios.h>
 #include <time.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -165,23 +166,41 @@ void _write_data_nots(int chunk_size, int chunk_num, int magic)
 	}
 }
 
-void _read_data(int chunk_size, int chunk_num, int magic)
+void _read_data(int chunk_size, int chunk_num, int magic, int rx_ts)
 {
 	int i, j;
 	uint32_t tmp, tmp2, tmp3;
 	int ret;
+	int k = rx_ts ? 1 : 2;
+	int read_size;
 
 	for (i = 0; i < chunk_num; i++) {
-		ret = read(iit_hpu, data,  8 * chunk_size);
-		if (ret != 8 * chunk_size) {
-			printf("read returned %d\n", ret);
+		read_size = 8 * chunk_size / k;
+		ret = read(iit_hpu, data,  read_size);
+		if (ret != read_size) {
+			printf("read (rxts=%d) returned %d, expected %d\n",
+			       rx_ts, ret, read_size);
 		} else {
 			for (j = 0; j < chunk_size; j++) {
 				tmp = (magic << 16) | ((i * chunk_size + j) & 0xffff);
-				tmp2 = data[j * 2 + 1];
-				tmp3 = data[j * 2];
-				if (tmp2 != tmp)
-					printf("error at %d,%d: rcv: %x (ts %x) exp: %x\n", i, j,tmp2, tmp3, tmp);
+				if (rx_ts) {
+					tmp2 = data[j * 2 + 1];
+					tmp3 = data[j * 2];
+					if (tmp2 != tmp) {
+						printf("error at %d,%d: rcv: %x (ts %x) exp: %x\n",
+						       i, j,tmp2, tmp3, tmp);
+						exit(-1);
+					}
+				} else {
+					tmp2 = data[j];
+					if (tmp2 != tmp) {
+						printf("error at %d,%d: rcv: %x exp: %x\n",
+						       i, j, tmp2, tmp);
+						//system("cat /sys/kernel/debug/hpu/hpu.0x0000000080010000/regdump");
+						exit(-1);
+					}
+
+				}
 			}
 		}
 	}
@@ -194,31 +213,13 @@ void write_data(int chunk_size, int chunk_num)
 
 void read_data(int chunk_size, int chunk_num)
 {
-	_read_data(chunk_size, chunk_num, 0x5a);
+	_read_data(chunk_size, chunk_num, 0x5a, 1);
 }
 
 void _read_data_nots(int chunk_size, int chunk_num, int magic)
 {
-	int i, j;
-	uint32_t tmp, tmp2;
-	int ret;
-
-	for (i = 0; i < chunk_num; i++) {
-		ret = read(iit_hpu, data,  4 * chunk_size);
-		if (ret != 4 * chunk_size) {
-			printf("read returned %d\n", ret);
-		} else {
-			for (j = 0; j < chunk_size; j++) {
-				tmp = (magic << 16) | ((i * chunk_size + j) & 0xffff);
-				tmp2 = data[j];
-				if (tmp2 != tmp)
-					printf("error at %d,%d: rcv: %x exp: %x\n",
-					       i, j, tmp2, tmp);
-			}
-		}
-	}
+	_read_data(chunk_size, chunk_num, magic, 0);
 }
-
 
 void read_thr_data(int chunk_size, int chunk_num)
 {
@@ -246,8 +247,10 @@ void read_thr_data(int chunk_size, int chunk_num)
 		for (j = 0; j < chunk_size; j++) {
 			tmp = (0x5a << 16) | ((i * chunk_size + j) & 0xffff);
 			tmp2 = data[j * 2 + 1];
-			if (tmp2 != tmp)
+			if (tmp2 != tmp) {
 				printf("error at %d,%d: %x %x\n", i, j,tmp2, tmp);
+				exit(-1);
+			}
 		}
 	}
 }
@@ -267,6 +270,55 @@ int help_bail(char **argv)
 	fprintf(stderr, "%s near\n", argv[0]);
 	fprintf(stderr, "%s [spinn|paer|saer] [L|R|aux]\n", argv[0]);
 	return -1;
+}
+
+void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts)
+{
+	int i, ret;
+	unsigned int size;
+	/*
+	 * when rx timestamps are disabled we need to TX twice the data in order to
+	 * fill the RX fifo
+	 */
+	int k = rx_ts ? 2 : 1;
+
+	/* cause a fifo full: fill-up the RX ring and the RF FIFO, plus an extra data */
+	printf("intentionally causing fifo full..\n");
+	for (i = 0; i < rx_pn; i++) {
+		write_data(rx_ps / 4 / k, /*rx_pn*/ 1);
+		usleep(100);
+	}
+	for (i = 0; i < 8; i++) {
+		write_data(1024 / 4 / 2, /*rx_pn*/ 1);
+		usleep(100);
+	}
+#warning tweak_for_last_boot.bin_fifo_size___needs_better_handling
+	write_data(8 / k - (rx_ts ? 1 : 3), /*rx_pn*/ 1);
+	/* rx fifo depth can stand at 8192 data, that is 32Kbytes */
+	//write_data(32 * 1024 / 8 - 1, /*rx_pn*/ 1);
+	//write_data(1, /*rx_pn*/ 1);
+	printf("fifo filled..\n");
+	usleep(100000);
+	ret = read(iit_hpu, data, 8);
+
+	printf("fifo full %s\n", (ret < 0) ? "OK" : "not detected");
+
+	/*
+	 * If the IP has been synthesized with at least one "real"
+	 * interface (e.g. paer), then during near-loop fifo-overflow
+	 * RX-suspend state, the TXFIFO discards data, i.e TXDATA is
+	 * discarded until the fifo-full condition is is recovered
+	 * (i.e. a read is attempted).
+	 * Do a dummy one without blocking, then go on.
+	 */
+	if (loop_type == LOOP_LNEAR) {
+		size = 0x0;
+		ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
+		read(iit_hpu, data,  8);
+	}
+
+	size = 0x7fff0000;
+	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
 }
 
 int main(int argc, char * argv[])
@@ -468,46 +520,12 @@ int main(int argc, char * argv[])
 
 	printf("phase 5 OK (%f)\n", time_sec);
 
-	/* cause a fifo full: fill-up the RX ring and the RF FIFO, plus an extra data */
-	for (i = 0; i < rx_pn; i++) {
-		write_data(rx_ps / 8, /*rx_pn*/ 1);
-		usleep(100);
-	}
-	for (i = 0; i < 8; i++) {
-		write_data(1024 / 8, /*rx_pn*/ 1);
-		usleep(100);
-	}
-	write_data(4, /*rx_pn*/ 1);
-	/* rx fifo depth can stand at 8192 data, that is 32Kbytes */
-	//write_data(32 * 1024 / 8 - 1, /*rx_pn*/ 1);
-	//write_data(1, /*rx_pn*/ 1);
-	printf("fifo filled..\n");
-	usleep(100000);
-	ret = read(iit_hpu, data, 8);
-
-	printf("fifo full %s\n", (ret < 0) ? "OK" : "not detected");
-
-	/*
-	 * If the IP has been synthesized with at least one "real"
-	 * interface (e.g. paer), then during near-loop fifo-overflow
-	 * RX-suspend state, the TXFIFO discards data, i.e TXDATA is
-	 * discarded until the fifo-full condition is is recovered
-	 * (i.e. a read is attempted).
-	 * Do a dummy one without blocking, then go on.
-	 */
-	if (loop_type == LOOP_LNEAR) {
-		size = 0x0;
-		ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
-		read(iit_hpu, data,  8);
-	}
-
-	size = 0x7fff0000;
-	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
+	fill_fifo(rx_ps, rx_pn, loop_type, 1);
 
 	/* check for fifo-full recover */
 	for (i = 0; i < iter_count; i++) {
 		_write_data(tx_size, tx_n, 0x55);
-		_read_data(rx_size, rx_n, 0x55);
+		_read_data(rx_size, rx_n, 0x55, 1);
 	}
 	printf("phase 6 OK\n");
 
@@ -520,6 +538,14 @@ int main(int argc, char * argv[])
 	}
 	printf("disabling RX TS is OK\n");
 
+	fill_fifo(rx_ps, rx_pn, loop_type, 0);
+
+	for (i = 0; i < iter_count; i++) {
+		_write_data(tx_size, tx_n, 0x57);
+		_read_data_nots(rx_size, rx_n, 0x57);
+	}
+	printf("RX with disabled TS survived fifo full condition\n");
+
 	val = 0;
 	ioctl(iit_hpu, IOC_SET_TX_TS_ENABLE, &val);
 
@@ -528,7 +554,7 @@ int main(int argc, char * argv[])
 
 	for (i = 0; i < iter_count; i++) {
 		_write_data_nots(tx_size, tx_n, 0x58);
-		_read_data(rx_size, rx_n, 0x58);
+		_read_data(rx_size, rx_n, 0x58, 1);
 	}
 	printf("disabling TX TS is OK\n");
 
