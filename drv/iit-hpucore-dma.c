@@ -559,6 +559,7 @@ struct hpu_priv {
 	int axis_lat;
 	unsigned int rx_tlast_count;
 	unsigned int rx_data_count;
+
 	bool thread_exit;
 	bool can_disable_ts;
 	bool tx_ts_disable;
@@ -897,13 +898,26 @@ static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *re
 	dma_sync_single_for_cpu(&priv->pdev->dev, buffer->phys, priv->dma_rx_pool.ps,
 				DMA_FROM_DEVICE);
 #endif
+
+	/*
+	 * The magic word 0xf0cacc1a is legal in the following three cases
+	 * - as an early buffer terminator (len < ps)
+	 * - as an early buffer terminator with len == ps, if 0xf0cacc1a fills
+	 *   last word of the buffer. This can happen only with RX TS disabled
+	 * - as a legal timestamp, which cannot be there when RX TS are disabled
+	 */
 	if (len != priv->dma_rx_pool.ps) {
 		priv->early_tlast++;
 		len -= 4;
 		word = ((u32*)buffer->virt)[len / 4];
 		if (unlikely(word != 0xf0cacc1a))
 			dev_err(&priv->pdev->dev, "Got early TLAST, but no magic word\n");
+	} else if (priv->rx_ts_disable) {
+		word = ((u32*)buffer->virt)[len / 4 - 1];
+		if (word == 0xf0cacc1a)
+			len -= 4;
 	}
+
 	priv->byte_rxed += len;
 	priv->pkt_rxed++;
 
@@ -2002,6 +2016,7 @@ static int hpu_set_rx_ts_enable(struct hpu_priv *priv, unsigned int val)
 	unsigned long flags;
 
 	spin_lock_irqsave(&priv->irq_lock, flags);
+	priv->rx_ts_disable = !val;
 	if (val)
 		priv->ctrl_reg &= ~HPU_CTRL_DISABLE_RX_TS;
 	else
@@ -2676,6 +2691,7 @@ static int hpu_probe(struct platform_device *pdev)
 	}
 	priv->hpu_is_opened = 0;
 	priv->rx_fifo_status = FIFO_OK;
+	priv->rx_ts_disable = priv->tx_ts_disable = false;
 
 	mutex_init(&priv->access_lock);
 	spin_lock_init(&priv->irq_lock);
