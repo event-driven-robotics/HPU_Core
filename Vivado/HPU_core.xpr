@@ -45,13 +45,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="83"/>
-    <Option Name="WTModelSimExportSim" Val="83"/>
-    <Option Name="WTQuestaExportSim" Val="83"/>
-    <Option Name="WTIesExportSim" Val="83"/>
-    <Option Name="WTVcsExportSim" Val="83"/>
-    <Option Name="WTRivieraExportSim" Val="83"/>
-    <Option Name="WTActivehdlExportSim" Val="83"/>
+    <Option Name="WTXSimExportSim" Val="87"/>
+    <Option Name="WTModelSimExportSim" Val="87"/>
+    <Option Name="WTQuestaExportSim" Val="87"/>
+    <Option Name="WTIesExportSim" Val="87"/>
+    <Option Name="WTVcsExportSim" Val="87"/>
+    <Option Name="WTRivieraExportSim" Val="87"/>
+    <Option Name="WTActivehdlExportSim" Val="87"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -85,14 +85,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/FIFO_GTP_MSG_ZYNQUPLUS/FIFO_GTP_MSG_ZYNQUPLUS.xci">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/FIFO_GTP_DATA_ZYNQUPLUS/FIFO_GTP_DATA_ZYNQUPLUS.xci">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -280,30 +280,30 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_Manager.vhd">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/GT_Manager.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="GTP_lib"/>
+          <Attr Name="Library" Val="GT_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_enable_signal_cdc.vhd">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/GT_enable_signal_cdc.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="common_lib"/>
+          <Attr Name="Library" Val="GT_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/GT_pkg.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="GTP_lib"/>
+          <Attr Name="Library" Val="GT_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_time_machine.vhd">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/GT_time_machine.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="GTP_lib"/>
+          <Attr Name="Library" Val="GT_lib"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -490,6 +490,38 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_pkg.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="GTP_lib"/>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_Manager.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="GTP_lib"/>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_enable_signal_cdc.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="common_lib"/>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/GTP_lib/GTP_time_machine.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="GTP_lib"/>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/hdl/HPU_lib/TimestampWrapDetector.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU_lib"/>
@@ -513,6 +545,22 @@
       <File Path="$PPRDIR/../src/hdl/GTP_lib/GTPRX_HPU_ZYNQ/GTPRX_HPU_ZYNQ.xci">
         <FileInfo>
           <Attr Name="UserDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/GT_lib/FIFO_GTP_MSG_ZYNQ/FIFO_GTP_MSG_ZYNQ.xci">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/GT_lib/FIFO_GTP_DATA_ZYNQ/FIFO_GTP_DATA_ZYNQ.xci">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -637,32 +685,6 @@
         <Option Name="TopAutoSet" Val="TRUE"/>
       </Config>
     </FileSet>
-    <FileSet Name="FIFO_GTP_DATA_ZYNQ" Type="BlockSrcs" RelSrcDir="$PSRCDIR/FIFO_GTP_DATA_ZYNQ">
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/FIFO_GTP_DATA_ZYNQ/FIFO_GTP_DATA_ZYNQ.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="FIFO_GTP_DATA_ZYNQ"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
-    <FileSet Name="FIFO_GTP_MSG_ZYNQ" Type="BlockSrcs" RelSrcDir="$PSRCDIR/FIFO_GTP_MSG_ZYNQ">
-      <File Path="$PPRDIR/../src/hdl/GTP_lib/FIFO_GTP_MSG_ZYNQ/FIFO_GTP_MSG_ZYNQ.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="FIFO_GTP_MSG_ZYNQ"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
     <FileSet Name="FIFO_SAER_ZYNQ" Type="BlockSrcs" RelSrcDir="$PSRCDIR/FIFO_SAER_ZYNQ">
       <File Path="$PPRDIR/../src/Vivado_ip/FIFO_SAER_ZYNQ/FIFO_SAER_ZYNQ.xci">
         <FileInfo>
@@ -719,26 +741,6 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="FIFO_GTP_DATA_ZYNQ_synth_1" Type="Ft3:Synth" SrcSet="FIFO_GTP_DATA_ZYNQ" Part="xczu5ev-sfvc784-2-i" ConstrsSet="FIFO_GTP_DATA_ZYNQ" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/FIFO_GTP_DATA_ZYNQ_synth_1" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="FIFO_GTP_MSG_ZYNQ_synth_1" Type="Ft3:Synth" SrcSet="FIFO_GTP_MSG_ZYNQ" Part="xczu5ev-sfvc784-2-i" ConstrsSet="FIFO_GTP_MSG_ZYNQ" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/FIFO_GTP_MSG_ZYNQ_synth_1" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
     <Run Id="FIFO_SAER_ZYNQ_synth_1" Type="Ft3:Synth" SrcSet="FIFO_SAER_ZYNQ" Part="xczu5ev-sfvc784-2-i" ConstrsSet="FIFO_SAER_ZYNQ" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/FIFO_SAER_ZYNQ_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
@@ -773,40 +775,6 @@
         <Step Id="write_bitstream"/>
       </Strategy>
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="FIFO_GTP_DATA_ZYNQ_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="FIFO_GTP_DATA_ZYNQ" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="FIFO_GTP_DATA_ZYNQ_synth_1" IncludeInArchive="false" GenFullBitstream="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="FIFO_GTP_MSG_ZYNQ_impl_1" Type="Ft2:EntireDesign" Part="xczu5ev-sfvc784-2-i" ConstrsSet="FIFO_GTP_MSG_ZYNQ" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="FIFO_GTP_MSG_ZYNQ_synth_1" IncludeInArchive="false" GenFullBitstream="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2020"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>

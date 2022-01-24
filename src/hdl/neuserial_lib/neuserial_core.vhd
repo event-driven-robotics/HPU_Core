@@ -37,352 +37,388 @@ library spinn_neu_if_lib;
 
 entity neuserial_core is
   generic (
-    -- -----------------------    
+    -- -----------------------              
     -- GENERAL
-    C_FAMILY                  : string                        := "zynq"; -- "zynq", "zynquplus" 
-    -- -----------------------    
-    -- PAER        
-    C_RX_L_HAS_PAER           : boolean                       := true;
-    C_RX_R_HAS_PAER           : boolean                       := true;
-    C_RX_A_HAS_PAER           : boolean                       := true;
-    C_RX_PAER_L_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
-    C_RX_PAER_R_SENS_ID       : std_logic_vector(2 downto 0)  := "000";
-    C_RX_PAER_A_SENS_ID       : std_logic_vector(2 downto 0)  := "001";
-    C_TX_HAS_PAER             : boolean                       := true;
-    C_PAER_DSIZE              : natural range 1 to 29         := 24;
-    -- -----------------------        
-    -- HSSAER
-    C_RX_L_HAS_HSSAER         : boolean                       := true;
-    C_RX_R_HAS_HSSAER         : boolean                       := true;
-    C_RX_A_HAS_HSSAER         : boolean                       := true;
-    C_RX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
-    C_RX_SAER0_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-    C_RX_SAER1_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-    C_RX_SAER2_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-    C_RX_SAER3_L_SENS_ID      : std_logic_vector(2 downto 0)  := "000";        
-    C_RX_SAER0_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-    C_RX_SAER1_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-    C_RX_SAER2_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";
-    C_RX_SAER3_R_SENS_ID      : std_logic_vector(2 downto 0)  := "000";        
-    C_RX_SAER0_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-    C_RX_SAER1_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-    C_RX_SAER2_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-    C_RX_SAER3_A_SENS_ID      : std_logic_vector(2 downto 0)  := "001";
-    C_TX_HAS_HSSAER           : boolean                       := true;
-    C_TX_HSSAER_N_CHAN        : natural range 1 to 4          := 3;
-    -- -----------------------        
-    -- GTP
-    C_RX_L_HAS_GTP            : boolean                       := true;
-    C_RX_R_HAS_GTP            : boolean                       := true;
-    C_RX_A_HAS_GTP            : boolean                       := true;
-    C_GTP_RXUSRCLK2_PERIOD_NS : real                          := 6.4;        
-    C_TX_HAS_GTP              : boolean                       := true;
-    C_GTP_TXUSRCLK2_PERIOD_NS : real                          := 6.4;  
-    C_GTP_DSIZE               : positive                      := 16;
+    C_FAMILY                              : string                        := "zynq"; -- "zynq", "zynquplus" 
     -- -----------------------                
+    -- PAER        
+    C_RX_L_HAS_PAER                       : boolean                       := true;
+    C_RX_R_HAS_PAER                       : boolean                       := true;
+    C_RX_A_HAS_PAER                       : boolean                       := true;
+    C_RX_PAER_L_SENS_ID                   : std_logic_vector(2 downto 0)  := "000";
+    C_RX_PAER_R_SENS_ID                   : std_logic_vector(2 downto 0)  := "000";
+    C_RX_PAER_A_SENS_ID                   : std_logic_vector(2 downto 0)  := "001";
+    C_TX_HAS_PAER                         : boolean                       := true;
+    C_PAER_DSIZE                          : natural range 1 to 29         := 24;
+    -- -----------------------                    
+    -- HSSAER
+    C_RX_L_HAS_HSSAER                     : boolean                       := true;
+    C_RX_R_HAS_HSSAER                     : boolean                       := true;
+    C_RX_A_HAS_HSSAER                     : boolean                       := true;
+    C_RX_HSSAER_N_CHAN                    : natural range 1 to 4          := 3;
+    C_RX_SAER0_L_SENS_ID                  : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER1_L_SENS_ID                  : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER2_L_SENS_ID                  : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER3_L_SENS_ID                  : std_logic_vector(2 downto 0)  := "000";        
+    C_RX_SAER0_R_SENS_ID                  : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER1_R_SENS_ID                  : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER2_R_SENS_ID                  : std_logic_vector(2 downto 0)  := "000";
+    C_RX_SAER3_R_SENS_ID                  : std_logic_vector(2 downto 0)  := "000";        
+    C_RX_SAER0_A_SENS_ID                  : std_logic_vector(2 downto 0)  := "001";
+    C_RX_SAER1_A_SENS_ID                  : std_logic_vector(2 downto 0)  := "001";
+    C_RX_SAER2_A_SENS_ID                  : std_logic_vector(2 downto 0)  := "001";
+    C_RX_SAER3_A_SENS_ID                  : std_logic_vector(2 downto 0)  := "001";
+    C_TX_HAS_HSSAER                       : boolean                       := true;
+    C_TX_HSSAER_N_CHAN                    : natural range 1 to 4          := 3;
+    -- -----------------------                    
+    -- GTP
+    C_RX_L_HAS_GTP                        : boolean                       := true;
+    C_RX_R_HAS_GTP                        : boolean                       := true;
+    C_RX_A_HAS_GTP                        : boolean                       := true;
+    C_GTP_RXUSRCLK2_PERIOD_NS             : real                          := 6.4;        
+    C_TX_HAS_GTP                          : boolean                       := true;
+    C_GTP_TXUSRCLK2_PERIOD_NS             : real                          := 6.4;  
+    C_GTP_DSIZE                           : positive                      := 16;
+    -- -----------------------                            
     -- SPINNLINK
-    C_RX_L_HAS_SPNNLNK        : boolean                       := true;
-    C_RX_R_HAS_SPNNLNK        : boolean                       := true;
-    C_RX_A_HAS_SPNNLNK        : boolean                       := true;
-    C_TX_HAS_SPNNLNK          : boolean                       := true;
-    C_PSPNNLNK_WIDTH      	  : natural range 1 to 32         := 32;
-    -- -----------------------
+    C_RX_L_HAS_SPNNLNK                    : boolean                       := true;
+    C_RX_R_HAS_SPNNLNK                    : boolean                       := true;
+    C_RX_A_HAS_SPNNLNK                    : boolean                       := true;
+    C_TX_HAS_SPNNLNK                      : boolean                       := true;
+    C_PSPNNLNK_WIDTH      	              : natural range 1 to 32         := 32;
+    -- -----------------------            
     -- INTERCEPTION
-    C_RX_L_INTERCEPTION       : boolean                       := false;
-    C_RX_R_INTERCEPTION       : boolean                       := false;
-    C_RX_A_INTERCEPTION       : boolean                       := false;
+    C_RX_L_INTERCEPTION                   : boolean                       := false;
+    C_RX_R_INTERCEPTION                   : boolean                       := false;
+    C_RX_A_INTERCEPTION                   : boolean                       := false;
     -- -----------------------
     -- SIMULATION
-    C_SIM_TIME_COMPRESSION     : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+    C_SIM_TIME_COMPRESSION                : boolean                      := false   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
   port (
     --
     -- Clocks & Reset
     ---------------------
     -- System Clock domain
-    CoreClk_i                   : in  std_logic;
-    nRst_CoreClk_i              : in  std_logic;
-    Timing_i                    : in  time_tick;
+    CoreClk_i                             : in  std_logic;
+    nRst_CoreClk_i                        : in  std_logic;
+    Timing_i                              : in  time_tick;
     -- DMA Clock Domain
-    AxisClk_i                   : in  std_logic;
-    nRst_AxisClk_i              : in  std_logic;
+    AxisClk_i                             : in  std_logic;
+    nRst_AxisClk_i                        : in  std_logic;
     -- HSSAER Clocks domain
-    Clk_hs_p                    : in  std_logic;
-    Clk_hs_n                    : in  std_logic;
-    Clk_ls_p                    : in  std_logic;
-    Clk_ls_n                    : in  std_logic;
+    Clk_hs_p                              : in  std_logic;
+    Clk_hs_n                              : in  std_logic;
+    Clk_ls_p                              : in  std_logic;
+    Clk_ls_n                              : in  std_logic;
     
     --
     -- TX Interface
     ---------------------
     -- Parallel AER
-    Tx_PAER_Addr_o              : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    Tx_PAER_Req_o               : out std_logic;
-    Tx_PAER_Ack_i               : in  std_logic;
+    Tx_PAER_Addr_o                        : out std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    Tx_PAER_Req_o                         : out std_logic;
+    Tx_PAER_Ack_i                         : in  std_logic;
     -- HSSAER channels
-    Tx_HSSAER_o                 : out std_logic_vector(0 to C_TX_HSSAER_N_CHAN-1);
+    Tx_HSSAER_o                           : out std_logic_vector(0 to C_TX_HSSAER_N_CHAN-1);
     -- GTP lines
-    Tx_TxGtpMsg_i               : in  std_logic_vector(7 downto 0);
-    Tx_TxGtpMsgSrcRdy_i         : in  std_logic;
-    Tx_TxGtpMsgDstRdy_o         : out std_logic;  
-    Tx_TxGtpAlignRequest_i      : in  std_logic;
-    Tx_TxGtpAlignFlag_o         : out std_logic;
-    Tx_GTP_TxUsrClk2_i          : in  std_logic;   
-    Tx_GTP_SoftResetTx_o        : out  std_logic;                                          
-    Tx_GTP_DataValid_o          : out std_logic;    
-    Tx_GTP_Txuserrdy_o          : out std_logic;                                           
-    Tx_GTP_Txdata_o             : out std_logic_vector(C_GTP_DSIZE-1 downto 0);            
-    Tx_GTP_Txcharisk_o          : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    Tx_GTP_PllLock_i            : in  std_logic;                                           
-    Tx_GTP_PllRefclklost_i      : in  std_logic;         
+    Tx_TxGtpMsg_i                         : in  std_logic_vector(7 downto 0);
+    Tx_TxGtpMsgSrcRdy_i                   : in  std_logic;
+    Tx_TxGtpMsgDstRdy_o                   : out std_logic;  
+    Tx_TxGtpAlignRequest_i                : in  std_logic;
+    Tx_TxGtpAlignFlag_o                   : out std_logic;
+    Tx_GTP_TxUsrClk2_i                    : in  std_logic;   
+    Tx_GTP_SoftResetTx_o                  : out  std_logic;                                          
+    Tx_GTP_DataValid_o                    : out std_logic;    
+    Tx_GTP_Txuserrdy_o                    : out std_logic;                                           
+    Tx_GTP_Txdata_o                       : out std_logic_vector(C_GTP_DSIZE-1 downto 0);            
+    Tx_GTP_Txcharisk_o                    : out std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    Tx_GTP_PllLock_i                      : in  std_logic;                                           
+    Tx_GTP_PllRefclklost_i                : in  std_logic;         
     -- SpiNNaker Interface
-    Tx_SPNN_Data_o              : out std_logic_vector(6 downto 0);
-    Tx_SPNN_Ack_i               : in  std_logic; 
+    Tx_SPNN_Data_o                        : out std_logic_vector(6 downto 0);
+    Tx_SPNN_Ack_i                         : in  std_logic; 
     
     --
     -- RX Left Interface
     ---------------------
     -- Parallel AER
-    LRx_PAER_Addr_i             : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    LRx_PAER_Req_i              : in  std_logic;
-    LRx_PAER_Ack_o              : out std_logic;
+    LRx_PAER_Addr_i                       : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    LRx_PAER_Req_i                        : in  std_logic;
+    LRx_PAER_Ack_o                        : out std_logic;
     -- HSSAER channels
-    LRx_HSSAER_i                : in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
+    LRx_HSSAER_i                          : in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
     -- GTP lines
-    LRx_RxGtpMsg_o              : out std_logic_vector(7 downto 0);
-    LRx_RxGtpMsgSrcRdy_o        : out std_logic;
-    LRx_RxGtpMsgDstRdy_i        : in  std_logic;  
-    LRx_RxGtpAlignRequest_o     : out std_logic;
-    LRx_GTP_RxUsrClk2_i         : in  std_logic;
-    LRx_GTP_SoftResetRx_o       : out  std_logic;                                          
-    LRx_GTP_DataValid_o         : out std_logic;          
-    LRx_GTP_Rxuserrdy_o         : out std_logic;              
-    LRx_GTP_Rxdata_i            : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);           
-    LRx_GTP_Rxchariscomma_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    LRx_GTP_Rxcharisk_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    LRx_GTP_Rxdisperr_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    LRx_GTP_Rxnotintable_i      : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);            
-    LRx_GTP_Rxbyteisaligned_i   : in  std_logic;                                           
-    LRx_GTP_Rxbyterealign_i     : in  std_logic;         
-    LRx_GTP_PllLock_i           : in  std_logic;                                           
-    LRx_GTP_PllRefclklost_i     : in  std_logic;   
-    -- SpiNNaker Interface
-    LRx_SPNN_Data_i             : in  std_logic_vector(6 downto 0); 
-    LRx_SPNN_Ack_o              : out std_logic;
+    LRx_RxGtpMsg_o                        : out std_logic_vector(7 downto 0);
+    LRx_RxGtpMsgSrcRdy_o                  : out std_logic;
+    LRx_RxGtpMsgDstRdy_i                  : in  std_logic;  
+    LRx_RxGtpAlignRequest_o               : out std_logic;
+    LRx_GTP_RxUsrClk2_i                   : in  std_logic;
+    LRx_GTP_SoftResetRx_o                 : out  std_logic;                                          
+    LRx_GTP_DataValid_o                   : out std_logic;          
+    LRx_GTP_Rxuserrdy_o                   : out std_logic;              
+    LRx_GTP_Rxdata_i                      : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);           
+    LRx_GTP_Rxchariscomma_i               : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    LRx_GTP_Rxcharisk_i                   : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    LRx_GTP_Rxdisperr_i                   : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    LRx_GTP_Rxnotintable_i                : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);            
+    LRx_GTP_Rxbyteisaligned_i             : in  std_logic;                                           
+    LRx_GTP_Rxbyterealign_i               : in  std_logic;         
+    LRx_GTP_PllLock_i                     : in  std_logic;                                           
+    LRx_GTP_PllRefclklost_i               : in  std_logic;      
+    -- GTH lines 
+    LRx_GTH_gtwiz_userclk_rx_usrclk2_i    : in std_logic_vector(0 downto 0);                
+    LRx_GTH_gtwiz_reset_all_o             : out std_logic_vector(0 downto 0);               
+    LRx_GTH_gtwiz_userdata_rx_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);   
+    LRx_GTH_Rxctrl2_i                     : in  std_logic_vector(7 downto 0);
+    LRx_GTH_Rxctrl0_i                     : in  std_logic_vector(15 downto 0);
+    LRx_GTH_Rxctrl1_i                     : in  std_logic_vector(15 downto 0);
+    LRx_GTH_Rxctrl3_i                     : in  std_logic_vector(7 downto 0);
+    LRx_GTH_Rxbyteisaligned_i             : in  std_logic_vector(0 downto 0);               
+    LRx_GTH_Rxbyterealign_i               : in  std_logic_vector(0 downto 0);               
+    LRx_GTH_Qpll_lock_i                   : in  std_logic_vector(0 downto 0);               
+    LRx_GTH_Qpll_refclklost_i             : in  std_logic_vector(0 downto 0);               
+   -- SpiNNaker Interface
+    LRx_SPNN_Data_i                       : in  std_logic_vector(6 downto 0); 
+    LRx_SPNN_Ack_o                        : out std_logic;
                           
     --
     -- RX Right Interface
     ---------------------
     -- Parallel AER
-    RRx_PAER_Addr_i             : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    RRx_PAER_Req_i              : in  std_logic;
-    RRx_PAER_Ack_o              : out std_logic;
+    RRx_PAER_Addr_i                       : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    RRx_PAER_Req_i                        : in  std_logic;
+    RRx_PAER_Ack_o                        : out std_logic;
     -- HSSAER channels
-    RRx_HSSAER_i               : in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
+    RRx_HSSAER_i                          : in  std_logic_vector(0 to C_RX_HSSAER_N_CHAN-1);
     -- GTP lines
-    RRx_RxGtpMsg_o              : out std_logic_vector(7 downto 0);
-    RRx_RxGtpMsgSrcRdy_o        : out std_logic;
-    RRx_RxGtpMsgDstRdy_i        : in  std_logic;  
-    RRx_RxGtpAlignRequest_o    : out std_logic;
-    RRx_GTP_RxUsrClk2_i         : in  std_logic;
-    RRx_GTP_SoftResetRx_o          : out  std_logic;                                          
-    RRx_GTP_DataValid_o         : out std_logic;          
-    RRx_GTP_Rxuserrdy_o         : out std_logic;              
-    RRx_GTP_Rxdata_i            : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);           
-    RRx_GTP_Rxchariscomma_i     : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    RRx_GTP_Rxcharisk_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    RRx_GTP_Rxdisperr_i         : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    RRx_GTP_Rxnotintable_i      : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);            
-    RRx_GTP_Rxbyteisaligned_i   : in  std_logic;                                           
-    RRx_GTP_Rxbyterealign_i     : in  std_logic;         
-    RRx_GTP_PllLock_i           : in  std_logic;                                           
-    RRx_GTP_PllRefclklost_i     : in  std_logic;   
+    RRx_RxGtpMsg_o                        : out std_logic_vector(7 downto 0);
+    RRx_RxGtpMsgSrcRdy_o                  : out std_logic;
+    RRx_RxGtpMsgDstRdy_i                  : in  std_logic;  
+    RRx_RxGtpAlignRequest_o               : out std_logic;
+    RRx_GTP_RxUsrClk2_i                   : in  std_logic;
+    RRx_GTP_SoftResetRx_o                 : out  std_logic;                                          
+    RRx_GTP_DataValid_o                   : out std_logic;          
+    RRx_GTP_Rxuserrdy_o                   : out std_logic;              
+    RRx_GTP_Rxdata_i                      : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);           
+    RRx_GTP_Rxchariscomma_i               : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    RRx_GTP_Rxcharisk_i                   : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    RRx_GTP_Rxdisperr_i                   : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    RRx_GTP_Rxnotintable_i                : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);            
+    RRx_GTP_Rxbyteisaligned_i             : in  std_logic;                                           
+    RRx_GTP_Rxbyterealign_i               : in  std_logic;         
+    RRx_GTP_PllLock_i                     : in  std_logic;                                           
+    RRx_GTP_PllRefclklost_i               : in  std_logic;
+    -- GTH lines 
+    RRx_GTH_gtwiz_userclk_rx_usrclk2_i    : in std_logic_vector(0 downto 0);                
+    RRx_GTH_gtwiz_reset_all_o             : out std_logic_vector(0 downto 0);               
+    RRx_GTH_gtwiz_userdata_rx_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);   
+    RRx_GTH_Rxctrl2_i                     : in  std_logic_vector(7 downto 0);
+    RRx_GTH_Rxctrl0_i                     : in  std_logic_vector(15 downto 0);
+    RRx_GTH_Rxctrl1_i                     : in  std_logic_vector(15 downto 0);
+    RRx_GTH_Rxctrl3_i                     : in  std_logic_vector(7 downto 0);
+    RRx_GTH_Rxbyteisaligned_i             : in  std_logic_vector(0 downto 0);               
+    RRx_GTH_Rxbyterealign_i               : in  std_logic_vector(0 downto 0);               
+    RRx_GTH_Qpll_lock_i                   : in  std_logic_vector(0 downto 0);               
+    RRx_GTH_Qpll_refclklost_i             : in  std_logic_vector(0 downto 0);  
     -- SpiNNaker Interface
-    RRx_SPNN_Data_i             : in  std_logic_vector(6 downto 0); 
-    RRx_SPNN_Ack_o              : out std_logic;
+    RRx_SPNN_Data_i                       : in  std_logic_vector(6 downto 0); 
+    RRx_SPNN_Ack_o                        : out std_logic;
                    
     --
     -- Aux Interface
     ---------------------
     -- Parallel AER
-    AuxRx_PAER_Addr_i           : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    AuxRx_PAER_Req_i            : in  std_logic;
-    AuxRx_PAER_Ack_o            : out std_logic;
+    AuxRx_PAER_Addr_i                     : in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    AuxRx_PAER_Req_i                      : in  std_logic;
+    AuxRx_PAER_Ack_o                      : out std_logic;
     -- HSSAER channels 
-    AuxRx_HSSAER_i              : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    AuxRx_HSSAER_i                        : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
     -- GTP lines
-    AuxRx_RxGtpMsg_o            : out std_logic_vector(7 downto 0);
-    AuxRx_RxGtpMsgSrcRdy_o      : out std_logic;
-    AuxRx_RxGtpMsgDstRdy_i      : in  std_logic;  
-    AuxRx_RxGtpAlignRequest_o   : out std_logic;
-    AuxRx_GTP_RxUsrClk2_i       : in  std_logic;
-    AuxRx_GTP_SoftResetRx_o     : out  std_logic;                                          
-    AuxRx_GTP_DataValid_o       : out std_logic;          
-    AuxRx_GTP_Rxuserrdy_o       : out std_logic;              
-    AuxRx_GTP_Rxdata_i          : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);           
-    AuxRx_GTP_Rxchariscomma_i   : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    AuxRx_GTP_Rxcharisk_i       : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    AuxRx_GTP_Rxdisperr_i       : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
-    AuxRx_GTP_Rxnotintable_i    : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);            
-    AuxRx_GTP_Rxbyteisaligned_i : in  std_logic;                                           
-    AuxRx_GTP_Rxbyterealign_i   : in  std_logic;         
-    AuxRx_GTP_PllLock_i         : in  std_logic;                                           
-    AuxRx_GTP_PllRefclklost_i   : in  std_logic;   
+    AuxRx_RxGtpMsg_o                      : out std_logic_vector(7 downto 0);
+    AuxRx_RxGtpMsgSrcRdy_o                : out std_logic;
+    AuxRx_RxGtpMsgDstRdy_i                : in  std_logic;  
+    AuxRx_RxGtpAlignRequest_o             : out std_logic;
+    AuxRx_GTP_RxUsrClk2_i                 : in  std_logic;
+    AuxRx_GTP_SoftResetRx_o               : out  std_logic;                                          
+    AuxRx_GTP_DataValid_o                 : out std_logic;          
+    AuxRx_GTP_Rxuserrdy_o                 : out std_logic;              
+    AuxRx_GTP_Rxdata_i                    : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);           
+    AuxRx_GTP_Rxchariscomma_i             : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    AuxRx_GTP_Rxcharisk_i                 : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    AuxRx_GTP_Rxdisperr_i                 : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);        
+    AuxRx_GTP_Rxnotintable_i              : in  std_logic_vector((C_GTP_DSIZE/8)-1 downto 0);            
+    AuxRx_GTP_Rxbyteisaligned_i           : in  std_logic;                                           
+    AuxRx_GTP_Rxbyterealign_i             : in  std_logic;         
+    AuxRx_GTP_PllLock_i                   : in  std_logic;                                           
+    AuxRx_GTP_PllRefclklost_i             : in  std_logic;
+    -- GTH lines 
+    AuxRx_GTH_gtwiz_userclk_rx_usrclk2_i  : in std_logic_vector(0 downto 0);                
+    AuxRx_GTH_gtwiz_reset_all_o           : out std_logic_vector(0 downto 0);               
+    AuxRx_GTH_gtwiz_userdata_rx_i         : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);   
+    AuxRx_GTH_Rxctrl2_i                   : in  std_logic_vector(7 downto 0);
+    AuxRx_GTH_Rxctrl0_i                   : in  std_logic_vector(15 downto 0);
+    AuxRx_GTH_Rxctrl1_i                   : in  std_logic_vector(15 downto 0);
+    AuxRx_GTH_Rxctrl3_i                   : in  std_logic_vector(7 downto 0);
+    AuxRx_GTH_Rxbyteisaligned_i           : in  std_logic_vector(0 downto 0);               
+    AuxRx_GTH_Rxbyterealign_i             : in  std_logic_vector(0 downto 0);               
+    AuxRx_GTH_Qpll_lock_i                 : in  std_logic_vector(0 downto 0);               
+    AuxRx_GTH_Qpll_refclklost_i           : in  std_logic_vector(0 downto 0); 
     -- SpiNNaker Interface 
-    AuxRx_SPNN_Data_i           : in  std_logic_vector(6 downto 0); 
-    AuxRx_SPNN_Ack_o            : out std_logic;              
+    AuxRx_SPNN_Data_i                     : in  std_logic_vector(6 downto 0); 
+    AuxRx_SPNN_Ack_o                      : out std_logic;              
     
     --
     -- FIFOs interfaces
     ---------------------
-    FifoRxDat_o                 : out std_logic_vector(63 downto 0);
-    FifoRxRead_i                : in  std_logic;
-    FifoRxEmpty_o               : out std_logic;
-    FifoRxAlmostEmpty_o         : out std_logic;
-    FifoRxLastData_o            : out std_logic;
-    FifoRxFull_o                : out std_logic;
-    FifoRxNumData_o             : out std_logic_vector(10 downto 0);
-    FifoRxResetBusy_o           : out std_logic;
+    FifoRxDat_o                           : out std_logic_vector(63 downto 0);
+    FifoRxRead_i                          : in  std_logic;
+    FifoRxEmpty_o                         : out std_logic;
+    FifoRxAlmostEmpty_o                   : out std_logic;
+    FifoRxLastData_o                      : out std_logic;
+    FifoRxFull_o                          : out std_logic;
+    FifoRxNumData_o                       : out std_logic_vector(10 downto 0);
+    FifoRxResetBusy_o                     : out std_logic;
     --
-    FifoTxDat_i                 : in  std_logic_vector(31 downto 0);
-    FifoTxWrite_i               : in  std_logic;
-    FifoTxLastData_i            : in  std_logic; 
-    FifoTxFull_o                : out std_logic;
-    FifoTxAlmostFull_o          : out std_logic;
-    FifoTxEmpty_o               : out std_logic;
-    FifoTxResetBusy_o           : out std_logic;
+    FifoTxDat_i                           : in  std_logic_vector(31 downto 0);
+    FifoTxWrite_i                         : in  std_logic;
+    FifoTxLastData_i                      : in  std_logic; 
+    FifoTxFull_o                          : out std_logic;
+    FifoTxAlmostFull_o                    : out std_logic;
+    FifoTxEmpty_o                         : out std_logic;
+    FifoTxResetBusy_o                     : out std_logic;
     
     -----------------------------------------------------------------------
     -- uController Interface
     ---------------------
     -- Control
-    CleanTimer_i                : in  std_logic;
-    FlushRXFifos_i              : in  std_logic;
-    FlushTXFifos_i              : in  std_logic;        
-    --TxEnable_i                : in  std_logic;
-    --TxPaerFlushFifos_i        : in  std_logic;
-    --LRxEnable_i               : in  std_logic;
-    --RRxEnable_i               : in  std_logic;
-    LRxPaerFlushFifos_i         : in  std_logic;
-    RRxPaerFlushFifos_i         : in  std_logic;
-    AuxRxPaerFlushFifos_i       : in  std_logic;
-    FullTimestamp_i             : in  std_logic;
+    CleanTimer_i                          : in  std_logic;
+    FlushRXFifos_i                        : in  std_logic;
+    FlushTXFifos_i                        : in  std_logic;        
+    --TxEnable_i                          : in  std_logic;
+    --TxPaerFlushFifos_i                  : in  std_logic;
+    --LRxEnable_i                         : in  std_logic;
+    --RRxEnable_i                         : in  std_logic;
+    LRxPaerFlushFifos_i                   : in  std_logic;
+    RRxPaerFlushFifos_i                   : in  std_logic;
+    AuxRxPaerFlushFifos_i                 : in  std_logic;
+    FullTimestamp_i                       : in  std_logic;
     
     -- Configurations
-    DmaLength_i                 : in  std_logic_vector(15 downto 0);
-    OnlyEventsRx_i              : in  std_logic;
-    OnlyEventsTx_i              : in  std_logic;
-    RemoteLoopback_i            : in  std_logic;
-    LocNearLoopback_i           : in  std_logic;
-    LocFarLPaerLoopback_i       : in  std_logic;
-    LocFarRPaerLoopback_i       : in  std_logic;
-    LocFarAuxPaerLoopback_i     : in  std_logic;
-    LocFarLSaerLoopback_i       : in  std_logic;
-    LocFarRSaerLoopback_i       : in  std_logic;
-    LocFarAuxSaerLoopback_i     : in  std_logic;
-    LocFarSaerLpbkCfg_i         : in  t_XConCfg;
-    LocFarSpnnLnkLoopbackSel_i  : in  std_logic_vector(1 downto 0);
+    DmaLength_i                           : in  std_logic_vector(15 downto 0);
+    OnlyEventsRx_i                        : in  std_logic;
+    OnlyEventsTx_i                        : in  std_logic;
+    RemoteLoopback_i                      : in  std_logic;
+    LocNearLoopback_i                     : in  std_logic;
+    LocFarLPaerLoopback_i                 : in  std_logic;
+    LocFarRPaerLoopback_i                 : in  std_logic;
+    LocFarAuxPaerLoopback_i               : in  std_logic;
+    LocFarLSaerLoopback_i                 : in  std_logic;
+    LocFarRSaerLoopback_i                 : in  std_logic;
+    LocFarAuxSaerLoopback_i               : in  std_logic;
+    LocFarSaerLpbkCfg_i                   : in  t_XConCfg;
+    LocFarSpnnLnkLoopbackSel_i            : in  std_logic_vector(1 downto 0);
     
-    TxPaerEn_i                  : in  std_logic;
-    TxHSSaerEn_i                : in  std_logic;
-    TxGtpEn_i                   : in  std_logic;
-    TxSpnnLnkEn_i               : in  std_logic;
-    TxDestSwitch_i              : in  std_logic_vector(2 downto 0);
-    --TxPaerIgnoreFifoFull_i    : in  std_logic;
-    TxPaerReqActLevel_i         : in  std_logic;
-    TxPaerAckActLevel_i         : in  std_logic;
-    TxSaerChanEn_i              : in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
-    --TxSaerChanCfg_i           : in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
+    TxPaerEn_i                            : in  std_logic;
+    TxHSSaerEn_i                          : in  std_logic;
+    TxGtpEn_i                             : in  std_logic;
+    TxSpnnLnkEn_i                         : in  std_logic;
+    TxDestSwitch_i                        : in  std_logic_vector(2 downto 0);
+    --TxPaerIgnoreFifoFull_i              : in  std_logic;
+    TxPaerReqActLevel_i                   : in  std_logic;
+    TxPaerAckActLevel_i                   : in  std_logic;
+    TxSaerChanEn_i                        : in  std_logic_vector(C_TX_HSSAER_N_CHAN-1 downto 0);
+    --TxSaerChanCfg_i                     : in  t_hssaerCfg_array(C_TX_HSSAER_N_CHAN-1 downto 0);
     
     -- TX Timestamp
-    TxTSMode_i                  : in  std_logic_vector(1 downto 0);
-    TxTSTimeoutSel_i            : in  std_logic_vector(3 downto 0);
-    TxTSRetrigCmd_i             : in  std_logic;
-    TxTSRearmCmd_i              : in  std_logic;
-    TxTSRetrigStatus_o          : out std_logic;
-    TxTSTimeoutCounts_o         : out std_logic;
-    TxTSMaskSel_i               : in  std_logic_vector(1 downto 0);
+    TxTSMode_i                            : in  std_logic_vector(1 downto 0);
+    TxTSTimeoutSel_i                      : in  std_logic_vector(3 downto 0);
+    TxTSRetrigCmd_i                       : in  std_logic;
+    TxTSRearmCmd_i                        : in  std_logic;
+    TxTSRetrigStatus_o                    : out std_logic;
+    TxTSTimeoutCounts_o                   : out std_logic;
+    TxTSMaskSel_i                         : in  std_logic_vector(1 downto 0);
     
     --
-    LRxPaerEn_i                 : in  std_logic;
-    RRxPaerEn_i                 : in  std_logic;
-    AuxRxPaerEn_i               : in  std_logic;
-    LRxHSSaerEn_i               : in  std_logic;
-    RRxHSSaerEn_i               : in  std_logic;
-    AuxRxHSSaerEn_i             : in  std_logic;
-    LRxGtpEn_i                  : in  std_logic;
-    RRxGtpEn_i                  : in  std_logic;
-    AuxRxGtpEn_i                : in  std_logic;
-    LRxSpnnLnkEn_i              : in  std_logic;
-    RRxSpnnLnkEn_i              : in  std_logic;
-    AuxRxSpnnLnkEn_i            : in  std_logic;
-    LRxSaerChanEn_i             : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    RRxSaerChanEn_i             : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    AuxRxSaerChanEn_i           : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    RxPaerReqActLevel_i         : in  std_logic;
-    RxPaerAckActLevel_i         : in  std_logic;
-    RxPaerIgnoreFifoFull_i      : in  std_logic;
-    RxPaerAckSetDelay_i         : in  std_logic_vector(7 downto 0);
-    RxPaerSampleDelay_i         : in  std_logic_vector(7 downto 0);
-    RxPaerAckRelDelay_i         : in  std_logic_vector(7 downto 0);
+    LRxPaerEn_i                           : in  std_logic;
+    RRxPaerEn_i                           : in  std_logic;
+    AuxRxPaerEn_i                         : in  std_logic;
+    LRxHSSaerEn_i                         : in  std_logic;
+    RRxHSSaerEn_i                         : in  std_logic;
+    AuxRxHSSaerEn_i                       : in  std_logic;
+    LRxGtpEn_i                            : in  std_logic;
+    RRxGtpEn_i                            : in  std_logic;
+    AuxRxGtpEn_i                          : in  std_logic;
+    LRxSpnnLnkEn_i                        : in  std_logic;
+    RRxSpnnLnkEn_i                        : in  std_logic;
+    AuxRxSpnnLnkEn_i                      : in  std_logic;
+    LRxSaerChanEn_i                       : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    RRxSaerChanEn_i                       : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    AuxRxSaerChanEn_i                     : in  std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    RxPaerReqActLevel_i                   : in  std_logic;
+    RxPaerAckActLevel_i                   : in  std_logic;
+    RxPaerIgnoreFifoFull_i                : in  std_logic;
+    RxPaerAckSetDelay_i                   : in  std_logic_vector(7 downto 0);
+    RxPaerSampleDelay_i                   : in  std_logic_vector(7 downto 0);
+    RxPaerAckRelDelay_i                   : in  std_logic_vector(7 downto 0);
     
     -- Status
-    WrapDetected_o              : out   std_logic;
+    WrapDetected_o                        : out   std_logic;
     
-    --TxPaerFifoEmpty_o         : out std_logic;
-    TxSaerStat_o                : out t_TxSaerStat_array(C_TX_HSSAER_N_CHAN-1 downto 0);
+    --TxPaerFifoEmpty_o                   : out std_logic;
+    TxSaerStat_o                          : out t_TxSaerStat_array(C_TX_HSSAER_N_CHAN-1 downto 0);
     
-    LRxPaerFifoFull_o           : out std_logic;
-    RRxPaerFifoFull_o           : out std_logic;
-    AuxRxPaerFifoFull_o         : out std_logic;
-    LRxSaerStat_o               : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-    RRxSaerStat_o               : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-    AUXRxSaerStat_o             : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-    LRxGtpStat_o                : out t_RxGtpStat;
-    RRxGtpStat_o                : out t_RxGtpStat;
-    AUXRxGtpStat_o              : out t_RxGtpStat;
-    TxSpnnlnkStat_o             : out t_TxSpnnlnkStat;
-    LRxSpnnlnkStat_o            : out t_RxSpnnlnkStat;
-    RRxSpnnlnkStat_o            : out t_RxSpnnlnkStat;
-    AuxRxSpnnlnkStat_o          : out t_RxSpnnlnkStat;
+    LRxPaerFifoFull_o                     : out std_logic;
+    RRxPaerFifoFull_o                     : out std_logic;
+    AuxRxPaerFifoFull_o                   : out std_logic;
+    LRxSaerStat_o                         : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    RRxSaerStat_o                         : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    AUXRxSaerStat_o                       : out t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    LRxGtpStat_o                          : out t_RxGtpStat;
+    RRxGtpStat_o                          : out t_RxGtpStat;
+    AUXRxGtpStat_o                        : out t_RxGtpStat;
+    TxSpnnlnkStat_o                       : out t_TxSpnnlnkStat;
+    LRxSpnnlnkStat_o                      : out t_RxSpnnlnkStat;
+    RRxSpnnlnkStat_o                      : out t_RxSpnnlnkStat;
+    AuxRxSpnnlnkStat_o                    : out t_RxSpnnlnkStat;
     
-    SpnnStartKey_i              : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command key
-    SpnnStopKey_i               : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command key
-    SpnnTxMask_i                : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
-    SpnnRxMask_i                : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
-    SpnnCtrl_i                  : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
-    SpnnStatus_o                : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
+    SpnnStartKey_i                        : in  std_logic_vector(31 downto 0);  -- SpiNNaker "START to send data" command key
+    SpnnStopKey_i                         : in  std_logic_vector(31 downto 0);  -- SpiNNaker "STOP to send data" command key
+    SpnnTxMask_i                          : in  std_logic_vector(31 downto 0);  -- SpiNNaker TX Data Mask
+    SpnnRxMask_i                          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
+    SpnnCtrl_i                            : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
+    SpnnStatus_o                          : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
     
     --
     -- INTERCEPTION
     ---------------------
-    RRxData_o                   : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    RRxSrcRdy_o                 : out std_logic;
-    RRxDstRdy_i                 : in  std_logic;
-    RRxBypassData_i             : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    RRxBypassSrcRdy_i           : in  std_logic;
-    RRxBypassDstRdy_o           : out std_logic;
+    RRxData_o                             : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    RRxSrcRdy_o                           : out std_logic;
+    RRxDstRdy_i                           : in  std_logic;
+    RRxBypassData_i                       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    RRxBypassSrcRdy_i                     : in  std_logic;
+    RRxBypassDstRdy_o                     : out std_logic;
     --
-    LRxData_o                   : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    LRxSrcRdy_o                 : out std_logic;
-    LRxDstRdy_i                 : in  std_logic;
-    LRxBypassData_i             : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    LRxBypassSrcRdy_i           : in  std_logic;
-    LRxBypassDstRdy_o           : out std_logic;
+    LRxData_o                             : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    LRxSrcRdy_o                           : out std_logic;
+    LRxDstRdy_i                           : in  std_logic;
+    LRxBypassData_i                       : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    LRxBypassSrcRdy_i                     : in  std_logic;
+    LRxBypassDstRdy_o                     : out std_logic;
     --
-    AuxRxData_o                 : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    AuxRxSrcRdy_o               : out std_logic;
-    AuxRxDstRdy_i               : in  std_logic;
-    AuxRxBypassData_i           : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
-    AuxRxBypassSrcRdy_i         : in  std_logic;
-    AuxRxBypassDstRdy_o         : out std_logic;        
+    AuxRxData_o                           : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    AuxRxSrcRdy_o                         : out std_logic;
+    AuxRxDstRdy_i                         : in  std_logic;
+    AuxRxBypassData_i                     : in  std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
+    AuxRxBypassSrcRdy_i                   : in  std_logic;
+    AuxRxBypassDstRdy_o                   : out std_logic;        
     
     --
     -- LED drivers
     ---------------------
-    LEDo_o                      : out std_logic;
-    LEDr_o                      : out std_logic;
-    LEDy_o                      : out std_logic
+    LEDo_o                                : out std_logic;
+    LEDr_o                                : out std_logic;
+    LEDy_o                                : out std_logic
     );
 -- translate_off
 begin
@@ -861,20 +897,20 @@ TX_DATAPATH_m : hpu_tx_datapath
 
 RX_LEFT_DATAPATH_m : hpu_rx_datapath
   generic map (
-    C_FAMILY                  => C_FAMILY,
+    C_FAMILY                        => C_FAMILY,
     --
-    C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
-    C_PAER_DSIZE              => C_PAER_DSIZE,
-    C_HAS_PAER                => C_RX_L_HAS_PAER,
-    C_HAS_HSSAER              => C_RX_L_HAS_HSSAER,
-    C_HSSAER_N_CHAN           => C_RX_HSSAER_N_CHAN,
-    C_HAS_GTP                 => C_RX_L_HAS_GTP,
-    C_GTP_DSIZE               => C_GTP_DSIZE,
-    C_GTP_TXUSRCLK2_PERIOD_NS => C_GTP_TXUSRCLK2_PERIOD_NS,
-    C_GTP_RXUSRCLK2_PERIOD_NS => C_GTP_RXUSRCLK2_PERIOD_NS,
-    C_HAS_SPNNLNK             => C_RX_L_HAS_SPNNLNK,
-    C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH,
-    C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION
+    C_OUTPUT_DSIZE                  => C_INTERNAL_DSIZE,
+    C_PAER_DSIZE                    => C_PAER_DSIZE,
+    C_HAS_PAER                      => C_RX_L_HAS_PAER,
+    C_HAS_HSSAER                    => C_RX_L_HAS_HSSAER,
+    C_HSSAER_N_CHAN                 => C_RX_HSSAER_N_CHAN,
+    C_HAS_GTP                       => C_RX_L_HAS_GTP,
+    C_GTP_DSIZE                     => C_GTP_DSIZE,
+    C_GTP_TXUSRCLK2_PERIOD_NS       => C_GTP_TXUSRCLK2_PERIOD_NS,
+    C_GTP_RXUSRCLK2_PERIOD_NS       => C_GTP_RXUSRCLK2_PERIOD_NS,
+    C_HAS_SPNNLNK                   => C_RX_L_HAS_SPNNLNK,
+    C_PSPNNLNK_WIDTH                => C_PSPNNLNK_WIDTH,
+    C_SIM_TIME_COMPRESSION          => C_SIM_TIME_COMPRESSION
     )
   port map (
 
@@ -882,15 +918,15 @@ RX_LEFT_DATAPATH_m : hpu_rx_datapath
     -- Barecontrol
     -- **********************************************
     -- Resets
-    nRst                 => nRst_CoreClk_i,                         -- in  std_logic;
+    nRst                            => nRst_CoreClk_i,                         -- in  std_logic;
     -- System Clock domain
-    Clk_i                => CoreClk_i,                        -- in  std_logic;
-    En1Sec_i             => timing_i.en1s,                -- : in  std_logic;
+    Clk_i                           => CoreClk_i,                        -- in  std_logic;
+    En1Sec_i                        => timing_i.en1s,                -- : in  std_logic;
 		-- HSSAER Clocks domain
-		Clk_hs_p             => Clk_hs_p,                     -- in  std_logic;
-		Clk_hs_n             => Clk_hs_n,                     -- in  std_logic;
-    Clk_ls_p             => Clk_ls_p,                     -- in  std_logic;
-    Clk_ls_n             => Clk_ls_n,                     -- in  std_logic;
+		Clk_hs_p                        => Clk_hs_p,                     -- in  std_logic;
+		Clk_hs_n                        => Clk_hs_n,                     -- in  std_logic;
+    Clk_ls_p                        => Clk_ls_p,                     -- in  std_logic;
+    Clk_ls_n                        => Clk_ls_n,                     -- in  std_logic;
  
  
     -- **********************************************
@@ -900,7 +936,7 @@ RX_LEFT_DATAPATH_m : hpu_rx_datapath
     -- In case of aux channel the HPU header is 
     -- adapted to what received
     -- ----------------------------------------------
-    Aux_Channel_i        => '0',
+    Aux_Channel_i                   => '0',
 
     -- **********************************************
     -- uController Interface
@@ -908,60 +944,60 @@ RX_LEFT_DATAPATH_m : hpu_rx_datapath
 
     -- Control signals
     -- ----------------------------------------------
-    PaerFlushFifos_i     => LRxPaerFlushFifos_i,         
+    PaerFlushFifos_i                => LRxPaerFlushFifos_i,         
     
     -- Control output signals
     -- ----------------------------------------------    
-    RxGtpAlignRequest_o  => LRx_RxGtpAlignRequest_o, 
+    RxGtpAlignRequest_o             => LRx_RxGtpAlignRequest_o, 
 
     -- Status signals
     -----------------------------
-    PaerFifoFull_o       => LRxPaerFifoFull_o,           -- out std_logic;
-    RxSaerStat_o         => LRxSaerStat_o,               -- out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
-    RxGtpStat_o          => LRxGtpStat_o,                -- out t_RxGtpStat;
-    RxSpnnlnkStat_o      => LRxSpnnlnkStat_o,            -- out t_RxSpnnlnkStat;
+    PaerFifoFull_o                  => LRxPaerFifoFull_o,           -- out std_logic;
+    RxSaerStat_o                    => LRxSaerStat_o,               -- out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+    RxGtpStat_o                     => LRxGtpStat_o,                -- out t_RxGtpStat;
+    RxSpnnlnkStat_o                 => LRxSpnnlnkStat_o,            -- out t_RxSpnnlnkStat;
         
-    -- GTP Statistics        
-    RxGtpDataRate_o      => i_LRxGtpDataRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpAlignRate_o     => i_LRxGtpAlignRate,           -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
-    RxGtpMsgRate_o       => i_LRxGtpMsgRate,             -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpIdleRate_o      => i_LRxGtpIdleRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpEventRate_o     => i_LRxGtpEventRate,           -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpMessageRate_o   => i_LRxGtpMessageRate,         -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
+    -- GTP Statistics                   
+    RxGtpDataRate_o                 => i_LRxGtpDataRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpAlignRate_o                => i_LRxGtpAlignRate,           -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
+    RxGtpMsgRate_o                  => i_LRxGtpMsgRate,             -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpIdleRate_o                 => i_LRxGtpIdleRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpEventRate_o                => i_LRxGtpEventRate,           -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpMessageRate_o              => i_LRxGtpMessageRate,         -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
 
     -- Configuration signals
     -----------------------------
     --
     -- Source I/F configurations
-    EnablePAER_i         => LRxPaerEn_i,                 -- in  std_logic;
-    EnableHSSAER_i       => LRxHSSaerEn_i,               -- in  std_logic;
-    EnableGTP_i          => LRxGtpEn_i,                  -- in  std_logic;
-    EnableSPNNLNK_i      => LRxSpnnLnkEn_i,              -- in  std_logic;
+    EnablePAER_i                    => LRxPaerEn_i,                 -- in  std_logic;
+    EnableHSSAER_i                  => LRxHSSaerEn_i,               -- in  std_logic;
+    EnableGTP_i                     => LRxGtpEn_i,                  -- in  std_logic;
+    EnableSPNNLNK_i                 => LRxSpnnLnkEn_i,              -- in  std_logic;
     -- PAER
-    RxPaerHighBits_i     => c_LRxPaerHighBits,           -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    PaerReqActLevel_i    => RxPaerReqActLevel_i,         -- in  std_logic;
-    PaerAckActLevel_i    => RxPaerAckActLevel_i,         -- in  std_logic;
-    PaerIgnoreFifoFull_i => RxPaerIgnoreFifoFull_i,      -- in  std_logic;
-    PaerAckSetDelay_i    => RxPaerAckSetDelay_i,         -- in  std_logic_vector(7 downto 0);
-    PaerSampleDelay_i    => RxPaerSampleDelay_i,         -- in  std_logic_vector(7 downto 0);
-    PaerAckRelDelay_i    => RxPaerAckRelDelay_i,         -- in  std_logic_vector(7 downto 0);
+    RxPaerHighBits_i                => c_LRxPaerHighBits,           -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    PaerReqActLevel_i               => RxPaerReqActLevel_i,         -- in  std_logic;
+    PaerAckActLevel_i               => RxPaerAckActLevel_i,         -- in  std_logic;
+    PaerIgnoreFifoFull_i            => RxPaerIgnoreFifoFull_i,      -- in  std_logic;
+    PaerAckSetDelay_i               => RxPaerAckSetDelay_i,         -- in  std_logic_vector(7 downto 0);
+    PaerSampleDelay_i               => RxPaerSampleDelay_i,         -- in  std_logic_vector(7 downto 0);
+    PaerAckRelDelay_i               => RxPaerAckRelDelay_i,         -- in  std_logic_vector(7 downto 0);
     -- HSSAER
-    RxSaerHighbits0_i    => c_LRxSaerHighBits0,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    RxSaerHighbits1_i    => c_LRxSaerHighBits1,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    RxSaerHighbits2_i    => c_LRxSaerHighBits2,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    RxSaerHighbits3_i    => c_LRxSaerHighBits3,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    HSSaerChanEn_i       => LRxSaerChanEn_i,             -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+    RxSaerHighbits0_i               => c_LRxSaerHighBits0,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighbits1_i               => c_LRxSaerHighBits1,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighbits2_i               => c_LRxSaerHighBits2,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighbits3_i               => c_LRxSaerHighBits3,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    HSSaerChanEn_i                  => LRxSaerChanEn_i,             -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
     -- GTP
-    RxGtpHighbits_i      => c_LRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxGtpHighbits_i                 => c_LRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
     -- SpiNNlink controls
-    SpnnStartKey_i       => SpnnStartKey_i,            -- in  std_logic_vector(31 downto 0);
-    SpnnStopKey_i        => SpnnStopKey_i,             -- in  std_logic_vector(31 downto 0);
-    SpnnCmdStart_o       => open,                        -- out std_logic;
-    SpnnCmdStop_o        => open,                        -- out std_logic;
-    SpnnRxMask_i         => SpnnRxMask_i,              -- in  std_logic_vector(31 downto 0);
-    SpnnKeysEnable_i     => SpnnCtrl_i(24),             -- in  std_logic;
-    SpnnParityErr_o      => SpnnStatus_o(25),           -- out std_logic;
-    SpnnRxErr_o          => SpnnStatus_o(24),           -- out std_logic; 
+    SpnnStartKey_i                  => SpnnStartKey_i,            -- in  std_logic_vector(31 downto 0);
+    SpnnStopKey_i                   => SpnnStopKey_i,             -- in  std_logic_vector(31 downto 0);
+    SpnnCmdStart_o                  => open,                        -- out std_logic;
+    SpnnCmdStop_o                   => open,                        -- out std_logic;
+    SpnnRxMask_i                    => SpnnRxMask_i,              -- in  std_logic_vector(31 downto 0);
+    SpnnKeysEnable_i                => SpnnCtrl_i(24),             -- in  std_logic;
+    SpnnParityErr_o                 => SpnnStatus_o(25),           -- out std_logic;
+    SpnnRxErr_o                     => SpnnStatus_o(24),           -- out std_logic; 
 
   
     -- **********************************************
@@ -970,82 +1006,96 @@ RX_LEFT_DATAPATH_m : hpu_rx_datapath
 
     -- Parallel AER Interface
     -- ----------------------------------------------
-    PAER_Addr_i          => i_LRxPaerAddr,               -- in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    PAER_Req_i           => i_LRxPaerReq,                -- in  std_logic;
-    PAER_Ack_o           => i_LRxPaerAck,                -- out std_logic;
+    PAER_Addr_i                     => i_LRxPaerAddr,               -- in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    PAER_Req_i                      => i_LRxPaerReq,                -- in  std_logic;
+    PAER_Ack_o                      => i_LRxPaerAck,                -- out std_logic;
 
     -- HSSAER Interface
     -- ----------------------------------------------
-    HSSAER_Rx_i          => i_LRxHssaer,                -- in  std_logic_vector(0 to C_HSSAER_N_CHAN-1);
+    HSSAER_Rx_i                     => i_LRxHssaer,                -- in  std_logic_vector(0 to C_HSSAER_N_CHAN-1);
 
     -- GTP Wizard Interface
     -- ----------------------------------------------
-    GTP_RxUsrClk2_i       => LRx_GTP_RxUsrClk2_i, 
-    GTP_SoftResetRx_o     => LRx_GTP_SoftResetRx_o,                                
-    GTP_DataValid_o       => LRx_GTP_DataValid_o,                                
-    GTP_Rxuserrdy_o       => LRx_GTP_Rxuserrdy_o,                                      
-    GTP_Rxdata_i          => LRx_GTP_Rxdata_i,            
-    GTP_Rxchariscomma_i   => LRx_GTP_Rxchariscomma_i,      
-    GTP_Rxcharisk_i       => LRx_GTP_Rxcharisk_i,          
-    GTP_Rxdisperr_i       => LRx_GTP_Rxdisperr_i,          
-    GTP_Rxnotintable_i    => LRx_GTP_Rxnotintable_i,       
-    GTP_Rxbyteisaligned_i => LRx_GTP_Rxbyteisaligned_i,                           
-    GTP_Rxbyterealign_i   => LRx_GTP_Rxbyterealign_i,                            
-    GTP_PllLock_i         => LRx_GTP_PllLock_i,                                        
-    GTP_PllRefclklost_i   => LRx_GTP_PllRefclklost_i,                                      
+    GTP_RxUsrClk2_i                 => LRx_GTP_RxUsrClk2_i, 
+    GTP_SoftResetRx_o               => LRx_GTP_SoftResetRx_o,                                
+    GTP_DataValid_o                 => LRx_GTP_DataValid_o,                                
+    GTP_Rxuserrdy_o                 => LRx_GTP_Rxuserrdy_o,                                      
+    GTP_Rxdata_i                    => LRx_GTP_Rxdata_i,            
+    GTP_Rxchariscomma_i             => LRx_GTP_Rxchariscomma_i,      
+    GTP_Rxcharisk_i                 => LRx_GTP_Rxcharisk_i,          
+    GTP_Rxdisperr_i                 => LRx_GTP_Rxdisperr_i,          
+    GTP_Rxnotintable_i              => LRx_GTP_Rxnotintable_i,       
+    GTP_Rxbyteisaligned_i           => LRx_GTP_Rxbyteisaligned_i,                           
+    GTP_Rxbyterealign_i             => LRx_GTP_Rxbyterealign_i,                            
+    GTP_PllLock_i                   => LRx_GTP_PllLock_i,                                        
+    GTP_PllRefclklost_i             => LRx_GTP_PllRefclklost_i,                                      
+
+    -- GTH Wizard Interface                                             
+    -- ----------------------------------------------                   
+    GTH_gtwiz_userclk_rx_usrclk2_i  => LRx_GTH_gtwiz_userclk_rx_usrclk2_i,
+    GTH_gtwiz_reset_all_o           => LRx_GTH_gtwiz_reset_all_o,
+    GTH_gtwiz_userdata_rx_i         => LRx_GTH_gtwiz_userdata_rx_i,
+    GTH_Rxctrl2_i                   => LRx_GTH_Rxctrl2_i,
+    GTH_Rxctrl0_i                   => LRx_GTH_Rxctrl0_i,
+    GTH_Rxctrl1_i                   => LRx_GTH_Rxctrl1_i,
+    GTH_Rxctrl3_i                   => LRx_GTH_Rxctrl3_i,
+    GTH_Rxbyteisaligned_i           => LRx_GTH_Rxbyteisaligned_i,
+    GTH_Rxbyterealign_i             => LRx_GTH_Rxbyterealign_i,
+    GTH_Qpll_lock_i                 => LRx_GTH_Qpll_lock_i,
+    GTH_Qpll_refclklost_i           => LRx_GTH_Qpll_refclklost_i,
 
     -- SpiNNlink
     -- ----------------------------------------------
-    SPNN_Data_i           => i_LRxData2of7FromSpinnaker,
-    SPNN_Ack_o            => i_LRxAckToSpinnaker,
+    SPNN_Data_i                     => i_LRxData2of7FromSpinnaker,
+    SPNN_Ack_o                      => i_LRxAckToSpinnaker,
 
 
     -- **********************************************
     -- Received Data Output
     -- **********************************************
-    RxData_o             => LRxData,               --  i_rxMonSrc(0).idx,      
-    RxDataSrcRdy_o       => LRxSrcRdy,             --  i_rxMonSrc(0).vld,      
-    RxDataDstRdy_i       => LRxDstRdy,             --  i_rxMonDst(0).rdy,      
+    RxData_o                        => LRxData,               --  i_rxMonSrc(0).idx,      
+    RxDataSrcRdy_o                  => LRxSrcRdy,             --  i_rxMonSrc(0).vld,      
+    RxDataDstRdy_i                  => LRxDstRdy,             --  i_rxMonDst(0).rdy,      
 
-    RxGtpMsg_o           => LRx_RxGtpMsg_o,
-    RxGtpMsgSrcRdy_o     => LRx_RxGtpMsgSrcRdy_o,
-    RxGtpMsgDstRdy_i     => LRx_RxGtpMsgDstRdy_i,
+    RxGtpMsg_o                      => LRx_RxGtpMsg_o,
+    RxGtpMsgSrcRdy_o                => LRx_RxGtpMsgSrcRdy_o,
+    RxGtpMsgDstRdy_i                => LRx_RxGtpMsgDstRdy_i,
     
     
     -- **********************************************
     -- Debug signals
     -- **********************************************
-    dbg_PaerDataOk       => open,                         -- out std_logic
-    DBG_src_rdy          => open,
-    DBG_dst_rdy          => open,
-    DBG_err              => open, 
-    DBG_run              => open,
-    DBG_RX               => open,
+    dbg_PaerDataOk                  => open,                         -- out std_logic
+    DBG_src_rdy                     => open,
+    DBG_dst_rdy                     => open,
+    DBG_err                         => open, 
+    DBG_run                         => open,
+    DBG_RX                          => open,
     
-    DBG_FIFO_0           => open,
-    DBG_FIFO_1           => open,
-    DBG_FIFO_2           => open,
-    DBG_FIFO_3           => open,
-    DBG_FIFO_4           => open                         
+    DBG_FIFO_0                      => open,
+    DBG_FIFO_1                      => open,
+    DBG_FIFO_2                      => open,
+    DBG_FIFO_3                      => open,
+    DBG_FIFO_4                      => open                         
     );
 
 
 RX_RIGHT_DATAPATH_m : hpu_rx_datapath
   generic map (
-    C_FAMILY                  => C_FAMILY,
+    C_FAMILY                        => C_FAMILY,
     --
-    C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
-    C_PAER_DSIZE              => C_PAER_DSIZE,
-    C_HAS_PAER                => C_RX_R_HAS_PAER,
-    C_HAS_HSSAER              => C_RX_R_HAS_HSSAER,
-    C_HSSAER_N_CHAN           => C_RX_HSSAER_N_CHAN,
-    C_HAS_GTP                 => C_RX_R_HAS_GTP,
-    C_GTP_DSIZE               => C_GTP_DSIZE,
-    C_GTP_TXUSRCLK2_PERIOD_NS => C_GTP_TXUSRCLK2_PERIOD_NS,
-    C_GTP_RXUSRCLK2_PERIOD_NS => C_GTP_RXUSRCLK2_PERIOD_NS,
-    C_HAS_SPNNLNK             => C_RX_R_HAS_SPNNLNK,
-    C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH,
-    C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION
+    C_OUTPUT_DSIZE                  => C_INTERNAL_DSIZE,
+    C_PAER_DSIZE                    => C_PAER_DSIZE,
+    C_HAS_PAER                      => C_RX_R_HAS_PAER,
+    C_HAS_HSSAER                    => C_RX_R_HAS_HSSAER,
+    C_HSSAER_N_CHAN                 => C_RX_HSSAER_N_CHAN,
+    C_HAS_GTP                       => C_RX_R_HAS_GTP,
+    C_GTP_DSIZE                     => C_GTP_DSIZE,
+    C_GTP_TXUSRCLK2_PERIOD_NS       => C_GTP_TXUSRCLK2_PERIOD_NS,
+    C_GTP_RXUSRCLK2_PERIOD_NS       => C_GTP_RXUSRCLK2_PERIOD_NS,
+    C_HAS_SPNNLNK                   => C_RX_R_HAS_SPNNLNK,
+    C_PSPNNLNK_WIDTH                => C_PSPNNLNK_WIDTH,
+    C_SIM_TIME_COMPRESSION          => C_SIM_TIME_COMPRESSION
     )
   port map (
 
@@ -1053,15 +1103,15 @@ RX_RIGHT_DATAPATH_m : hpu_rx_datapath
     -- Barecontrol
     -- **********************************************
     -- Resets
-    nRst                 => nRst_CoreClk_i,               -- in  std_logic;
+    nRst                            => nRst_CoreClk_i,               -- in  std_logic;
     -- System Clock domain
-    Clk_i                => CoreClk_i,                    -- in  std_logic;
-    En1Sec_i             => timing_i.en1s,-- : in  std_logic;
+    Clk_i                           => CoreClk_i,                    -- in  std_logic;
+    En1Sec_i                        => timing_i.en1s,-- : in  std_logic;
 		-- HSSAER Clocks domain
-		Clk_hs_p             => Clk_hs_p,                     -- in  std_logic;
-		Clk_hs_n             => Clk_hs_n,                     -- in  std_logic;
-    Clk_ls_p             => Clk_ls_p,                     -- in  std_logic;
-    Clk_ls_n             => Clk_ls_n,                     -- in  std_logic;
+		Clk_hs_p                        => Clk_hs_p,                     -- in  std_logic;
+		Clk_hs_n                        => Clk_hs_n,                     -- in  std_logic;
+    Clk_ls_p                        => Clk_ls_p,                     -- in  std_logic;
+    Clk_ls_n                        => Clk_ls_n,                     -- in  std_logic;
  
  
     -- **********************************************
@@ -1071,7 +1121,7 @@ RX_RIGHT_DATAPATH_m : hpu_rx_datapath
     -- In case of aux channel the HPU header is 
     -- adapted to what received
     -- ----------------------------------------------
-    Aux_Channel_i        => '0',
+    Aux_Channel_i                   => '0',
 
 
     -- **********************************************
@@ -1080,60 +1130,60 @@ RX_RIGHT_DATAPATH_m : hpu_rx_datapath
 
     -- Control signals
     -- ----------------------------------------------
-    PaerFlushFifos_i     => RRxPaerFlushFifos_i,         -- in  std_logic;
+    PaerFlushFifos_i                => RRxPaerFlushFifos_i,         -- in  std_logic;
     
     -- Control output signals
     -- ----------------------------------------------    
-    RxGtpAlignRequest_o  => RRx_RxGtpAlignRequest_o, 
+    RxGtpAlignRequest_o             => RRx_RxGtpAlignRequest_o, 
 
     -- Status signals
     -----------------------------
-    PaerFifoFull_o       => RRxPaerFifoFull_o,           -- out std_logic;
-    RxSaerStat_o         => RRxSaerStat_o,               -- out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
-    RxGtpStat_o          => RRxGtpStat_o,                -- out t_RxGtpStat;
-    RxSpnnlnkStat_o      => RRxSpnnlnkStat_o,            -- out t_RxSpnnlnkStat;
+    PaerFifoFull_o                  => RRxPaerFifoFull_o,           -- out std_logic;
+    RxSaerStat_o                    => RRxSaerStat_o,               -- out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+    RxGtpStat_o                     => RRxGtpStat_o,                -- out t_RxGtpStat;
+    RxSpnnlnkStat_o                 => RRxSpnnlnkStat_o,            -- out t_RxSpnnlnkStat;
     
-    -- GTP Statistics        
-    RxGtpDataRate_o      => i_RRxGtpDataRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpAlignRate_o     => i_RRxGtpAlignRate,           -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
-    RxGtpMsgRate_o       => i_RRxGtpMsgRate,             -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpIdleRate_o      => i_RRxGtpIdleRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpEventRate_o     => i_RRxGtpEventRate,           -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpMessageRate_o   => i_RRxGtpMessageRate,         -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
+    -- GTP Statistics                   
+    RxGtpDataRate_o                 => i_RRxGtpDataRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpAlignRate_o                => i_RRxGtpAlignRate,           -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
+    RxGtpMsgRate_o                  => i_RRxGtpMsgRate,             -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpIdleRate_o                 => i_RRxGtpIdleRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpEventRate_o                => i_RRxGtpEventRate,           -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpMessageRate_o              => i_RRxGtpMessageRate,         -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
 
     -- Configuration signals
     -----------------------------
     --
     -- Source I/F configurations
-    EnablePAER_i         => RRxPaerEn_i,                 -- in  std_logic;
-    EnableHSSAER_i       => RRxHSSaerEn_i,               -- in  std_logic;
-    EnableGTP_i          => RRxGtpEn_I,                  -- in  std_logic;
-    EnableSPNNLNK_i      => RRxSpnnLnkEn_i,              -- in  std_logic;
+    EnablePAER_i                    => RRxPaerEn_i,                 -- in  std_logic;
+    EnableHSSAER_i                  => RRxHSSaerEn_i,               -- in  std_logic;
+    EnableGTP_i                     => RRxGtpEn_I,                  -- in  std_logic;
+    EnableSPNNLNK_i                 => RRxSpnnLnkEn_i,              -- in  std_logic;
     -- PAER
-    RxPaerHighBits_i     => c_RRxPaerHighBits,           -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    PaerReqActLevel_i    => RxPaerReqActLevel_i,         -- in  std_logic;
-    PaerAckActLevel_i    => RxPaerAckActLevel_i,         -- in  std_logic;
-    PaerIgnoreFifoFull_i => RxPaerIgnoreFifoFull_i,      -- in  std_logic;
-    PaerAckSetDelay_i    => RxPaerAckSetDelay_i,         -- in  std_logic_vector(7 downto 0);
-    PaerSampleDelay_i    => RxPaerSampleDelay_i,         -- in  std_logic_vector(7 downto 0);
-    PaerAckRelDelay_i    => RxPaerAckRelDelay_i,         -- in  std_logic_vector(7 downto 0);
+    RxPaerHighBits_i                => c_RRxPaerHighBits,           -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    PaerReqActLevel_i               => RxPaerReqActLevel_i,         -- in  std_logic;
+    PaerAckActLevel_i               => RxPaerAckActLevel_i,         -- in  std_logic;
+    PaerIgnoreFifoFull_i            => RxPaerIgnoreFifoFull_i,      -- in  std_logic;
+    PaerAckSetDelay_i               => RxPaerAckSetDelay_i,         -- in  std_logic_vector(7 downto 0);
+    PaerSampleDelay_i               => RxPaerSampleDelay_i,         -- in  std_logic_vector(7 downto 0);
+    PaerAckRelDelay_i               => RxPaerAckRelDelay_i,         -- in  std_logic_vector(7 downto 0);
     -- HSSAER
-    RxSaerHighbits0_i    => c_RRxSaerHighBits0,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    RxSaerHighbits1_i    => c_RRxSaerHighBits1,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    RxSaerHighbits2_i    => c_RRxSaerHighBits2,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    RxSaerHighbits3_i    => c_RRxSaerHighBits3,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    HSSaerChanEn_i       => RRxSaerChanEn_i,             -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+    RxSaerHighbits0_i               => c_RRxSaerHighBits0,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighbits1_i               => c_RRxSaerHighBits1,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighbits2_i               => c_RRxSaerHighBits2,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighbits3_i               => c_RRxSaerHighBits3,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    HSSaerChanEn_i                  => RRxSaerChanEn_i,             -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
     -- GTP
-    RxGtpHighbits_i      => c_RRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxGtpHighbits_i                 => c_RRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
     -- SpiNNlink controls
-    SpnnStartKey_i       => SpnnStartKey_i,            -- in  std_logic_vector(31 downto 0);
-    SpnnStopKey_i        => SpnnStopKey_i,             -- in  std_logic_vector(31 downto 0);
-    SpnnCmdStart_o       => open,                        -- out std_logic;
-    SpnnCmdStop_o        => open,                        -- out std_logic;
-    SpnnRxMask_i         => SpnnRxMask_i,              -- in  std_logic_vector(31 downto 0);
-    SpnnKeysEnable_i     => SpnnCtrl_i(16),             -- in  std_logic;
-    SpnnParityErr_o      => SpnnStatus_o(17),           -- out std_logic;
-    SpnnRxErr_o          => SpnnStatus_o(16),           -- out std_logic;
+    SpnnStartKey_i                  => SpnnStartKey_i,            -- in  std_logic_vector(31 downto 0);
+    SpnnStopKey_i                   => SpnnStopKey_i,             -- in  std_logic_vector(31 downto 0);
+    SpnnCmdStart_o                  => open,                        -- out std_logic;
+    SpnnCmdStop_o                   => open,                        -- out std_logic;
+    SpnnRxMask_i                    => SpnnRxMask_i,              -- in  std_logic_vector(31 downto 0);
+    SpnnKeysEnable_i                => SpnnCtrl_i(16),             -- in  std_logic;
+    SpnnParityErr_o                 => SpnnStatus_o(17),           -- out std_logic;
+    SpnnRxErr_o                     => SpnnStatus_o(16),           -- out std_logic;
                        
                         
     -- **********************************************
@@ -1142,82 +1192,96 @@ RX_RIGHT_DATAPATH_m : hpu_rx_datapath
 
     -- Parallel AER Interface
     -- ----------------------------------------------
-    PAER_Addr_i          => i_RRxPaerAddr,             -- in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    PAER_Req_i           => i_RRxPaerReq,              -- in  std_logic;
-    PAER_Ack_o           => i_RRxPaerAck,              -- out std_logic;
+    PAER_Addr_i                     => i_RRxPaerAddr,             -- in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    PAER_Req_i                      => i_RRxPaerReq,              -- in  std_logic;
+    PAER_Ack_o                      => i_RRxPaerAck,              -- out std_logic;
 
     -- HSSAER Interface
     -- ----------------------------------------------
-    HSSAER_Rx_i          => i_RRxHssaer,                -- in  std_logic_vector(0 to C_HSSAER_N_CHAN-1);
+    HSSAER_Rx_i                     => i_RRxHssaer,                -- in  std_logic_vector(0 to C_HSSAER_N_CHAN-1);
 
     -- GTP Wizard Interface
     -- ----------------------------------------------
-    GTP_RxUsrClk2_i       => RRx_GTP_RxUsrClk2_i,        
-    GTP_SoftResetRx_o     => RRx_GTP_SoftResetRx_o,                           
-    GTP_DataValid_o       => RRx_GTP_DataValid_o,                              
-    GTP_Rxuserrdy_o       => RRx_GTP_Rxuserrdy_o,                                         
-    GTP_Rxdata_i          => RRx_GTP_Rxdata_i,           
-    GTP_Rxchariscomma_i   => RRx_GTP_Rxchariscomma_i,    
-    GTP_Rxcharisk_i       => RRx_GTP_Rxcharisk_i,        
-    GTP_Rxdisperr_i       => RRx_GTP_Rxdisperr_i,        
-    GTP_Rxnotintable_i    => RRx_GTP_Rxnotintable_i,     
-    GTP_Rxbyteisaligned_i => RRx_GTP_Rxbyteisaligned_i,                         
-    GTP_Rxbyterealign_i   => RRx_GTP_Rxbyterealign_i,                          
-    GTP_PllLock_i         => RRx_GTP_PllLock_i,                                      
-    GTP_PllRefclklost_i   => RRx_GTP_PllRefclklost_i,                                    
+    GTP_RxUsrClk2_i                 => RRx_GTP_RxUsrClk2_i,        
+    GTP_SoftResetRx_o               => RRx_GTP_SoftResetRx_o,                           
+    GTP_DataValid_o                 => RRx_GTP_DataValid_o,                              
+    GTP_Rxuserrdy_o                 => RRx_GTP_Rxuserrdy_o,                                         
+    GTP_Rxdata_i                    => RRx_GTP_Rxdata_i,           
+    GTP_Rxchariscomma_i             => RRx_GTP_Rxchariscomma_i,    
+    GTP_Rxcharisk_i                 => RRx_GTP_Rxcharisk_i,        
+    GTP_Rxdisperr_i                 => RRx_GTP_Rxdisperr_i,        
+    GTP_Rxnotintable_i              => RRx_GTP_Rxnotintable_i,     
+    GTP_Rxbyteisaligned_i           => RRx_GTP_Rxbyteisaligned_i,                         
+    GTP_Rxbyterealign_i             => RRx_GTP_Rxbyterealign_i,                          
+    GTP_PllLock_i                   => RRx_GTP_PllLock_i,                                      
+    GTP_PllRefclklost_i             => RRx_GTP_PllRefclklost_i,                                    
+
+    -- GTH Wizard Interface                                             
+    -- ----------------------------------------------                   
+    GTH_gtwiz_userclk_rx_usrclk2_i  => RRx_GTH_gtwiz_userclk_rx_usrclk2_i,
+    GTH_gtwiz_reset_all_o           => RRx_GTH_gtwiz_reset_all_o,
+    GTH_gtwiz_userdata_rx_i         => RRx_GTH_gtwiz_userdata_rx_i,
+    GTH_Rxctrl2_i                   => RRx_GTH_Rxctrl2_i,
+    GTH_Rxctrl0_i                   => RRx_GTH_Rxctrl0_i,
+    GTH_Rxctrl1_i                   => RRx_GTH_Rxctrl1_i,
+    GTH_Rxctrl3_i                   => RRx_GTH_Rxctrl3_i,
+    GTH_Rxbyteisaligned_i           => RRx_GTH_Rxbyteisaligned_i,
+    GTH_Rxbyterealign_i             => RRx_GTH_Rxbyterealign_i,
+    GTH_Qpll_lock_i                 => RRx_GTH_Qpll_lock_i,
+    GTH_Qpll_refclklost_i           => RRx_GTH_Qpll_refclklost_i,
 
     -- SpiNNlink
     -- ----------------------------------------------
-    SPNN_Data_i           => i_RRxData2of7FromSpinnaker,
-    SPNN_Ack_o            => i_RRxAckToSpinnaker,
+    SPNN_Data_i                     => i_RRxData2of7FromSpinnaker,
+    SPNN_Ack_o                      => i_RRxAckToSpinnaker,
 
 
     -- **********************************************
     -- Received Data Output
     -- **********************************************
-    RxData_o             => RRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(1).idx,      
-    RxDataSrcRdy_o       => RRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(1).vld,      
-    RxDataDstRdy_i       => RRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(1).rdy,      
+    RxData_o                        => RRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(1).idx,      
+    RxDataSrcRdy_o                  => RRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(1).vld,      
+    RxDataDstRdy_i                  => RRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(1).rdy,      
 
-    RxGtpMsg_o           => RRx_RxGtpMsg_o,
-    RxGtpMsgSrcRdy_o     => RRx_RxGtpMsgSrcRdy_o,
-    RxGtpMsgDstRdy_i     => RRx_RxGtpMsgDstRdy_i,   
+    RxGtpMsg_o                      => RRx_RxGtpMsg_o,
+    RxGtpMsgSrcRdy_o                => RRx_RxGtpMsgSrcRdy_o,
+    RxGtpMsgDstRdy_i                => RRx_RxGtpMsgDstRdy_i,   
        
         
     -- **********************************************
     -- Debug signals
     -- **********************************************
-    dbg_PaerDataOk       => open,                         -- out std_logic
-    DBG_src_rdy          => open,
-    DBG_dst_rdy          => open,
-    DBG_err              => open, 
-    DBG_run              => open,
-    DBG_RX               => open,
+    dbg_PaerDataOk                  => open,                         -- out std_logic
+    DBG_src_rdy                     => open,
+    DBG_dst_rdy                     => open,
+    DBG_err                         => open, 
+    DBG_run                         => open,
+    DBG_RX                          => open,
     
-    DBG_FIFO_0           => open,
-    DBG_FIFO_1           => open,
-    DBG_FIFO_2           => open,
-    DBG_FIFO_3           => open,
-    DBG_FIFO_4           => open                         
+    DBG_FIFO_0                      => open,
+    DBG_FIFO_1                      => open,
+    DBG_FIFO_2                      => open,
+    DBG_FIFO_3                      => open,
+    DBG_FIFO_4                      => open                         
     );
 
 
 RX_AUX_DATAPATH_m : hpu_rx_datapath
   generic map (
-    C_FAMILY                  => C_FAMILY,
+    C_FAMILY                        => C_FAMILY,
     --
-    C_OUTPUT_DSIZE            => C_INTERNAL_DSIZE,
-    C_PAER_DSIZE              => C_PAER_DSIZE,
-    C_HAS_PAER                => C_RX_A_HAS_PAER,
-    C_HAS_HSSAER              => C_RX_A_HAS_HSSAER,
-    C_HSSAER_N_CHAN           => C_RX_HSSAER_N_CHAN,
-    C_HAS_GTP                 => C_RX_A_HAS_GTP,
-    C_GTP_DSIZE               => C_GTP_DSIZE,
-    C_GTP_TXUSRCLK2_PERIOD_NS => C_GTP_TXUSRCLK2_PERIOD_NS,
-    C_GTP_RXUSRCLK2_PERIOD_NS => C_GTP_RXUSRCLK2_PERIOD_NS,
-    C_HAS_SPNNLNK             => C_RX_A_HAS_SPNNLNK,
-    C_PSPNNLNK_WIDTH          => C_PSPNNLNK_WIDTH,
-    C_SIM_TIME_COMPRESSION    => C_SIM_TIME_COMPRESSION
+    C_OUTPUT_DSIZE                  => C_INTERNAL_DSIZE,
+    C_PAER_DSIZE                    => C_PAER_DSIZE,
+    C_HAS_PAER                      => C_RX_A_HAS_PAER,
+    C_HAS_HSSAER                    => C_RX_A_HAS_HSSAER,
+    C_HSSAER_N_CHAN                 => C_RX_HSSAER_N_CHAN,
+    C_HAS_GTP                       => C_RX_A_HAS_GTP,
+    C_GTP_DSIZE                     => C_GTP_DSIZE,
+    C_GTP_TXUSRCLK2_PERIOD_NS       => C_GTP_TXUSRCLK2_PERIOD_NS,
+    C_GTP_RXUSRCLK2_PERIOD_NS       => C_GTP_RXUSRCLK2_PERIOD_NS,
+    C_HAS_SPNNLNK                   => C_RX_A_HAS_SPNNLNK,
+    C_PSPNNLNK_WIDTH                => C_PSPNNLNK_WIDTH,
+    C_SIM_TIME_COMPRESSION          => C_SIM_TIME_COMPRESSION
     )
   port map (
 
@@ -1225,15 +1289,15 @@ RX_AUX_DATAPATH_m : hpu_rx_datapath
     -- Barecontrol
     -- **********************************************
     -- Resets
-    nRst                 => nRst_CoreClk_i,               -- in  std_logic;
+    nRst                            => nRst_CoreClk_i,               -- in  std_logic;
     -- System Clock domain
-    Clk_i                => CoreClk_i,                    -- in  std_logic;
-    En1Sec_i             => timing_i.en1s,                -- : in  std_logic;
+    Clk_i                           => CoreClk_i,                    -- in  std_logic;
+    En1Sec_i                        => timing_i.en1s,                -- : in  std_logic;
 		-- HSSAER Clocks domain
-		Clk_hs_p             => Clk_hs_p,                     -- in  std_logic;
-		Clk_hs_n             => Clk_hs_n,                     -- in  std_logic;
-    Clk_ls_p             => Clk_ls_p,                     -- in  std_logic;
-    Clk_ls_n             => Clk_ls_n,                     -- in  std_logic;
+		Clk_hs_p                        => Clk_hs_p,                     -- in  std_logic;
+		Clk_hs_n                        => Clk_hs_n,                     -- in  std_logic;
+    Clk_ls_p                        => Clk_ls_p,                     -- in  std_logic;
+    Clk_ls_n                        => Clk_ls_n,                     -- in  std_logic;
  
  
     -- **********************************************
@@ -1243,7 +1307,7 @@ RX_AUX_DATAPATH_m : hpu_rx_datapath
     -- In case of aux channel the HPU header is 
     -- adapted to what received
     -- ----------------------------------------------
-    Aux_Channel_i        => '1',
+    Aux_Channel_i                   => '1',
 
 
     -- **********************************************
@@ -1252,60 +1316,60 @@ RX_AUX_DATAPATH_m : hpu_rx_datapath
 
     -- Control signals
     -- ----------------------------------------------
-    PaerFlushFifos_i     => AuxRxPaerFlushFifos_i,         -- in  std_logic;
+    PaerFlushFifos_i                => AuxRxPaerFlushFifos_i,         -- in  std_logic;
     
     -- Control output signals
     -- ---------------------------------------------- 
-    RxGtpAlignRequest_o  => AuxRx_RxGtpAlignRequest_o,            -- out std_logic;  
+    RxGtpAlignRequest_o             => AuxRx_RxGtpAlignRequest_o,            -- out std_logic;  
  
     -- Status signals
     -----------------------------
-    PaerFifoFull_o       => AuxRxPaerFifoFull_o,           -- out std_logic;
-    RxSaerStat_o         => AuxRxSaerStat_o,               -- out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
-    RxGtpStat_o          => AuxRxGtpStat_o,                -- out t_RxGtpStat;
-    RxSpnnlnkStat_o      => AuxRxSpnnlnkStat_o,            -- out t_RxSpnnlnkStat;
+    PaerFifoFull_o                  => AuxRxPaerFifoFull_o,           -- out std_logic;
+    RxSaerStat_o                    => AuxRxSaerStat_o,               -- out t_RxSaerStat_array(C_HSSAER_N_CHAN-1 downto 0);
+    RxGtpStat_o                     => AuxRxGtpStat_o,                -- out t_RxGtpStat;
+    RxSpnnlnkStat_o                 => AuxRxSpnnlnkStat_o,            -- out t_RxSpnnlnkStat;
     
-    -- GTP Statistics        
-    RxGtpDataRate_o      => i_AuxRxGtpDataRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpAlignRate_o     => i_AuxRxGtpAlignRate,           -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
-    RxGtpMsgRate_o       => i_AuxRxGtpMsgRate,             -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpIdleRate_o      => i_AuxRxGtpIdleRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpEventRate_o     => i_AuxRxGtpEventRate,           -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
-    RxGtpMessageRate_o   => i_AuxRxGtpMessageRate,         -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
+    -- GTP Statistics                   
+    RxGtpDataRate_o                 => i_AuxRxGtpDataRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpAlignRate_o                => i_AuxRxGtpAlignRate,           -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
+    RxGtpMsgRate_o                  => i_AuxRxGtpMsgRate,             -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpIdleRate_o                 => i_AuxRxGtpIdleRate,            -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpEventRate_o                => i_AuxRxGtpEventRate,           -- : out std_logic_vector(15 downto 0); -- Count per millisecond 
+    RxGtpMessageRate_o              => i_AuxRxGtpMessageRate,         -- : out std_logic_vector( 7 downto 0); -- Count per millisecond 
 
     -- Configuration signals
     -----------------------------
     --
     -- Source I/F configurations
-    EnablePAER_i         => AuxRxPaerEn_i,                 -- in  std_logic;
-    EnableHSSAER_i       => AuxRxHSSaerEn_i,               -- in  std_logic;
-    EnableGTP_i          => AuxRxGtpEn_I,                  -- in  std_logic;
-    EnableSPNNLNK_i      => AuxRxSpnnLnkEn_i,              -- in  std_logic;
+    EnablePAER_i                    => AuxRxPaerEn_i,                 -- in  std_logic;
+    EnableHSSAER_i                  => AuxRxHSSaerEn_i,               -- in  std_logic;
+    EnableGTP_i                     => AuxRxGtpEn_I,                  -- in  std_logic;
+    EnableSPNNLNK_i                 => AuxRxSpnnLnkEn_i,              -- in  std_logic;
     -- PAER
-    RxPaerHighBits_i     => c_AuxRxPaerHighBits,           -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    PaerReqActLevel_i    => RxPaerReqActLevel_i,         -- in  std_logic;
-    PaerAckActLevel_i    => RxPaerAckActLevel_i,         -- in  std_logic;
-    PaerIgnoreFifoFull_i => RxPaerIgnoreFifoFull_i,      -- in  std_logic;
-    PaerAckSetDelay_i    => RxPaerAckSetDelay_i,         -- in  std_logic_vector(7 downto 0);
-    PaerSampleDelay_i    => RxPaerSampleDelay_i,         -- in  std_logic_vector(7 downto 0);
-    PaerAckRelDelay_i    => RxPaerAckRelDelay_i,         -- in  std_logic_vector(7 downto 0);
+    RxPaerHighBits_i                => c_AuxRxPaerHighBits,           -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    PaerReqActLevel_i               => RxPaerReqActLevel_i,         -- in  std_logic;
+    PaerAckActLevel_i               => RxPaerAckActLevel_i,         -- in  std_logic;
+    PaerIgnoreFifoFull_i            => RxPaerIgnoreFifoFull_i,      -- in  std_logic;
+    PaerAckSetDelay_i               => RxPaerAckSetDelay_i,         -- in  std_logic_vector(7 downto 0);
+    PaerSampleDelay_i               => RxPaerSampleDelay_i,         -- in  std_logic_vector(7 downto 0);
+    PaerAckRelDelay_i               => RxPaerAckRelDelay_i,         -- in  std_logic_vector(7 downto 0);
     -- HSSAER
-    RxSaerHighbits0_i    => c_AuxRxSaerHighBits0,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    RxSaerHighbits1_i    => c_AuxRxSaerHighBits1,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    RxSaerHighbits2_i    => c_AuxRxSaerHighBits2,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    RxSaerHighbits3_i    => c_AuxRxSaerHighBits3,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    HSSaerChanEn_i       => AuxRxSaerChanEn_i,             -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
+    RxSaerHighbits0_i               => c_AuxRxSaerHighBits0,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighbits1_i               => c_AuxRxSaerHighBits1,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighbits2_i               => c_AuxRxSaerHighBits2,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    RxSaerHighbits3_i               => c_AuxRxSaerHighBits3,          -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    HSSaerChanEn_i                  => AuxRxSaerChanEn_i,             -- in  std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
     -- GTP
-    RxGtpHighbits_i      => c_AuxRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
-    -- SpiNNlink controls
-    SpnnStartKey_i       => SpnnStartKey_i,            -- in  std_logic_vector(31 downto 0);
-    SpnnStopKey_i        => SpnnStopKey_i,             -- in  std_logic_vector(31 downto 0);
-    SpnnCmdStart_o       => open,                        -- out std_logic;
-    SpnnCmdStop_o        => open,                        -- out std_logic;
-    SpnnRxMask_i         => SpnnRxMask_i,              -- in  std_logic_vector(31 downto 0);
-    SpnnKeysEnable_i     => SpnnCtrl_i(8),             -- in  std_logic;
-    SpnnParityErr_o      => SpnnStatus_o(9),           -- out std_logic;
-    SpnnRxErr_o          => SpnnStatus_o(8),           -- out std_logic;
+    RxGtpHighbits_i                 => c_AuxRxGtpHighBits,            -- in  std_logic_vector(C_INTERNAL_DSIZE-1 downto C_PAER_DSIZE);
+    -- SpiNNlink controls           
+    SpnnStartKey_i                  => SpnnStartKey_i,            -- in  std_logic_vector(31 downto 0);
+    SpnnStopKey_i                   => SpnnStopKey_i,             -- in  std_logic_vector(31 downto 0);
+    SpnnCmdStart_o                  => open,                        -- out std_logic;
+    SpnnCmdStop_o                   => open,                        -- out std_logic;
+    SpnnRxMask_i                    => SpnnRxMask_i,              -- in  std_logic_vector(31 downto 0);
+    SpnnKeysEnable_i                => SpnnCtrl_i(8),             -- in  std_logic;
+    SpnnParityErr_o                 => SpnnStatus_o(9),           -- out std_logic;
+    SpnnRxErr_o                     => SpnnStatus_o(8),           -- out std_logic;
 
              
     -- **********************************************
@@ -1314,63 +1378,77 @@ RX_AUX_DATAPATH_m : hpu_rx_datapath
 
     -- Parallel AER Interface
     -- ----------------------------------------------
-    PAER_Addr_i          => i_AuxRxPaerAddr,             -- in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
-    PAER_Req_i           => i_AuxRxPaerReq,              -- in  std_logic;
-    PAER_Ack_o           => i_AuxRxPaerAck,              -- out std_logic;
+    PAER_Addr_i                     => i_AuxRxPaerAddr,             -- in  std_logic_vector(C_PAER_DSIZE-1 downto 0);
+    PAER_Req_i                      => i_AuxRxPaerReq,              -- in  std_logic;
+    PAER_Ack_o                      => i_AuxRxPaerAck,              -- out std_logic;
 
     -- HSSAER Interface
     -- ----------------------------------------------
-    HSSAER_Rx_i          => i_AuxRxHssaer,                -- in  std_logic_vector(0 to C_HSSAER_N_CHAN-1);
+    HSSAER_Rx_i                     => i_AuxRxHssaer,                -- in  std_logic_vector(0 to C_HSSAER_N_CHAN-1);
 
     -- GTP Wizard Interface
     -- ----------------------------------------------
-    GTP_RxUsrClk2_i       => AuxRx_GTP_RxUsrClk2_i,        
-    GTP_SoftResetRx_o     => AuxRx_GTP_SoftResetRx_o,                           
-    GTP_DataValid_o       => AuxRx_GTP_DataValid_o,                              
-    GTP_Rxuserrdy_o       => AuxRx_GTP_Rxuserrdy_o,                                         
-    GTP_Rxdata_i          => AuxRx_GTP_Rxdata_i,           
-    GTP_Rxchariscomma_i   => AuxRx_GTP_Rxchariscomma_i,    
-    GTP_Rxcharisk_i       => AuxRx_GTP_Rxcharisk_i,        
-    GTP_Rxdisperr_i       => AuxRx_GTP_Rxdisperr_i,        
-    GTP_Rxnotintable_i    => AuxRx_GTP_Rxnotintable_i,     
-    GTP_Rxbyteisaligned_i => AuxRx_GTP_Rxbyteisaligned_i,                         
-    GTP_Rxbyterealign_i   => AuxRx_GTP_Rxbyterealign_i,                          
-    GTP_PllLock_i         => AuxRx_GTP_PllLock_i,                                      
-    GTP_PllRefclklost_i   => AuxRx_GTP_PllRefclklost_i,                                        
+    GTP_RxUsrClk2_i                 => AuxRx_GTP_RxUsrClk2_i,        
+    GTP_SoftResetRx_o               => AuxRx_GTP_SoftResetRx_o,                           
+    GTP_DataValid_o                 => AuxRx_GTP_DataValid_o,                              
+    GTP_Rxuserrdy_o                 => AuxRx_GTP_Rxuserrdy_o,                                         
+    GTP_Rxdata_i                    => AuxRx_GTP_Rxdata_i,           
+    GTP_Rxchariscomma_i             => AuxRx_GTP_Rxchariscomma_i,    
+    GTP_Rxcharisk_i                 => AuxRx_GTP_Rxcharisk_i,        
+    GTP_Rxdisperr_i                 => AuxRx_GTP_Rxdisperr_i,        
+    GTP_Rxnotintable_i              => AuxRx_GTP_Rxnotintable_i,     
+    GTP_Rxbyteisaligned_i           => AuxRx_GTP_Rxbyteisaligned_i,                         
+    GTP_Rxbyterealign_i             => AuxRx_GTP_Rxbyterealign_i,                          
+    GTP_PllLock_i                   => AuxRx_GTP_PllLock_i,                                      
+    GTP_PllRefclklost_i             => AuxRx_GTP_PllRefclklost_i,                                        
+
+    -- GTH Wizard Interface                                             
+    -- ----------------------------------------------                   
+    GTH_gtwiz_userclk_rx_usrclk2_i  => AuxRx_GTH_gtwiz_userclk_rx_usrclk2_i,
+    GTH_gtwiz_reset_all_o           => AuxRx_GTH_gtwiz_reset_all_o,
+    GTH_gtwiz_userdata_rx_i         => AuxRx_GTH_gtwiz_userdata_rx_i,
+    GTH_Rxctrl2_i                   => AuxRx_GTH_Rxctrl2_i,
+    GTH_Rxctrl0_i                   => AuxRx_GTH_Rxctrl0_i,
+    GTH_Rxctrl1_i                   => AuxRx_GTH_Rxctrl1_i,
+    GTH_Rxctrl3_i                   => AuxRx_GTH_Rxctrl3_i,
+    GTH_Rxbyteisaligned_i           => AuxRx_GTH_Rxbyteisaligned_i,
+    GTH_Rxbyterealign_i             => AuxRx_GTH_Rxbyterealign_i,
+    GTH_Qpll_lock_i                 => AuxRx_GTH_Qpll_lock_i,
+    GTH_Qpll_refclklost_i           => AuxRx_GTH_Qpll_refclklost_i,
 
     -- SpiNNlink
     -- ----------------------------------------------
-    SPNN_Data_i           => i_AuxRxData2of7FromSpinnaker,
-    SPNN_Ack_o            => i_AuxRxAckToSpinnaker,
+    SPNN_Data_i                     => i_AuxRxData2of7FromSpinnaker,
+    SPNN_Ack_o                      => i_AuxRxAckToSpinnaker,
 
 
     -- **********************************************
     -- Monitor interface
     -- **********************************************
-    RxData_o             => AuxRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(2).idx,      
-    RxDataSrcRdy_o       => AuxRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(2).vld,      
-    RxDataDstRdy_i       => AuxRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(2).rdy,      
+    RxData_o                        => AuxRxData,               -- : out std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);  i_rxMonSrc(2).idx,      
+    RxDataSrcRdy_o                  => AuxRxSrcRdy,             -- : out std_logic;                                      i_rxMonSrc(2).vld,      
+    RxDataDstRdy_i                  => AuxRxDstRdy,             -- : in  std_logic;                                      i_rxMonDst(2).rdy,      
 
-    RxGtpMsg_o           => AuxRx_RxGtpMsg_o,
-    RxGtpMsgSrcRdy_o     => AuxRx_RxGtpMsgSrcRdy_o,
-    RxGtpMsgDstRdy_i     => AuxRx_RxGtpMsgDstRdy_i,  
+    RxGtpMsg_o                      => AuxRx_RxGtpMsg_o,
+    RxGtpMsgSrcRdy_o                => AuxRx_RxGtpMsgSrcRdy_o,
+    RxGtpMsgDstRdy_i                => AuxRx_RxGtpMsgDstRdy_i,  
        
         
     -- **********************************************
     -- Debug signals
     -- **********************************************
-    dbg_PaerDataOk       => open,                         -- out std_logic
-    DBG_src_rdy          => open,
-    DBG_dst_rdy          => open,
-    DBG_err              => open, 
-    DBG_run              => open,
-    DBG_RX               => open,
+    dbg_PaerDataOk                  => open,                         -- out std_logic
+    DBG_src_rdy                     => open,
+    DBG_dst_rdy                     => open,
+    DBG_err                         => open, 
+    DBG_run                         => open,
+    DBG_RX                          => open,
     
-    DBG_FIFO_0           => open,
-    DBG_FIFO_1           => open,
-    DBG_FIFO_2           => open,
-    DBG_FIFO_3           => open,
-    DBG_FIFO_4           => open                         
+    DBG_FIFO_0                      => open,
+    DBG_FIFO_1                      => open,
+    DBG_FIFO_2                      => open,
+    DBG_FIFO_3                      => open,
+    DBG_FIFO_4                      => open                         
     );
 
 

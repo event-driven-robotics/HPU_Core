@@ -26,8 +26,8 @@ library datapath_lib;
 library spinn_neu_if_lib;
   use spinn_neu_if_lib.spinn_neu_pkg.all;
     
-library GTP_lib;
-  use GTP_lib.GTP_pkg.all;
+library GT_lib;
+  use GT_lib.GT_pkg.all;
 
 
 entity hpu_tx_datapath is
@@ -575,15 +575,15 @@ begin
 i_TxGtpAutoAlign      <= '0';
 i_TxGtpErrorInjection <= '0';
  
-  GTP_MANAGER_TX_i : GTP_Manager 
+  GT_MANAGER_TX_i : GT_Manager 
     generic map( 
       FAMILY_g                  =>  C_FAMILY,
       --
       USER_DATA_WIDTH_g         =>  C_INPUT_DSIZE,               -- Width of Data - Fabric side
       USER_MESSAGE_WIDTH_g      =>    8,                          -- Width of Message - Fabric side 
-      GTP_DATA_WIDTH_g          =>  C_GTP_DSIZE,                  -- Width of Data - GTP side
-      GTP_TXUSRCLK2_PERIOD_NS_g =>  C_GTP_TXUSRCLK2_PERIOD_NS,    -- TX GTP User clock period
-      GTP_RXUSRCLK2_PERIOD_NS_g =>  C_GTP_RXUSRCLK2_PERIOD_NS,    -- RX GTP User clock period
+      GT_DATA_WIDTH_g           =>  C_GTP_DSIZE,                  -- Width of Data - GTP side
+      GT_TXUSRCLK2_PERIOD_NS_g  =>  C_GTP_TXUSRCLK2_PERIOD_NS,    -- TX GTP User clock period
+      GT_RXUSRCLK2_PERIOD_NS_g  =>  C_GTP_RXUSRCLK2_PERIOD_NS,    -- RX GTP User clock period
       SIM_TIME_COMPRESSION_g    =>  C_SIM_TIME_COMPRESSION    -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
       )
     port map(
@@ -606,7 +606,7 @@ i_TxGtpErrorInjection <= '0';
       TX_ERROR_INJECTION_i    => i_TxGtpErrorInjection,    -- Error insertin (debug purpose)
       
       -- Status
-      TX_GTP_ALIGN_FLAG_o     => i_TxGtpAlignFlag,         -- Monitor out: sending align
+      TX_GT_ALIGN_FLAG_o      => i_TxGtpAlignFlag,         -- Monitor out: sending align
       
       -- Statistics
       TX_DATA_RATE_o          => i_TxGtpDataRate,
@@ -632,7 +632,10 @@ i_TxGtpErrorInjection <= '0';
       -- Control out
       RX_ALIGN_REQUEST_o      => open,  
       
-      -- Statistics        
+      -- Status and errors
+      RX_DISALIGNED_o         => open,
+      
+      -- Statistics     
       RX_DATA_RATE_o          => open,
       RX_ALIGN_RATE_o         => open, 
       RX_MSG_RATE_o           => open, 
@@ -691,8 +694,47 @@ i_TxGtpErrorInjection <= '0';
       -- -------------------------------------------------------------------------    
       -- COMMON PORTS
       GTP_PLL_LOCK_i           => GTP_PllLock_i,                                          -- ASYNC        --
-      GTP_PLL_REFCLKLOST_i     => GTP_PllRefclklost_i                                     -- SYS_CLK      -- 
-      );
+      GTP_PLL_REFCLKLOST_i     => GTP_PllRefclklost_i,                                    -- SYS_CLK      -- 
+ 
+ 
+ 
+      -- *****************************************************************************************
+      -- Transceiver Interface for Ultrascale+ GTH
+      -- ***************************************************************************************** 
+       
+      -- Clock Ports
+      --  GTH_GTWIZ_USERCLK_TX_USRCLK2_i        : in std_logic_vector(0 downto 0);
+      GTH_GTWIZ_USERCLK_RX_USRCLK2_i        => "0",
+      
+      -- Reset FSM Control Ports
+      GTH_GTWIZ_RESET_ALL_o                 => open,               -- ASYNC     --
+
+
+      -- -------------------------------------------------------------------------
+      -- TRANSMITTER 
+
+      -- TBD
+
+      
+      -- -------------------------------------------------------------------------
+      -- RECEIVER
+      ------------------ Receive Ports - FPGA RX Interface Ports -----------------
+      GTH_GTWIZ_USERDATA_RX_i               => (others => '0'),            -- RXUSRCLK2 --
+      ------------------ Receive Ports - RX 8B/10B Decoder Ports -----------------
+      GTH_RXCTRL2_i                         => (others => '0'),  -- (RXCHARISCOMMA)  -- RXUSRCLK2 --
+      GTH_RXCTRL0_i                         => (others => '0'),  -- (RXCHARISK)      -- RXUSRCLK2 --
+      GTH_RXCTRL1_i                         => (others => '0'),  -- (RXDISPERR)      -- RXUSRCLK2 --
+      GTH_RXCTRL3_i                         => (others => '0'),  -- (RXNOTINTABLE)   -- RXUSRCLK2 --
+      -------------- Receive Ports - RX Byte and Word Alignment Ports ------------
+      GTH_RXBYTEISALIGNED_i                 => "0",             -- RXUSRCLK2 --
+      GTH_RXBYTEREALIGN_i                   => "0",             -- RXUSRCLK2 --
+          
+      -- -------------------------------------------------------------------------    
+      -- COMMON PORTS    
+      GTH_QPLL_LOCK_i                       => "0",              -- ASYNC     --
+      GTH_QPLL_REFCLKLOST_i                 => "0"               -- QPLL0LOCKDETCLK --
+             
+    );  
 
   TxGtpAlignFlag_o        <= i_TxGtpAlignFlag;
   
