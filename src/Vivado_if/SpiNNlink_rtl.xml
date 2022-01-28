@@ -8,7 +8,7 @@
   <spirit:ports>
     <spirit:port>
       <spirit:logicalName>Lin</spirit:logicalName>
-      <spirit:description>Data In</spirit:description>
+      <spirit:description>SpiNNlink Data input</spirit:description>
       <spirit:wire>
         <spirit:qualifier>
           <spirit:isData>true</spirit:isData>
@@ -16,6 +16,7 @@
         <spirit:onMaster>
           <spirit:presence>illegal</spirit:presence>
           <spirit:width>7</spirit:width>
+          <spirit:direction>in</spirit:direction>
         </spirit:onMaster>
         <spirit:onSlave>
           <spirit:presence>required</spirit:presence>
@@ -27,12 +28,10 @@
     </spirit:port>
     <spirit:port>
       <spirit:logicalName>LinAck</spirit:logicalName>
-      <spirit:description>Data In Acknowledge</spirit:description>
+      <spirit:description>Acknowledge output for Lin</spirit:description>
       <spirit:wire>
         <spirit:onMaster>
           <spirit:presence>illegal</spirit:presence>
-          <spirit:width>1</spirit:width>
-          <spirit:direction>in</spirit:direction>
         </spirit:onMaster>
         <spirit:onSlave>
           <spirit:presence>required</spirit:presence>
@@ -43,7 +42,7 @@
     </spirit:port>
     <spirit:port>
       <spirit:logicalName>Lout</spirit:logicalName>
-      <spirit:description>Data Out</spirit:description>
+      <spirit:description>SpiNNlink Data output</spirit:description>
       <spirit:wire>
         <spirit:qualifier>
           <spirit:isData>true</spirit:isData>
@@ -55,23 +54,21 @@
         <spirit:onSlave>
           <spirit:presence>illegal</spirit:presence>
           <spirit:width>7</spirit:width>
-          <spirit:direction>in</spirit:direction>
         </spirit:onSlave>
         <spirit:defaultValue>0</spirit:defaultValue>
       </spirit:wire>
     </spirit:port>
     <spirit:port>
       <spirit:logicalName>LoutAck</spirit:logicalName>
-      <spirit:description>Data Out Acknowledge</spirit:description>
+      <spirit:description>Acknowledge input for Lout</spirit:description>
       <spirit:wire>
         <spirit:onMaster>
           <spirit:presence>required</spirit:presence>
-          <spirit:width>1</spirit:width>
           <spirit:direction>in</spirit:direction>
         </spirit:onMaster>
         <spirit:onSlave>
           <spirit:presence>illegal</spirit:presence>
-          <spirit:width>1</spirit:width>
+          <spirit:direction>in</spirit:direction>
         </spirit:onSlave>
         <spirit:defaultValue>0</spirit:defaultValue>
       </spirit:wire>
