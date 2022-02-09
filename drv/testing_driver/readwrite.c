@@ -275,7 +275,7 @@ int help_bail(char **argv)
 	return -1;
 }
 
-void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts)
+void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts, int tx_ts)
 {
 	int i, ret;
 	unsigned int size;
@@ -285,18 +285,21 @@ void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts)
 	 */
 	int k = rx_ts ? 2 : 1;
 
-	/* cause a fifo full: fill-up the RX ring and the RF FIFO, plus an extra data */
+	/* when tx ts are disabled we need to TX half data */
+	int h = tx_ts ? 1 : 2;
+
+	/* cause a fifo full: fill-up the RX ring and the RX FIFO, plus an extra data */
 	printf("intentionally causing fifo full..\n");
 	for (i = 0; i < rx_pn; i++) {
-		write_data(rx_ps / 4 / k, /*rx_pn*/ 1);
+		write_data(rx_ps / 4 / k / h, /*rx_pn*/ 1);
 		usleep(100);
 	}
 	for (i = 0; i < 8; i++) {
-		write_data(1024 / 4 / 2, /*rx_pn*/ 1);
+		write_data(1024 / 4 / 2 / h, /*rx_pn*/ 1);
 		usleep(100);
 	}
 #warning tweak_for_last_boot.bin_fifo_size___needs_better_handling
-	write_data(8 / k - (rx_ts ? 1 : 3), /*rx_pn*/ 1);
+	write_data(8 / k - (rx_ts ? 1 : 3) / h, /*rx_pn*/ 1);
 	/* rx fifo depth can stand at 8192 data, that is 32Kbytes */
 	//write_data(32 * 1024 / 8 - 1, /*rx_pn*/ 1);
 	//write_data(1, /*rx_pn*/ 1);
@@ -361,7 +364,7 @@ void test_throughput(int rx_ps)
 				break;
 		}
 
-		if ( et > 0) {
+		if (et > 0) {
 			thr = (float)rlen / 1024 / 1024 / et;
 			printf("Throughput %f MB/s\n", thr);
 		}
@@ -598,7 +601,7 @@ int main(int argc, char * argv[])
 
 	test_throughput(rx_ps);
 
-	fill_fifo(rx_ps, rx_pn, loop_type, 1);
+	fill_fifo(rx_ps, rx_pn, loop_type, 1, 1);
 
 	/* check for fifo-full recover */
 	for (i = 0; i < iter_count; i++) {
@@ -606,7 +609,6 @@ int main(int argc, char * argv[])
 		_read_data(rx_size, rx_n, 0x55, 1);
 	}
 	printf("phase 6 OK\n");
-
 
 	test_throughput(rx_ps);
 
@@ -619,14 +621,13 @@ int main(int argc, char * argv[])
 	}
 	printf("disabling RX TS is OK\n");
 
-	fill_fifo(rx_ps, rx_pn, loop_type, 0);
+	fill_fifo(rx_ps, rx_pn, loop_type, 0, 1);
 
 	for (i = 0; i < iter_count; i++) {
 		_write_data(tx_size, tx_n, 0x57);
 		_read_data_nots(rx_size, rx_n, 0x57);
 	}
 	printf("RX with disabled TS survived fifo full condition\n");
-
 	val = 0;
 	ioctl(iit_hpu, IOC_SET_TX_TS_ENABLE, &val);
 
@@ -643,6 +644,10 @@ int main(int argc, char * argv[])
 	ioctl(iit_hpu, IOC_SET_TX_TS_ENABLE, &val);
 	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
 
+	printf("With RX&TX disabled TS: ");
+	test_throughput(rx_ps);
+	fill_fifo(rx_ps, rx_pn, loop_type, 0, 0);
+	printf("With RX&TX disabled TS; after fifo full: ");
 	test_throughput(rx_ps);
 	return 0;
 }
