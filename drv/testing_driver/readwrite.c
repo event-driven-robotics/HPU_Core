@@ -130,6 +130,26 @@ int iit_hpu;
 
 #define ACCESS_ONCE(x) (*(volatile typeof(x) *)&(x))
 
+#define GREEN "\033[92m"
+#define NORMAL "\x1b[0m"
+#define MAGENTA "\033[95m"
+#define BLUE "\033[94m"
+#define YELLOW "\33[33m"
+#define BOLD "\033[1m"
+#define UNDERLINE "\033[4m"
+void banner(char *b)
+{
+	printf(MAGENTA"+ " NORMAL BOLD);
+	printf(b);
+	printf(NORMAL);
+	fflush(stdout);
+}
+
+void banner_ok()
+{
+	printf(GREEN" [ OK ]\n"NORMAL);
+}
+
 void handle_kill(int sig)
 {
         printf("\nProgram exited\n");
@@ -289,7 +309,7 @@ void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts, int tx_t
 	int h = tx_ts ? 1 : 2;
 
 	/* cause a fifo full: fill-up the RX ring and the RX FIFO, plus an extra data */
-	printf("intentionally causing fifo full..\n");
+	printf(YELLOW"[intentionally causing fifo full");
 	for (i = 0; i < rx_pn; i++) {
 		write_data(rx_ps / 4 / k / h, /*rx_pn*/ 1);
 		usleep(100);
@@ -303,11 +323,11 @@ void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts, int tx_t
 	/* rx fifo depth can stand at 8192 data, that is 32Kbytes */
 	//write_data(32 * 1024 / 8 - 1, /*rx_pn*/ 1);
 	//write_data(1, /*rx_pn*/ 1);
-	printf("fifo filled..\n");
+	printf(".. fifo filled");
 	usleep(100000);
 	ret = read(iit_hpu, data, 8);
 
-	printf("fifo full %s\n", (ret < 0) ? "OK" : "not detected");
+	printf(".. fifo full %s]"NORMAL"\n", (ret < 0) ? "OK" : "not detected");
 
 	/*
 	 * If the IP has been synthesized with at least one "real"
@@ -366,7 +386,7 @@ void test_throughput(int rx_ps)
 
 		if (et > 0) {
 			thr = (float)rlen / 1024 / 1024 / et;
-			printf("Throughput %f MB/s\n", thr);
+			printf(UNDERLINE BLUE"%f MB/s\n"NORMAL, thr);
 		}
 		ACCESS_ONCE(run) = 0;
 		sem_post(&write_sem);
@@ -552,33 +572,33 @@ int main(int argc, char * argv[])
 	val = 500;
 	ioctl(iit_hpu, IOC_SET_AXIS_LATENCY, &val);
 
-
-	/* check for correctness - write and read not overlappin*/
+	printf("\n");
+	banner("check for correctness - write and read not overlapping.. ");
 	for (i = 0; i < iter_count; i++) {
 		write_data(tx_size, tx_n);
 		usleep(10000);
 		read_data(rx_size, rx_n);
 	}
-	printf("phase 1 OK\n");
+	banner_ok();
 
-	/* check for correctness - overlapping write/read */
+	banner("check for correctness - overlapping write/read");
 	for (i = 0; i < iter_count; i++) {
 		write_data(tx_size, tx_n);
 		read_data(rx_size, rx_n);
 	}
-	printf("phase 2 OK\n");
+	banner_ok();
 
-	/* check for correctness - overlapping write/read - RX threshold ioctl */
+	banner("check for correctness - overlapping write/read - RX threshold ioctl");
 	for (i = 0; i < iter_count; i++) {
 		write_data(tx_size, tx_n);
 		read_thr_data(rx_size, rx_n);
 	}
-	printf("phase 3 OK\n");
+	banner_ok();
 
 	size = rx_ps;
 	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
 
-	/* check for correctness - overlapping write/read - RX threshold ioctl */
+	banner("check for correctness - overlapping write/read - RX threshold ioctl");
 	for (i = 1; i <= 4; i++) {
 		ret = write(iit_hpu, wdata, rx_ps * i);
 		usleep(10000);
@@ -586,32 +606,37 @@ int main(int argc, char * argv[])
 		if (ret != rx_ps * i)
 			printf("read %d instead of %d\n", ret, rx_ps * i);
 	}
-	printf("phase 4 OK\n");
+	banner_ok();
 
 	val = 50;
 	ioctl(iit_hpu, IOC_SET_AXIS_LATENCY, &val);
-	/* check for early-tlast mechanism to be OK */
+
+	banner("check for early-tlast mechanism to be OK..");
 	clock_gettime(CLOCK_MONOTONIC_RAW, &ts1);
 	write_data(rx_ps / 8 / 2, 1);
 	read_data(rx_ps / 8 / 2, 1);
 	clock_gettime(CLOCK_MONOTONIC_RAW, &ts2);
 	time_sec = time_diff(&ts1, &ts2);
 
-	printf("phase 5 OK (%f)\n", time_sec);
+	printf(" (got data in %fS) ", time_sec);
+	banner_ok();
 
+	banner("testing for throughput.. ");
 	test_throughput(rx_ps);
 
 	fill_fifo(rx_ps, rx_pn, loop_type, 1, 1);
 
-	/* check for fifo-full recover */
+	banner("check for fifo-full recover");
 	for (i = 0; i < iter_count; i++) {
 		_write_data(tx_size, tx_n, 0x55);
 		_read_data(rx_size, rx_n, 0x55, 1);
 	}
-	printf("phase 6 OK\n");
+	banner_ok();
 
+	banner("testing for throughput after fifo full: ");
 	test_throughput(rx_ps);
 
+	banner("testing RX TS disabling");
 	val = 0;
 	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
 
@@ -619,18 +644,19 @@ int main(int argc, char * argv[])
 		_write_data(tx_size, tx_n, 0x57);
 		_read_data_nots(rx_size, rx_n, 0x57);
 	}
-	printf("disabling RX TS is OK\n");
+	banner_ok();
 
 	fill_fifo(rx_ps, rx_pn, loop_type, 0, 1);
-
+	banner("testing fifo full with disabled RX TS");
 	for (i = 0; i < iter_count; i++) {
 		_write_data(tx_size, tx_n, 0x57);
 		_read_data_nots(rx_size, rx_n, 0x57);
 	}
-	printf("RX with disabled TS survived fifo full condition\n");
+	banner_ok();
+
+	banner("testing TX TS disabling");
 	val = 0;
 	ioctl(iit_hpu, IOC_SET_TX_TS_ENABLE, &val);
-
 	val = 1;
 	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
 
@@ -638,16 +664,16 @@ int main(int argc, char * argv[])
 		_write_data_nots(tx_size, tx_n, 0x58);
 		_read_data(rx_size, rx_n, 0x58, 1);
 	}
-	printf("disabling TX TS is OK\n");
+	banner_ok();
 
+	banner("RX&TX TS disabled; throughput: ");
 	val = 0;
 	ioctl(iit_hpu, IOC_SET_TX_TS_ENABLE, &val);
 	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
 
-	printf("With RX&TX disabled TS: ");
 	test_throughput(rx_ps);
 	fill_fifo(rx_ps, rx_pn, loop_type, 0, 0);
-	printf("With RX&TX disabled TS; after fifo full: ");
+	banner("RX&TX TS disabled, after fifo full; throughput: ");
 	test_throughput(rx_ps);
 	return 0;
 }
