@@ -639,5 +639,10 @@ int main(int argc, char * argv[])
 	}
 	printf("disabling TX TS is OK\n");
 
+	val = 0;
+	ioctl(iit_hpu, IOC_SET_TX_TS_ENABLE, &val);
+	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
+
+	test_throughput(rx_ps);
 	return 0;
 }
