@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <pthread.h>
+#include <semaphore.h>
 #include <string.h>
 #include <signal.h>
 #include <termios.h>
@@ -126,6 +128,7 @@ typedef struct {
 uint32_t data[65536], wdata[65536];
 int iit_hpu;
 
+#define ACCESS_ONCE(x) (*(volatile typeof(x) *)&(x))
 
 void handle_kill(int sig)
 {
@@ -314,11 +317,84 @@ void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts)
 	if (loop_type == LOOP_LNEAR) {
 		size = 0x0;
 		ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
-		read(iit_hpu, data,  8);
+		read(iit_hpu, data, 8);
 	}
 
 	size = 0x7fff0000;
 	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
+}
+
+void test_throughput(int rx_ps)
+{
+	pthread_t read_thread;
+	int ret;
+	int run = -1;
+	int thread_kill = 0;
+	float thr;
+	sem_t write_sem;
+	int size;
+
+	void *read_thread_fun(void *arg)
+	{
+		unsigned long rlen = 0;
+		int ret;
+		double et = 0.0;
+		struct timespec start_time, cur_time;
+
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
+
+		ACCESS_ONCE(run) = 1;
+		while (1) {
+			ret = read(iit_hpu, data, rx_ps);
+			if (ret < 0) {
+				fprintf(stderr, "read err %d\n", ret);
+				break;
+			}
+			sem_post(&write_sem);
+			rlen += ret;
+			clock_gettime(CLOCK_MONOTONIC_RAW, &cur_time);
+			et = time_diff(&start_time, &cur_time);
+			if (et > 10)
+				break;
+
+			if (ACCESS_ONCE(thread_kill))
+				break;
+		}
+
+		if ( et > 0) {
+			thr = (float)rlen / 1024 / 1024 / et;
+			printf("Throughput %f MB/s\n", thr);
+		}
+		ACCESS_ONCE(run) = 0;
+		sem_post(&write_sem);
+		return NULL;
+	}
+
+	sem_init(&write_sem, 0, 5);
+	pthread_create(&read_thread, NULL, read_thread_fun, NULL);
+
+	while (1) {
+		sem_wait(&write_sem);
+		if (!ACCESS_ONCE(run))
+			break;
+		ret = write(iit_hpu, wdata, rx_ps);
+		if (ret < 0) {
+			fprintf(stderr, "tx error %d\n", ret);
+			ACCESS_ONCE(thread_kill) = 1;
+			break;
+		}
+	}
+
+	pthread_join(read_thread, NULL);
+	sem_destroy(&write_sem);
+
+	size = 0;
+	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
+	while (read(iit_hpu, data, rx_ps) > 0);
+
+	size = 0x7fff0000;
+	ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
+
 }
 
 int main(int argc, char * argv[])
@@ -520,6 +596,8 @@ int main(int argc, char * argv[])
 
 	printf("phase 5 OK (%f)\n", time_sec);
 
+	test_throughput(rx_ps);
+
 	fill_fifo(rx_ps, rx_pn, loop_type, 1);
 
 	/* check for fifo-full recover */
@@ -528,6 +606,9 @@ int main(int argc, char * argv[])
 		_read_data(rx_size, rx_n, 0x55, 1);
 	}
 	printf("phase 6 OK\n");
+
+
+	test_throughput(rx_ps);
 
 	val = 0;
 	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
