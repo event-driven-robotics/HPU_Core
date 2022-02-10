@@ -75,8 +75,11 @@
 #define IOC_SET_AXIS_LATENCY		_IOW(IOC_MAGIC_NUMBER, 28, unsigned int *)
 #define IOC_GET_RX_PN			_IOR(IOC_MAGIC_NUMBER, 29, unsigned int *)
 
+#define IOC_SET_TX_TIMING_MODE         	_IOW(IOC_MAGIC_NUMBER, 32, unsigned int *)
+
 #define IOC_SET_RX_TS_ENABLE		_IOW(IOC_MAGIC_NUMBER, 40, unsigned int *)
 #define IOC_SET_TX_TS_ENABLE		_IOW(IOC_MAGIC_NUMBER, 41, unsigned int *)
+
 
 typedef enum {
 	/* order matters here! Must be consistent with the following array */
@@ -120,7 +123,11 @@ typedef struct {
 	hpu_interface_cfg_t cfg;
 	hpu_tx_route_t route;
 } hpu_tx_interface_ioctl_t;
-
+typedef enum {
+	TIMINGMODE_DELTA,
+	TIMINGMODE_ASAP,
+	TIMINGMODE_ABS,
+} hpu_tx_timing_mode_t;
 
 uint32_t data[65536], wdata[65536];
 int iit_hpu;
@@ -511,6 +518,9 @@ int main(int argc, char * argv[])
 	val = 1;
 	ioctl(iit_hpu, IOC_SET_RX_TS_ENABLE, &val);
 	ioctl(iit_hpu, IOC_SET_TX_TS_ENABLE, &val);
+
+	hpu_tx_timing_mode_t timing_mode = TIMINGMODE_ASAP;
+	ioctl(iit_hpu, IOC_SET_TX_TIMING_MODE, &timing_mode);
 
 	memset((void*)&rxiface, 0, sizeof(rxiface));
 	memset((void*)&txiface, 0, sizeof(txiface));
