@@ -1013,6 +1013,11 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 						       DMA_MEM_TO_DEV,
 						       DMA_CTRL_ACK |
 						       DMA_PREP_INTERRUPT);
+		if (!dma_desc) {
+			i = -ENOMEM;
+			goto exit;
+		}
+
 		dma_desc->callback = hpu_tx_dma_callback;
 		dma_desc->callback_param = dma_buf;
 #ifdef HPU_DMA_STREAMING
