@@ -358,25 +358,31 @@ void test_throughput(int rx_ps)
 	float thr;
 	sem_t write_sem;
 	int size;
+	int to_write;
 
 	void *read_thread_fun(void *arg)
 	{
 		unsigned long rlen = 0;
-		int ret;
+		int ret = 0;
 		double et = 0.0;
+		int to_read;
 		struct timespec start_time, cur_time;
 
 		clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
 
 		ACCESS_ONCE(run) = 1;
-		while (1) {
-			ret = read(iit_hpu, data, rx_ps);
-			if (ret < 0) {
-				fprintf(stderr, "read err %d\n", ret);
-				break;
+		while (ret >= 0) {
+			to_read = rx_ps;
+			while (to_read) {
+				ret = read(iit_hpu, data, to_read);
+				if (ret < 0) {
+					fprintf(stderr, "read err %d\n", ret);
+					break;
+				}
+				to_read -= ret;
 			}
 			sem_post(&write_sem);
-			rlen += ret;
+			rlen += rx_ps;
 			clock_gettime(CLOCK_MONOTONIC_RAW, &cur_time);
 			et = time_diff(&start_time, &cur_time);
 			if (et > 10)
@@ -398,15 +404,20 @@ void test_throughput(int rx_ps)
 	sem_init(&write_sem, 0, 5);
 	pthread_create(&read_thread, NULL, read_thread_fun, NULL);
 
-	while (1) {
+	while (ACCESS_ONCE(run) && !ACCESS_ONCE(thread_kill)) {
 		sem_wait(&write_sem);
-		if (!ACCESS_ONCE(run))
-			break;
-		ret = write(iit_hpu, wdata, rx_ps);
-		if (ret < 0) {
-			fprintf(stderr, "tx error %d\n", ret);
-			ACCESS_ONCE(thread_kill) = 1;
-			break;
+		to_write = rx_ps;
+		while (to_write) {
+			if (!ACCESS_ONCE(run))
+				break;
+
+			ret = write(iit_hpu, wdata, to_write);
+			if (ret < 0) {
+				fprintf(stderr, "tx error %d\n", ret);
+				ACCESS_ONCE(thread_kill) = 1;
+				break;
+			}
+			to_write -= ret;
 		}
 	}
 
