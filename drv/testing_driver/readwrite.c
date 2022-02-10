@@ -136,9 +136,7 @@ int iit_hpu;
 #define UNDERLINE "\033[4m"
 void banner(char *b)
 {
-	printf(MAGENTA"+ " NORMAL BOLD);
-	printf(b);
-	printf(NORMAL);
+	printf(MAGENTA"+ " NORMAL BOLD"%s"NORMAL, b);
 	fflush(stdout);
 }
 
@@ -339,7 +337,7 @@ void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts, int tx_t
 	if (loop_type == LOOP_LNEAR) {
 		size = 0x0;
 		ioctl(iit_hpu, IOCTL_SET_BLK_RX_THR, &size);
-		read(iit_hpu, data, 8);
+		ret = read(iit_hpu, data, 8);
 	}
 
 	size = 0x7fff0000;
