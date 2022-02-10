@@ -150,8 +150,8 @@ int main(int argc, char * argv[])
 	signal(SIGINT, handle_kill);
 
 	mlockall(MCL_CURRENT|MCL_FUTURE);
-	memset(wdata, 0, sizeof(wdata) / sizeof(wdata[0]));
-	memset(data, 0, sizeof(data) / sizeof(data[0]));
+	memset(wdata, 0, sizeof(wdata));
+	memset(data, 0, sizeof(data));
 
 	printf("REMEMBER: driver must be in 'test dma' mode\n");
 	iit_hpu = open("/dev/iit-hpu0",O_RDWR);
