@@ -60,9 +60,6 @@
 #define TYPE_TD 		0x00000000
 #define TYPE_APS  		0x00040000
 
-#define DIFF_TIMESTAMP          80.0
-#define UNITY_TIMESTAMP         0.000000001
-
 #define IOC_MAGIC_NUMBER        0
 #define IOC_READ_TS			_IOR(IOC_MAGIC_NUMBER, 1, unsigned int *)
 #define IOC_CLEAR_TS			_IOW(IOC_MAGIC_NUMBER, 2, unsigned int *)
