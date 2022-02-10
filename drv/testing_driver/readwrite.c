@@ -310,6 +310,7 @@ void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts, int tx_t
 
 	/* cause a fifo full: fill-up the RX ring and the RX FIFO, plus an extra data */
 	printf(YELLOW"[intentionally causing fifo full");
+	fflush(stdout);
 	for (i = 0; i < rx_pn; i++) {
 		write_data(rx_ps / 4 / k / h, /*rx_pn*/ 1);
 		usleep(100);
@@ -324,11 +325,12 @@ void fill_fifo(int rx_ps, int rx_pn, spinn_loop_t loop_type, int rx_ts, int tx_t
 	//write_data(32 * 1024 / 8 - 1, /*rx_pn*/ 1);
 	//write_data(1, /*rx_pn*/ 1);
 	printf(".. fifo filled");
+	fflush(stdout);
 	usleep(100000);
 	ret = read(iit_hpu, data, 8);
 
 	printf(".. fifo full %s]"NORMAL"\n", (ret < 0) ? "OK" : "not detected");
-
+	fflush(stdout);
 	/*
 	 * If the IP has been synthesized with at least one "real"
 	 * interface (e.g. paer), then during near-loop fifo-overflow
