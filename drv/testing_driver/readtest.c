@@ -165,7 +165,7 @@ int main(int argc, char * argv[])
 	else
 		printf("RX Pool size = %d\n", rx_ps);
 
-		ret = ioctl(iit_hpu, IOC_GET_RX_PN, &rx_pn);
+	ret = ioctl(iit_hpu, IOC_GET_RX_PN, &rx_pn);
 	if (ret < 0)
 		printf("Unknown RX pn\n");
 	else
