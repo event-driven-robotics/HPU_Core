@@ -1661,7 +1661,7 @@
             <spirit:name>gtwiz_userclk_rx_usrclk2</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_gtwiz_userclk_rx_usrclk2_i</spirit:name>
+            <spirit:name>ARx_GTH_gtwiz_userclk_rx_usrclk2_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1669,7 +1669,7 @@
             <spirit:name>gtwiz_reset_all</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_gtwiz_reset_all_o</spirit:name>
+            <spirit:name>ARx_GTH_gtwiz_reset_all_o</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1677,7 +1677,7 @@
             <spirit:name>rxbyteisaligned</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_Rxbyteisaligned_i</spirit:name>
+            <spirit:name>ARx_GTH_Rxbyteisaligned_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1685,7 +1685,7 @@
             <spirit:name>rxctrl2</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_Rxctrl2_i</spirit:name>
+            <spirit:name>ARx_GTH_Rxctrl2_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1693,7 +1693,7 @@
             <spirit:name>rxctrl1</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_Rxctrl1_i</spirit:name>
+            <spirit:name>ARx_GTH_Rxctrl1_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1701,7 +1701,7 @@
             <spirit:name>rxctrl3</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_Rxctrl3_i</spirit:name>
+            <spirit:name>ARx_GTH_Rxctrl3_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1709,7 +1709,7 @@
             <spirit:name>rxbyterealign</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_Rxbyterealign_i</spirit:name>
+            <spirit:name>ARx_GTH_Rxbyterealign_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1717,7 +1717,7 @@
             <spirit:name>qpll_lock</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_Qpll_lock_i</spirit:name>
+            <spirit:name>ARx_GTH_Qpll_lock_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1725,7 +1725,7 @@
             <spirit:name>rxctrl0</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_Rxctrl0_i</spirit:name>
+            <spirit:name>ARx_GTH_Rxctrl0_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1733,7 +1733,7 @@
             <spirit:name>qpll_refclklost</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_Qpll_refclklost_i</spirit:name>
+            <spirit:name>ARx_GTH_Qpll_refclklost_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -1741,7 +1741,7 @@
             <spirit:name>gtwiz_userdata_rx</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>AuxRx_GTH_gtwiz_userdata_rx_i</spirit:name>
+            <spirit:name>ARx_GTH_gtwiz_userdata_rx_i</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
       </spirit:portMaps>
@@ -2032,7 +2032,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>b354e884</spirit:value>
+            <spirit:value>7b187162</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2051,7 +2051,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>b354e884</spirit:value>
+            <spirit:value>7b187162</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2066,7 +2066,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>1fac7885</spirit:value>
+            <spirit:value>8d2af28a</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -3764,7 +3764,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_RxGtpAlignRequest_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_RxGtpAlignRequest_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4951,7 +4951,7 @@
         </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_gtwiz_userclk_rx_usrclk2_i</spirit:name>
+        <spirit:name>ARx_GTH_gtwiz_userclk_rx_usrclk2_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -4965,20 +4965,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_gtwiz_userclk_rx_usrclk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_gtwiz_reset_all_o</spirit:name>
+        <spirit:name>ARx_GTH_gtwiz_reset_all_o</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:vector>
@@ -4992,20 +4982,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_gtwiz_reset_all_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_gtwiz_userdata_rx_i</spirit:name>
+        <spirit:name>ARx_GTH_gtwiz_userdata_rx_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -5019,20 +4999,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_gtwiz_userdata_rx_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_Rxctrl2_i</spirit:name>
+        <spirit:name>ARx_GTH_Rxctrl2_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -5046,20 +5016,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_Rxctrl2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_Rxctrl0_i</spirit:name>
+        <spirit:name>ARx_GTH_Rxctrl0_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -5073,20 +5033,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_Rxctrl0_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_Rxctrl1_i</spirit:name>
+        <spirit:name>ARx_GTH_Rxctrl1_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -5100,20 +5050,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_Rxctrl1_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_Rxctrl3_i</spirit:name>
+        <spirit:name>ARx_GTH_Rxctrl3_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -5127,20 +5067,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_Rxctrl3_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_Rxbyteisaligned_i</spirit:name>
+        <spirit:name>ARx_GTH_Rxbyteisaligned_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -5154,20 +5084,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_Rxbyterealign_i</spirit:name>
+        <spirit:name>ARx_GTH_Rxbyterealign_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -5181,20 +5101,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_Qpll_lock_i</spirit:name>
+        <spirit:name>ARx_GTH_Qpll_lock_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -5208,20 +5118,10 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_Qpll_lock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>AuxRx_GTH_Qpll_refclklost_i</spirit:name>
+        <spirit:name>ARx_GTH_Qpll_refclklost_i</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
@@ -5235,17 +5135,7 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
         </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.AuxRx_GTH_Qpll_refclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
         <spirit:name>ARx_SPNN_Data_i</spirit:name>
@@ -7784,8 +7674,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>7</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2022-01-26T15:29:38Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>11</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2022-02-10T16:28:36Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
@@ -8155,14 +8045,85 @@
         <xilinx:tag xilinx:name="ui.data.coregen.dd@2d5ecd39_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@3219ed0d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@642a718e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4bdc8ef2_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d6aa70c_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@51e67ea3_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7608b1d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3dae8d15_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@33ef2a6d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@d8c781c_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@42ced119_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@252b72d2_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6950473d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@48ef0332_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@12696923_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3aa41334_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@16c00f44_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4f1bbf43_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@253c8c6_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e12dd95_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@368a9cd4_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@104a8a76_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@bf5fbbb_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5adaebba_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3cbd0267_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@fac210_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20dc34b5_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4cf9050f_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3e08d7ff_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39214f18_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@770054e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40b723e7_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40713367_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4131efff_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@446ac29b_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6b20cd51_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@21f9ffe4_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44735e98_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7bcedeaa_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61fe2ae9_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6638845c_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@618ee1dd_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@199c98f4_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5410c16b_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5b433232_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@333becbb_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@77205738_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@67b7c78f_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@41c717a9_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36573790_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3717840e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ac3929b_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@725ebc84_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@76478ce3_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@a2e1637_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@184503e9_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@66f976a5_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a6dde57_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@a2b9f5_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@24b501a8_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6fcf0643_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9d093d0_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7edb1117_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@60efeb20_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5d2c8dc7_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@23d24f9e_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@113408e5_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5a145110_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@56117d79_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1198a457_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@26e19055_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3413f882_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@20ea688d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3292dfd7_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2020.1</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="6f9db30d"/>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="6ce4280d"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="7a037ac6"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="dd7b9039"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="28dda69f"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="7382dc3d"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="f4ca08d3"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="10a04d42"/>
     </xilinx:packagingInfo>

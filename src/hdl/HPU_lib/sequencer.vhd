@@ -92,6 +92,9 @@ architecture beh of sequencer is
     signal TSMask            : std_logic_vector(31 downto 0);
     signal TSTimeoutEnable   : std_logic;
     
+    signal i_OutSrcRdy       : std_logic; 
+    signal i_InRead          : std_logic; 
+    
     type rom_array is array (0 to 15) of unsigned (23 downto 0);
     constant Timeout_Table : rom_array := ( conv_unsigned(      1_0, 24),  -- Address 0   :       1.0 ms
                                             conv_unsigned(      5_0, 24),  -- Address 1   :       5.0 ms
@@ -130,7 +133,10 @@ begin
     combo   <= NmL_xDN(31) & NmA_xDN(31) & AmL_xDN(31);
 
     -- wiring
-    OutAddr_o    <= Address_xDP;
+    OutAddr_o    <= InAddrEvt_i(31 downto 0) when (TSMode_i = "01") else Address_xDP;
+    OutSrcRdy_o  <= i_OutSrcRdy;
+    InRead_o     <= i_InRead;
+    
     --ConfigAddr_xDO <= Address_xDP;
 
     --p_next : process (Address_xDN, Address_xDP, ConfigAck_xSI, Delta_xDN, Delta_xDP,
@@ -150,8 +156,8 @@ begin
         NetxTime_xDN <= NetxTime_xDP;
         LastTime_xDN <= LastTime_xDP;
 
-        InRead_o     <= '0';
-        OutSrcRdy_o  <= '0';
+        i_InRead     <= '0';
+        i_OutSrcRdy  <= '0';
         
         LoadTimer_o  <= '0';
         SendPending  <= '0';
@@ -166,7 +172,7 @@ begin
                     if (InEmpty_i = '0') then
                         Delta_xDN   <= unsigned(InAddrEvt_i(63 downto 32));
                         Address_xDN <= InAddrEvt_i(31 downto 0);
-                        InRead_o    <= '1';
+                        i_InRead    <= '1';
                         
                         NetxTime_xDN <= unsigned(InAddrEvt_i(63 downto 32) and TSMask);
                         LastTime_xDN <= NetxTime_xDP;
@@ -186,7 +192,11 @@ begin
                          
                          elsif (TSMode_i = "01") then  -- (Send immediatly)
                              
-                             State_xDN <= stSend;
+                             i_InRead <= not InEmpty_i and OutDstRdy_i;
+                             i_OutSrcRdy <= not InEmpty_i;
+                             
+                             State_xDN <= stIdle;
+                             -- State_xDN <= stSend;
                             
                          elsif (TSMode_i = "10") then  -- (Absolute Time)
                              
@@ -206,7 +216,7 @@ begin
                 else
                     -- not Enable_xSI
                     -- discard pending sequencer data if not enabled:
-                    InRead_o <= not InEmpty_i;
+                    i_InRead <= not InEmpty_i;
                 end if;
             
             when stWaitDelta =>
@@ -250,7 +260,7 @@ begin
             when stSend =>
 
                 SendPending   <= '1';
-                OutSrcRdy_o   <= '1';
+                i_OutSrcRdy   <= '1';
                 
                 if (OutDstRdy_i = '1') then
             --        State_xDN <= stWait; -- ADDED -=FD=-

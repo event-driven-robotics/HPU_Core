@@ -325,17 +325,17 @@ entity HPUCore is
     ARx_GTP_PllLock_i                     : in  std_logic;                                           
     ARx_GTP_PllRefclklost_i               : in  std_logic;   
     -- GTH lines 
-    AuxRx_GTH_gtwiz_userclk_rx_usrclk2_i  : in std_logic_vector(0 downto 0);                
-    AuxRx_GTH_gtwiz_reset_all_o           : out std_logic_vector(0 downto 0);               
-    AuxRx_GTH_gtwiz_userdata_rx_i         : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);   
-    AuxRx_GTH_Rxctrl2_i                   : in  std_logic_vector(7 downto 0);
-    AuxRx_GTH_Rxctrl0_i                   : in  std_logic_vector(15 downto 0);
-    AuxRx_GTH_Rxctrl1_i                   : in  std_logic_vector(15 downto 0);
-    AuxRx_GTH_Rxctrl3_i                   : in  std_logic_vector(7 downto 0);
-    AuxRx_GTH_Rxbyteisaligned_i           : in  std_logic_vector(0 downto 0);               
-    AuxRx_GTH_Rxbyterealign_i             : in  std_logic_vector(0 downto 0);               
-    AuxRx_GTH_Qpll_lock_i                 : in  std_logic_vector(0 downto 0);               
-    AuxRx_GTH_Qpll_refclklost_i           : in  std_logic_vector(0 downto 0); 
+    ARx_GTH_gtwiz_userclk_rx_usrclk2_i    : in std_logic_vector(0 downto 0);                
+    ARx_GTH_gtwiz_reset_all_o             : out std_logic_vector(0 downto 0);               
+    ARx_GTH_gtwiz_userdata_rx_i           : in  std_logic_vector(C_GTP_DSIZE-1 downto 0);   
+    ARx_GTH_Rxctrl2_i                     : in  std_logic_vector(7 downto 0);
+    ARx_GTH_Rxctrl0_i                     : in  std_logic_vector(15 downto 0);
+    ARx_GTH_Rxctrl1_i                     : in  std_logic_vector(15 downto 0);
+    ARx_GTH_Rxctrl3_i                     : in  std_logic_vector(7 downto 0);
+    ARx_GTH_Rxbyteisaligned_i             : in  std_logic_vector(0 downto 0);               
+    ARx_GTH_Rxbyterealign_i               : in  std_logic_vector(0 downto 0);               
+    ARx_GTH_Qpll_lock_i                   : in  std_logic_vector(0 downto 0);               
+    ARx_GTH_Qpll_refclklost_i             : in  std_logic_vector(0 downto 0); 
     -- SpiNNaker Interface 
     ARx_SPNN_Data_i                       : in  std_logic_vector(6 downto 0); 
     ARx_SPNN_Ack_o                        : out std_logic;  
@@ -1203,17 +1203,17 @@ NEUSERIAL_CORE_m : neuserial_core
     AuxRx_GTP_PllLock_i                   => ARx_GTP_PllLock_i,                
     AuxRx_GTP_PllRefclklost_i             => ARx_GTP_PllRefclklost_i,      
     -- GTH lines 
-    AuxRx_GTH_gtwiz_userclk_rx_usrclk2_i  => AuxRx_GTH_gtwiz_userclk_rx_usrclk2_i,
-    AuxRx_GTH_gtwiz_reset_all_o           => AuxRx_GTH_gtwiz_reset_all_o,
-    AuxRx_GTH_gtwiz_userdata_rx_i         => AuxRx_GTH_gtwiz_userdata_rx_i,
-    AuxRx_GTH_Rxctrl2_i                   => AuxRx_GTH_Rxctrl2_i,
-    AuxRx_GTH_Rxctrl0_i                   => AuxRx_GTH_Rxctrl0_i,
-    AuxRx_GTH_Rxctrl1_i                   => AuxRx_GTH_Rxctrl1_i,
-    AuxRx_GTH_Rxctrl3_i                   => AuxRx_GTH_Rxctrl3_i,
-    AuxRx_GTH_Rxbyteisaligned_i           => AuxRx_GTH_Rxbyteisaligned_i,
-    AuxRx_GTH_Rxbyterealign_i             => AuxRx_GTH_Rxbyterealign_i,
-    AuxRx_GTH_Qpll_lock_i                 => AuxRx_GTH_Qpll_lock_i,
-    AuxRx_GTH_Qpll_refclklost_i           => AuxRx_GTH_Qpll_refclklost_i,
+    AuxRx_GTH_gtwiz_userclk_rx_usrclk2_i  => ARx_GTH_gtwiz_userclk_rx_usrclk2_i,
+    AuxRx_GTH_gtwiz_reset_all_o           => ARx_GTH_gtwiz_reset_all_o,
+    AuxRx_GTH_gtwiz_userdata_rx_i         => ARx_GTH_gtwiz_userdata_rx_i,
+    AuxRx_GTH_Rxctrl2_i                   => ARx_GTH_Rxctrl2_i,
+    AuxRx_GTH_Rxctrl0_i                   => ARx_GTH_Rxctrl0_i,
+    AuxRx_GTH_Rxctrl1_i                   => ARx_GTH_Rxctrl1_i,
+    AuxRx_GTH_Rxctrl3_i                   => ARx_GTH_Rxctrl3_i,
+    AuxRx_GTH_Rxbyteisaligned_i           => ARx_GTH_Rxbyteisaligned_i,
+    AuxRx_GTH_Rxbyterealign_i             => ARx_GTH_Rxbyterealign_i,
+    AuxRx_GTH_Qpll_lock_i                 => ARx_GTH_Qpll_lock_i,
+    AuxRx_GTH_Qpll_refclklost_i           => ARx_GTH_Qpll_refclklost_i,
     -- SpiNNaker Interface              
     AuxRx_SPNN_Data_i                     => ARx_SPNN_Data_i,
     AuxRx_SPNN_Ack_o                      => ARx_SPNN_Ack_o, 
