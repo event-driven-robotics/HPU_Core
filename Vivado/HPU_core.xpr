@@ -85,14 +85,14 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GT_lib/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/Vivado_ip/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GT_lib/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -510,7 +510,7 @@
       <File Path="$PPRDIR/../component.xml">
         <FileInfo SFType="IPXACT"/>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GT_lib/GTPRX_HPU_ZYNQ/GTPRX_HPU_ZYNQ.xci">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/Vivado_ip/GTPRX_HPU_ZYNQ/GTPRX_HPU_ZYNQ.xci">
         <FileInfo>
           <Attr Name="UserDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -518,7 +518,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GT_lib/FIFO_GTP_MSG_ZYNQ/FIFO_GTP_MSG_ZYNQ.xci">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/Vivado_ip/FIFO_GTP_MSG_ZYNQ/FIFO_GTP_MSG_ZYNQ.xci">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -526,7 +526,7 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/GT_lib/FIFO_GTP_DATA_ZYNQ/FIFO_GTP_DATA_ZYNQ.xci">
+      <File Path="$PPRDIR/../src/hdl/GT_lib/Vivado_ip/FIFO_GTP_DATA_ZYNQ/FIFO_GTP_DATA_ZYNQ.xci">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>

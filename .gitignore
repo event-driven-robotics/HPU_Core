@@ -38,16 +38,12 @@ Vivado/*
 *DRAFT*                                           
 *draft*                                           
 
-# Vivado IP generation files in GTP_lib folder:
-src/hdl/GTP_lib/**/*.*                              
-!src/hdl/GTP_lib/*/*.xci  
-
-                                                  
 # Vivado IP source subfolder:                     
-src/Vivado_ip/**/*.*                              
-!src/Vivado_ip/*/*.xci                           
+**/Vivado_ip/*/*                                
+!**/Vivado_ip/*/*.xci       
+!**/Vivado_ip/*/*.coe  
                                                   
 # Vivado Block Diagram source subfolder:          
-src/Vivado_bd/**/*.*                              
-!src/Vivado_bd/*/*.bd                            
-!src/Vivado_bd/*/*.ui 
+**/Vivado_bd/*/*                        
+!**/Vivado_bd/*/*.bd                            
+!**/Vivado_bd/*/synth/*.vhd  
