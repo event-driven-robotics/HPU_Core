@@ -2032,7 +2032,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>7b187162</spirit:value>
+            <spirit:value>7581f568</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2051,7 +2051,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>7b187162</spirit:value>
+            <spirit:value>7581f568</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2066,7 +2066,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>8d2af28a</spirit:value>
+            <spirit:value>c6d09352</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -6621,16 +6621,6 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GT_lib/FIFO_GTP_DATA_ZYNQ/FIFO_GTP_DATA_ZYNQ.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/GT_lib/FIFO_GTP_MSG_ZYNQ/FIFO_GTP_MSG_ZYNQ.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQ/FIFO_SAER_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
@@ -6663,17 +6653,17 @@
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GT_lib/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/GT_lib/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci</spirit:name>
+        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQUPLUS/FIFO_SAER_ZYNQUPLUS.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -7003,16 +6993,6 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GT_lib/FIFO_GTP_DATA_ZYNQ/FIFO_GTP_DATA_ZYNQ.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/GT_lib/FIFO_GTP_MSG_ZYNQ/FIFO_GTP_MSG_ZYNQ.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQ/FIFO_SAER_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
@@ -7044,17 +7024,17 @@
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GT_lib/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/GT_lib/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci</spirit:name>
+        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQUPLUS/FIFO_SAER_ZYNQUPLUS.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -7674,8 +7654,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>11</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2022-02-10T16:28:36Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>12</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2022-02-18T12:22:19Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
@@ -8116,13 +8096,27 @@
         <xilinx:tag xilinx:name="ui.data.coregen.dd@3413f882_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@20ea688d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@3292dfd7_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@239331eb_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@44c904f6_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7842cf95_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@78df1da9_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ba69d01_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@64fbcb58_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@11a4af6f_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@777c38bc_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@218f4925_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3cd9d4d9_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@50b7e2bb_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14425097_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@9e1e2fe_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2adc46d_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2020.1</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="6ce4280d"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="28dda69f"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="810e1b01"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="7382dc3d"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="f4ca08d3"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="10a04d42"/>
