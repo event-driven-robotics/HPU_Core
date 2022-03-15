@@ -101,14 +101,18 @@ library ieee;
     type t_RxSaerStat_array is array (natural range <>) of t_RxSaerStat;
 
     type t_TxGtpStat is record
-        pll_alarm     : std_logic;
+        pll_alarm           : std_logic;
+        TxGtpEventRate      : std_logic_vector(15 downto 0); -- Count per millisecond 
+        TxGtpMessageRate    : std_logic_vector( 7 downto 0); -- Count per millisecond 
     end record t_TxGtpStat;
     
     type t_TxGtpStat_array is array (natural range <>) of t_TxGtpStat;
 
     type t_RxGtpStat is record
-        pll_alarm     : std_logic;
-        rx_disaligned : std_logic;
+        pll_alarm           : std_logic;
+        rx_disaligned       : std_logic;
+        RxGtpEventRate      : std_logic_vector(15 downto 0); -- Count per millisecond 
+        RxGtpMessageRate    : std_logic_vector( 7 downto 0); -- Count per millisecond 
     end record t_RxGtpStat;
     
     type t_RxGtpStat_array is array (natural range <>) of t_RxGtpStat;

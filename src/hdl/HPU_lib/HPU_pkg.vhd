@@ -365,7 +365,8 @@ component neuserial_core is
     RxPaerAckRelDelay_i                   : in  std_logic_vector(7 downto 0);
     
     -- Status
-    WrapDetected_o                        : out   std_logic;
+    WrapDetected_o                        : out std_logic;
+    TxGtpStat_o                           : out t_TxGtpStat;
     
     --TxPaerFifoEmpty_o                   : out std_logic;
     TxSaerStat_o                          : out t_TxSaerStat_array(C_TX_HSSAER_N_CHAN-1 downto 0);
@@ -564,6 +565,10 @@ component axilite is
     LRxSaerStat_i                   : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
     RRxSaerStat_i                   : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
     AUXRxSaerStat_i                 : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    TxGtpStat_i                     : in t_TxGtpStat;
+    LRxGtpStat_i                    : in t_RxGtpStat;
+    RRxGtpStat_i                    : in t_RxGtpStat;
+    AUXRxGtpStat_i                  : in t_RxGtpStat;
     TxSpnnlnkStat_i                 : in  t_TxSpnnlnkStat;
     LRxSpnnlnkStat_i                : in  t_RxSpnnlnkStat;
     RRxSpnnlnkStat_i                : in  t_RxSpnnlnkStat;

@@ -367,6 +367,7 @@ entity neuserial_core is
     
     --TxPaerFifoEmpty_o                   : out std_logic;
     TxSaerStat_o                          : out t_TxSaerStat_array(C_TX_HSSAER_N_CHAN-1 downto 0);
+    TxGtpStat_o                           : out t_TxGtpStat;
     
     LRxPaerFifoFull_o                     : out std_logic;
     RRxPaerFifoFull_o                     : out std_logic;
@@ -388,7 +389,7 @@ entity neuserial_core is
     SpnnRxMask_i                          : in  std_logic_vector(31 downto 0);  -- SpiNNaker RX Data Mask 
     SpnnCtrl_i                            : in  std_logic_vector(31 downto 0);  -- SpiNNaker Control register 
     SpnnStatus_o                          : out std_logic_vector(31 downto 0);  -- SpiNNaker Status Register  
-    
+   
     --
     -- INTERCEPTION
     ---------------------

@@ -170,6 +170,10 @@ entity axilite is
     LRxSaerStat_i                   : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
     RRxSaerStat_i                   : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
     AUXRxSaerStat_i                 : in  t_RxSaerStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    TxGtpStat_i                     : in  t_TxGtpStat;
+    LRxGtpStat_i                    : in  t_RxGtpStat;
+    RRxGtpStat_i                    : in  t_RxGtpStat;
+    AUXRxGtpStat_i                  : in  t_RxGtpStat;
     TxSpnnlnkStat_i                 : in  t_TxSpnnlnkStat;
     LRxSpnnlnkStat_i                : in  t_RxSpnnlnkStat;
     RRxSpnnlnkStat_i                : in  t_RxSpnnlnkStat;
@@ -327,76 +331,80 @@ architecture rtl of axilite is
     signal  i_SPNN_RX_MASK_reg    : std_logic_vector (31 downto 0);
     signal  i_SPNN_CTRL_reg       : std_logic_vector (31 downto 0);
     
-    signal  i_CTRL_rd             : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_LPBK_CNFG_rd        : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_RXData_rd           : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_RXTime_rd           : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_TXData_rd           : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_DMA_rd              : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_RAWSTAT_rd          : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_IRQ_rd              : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_MSK_rd              : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    -- signal  i_BiasTime_rd         : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_WRAPTime_rd         : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    -- signal  i_PRESCVal_rd         : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    -- signal  i_OutNeuronsThr_rd    : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_HSSAER_STAT_rd      : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_HSSAER_RX_ERR_rd    : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_HSSAER_RX_MSK_rd    : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_RX_CTRL_rd          : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_TX_CTRL_rd          : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_RX_CNFG_rd          : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_TX_CNFG_rd          : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_IP_CONFIG_rd        : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_FIFOTHRESH_rd       : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_LPBK_CNFG_AUX_rd    : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_ID_rd               : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_AUX_CTRL_rd         : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_HSSAER_AUX_RX_ERR_rd: std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_HSSAER_AUX_RX_MSK_rd: std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_HSSAER_AUX_RX_ERR_CNT_rd : t_RxErrStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
-    signal  i_readRxErrCnt : std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
-    signal  i_HSSAER_AUX_RX_ERR_THR_rd : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_SPNN_START_KEY_rd   : std_logic_vector (31 downto 0);
-    signal  i_SPNN_STOP_KEY_rd    : std_logic_vector (31 downto 0);
-    signal  i_SPNN_TX_MASK_rd     : std_logic_vector (31 downto 0);
-    signal  i_SPNN_RX_MASK_rd     : std_logic_vector (31 downto 0);
-    signal  i_SPNN_CTRL_rd        : std_logic_vector (31 downto 0);
-    signal  i_SPNN_STATUS_rd      : std_logic_vector (31 downto 0);
-    signal  i_TlastCnt_rd         : std_logic_vector (31 downto 0);
-    signal  i_TDataCnt_rd         : std_logic_vector (31 downto 0);
-    signal  i_TlastTO_rd          : std_logic_vector (31 downto 0);
+    signal  i_CTRL_rd                   : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_LPBK_CNFG_rd              : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_RXData_rd                 : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_RXTime_rd                 : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_TXData_rd                 : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_DMA_rd                    : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_RAWSTAT_rd                : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_IRQ_rd                    : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_MSK_rd                    : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    -- signal  i_BiasTime_rd            : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_WRAPTime_rd               : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    -- signal  i_PRESCVal_rd            : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    -- signal  i_OutNeuronsThr_rd       : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_HSSAER_STAT_rd            : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_HSSAER_RX_ERR_rd          : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_HSSAER_RX_MSK_rd          : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_RX_CTRL_rd                : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_TX_CTRL_rd                : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_RX_CNFG_rd                : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_TX_CNFG_rd                : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_IP_CONFIG_rd              : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_FIFOTHRESH_rd             : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_LPBK_CNFG_AUX_rd          : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_ID_rd                     : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_AUX_CTRL_rd               : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_HSSAER_AUX_RX_ERR_rd      : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_HSSAER_AUX_RX_MSK_rd      : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_HSSAER_AUX_RX_ERR_CNT_rd  : t_RxErrStat_array(C_RX_HSSAER_N_CHAN-1 downto 0);
+    signal  i_readRxErrCnt              : std_logic_vector(C_RX_HSSAER_N_CHAN-1 downto 0);
+    signal  i_HSSAER_AUX_RX_ERR_THR_rd  : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_SPNN_START_KEY_rd         : std_logic_vector (31 downto 0);
+    signal  i_SPNN_STOP_KEY_rd          : std_logic_vector (31 downto 0);
+    signal  i_SPNN_TX_MASK_rd           : std_logic_vector (31 downto 0);
+    signal  i_SPNN_RX_MASK_rd           : std_logic_vector (31 downto 0);
+    signal  i_SPNN_CTRL_rd              : std_logic_vector (31 downto 0);
+    signal  i_SPNN_STATUS_rd            : std_logic_vector (31 downto 0);
+    signal  i_TlastCnt_rd               : std_logic_vector (31 downto 0);
+    signal  i_TDataCnt_rd               : std_logic_vector (31 downto 0);
+    signal  i_TlastTO_rd                : std_logic_vector (31 downto 0);
+    signal  i_GTRX_LEFT_rd              : std_logic_vector (31 downto 0);
+    signal  i_GTRX_RIGHT_rd             : std_logic_vector (31 downto 0);
+    signal  i_GTRX_AUX_rd               : std_logic_vector (31 downto 0);
+    signal  i_GTTX_rd                   : std_logic_vector (31 downto 0);
 
 
-    signal  i_rawHSSaerErr  : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
-    signal  i_rawAUXHSSaerErr : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_rawHSSaerErr              : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
+    signal  i_rawAUXHSSaerErr           : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
 
-    signal  i_LocFarRPaerLoopback  : std_logic;
-    signal  i_LocFarLPaerLoopback  : std_logic;
-    signal  i_LocFarAuxPaerLoopback: std_logic;
-    signal  i_LocFarRSaerLoopback  : std_logic;
-    signal  i_LocFarLSaerLoopback  : std_logic;
-    signal  i_LocFarAuxSaerLoopback: std_logic;
-    signal  i_LocNearLoopback      : std_logic;
-    signal  i_RemoteLoopback       : std_logic;
-    signal  i_LocFarSpnnLnkLoopbackSel : std_logic_vector (1 downto 0);
-    -- signal  i_ChipType             : std_logic;
-    signal  i_fulltimestamp        : std_logic;
-    signal  i_ResetStream          : std_logic;
-    -- signal  i_TxEnable             : std_logic;
-    -- signal  i_RRxEnable            : std_logic;
-    -- signal  i_LRxEnable            : std_logic;
-    -- signal  i_BG_PowerDown         : std_logic;
-    -- signal  i_TxPaerFlushFifos     : std_logic;
-    signal  i_RRxPaerFlushFifos    : std_logic;
-    signal  i_LRxPaerFlushFifos    : std_logic;
-    signal  i_AuxRxPaerFlushFifos  : std_logic;
-    signal  i_FlushRXFifos           : std_logic;
-    signal  i_FlushTXFifos           : std_logic;
-    signal  i_LatTlast             : std_logic;
-    -- signal  i_EnableLoopBack       : std_logic;
-    signal  i_interruptEnable      : std_logic;
-    signal  i_EnableDmaIf          : std_logic;
+    signal  i_LocFarRPaerLoopback       : std_logic;
+    signal  i_LocFarLPaerLoopback       : std_logic;
+    signal  i_LocFarAuxPaerLoopback     : std_logic;
+    signal  i_LocFarRSaerLoopback       : std_logic;
+    signal  i_LocFarLSaerLoopback       : std_logic;
+    signal  i_LocFarAuxSaerLoopback     : std_logic;
+    signal  i_LocNearLoopback           : std_logic;
+    signal  i_RemoteLoopback            : std_logic;
+    signal  i_LocFarSpnnLnkLoopbackSel  : std_logic_vector (1 downto 0);
+    -- signal  i_ChipType               : std_logic;
+    signal  i_fulltimestamp             : std_logic;
+    signal  i_ResetStream               : std_logic;
+    -- signal  i_TxEnable               : std_logic;
+    -- signal  i_RRxEnable              : std_logic;
+    -- signal  i_LRxEnable              : std_logic;
+    -- signal  i_BG_PowerDown           : std_logic;
+    -- signal  i_TxPaerFlushFifos       : std_logic;
+    signal  i_RRxPaerFlushFifos         : std_logic;
+    signal  i_LRxPaerFlushFifos         : std_logic;
+    signal  i_AuxRxPaerFlushFifos       : std_logic;
+    signal  i_FlushRXFifos              : std_logic;
+    signal  i_FlushTXFifos              : std_logic;
+    signal  i_LatTlast                  : std_logic;
+    -- signal  i_EnableLoopBack         : std_logic;
+    signal  i_interruptEnable           : std_logic;
+    signal  i_EnableDmaIf               : std_logic;
     -- signal  i_EnableIp             : std_logic;
 
 
@@ -476,6 +484,7 @@ architecture rtl of axilite is
     signal  i_AUXRxHSSaerEn    : std_logic;
     signal  i_rawInterrupt     : std_logic_vector(C_SLV_DWIDTH-1 downto 0);
     signal  i_SpnnLnk_err      : std_logic_vector(26 downto 20);
+    signal  i_GT_err           : std_logic_vector(28 downto 27);
 
     signal  i_TlastTO          : std_logic_vector(31 downto 0);
     signal  i_TlastTowritten   : std_logic;
@@ -491,9 +500,20 @@ begin
                         AuxRxSpnnlnkStat_i.parity_err   &
                         AuxRxSpnnlnkStat_i.parity_err   &
                         TxSpnnlnkStat_i.dump_mode       ; 
+    
+    -- gigabit Transceivers errors                    
+    i_GT_err <=         (AuxRxGtpStat_i.rx_disaligned or RRxGtpStat_i.rx_disaligned or LRxGtpStat_i.rx_disaligned) &
+                        (TxGtpStat_i.pll_alarm or AuxRxGtpStat_i.pll_alarm or RRxGtpStat_i.pll_alarm or LRxGtpStat_i.pll_alarm);
+                        
+
+    i_GTRX_LEFT_rd      <= LRxGtpStat_i.RxGtpEventRate   & LRxGtpStat_i.RxGtpMessageRate   & "000000" & LRxGtpStat_i.rx_disaligned    & LRxGtpStat_i.pll_alarm    ;
+    i_GTRX_RIGHT_rd     <= RRxGtpStat_i.RxGtpEventRate   & RRxGtpStat_i.RxGtpMessageRate   & "000000" & RRxGtpStat_i.rx_disaligned    & RRxGtpStat_i.pll_alarm    ;
+    i_GTRX_AUX_rd       <= AuxRxGtpStat_i.RxGtpEventRate & AuxRxGtpStat_i.RxGtpMessageRate & "000000" & AuxRxGtpStat_i.rx_disaligned  & AuxRxGtpStat_i.pll_alarm  ;
+    i_GTTX_rd           <= TxGtpStat_i.TxGtpEventRate    & TxGtpStat_i.TxGtpMessageRate    & "000000" & '0'                           & TxGtpStat_i.pll_alarm;
+
                         
     -- i_rawInterrupt is used in IRQ_reg
-    i_rawInterrupt <= c_zero_vect(31 downto 27) & i_SpnnLnk_err & i_glbl_err_msk & RawInterrupt_i;
+    i_rawInterrupt <= c_zero_vect(31 downto 29) & i_GT_err & i_SpnnLnk_err & i_glbl_err_msk & RawInterrupt_i;
 
 
     ReadRxBuffer_o <= axi_arready when (unsigned(axi_araddr(C_ADDR_WIDTH-1 downto 2)) = 2 or unsigned(axi_araddr(C_ADDR_WIDTH-1 downto 2)) = 3) else
@@ -1115,7 +1135,8 @@ begin
                           i_readRxErrCnt, i_HSSAER_AUX_RX_ERR_THR_rd, i_HSSAER_AUX_RX_ERR_CNT_rd,
                           i_SPNN_START_KEY_rd, i_SPNN_STOP_KEY_rd, i_SPNN_TX_MASK_rd, i_SPNN_RX_MASK_rd,
                           i_SPNN_CTRL_rd, i_SPNN_STATUS_rd,
-                          i_TlastCnt_rd, i_TDataCnt_rd, i_TlastTO_rd)
+                          i_TlastCnt_rd, i_TDataCnt_rd, i_TlastTO_rd,
+                          i_GTRX_LEFT_rd, i_GTRX_RIGHT_rd, i_GTRX_AUX_rd, i_GTTX_rd)
     begin
         if (S_AXI_ARESETN = '0') then
             regDataOut <= (others => '0');
@@ -1183,7 +1204,12 @@ begin
                 when 40 => regDataOut  <= i_TlastTO_rd;
                 when 41 => regDataOut  <= i_TlastCnt_rd;
                 when 42 => regDataOut  <= i_TDataCnt_rd;
-
+           --   when 43 => Available   
+                when 44 => regDataOut  <= i_GTRX_LEFT_rd;
+                when 45 => regDataOut  <= i_GTRX_RIGHT_rd;
+                when 46 => regDataOut  <= i_GTRX_AUX_rd;
+                when 47 => regDataOut  <= i_GTTX_rd;
+                
                when others  => regDataOut  <= x"BAB0BAB0";
             end case;
         end if;
@@ -1980,8 +2006,13 @@ begin
     -- ------------------------------------------------------------------------
     i_TDataCnt_rd <= TDataCnt_i;
 
-
-
+    -- ------------------------------------------------------------------------
+    -- Gigabit Transceiver registers
+    -- ------------------------------------------------------------------------
+    i_GTRX_LEFT_rd      <= LRxGtpStat_i.RxGtpEventRate   & LRxGtpStat_i.RxGtpMessageRate   & "000000" & LRxGtpStat_i.rx_disaligned    & LRxGtpStat_i.pll_alarm    ;
+    i_GTRX_RIGHT_rd     <= RRxGtpStat_i.RxGtpEventRate   & RRxGtpStat_i.RxGtpMessageRate   & "000000" & RRxGtpStat_i.rx_disaligned    & RRxGtpStat_i.pll_alarm    ;
+    i_GTRX_AUX_rd       <= AuxRxGtpStat_i.RxGtpEventRate & AuxRxGtpStat_i.RxGtpMessageRate & "000000" & AuxRxGtpStat_i.rx_disaligned  & AuxRxGtpStat_i.pll_alarm  ;
+    i_GTTX_rd           <= TxGtpStat_i.TxGtpEventRate    & TxGtpStat_i.TxGtpMessageRate    & "000000" & '0'                           & TxGtpStat_i.pll_alarm;
 
 end architecture rtl;
 
