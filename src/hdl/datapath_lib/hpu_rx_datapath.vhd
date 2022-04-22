@@ -238,6 +238,32 @@ attribute mark_debug : string;
 attribute mark_debug of i_InPaerSrc               : signal is "true";
 attribute mark_debug of i_InPaerDst               : signal is "true";
 
+
+
+  
+attribute mark_debug of En1Sec_i                            : signal is "true";
+attribute mark_debug of RxGtpMsgDstRdy_i                    : signal is "true";
+attribute mark_debug of GTP_RxUsrClk2_i                     : signal is "true";
+attribute mark_debug of GTP_Rxdata_i                        : signal is "true";
+attribute mark_debug of GTP_Rxchariscomma_i                 : signal is "true";
+attribute mark_debug of GTP_Rxcharisk_i                     : signal is "true";
+attribute mark_debug of GTP_Rxdisperr_i                     : signal is "true";
+attribute mark_debug of GTP_Rxnotintable_i                  : signal is "true";
+attribute mark_debug of GTP_Rxbyteisaligned_i               : signal is "true";
+attribute mark_debug of GTP_Rxbyterealign_i                 : signal is "true";
+attribute mark_debug of GTP_PllLock_i                       : signal is "true";
+attribute mark_debug of GTP_PllRefclklost_i                 : signal is "true";
+attribute mark_debug of GTH_gtwiz_userclk_rx_usrclk2_i      : signal is "true";
+attribute mark_debug of GTH_gtwiz_userdata_rx_i             : signal is "true";
+attribute mark_debug of GTH_Rxctrl2_i                       : signal is "true";
+attribute mark_debug of GTH_Rxctrl0_i                       : signal is "true";
+attribute mark_debug of GTH_Rxctrl1_i                       : signal is "true";
+attribute mark_debug of GTH_Rxctrl3_i                       : signal is "true";
+attribute mark_debug of GTH_Rxbyteisaligned_i               : signal is "true";
+attribute mark_debug of GTH_Rxbyterealign_i                 : signal is "true";
+attribute mark_debug of GTH_Qpll_lock_i                     : signal is "true";
+attribute mark_debug of GTH_Qpll_refclklost_i               : signal is "true";
+
    
 
 begin
@@ -507,6 +533,8 @@ DBG_FIFO_4 <= DBG_FIFO4;
 g_gtp_true : if C_HAS_GTP = true generate
 
 -- Signals
+signal ii_gtp_nrst            : std_logic;
+
 signal i_RxGtpPllAlarm        : std_logic; 
 signal i_RxGtpAlignRequest    : std_logic;
 signal i_RxGtpDisaligned      : std_logic;
@@ -529,7 +557,21 @@ signal i_GtpRxuserrdy         : std_logic;
 
 signal i_gth_gtwiz_reset_all  : std_logic_vector(0 downto 0);  
 
+
+attribute mark_debug of ii_gtp_nrst                         : signal is "true";
+attribute mark_debug of i_RxGtpPllAlarm                     : signal is "true";
+attribute mark_debug of i_RxGtpAlignRequest                 : signal is "true";
+attribute mark_debug of i_RxGtpDisaligned                   : signal is "true";
+attribute mark_debug of i_RxGtpMsg                          : signal is "true";
+attribute mark_debug of i_RxGtpMsgSrcRdy                    : signal is "true";  
+attribute mark_debug of i_GtpSoftResetRx                    : signal is "true";
+attribute mark_debug of i_GtpDataValid                      : signal is "true";
+attribute mark_debug of i_GtpRxuserrdy                      : signal is "true";
+attribute mark_debug of i_gth_gtwiz_reset_all               : signal is "true";
+
 begin
+
+  ii_gtp_nrst <= nRst and EnableGTP_i;
 
   GT_MANAGER_RX_i : GT_Manager 
     generic map( 
@@ -546,9 +588,9 @@ begin
       
       -- COMMONs
       -- Bare Control ports
-      CLK_i                   => Clk_i,  -- Input clock - Fabric side
-      RST_N_i                 => nRst,      -- Asynchronous active low reset (clk clock)
-      EN1S_i                  => En1Sec_i,  -- Enable @ 1 sec in clk domain 
+      CLK_i                   => Clk_i,       -- Input clock - Fabric side
+      RST_N_i                 => ii_gtp_nrst, -- Asynchronous active low reset (clk clock)
+      EN1S_i                  => En1Sec_i,    -- Enable @ 1 sec in clk domain 
   
       -- Status
       PLL_ALARM_o             => i_RxGtpPllAlarm,

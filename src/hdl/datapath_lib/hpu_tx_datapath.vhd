@@ -283,7 +283,7 @@ signal ii_paer_nrst : std_logic;
 
 begin
 
-  ii_paer_nrst <= nRst and EnablePAER_i;        -- Modified from OR to AND logic - Maurizio Casti, 07/24/2018 
+  ii_paer_nrst <= nRst and EnablePAER_i;        -- Modified from OR to AND logic - Maurizio Casti, 24/07/2018 
   
   u_simplePAEROutput : SimplePAEROutputRR
   generic map (
@@ -346,7 +346,7 @@ signal synch_fifo_rd_en : std_logic_vector(C_HSSAER_N_CHAN-1 downto 0);
 
 begin
 
-  ii_hssaer_nrst <= nRst or EnableHSSAER_i;
+  ii_hssaer_nrst <= nRst and EnableHSSAER_i;        -- Modified from OR to AND logic - Maurizio Casti, 13/04/2022
   
   
   u_hssaer_tx_splitter : neuserial_PAER_splitter
@@ -549,6 +549,8 @@ end generate g_spinnlnk_false;
 
 g_gtp_true : if C_HAS_GTP = true generate
 
+signal ii_gtp_nrst            : std_logic;
+
 signal i_TxGtpPllAlarm        : std_logic;
 signal i_TxGtpAutoAlign       : std_logic;
 signal i_TxGtpErrorInjection  : std_logic;
@@ -574,6 +576,8 @@ begin
 
 i_TxGtpAutoAlign      <= '0';
 i_TxGtpErrorInjection <= '0';
+
+ii_gtp_nrst <= nRst and EnableGTP_i;
  
   GT_MANAGER_TX_i : GT_Manager 
     generic map( 
@@ -590,9 +594,9 @@ i_TxGtpErrorInjection <= '0';
       
       -- COMMONs
       -- Bare Control ports
-      CLK_i                   => Clk_i,  -- Input clock - Fabric side
-      RST_N_i                 => nRst,      -- Asynchronous active low reset (clk clock)
-      EN1S_i                  => En1Sec_i,  -- Enable @ 1 sec in clk domain 
+      CLK_i                   => Clk_i,       -- Input clock - Fabric side
+      RST_N_i                 => ii_gtp_nrst, -- Asynchronous active low reset (clk clock)
+      EN1S_i                  => En1Sec_i,    -- Enable @ 1 sec in clk domain 
   
       -- Status
       PLL_ALARM_o             => i_TxGtpPllAlarm,

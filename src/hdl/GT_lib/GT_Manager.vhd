@@ -536,11 +536,22 @@ signal rx_data_w1_gckrx            : std_logic_vector(GT_DATA_WIDTH_g-1 downto 0
 
 
 -- DEBUG
--- attribute mark_debug : string;
+attribute mark_debug : string;
 -- attribute mark_debug of RX_DATA_o               : signal is "true";
 -- attribute mark_debug of RX_DATA_SRC_RDY_o       : signal is "true";
 -- attribute mark_debug of RX_DATA_DST_RDY_i       : signal is "true";
 -- attribute mark_debug of RX_ALIGN_REQUEST_o      : signal is "true";
+
+attribute mark_debug of rx_align_req_gckrx               : signal is "true";
+attribute mark_debug of gt_rxbyteisaligned               : signal is "true";
+attribute mark_debug of rx_unknown_k_detected_gckrx      : signal is "true";
+attribute mark_debug of rx_k_chars_d_gckrx      : signal is "true";
+attribute mark_debug of rx_data_flag_d_gckrx      : signal is "true";
+attribute mark_debug of rx_gtp_align_flag_d_gckrx      : signal is "true";
+attribute mark_debug of rx_msg_flag_d_gckrx      : signal is "true";
+attribute mark_debug of rx_idle_flag_d_gckrx      : signal is "true";
+attribute mark_debug of rx_unknown_k_flag_gckrx      : signal is "true";
+
 
 
 

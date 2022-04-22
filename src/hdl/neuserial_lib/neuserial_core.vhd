@@ -626,6 +626,13 @@ attribute mark_debug : string;
 attribute mark_debug of LRxHSSaerEn_i       : signal is "true";
 attribute mark_debug of RRxHSSaerEn_i       : signal is "true";
 
+attribute mark_debug of i_rxMonSrc     : signal is "true";        
+attribute mark_debug of i_rxMonDst     : signal is "true";        
+
+attribute mark_debug of i_rxMonData    : signal is "true";        
+attribute mark_debug of i_rxMonSrcRdy  : signal is "true";        
+attribute mark_debug of i_rxMonDstRdy  : signal is "true";        
+
 -- attribute mark_debug of RRx_GTP_RxUsrClk2_i       : signal is "true";
 -- attribute mark_debug of RRx_GTP_SoftResetRx_o     : signal is "true";         
 -- attribute mark_debug of RRx_GTP_DataValid_o       : signal is "true";           
