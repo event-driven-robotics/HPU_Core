@@ -45,13 +45,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="97"/>
-    <Option Name="WTModelSimExportSim" Val="97"/>
-    <Option Name="WTQuestaExportSim" Val="97"/>
-    <Option Name="WTIesExportSim" Val="97"/>
-    <Option Name="WTVcsExportSim" Val="97"/>
-    <Option Name="WTRivieraExportSim" Val="97"/>
-    <Option Name="WTActivehdlExportSim" Val="97"/>
+    <Option Name="WTXSimExportSim" Val="101"/>
+    <Option Name="WTModelSimExportSim" Val="101"/>
+    <Option Name="WTQuestaExportSim" Val="101"/>
+    <Option Name="WTIesExportSim" Val="101"/>
+    <Option Name="WTVcsExportSim" Val="101"/>
+    <Option Name="WTRivieraExportSim" Val="101"/>
+    <Option Name="WTActivehdlExportSim" Val="101"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -64,6 +64,34 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
+      <File Path="$PPRDIR/../src/hdl/coremon/Vivado_ip/RXFIFO_HPU_ZYNQ/RXFIFO_HPU_ZYNQ.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/coremon/Vivado_ip/TXFIFO_HPU_ZYNQ/TXFIFO_HPU_ZYNQ.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/coremon/Vivado_ip/RXFIFO_HPU_ZYNQUPLUS/RXFIFO_HPU_ZYNQUPLUS.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/coremon/Vivado_ip/TXFIFO_HPU_ZYNQUPLUS/TXFIFO_HPU_ZYNQUPLUS.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../src/hdl/hssaer/ddr_sampler.v">
         <FileInfo>
           <Attr Name="Library" Val="hssaer"/>
@@ -215,9 +243,16 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/coremonseq/coremonseq_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/swissknife/swissknife_pkg.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="coremonseq"/>
+          <Attr Name="Library" Val="swissknife"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/coremon/coremonseq_pkg.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="coremon"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -229,16 +264,9 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/swissknife/swissknife_pkg.vhd">
+      <File Path="$PPRDIR/../src/hdl/coremon/CoreMonSeq.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="swissknife"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/hdl/coremonseq/CoreMonSeq.vhd">
-        <FileInfo>
-          <Attr Name="Library" Val="coremonseq"/>
+          <Attr Name="Library" Val="coremon"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -274,6 +302,20 @@
       <File Path="$PPRDIR/../src/hdl/HPU/HPU_pkg.vhd">
         <FileInfo>
           <Attr Name="Library" Val="HPU"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/axi/axi_pkg.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="axi"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/neuserial/neuserial_pkg.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="neuserial"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -348,16 +390,30 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/neuserial/axilite.vhd">
+      <File Path="$PPRDIR/../src/hdl/axi/axilite.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="neuserial"/>
+          <Attr Name="Library" Val="axi"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/neuserial/axistream.vhd">
+      <File Path="$PPRDIR/../src/hdl/axi/axistream.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="neuserial"/>
+          <Attr Name="Library" Val="axi"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/hssaer/hssaer_pkg.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="hssaer"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/hdl/spinnaker/spinnaker_pkg.vhd">
+        <FileInfo>
+          <Attr Name="Library" Val="spinnaker"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -390,13 +446,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/neuserial/neuserial_pkg.vhd">
-        <FileInfo>
-          <Attr Name="Library" Val="neuserial"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../src/hdl/neuserial/neuserial_core.vhd">
         <FileInfo>
           <Attr Name="Library" Val="neuserial"/>
@@ -411,9 +460,9 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/coremonseq/sequencer.vhd">
+      <File Path="$PPRDIR/../src/hdl/coremon/sequencer.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="coremonseq"/>
+          <Attr Name="Library" Val="coremon"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -432,16 +481,16 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/coremonseq/timestamp.vhd">
+      <File Path="$PPRDIR/../src/hdl/coremon/timestamp.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="coremonseq"/>
+          <Attr Name="Library" Val="coremon"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/coremonseq/timetagger.vhd">
+      <File Path="$PPRDIR/../src/hdl/coremon/timetagger.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="coremonseq"/>
+          <Attr Name="Library" Val="coremon"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -465,9 +514,9 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../src/hdl/coremonseq/TimestampWrapDetector.vhd">
+      <File Path="$PPRDIR/../src/hdl/coremon/TimestampWrapDetector.vhd">
         <FileInfo>
-          <Attr Name="Library" Val="coremonseq"/>
+          <Attr Name="Library" Val="coremon"/>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -644,58 +693,6 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="RXFIFO_HPU_ZYNQ" Type="BlockSrcs" RelSrcDir="$PSRCDIR/RXFIFO_HPU_ZYNQ">
-      <File Path="$PPRDIR/../src/hdl/coremonseq/Vivado_ip/RXFIFO_HPU_ZYNQ/RXFIFO_HPU_ZYNQ.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="RXFIFO_HPU_ZYNQ"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
-    <FileSet Name="TXFIFO_HPU_ZYNQ" Type="BlockSrcs" RelSrcDir="$PSRCDIR/TXFIFO_HPU_ZYNQ">
-      <File Path="$PPRDIR/../src/hdl/coremonseq/Vivado_ip/TXFIFO_HPU_ZYNQ/TXFIFO_HPU_ZYNQ.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="TXFIFO_HPU_ZYNQ"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
-    <FileSet Name="RXFIFO_HPU_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/RXFIFO_HPU_ZYNQUPLUS">
-      <File Path="$PPRDIR/../src/hdl/coremonseq/Vivado_ip/RXFIFO_HPU_ZYNQUPLUS/RXFIFO_HPU_ZYNQUPLUS.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="RXFIFO_HPU_ZYNQUPLUS"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
-    <FileSet Name="TXFIFO_HPU_ZYNQUPLUS" Type="BlockSrcs" RelSrcDir="$PSRCDIR/TXFIFO_HPU_ZYNQUPLUS">
-      <File Path="$PPRDIR/../src/hdl/coremonseq/Vivado_ip/TXFIFO_HPU_ZYNQUPLUS/TXFIFO_HPU_ZYNQUPLUS.xci">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <Config>
-        <Option Name="TopModule" Val="TXFIFO_HPU_ZYNQUPLUS"/>
-        <Option Name="UseBlackboxStub" Val="1"/>
-      </Config>
-    </FileSet>
     <FileSet Name="FIFO_SAER_ZYNQ" Type="BlockSrcs" RelSrcDir="$PSRCDIR/FIFO_SAER_ZYNQ">
       <File Path="$PPRDIR/../src/hdl/datapath/Vivado_ip/FIFO_SAER_ZYNQ/FIFO_SAER_ZYNQ.xci">
         <FileInfo>
@@ -742,11 +739,12 @@
     </Simulator>
   </Simulators>
   <Runs Version="1" Minor="11">
-    <Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7z015clg485-2" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" IncludeInArchive="true">
+    <Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7z015clg485-2" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" State="current" Dir="$PRUNDIR/synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
         <Step Id="synth_design"/>
       </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
@@ -791,59 +789,9 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="RXFIFO_HPU_ZYNQ_synth_1" Type="Ft3:Synth" SrcSet="RXFIFO_HPU_ZYNQ" Part="xc7z015clg485-2" ConstrsSet="RXFIFO_HPU_ZYNQ" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/RXFIFO_HPU_ZYNQ_synth_1" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="TXFIFO_HPU_ZYNQ_synth_1" Type="Ft3:Synth" SrcSet="TXFIFO_HPU_ZYNQ" Part="xc7z015clg485-2" ConstrsSet="TXFIFO_HPU_ZYNQ" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/TXFIFO_HPU_ZYNQ_synth_1" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="RXFIFO_HPU_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="RXFIFO_HPU_ZYNQUPLUS" Part="xc7z015clg485-2" ConstrsSet="RXFIFO_HPU_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/RXFIFO_HPU_ZYNQUPLUS_synth_1" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="TXFIFO_HPU_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="TXFIFO_HPU_ZYNQUPLUS" Part="xc7z015clg485-2" ConstrsSet="TXFIFO_HPU_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/TXFIFO_HPU_ZYNQUPLUS_synth_1" IncludeInArchive="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
-        <Step Id="synth_design"/>
-      </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
-      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
     <Run Id="FIFO_SAER_ZYNQ_synth_1" Type="Ft3:Synth" SrcSet="FIFO_SAER_ZYNQ" Part="xc7z015clg485-2" ConstrsSet="FIFO_SAER_ZYNQ" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/FIFO_SAER_ZYNQ_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -853,9 +801,7 @@
     </Run>
     <Run Id="FIFO_SAER_ZYNQUPLUS_synth_1" Type="Ft3:Synth" SrcSet="FIFO_SAER_ZYNQUPLUS" Part="xc7z015clg485-2" ConstrsSet="FIFO_SAER_ZYNQUPLUS" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/FIFO_SAER_ZYNQUPLUS_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -948,87 +894,9 @@
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
       <RQSFiles/>
     </Run>
-    <Run Id="RXFIFO_HPU_ZYNQ_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="RXFIFO_HPU_ZYNQ" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="RXFIFO_HPU_ZYNQ_synth_1" IncludeInArchive="false" GenFullBitstream="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="TXFIFO_HPU_ZYNQ_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="TXFIFO_HPU_ZYNQ" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="TXFIFO_HPU_ZYNQ_synth_1" IncludeInArchive="false" GenFullBitstream="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="RXFIFO_HPU_ZYNQUPLUS_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="RXFIFO_HPU_ZYNQUPLUS" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="RXFIFO_HPU_ZYNQUPLUS_synth_1" IncludeInArchive="false" GenFullBitstream="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
-    <Run Id="TXFIFO_HPU_ZYNQUPLUS_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="TXFIFO_HPU_ZYNQUPLUS" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="TXFIFO_HPU_ZYNQUPLUS_synth_1" IncludeInArchive="false" GenFullBitstream="true">
-      <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
-        <Step Id="init_design"/>
-        <Step Id="opt_design"/>
-        <Step Id="power_opt_design"/>
-        <Step Id="place_design"/>
-        <Step Id="post_place_power_opt_design"/>
-        <Step Id="phys_opt_design"/>
-        <Step Id="route_design"/>
-        <Step Id="post_route_phys_opt_design"/>
-        <Step Id="write_bitstream"/>
-      </Strategy>
-      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2020"/>
-      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
-      <RQSFiles/>
-    </Run>
     <Run Id="FIFO_SAER_ZYNQ_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="FIFO_SAER_ZYNQ" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="FIFO_SAER_ZYNQ_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -1045,9 +913,7 @@
     </Run>
     <Run Id="FIFO_SAER_ZYNQUPLUS_impl_1" Type="Ft2:EntireDesign" Part="xc7z015clg485-2" ConstrsSet="FIFO_SAER_ZYNQUPLUS" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="FIFO_SAER_ZYNQUPLUS_synth_1" IncludeInArchive="false" GenFullBitstream="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>

@@ -16,12 +16,23 @@ library ieee;
   use ieee.std_logic_1164.all;
   use ieee.std_logic_arith.all;
   use ieee.std_logic_unsigned.all;
+  
+library paer;
+  use paer.components.all;
+  
+library hssaer;
+  use hssaer.components.all;
+  
+library spinnaker;
+  use spinnaker.components.all;
+
+library GT;
+  use GT.components.all;
 
 library work;
   use work.constants.all;
   use work.types.all;
   use work.components.all;
-
 
 entity hpu_rx_datapath is
   generic (

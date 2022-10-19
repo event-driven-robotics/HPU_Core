@@ -14,16 +14,20 @@ library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
 
+library work;
+  use work.components.all;
+  
 library datapath;
   use datapath.constants.all;
   use datapath.types.all;
   use datapath.components.all;
 
+library coremon;
+  use coremon.components.all;
+  
 library swissknife;
   use swissknife.types.all;
 
-library work;
-  use work.components.all;
 
 --library neuelab;
 --    use neuelab.NEComponents_pkg.all;

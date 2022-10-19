@@ -77,11 +77,17 @@
 -- ********************************************
 
 library ieee;
-    use ieee.std_logic_1164.all;
+  use ieee.std_logic_1164.all;
 
 library work;
-    use work.components.all;
-    
+  use work.components.all;
+        
+library axi;
+  use axi.components.all;
+        
+library neuserial;
+  use neuserial.components.all;
+
 library datapath;
   use datapath.constants.all;
   use datapath.types.all;
