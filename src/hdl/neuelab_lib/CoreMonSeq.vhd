@@ -210,20 +210,12 @@ signal TxFifoResetting      : std_logic;
 signal TxFifoDin            : std_logic_vector(63 downto 0);
 signal TxFifoDinMsB         : std_logic_vector(63 downto 32);
 signal TxFifoDinLsB         : std_logic_vector(31 downto 0);
------------------------------------------------------------------------------
--- Debug attributes
+
+
+-- -----------------------------------------------------------------------------
+-- DEBUG
 attribute mark_debug : string;
-attribute mark_debug of RxFifoReset              : signal is "true";
-attribute mark_debug of RxFifoWrEn              : signal is "true";
-attribute mark_debug of RxFifoRdEn              : signal is "true";
-attribute mark_debug of RxFifoEmpty              : signal is "true";
-attribute mark_debug of RxFifoFull              : signal is "true";
-attribute mark_debug of RxFifoAlmostEmpty              : signal is "true";
-attribute mark_debug of FifoRxNumData_o              : signal is "true";
-attribute mark_debug of RxFifoWrRstBusy              : signal is "true";
-attribute mark_debug of RxFifoRdRstBusy              : signal is "true";
-attribute mark_debug of MonOutAddrEvt              : signal is "true";
-attribute mark_debug of FifoRxDat_o              : signal is "true";
+
 
 
 begin

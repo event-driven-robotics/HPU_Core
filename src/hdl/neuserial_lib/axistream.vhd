@@ -82,29 +82,6 @@ architecture rtl of axistream is
 -- -----------------------------------------------------------------------------
 -- DEBUG
 attribute mark_debug : string;
-attribute mark_debug of counterData               : signal is "true";
-attribute mark_debug of i_timeexpired             : signal is "true";
-attribute mark_debug of state                     : signal is "true";
-attribute mark_debug of i_enable_ip               : signal is "true";
-attribute mark_debug of i_sent_an_event           : signal is "true";
-attribute mark_debug of EnableAxistreamIf_i       : signal is "true";
-attribute mark_debug of S_AXIS_TREADY             : signal is "true";
-attribute mark_debug of S_AXIS_TDATA              : signal is "true";
-attribute mark_debug of S_AXIS_TLAST              : signal is "true";
-attribute mark_debug of S_AXIS_TVALID             : signal is "true";
-attribute mark_debug of M_AXIS_TVALID             : signal is "true";
-attribute mark_debug of M_AXIS_TDATA              : signal is "true";
-attribute mark_debug of M_AXIS_TLAST              : signal is "true";
-attribute mark_debug of M_AXIS_TREADY             : signal is "true";
-
-
--- attribute mark_debug of i_TlastTimerLock          : signal is "true";
-attribute mark_debug of i_TlastTimer              : signal is "true";
-attribute mark_debug of LatTlat_i                 : signal is "true";
-attribute mark_debug of TlastTO_i                 : signal is "true";
-attribute mark_debug of TlastTOwritten_i          : signal is "true";
-
-
 
 -- -----------------------------------------------------------------------------
 

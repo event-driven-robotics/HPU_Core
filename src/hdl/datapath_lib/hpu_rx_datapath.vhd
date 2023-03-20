@@ -235,36 +235,6 @@ signal DBG_FIFO4 : std_logic_vector(C_INTERNAL_DSIZE-1 downto 0);
 -- -----------------------------------------------------------------------------
 -- DEBUG
 attribute mark_debug : string;
-attribute mark_debug of i_InPaerSrc               : signal is "true";
-attribute mark_debug of i_InPaerDst               : signal is "true";
-
-
-
-  
-attribute mark_debug of En1Sec_i                            : signal is "true";
-attribute mark_debug of RxGtpMsgDstRdy_i                    : signal is "true";
-attribute mark_debug of GTP_RxUsrClk2_i                     : signal is "true";
-attribute mark_debug of GTP_Rxdata_i                        : signal is "true";
-attribute mark_debug of GTP_Rxchariscomma_i                 : signal is "true";
-attribute mark_debug of GTP_Rxcharisk_i                     : signal is "true";
-attribute mark_debug of GTP_Rxdisperr_i                     : signal is "true";
-attribute mark_debug of GTP_Rxnotintable_i                  : signal is "true";
-attribute mark_debug of GTP_Rxbyteisaligned_i               : signal is "true";
-attribute mark_debug of GTP_Rxbyterealign_i                 : signal is "true";
-attribute mark_debug of GTP_PllLock_i                       : signal is "true";
-attribute mark_debug of GTP_PllRefclklost_i                 : signal is "true";
-attribute mark_debug of GTH_gtwiz_userclk_rx_usrclk2_i      : signal is "true";
-attribute mark_debug of GTH_gtwiz_userdata_rx_i             : signal is "true";
-attribute mark_debug of GTH_Rxctrl2_i                       : signal is "true";
-attribute mark_debug of GTH_Rxctrl0_i                       : signal is "true";
-attribute mark_debug of GTH_Rxctrl1_i                       : signal is "true";
-attribute mark_debug of GTH_Rxctrl3_i                       : signal is "true";
-attribute mark_debug of GTH_Rxbyteisaligned_i               : signal is "true";
-attribute mark_debug of GTH_Rxbyterealign_i                 : signal is "true";
-attribute mark_debug of GTH_Qpll_lock_i                     : signal is "true";
-attribute mark_debug of GTH_Qpll_refclklost_i               : signal is "true";
-
-   
 
 begin
 
@@ -556,18 +526,6 @@ signal i_GtpDataValid         : std_logic;
 signal i_GtpRxuserrdy         : std_logic;
 
 signal i_gth_gtwiz_reset_all  : std_logic_vector(0 downto 0);  
-
-
-attribute mark_debug of ii_gtp_nrst                         : signal is "true";
-attribute mark_debug of i_RxGtpPllAlarm                     : signal is "true";
-attribute mark_debug of i_RxGtpAlignRequest                 : signal is "true";
-attribute mark_debug of i_RxGtpDisaligned                   : signal is "true";
-attribute mark_debug of i_RxGtpMsg                          : signal is "true";
-attribute mark_debug of i_RxGtpMsgSrcRdy                    : signal is "true";  
-attribute mark_debug of i_GtpSoftResetRx                    : signal is "true";
-attribute mark_debug of i_GtpDataValid                      : signal is "true";
-attribute mark_debug of i_GtpRxuserrdy                      : signal is "true";
-attribute mark_debug of i_gth_gtwiz_reset_all               : signal is "true";
 
 begin
 

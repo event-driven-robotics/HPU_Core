@@ -621,31 +621,10 @@ signal i_AuxRxGtpEventRate    : std_logic_vector(15 downto 0);
 signal i_AuxRxGtpMessageRate  : std_logic_vector( 7 downto 0);
 
 
+-- -----------------------------------------------------------------------------
 -- DEBUG
 attribute mark_debug : string;
-attribute mark_debug of LRxHSSaerEn_i       : signal is "true";
-attribute mark_debug of RRxHSSaerEn_i       : signal is "true";
-
-attribute mark_debug of i_rxMonSrc     : signal is "true";        
-attribute mark_debug of i_rxMonDst     : signal is "true";        
-
-attribute mark_debug of i_rxMonData    : signal is "true";        
-attribute mark_debug of i_rxMonSrcRdy  : signal is "true";        
-attribute mark_debug of i_rxMonDstRdy  : signal is "true";        
-
--- attribute mark_debug of RRx_GTP_RxUsrClk2_i       : signal is "true";
--- attribute mark_debug of RRx_GTP_SoftResetRx_o     : signal is "true";         
--- attribute mark_debug of RRx_GTP_DataValid_o       : signal is "true";           
--- attribute mark_debug of RRx_GTP_Rxuserrdy_o       : signal is "true";                   
--- attribute mark_debug of RRx_GTP_Rxdata_i          : signal is "true";
--- attribute mark_debug of RRx_GTP_Rxchariscomma_i   : signal is "true";
--- attribute mark_debug of RRx_GTP_Rxcharisk_i       : signal is "true";
--- attribute mark_debug of RRx_GTP_Rxdisperr_i       : signal is "true";
--- attribute mark_debug of RRx_GTP_Rxnotintable_i    : signal is "true";
--- attribute mark_debug of RRx_GTP_Rxbyteisaligned_i : signal is "true";                   
--- attribute mark_debug of RRx_GTP_Rxbyterealign_i   : signal is "true";                   
--- attribute mark_debug of RRx_GTP_PllLock_i         : signal is "true";                 
--- attribute mark_debug of RRx_GTP_PllRefclklost_i   : signal is "true";    
+  
 
 begin
 
