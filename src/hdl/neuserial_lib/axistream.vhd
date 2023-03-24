@@ -15,7 +15,7 @@ library ieee;
 entity axistream is
     port (
         Clk                    : in  std_logic;
-        nRst                   : in  std_logic;
+        nRst                   : in  std_logic;  -- NOTE: synchronous reset
         --                    
         DMA_test_mode_i        : in  std_logic;
         EnableAxistreamIf_i    : in  std_logic;

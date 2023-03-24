@@ -2032,7 +2032,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>de627f69</spirit:value>
+            <spirit:value>25d9cb4a</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2051,7 +2051,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>bd9c6cc4</spirit:value>
+            <spirit:value>9877d341</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -6747,6 +6747,12 @@
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
+      <spirit:file>
+        <spirit:name>src/hdl/HPU_lib/reset_machine.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_c8d58e8e</spirit:userFileType>
+        <spirit:logicalName>HPU_lib</spirit:logicalName>
+      </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
       <spirit:name>xilinx_anylanguagesynthesis_xilinx_com_ip_fifo_generator_13_2__ref_view_fileset</spirit:name>
@@ -7126,6 +7132,12 @@
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>sim/reset_machine_tb.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -7678,8 +7690,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>13</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2023-01-19T11:22:14Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>15</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2023-03-22T15:55:02Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="iit.local:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
         <xilinx:tag xilinx:name="IIT:user:HPUCore:1.0_ARCHIVE_LOCATION">d:/Projects/Repository/HPUCore_3.0</xilinx:tag>
@@ -8167,13 +8179,29 @@
         <xilinx:tag xilinx:name="ui.data.coregen.dd@48c89aa2_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@16aecec4_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@30dd0ee5_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2ca42e95_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@4753d9f2_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@7d8af17b_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@6f214549_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@7effcfd7_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@47c2b0b_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@bfe51c9_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@5a61b1e1_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@374c7495_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@1666462c_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@7b5a45f0_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@78f5eecb_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@1be02f3a_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2f6ec9cf_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@28798635_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@8033ad3_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2020.1</xilinx:xilinxVersion>
+      <xilinx:xilinxVersion>2021.1</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="6ce4280d"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="54d8cb3d"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="912240d0"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="7382dc3d"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="f4ca08d3"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="10a04d42"/>

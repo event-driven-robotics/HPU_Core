@@ -12,22 +12,17 @@
 -- ==============================================================================
 --  PRESENT REVISION
 -- ==============================================================================
---  File        : time_machine_tb.vhd
+--  File        : reset_machine_tb.vhd
 --  Revision    : 1.0
 --  Author      : M. Casti
 --  Date        : 
 -- ------------------------------------------------------------------------------
---  Description : Test Bench for "time_machine"
+--  Description : Test Bench for "reset_machine"
 --     
 -- ==============================================================================
 --  Revision history :
 -- ==============================================================================
--- 
---  Revision 1.1: 
---  - Added syncronous reset
---  (M. Casti - IIT)
--- 
--- ------------------------------------------------------------------------------
+--
 --  Revision 1.0: 
 --  - Initial revision
 --  (M. Casti - IIT)
@@ -43,26 +38,25 @@ library ieee;
   use ieee.std_logic_textio.all;
 
  
-entity time_machine_tb is
+entity reset_machine_tb is
   generic (
     CLK_PERIOD_g                 : integer := 10   -- CLK period [ns]
   );
-end time_machine_tb;
+end reset_machine_tb;
  
-architecture sim of time_machine_tb is 
+architecture behavior of reset_machine_tb is 
  
-component time_machine 
-  generic ( 
-    CLK_PERIOD_NS_g           : real                   := 10.0;   -- Main Clock period
+ 
+component reset_machine 
+  generic (
     CLR_POLARITY_g            : string                 := "HIGH"; -- Active "HIGH" or "LOW"
     ARST_LONG_PERSISTANCE_g   : integer range 0 to 31  := 16;     -- Persistance of Power-On reset (clock pulses)
     ARST_ULONG_DURATION_MS_g  : integer range 0 to 255 := 10;     -- Duration of Ultrra-Long Reset (ms)
-    HAS_POR_g                 : boolean                := TRUE;   -- If TRUE a Power On Reset is generated 
-    SIM_TIME_COMPRESSION_g    : boolean                := FALSE   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+    HAS_POR_g                 : boolean                := TRUE    -- If TRUE a Power On Reset is generated 
     );
-  port (
-    -- Clock in port
+  port ( 
     CLK_i                     : in  std_logic;        -- Input Clock
+    EN1MS_i                   : in  std_logic;        -- tick @ 1ms (for ultra-long reset generation)
     MCM_LOCKED_i              : in  std_logic := 'H'; -- Clock locked flag
     CLR_i                     : in  std_logic := 'L'; -- Polarity controlled Asyncronous Clear input
   
@@ -74,22 +68,12 @@ component time_machine
     ARST_ULONG_o              : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
     ARST_ULONG_N_o            : out std_logic;	      -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
     
-    RST_o                     : out std_logic;        -- Syncronous Reset output
-    RST_N_o                   : out std_logic;        -- Syncronous Reset output 
-    RST_LONG_o                : out std_logic;	      -- Syncronous Long Duration Reset output
-    RST_LONG_N_o              : out std_logic; 	      -- Syncronous Long Duration Reset output 
-    RST_ULONG_o               : out std_logic;	      -- Syncronous Ultra-Long Duration Reset output
-    RST_ULONG_N_o             : out std_logic;	      -- Syncronous Ultra-Long Duration Reset output 
-      
-    -- Output ports for generated clock enables
-    EN100NS_o                 : out std_logic;	      -- Clock enable every 200 ns
-    EN1US_o                   : out std_logic;	      -- Clock enable every 1 us
-    EN10US_o                  : out std_logic;	      -- Clock enable every 10 us
-    EN100US_o                 : out std_logic;	      -- Clock enable every 100 us
-    EN1MS_o                   : out std_logic;	      -- Clock enable every 1 ms
-    EN10MS_o                  : out std_logic;	      -- Clock enable every 10 ms
-    EN100MS_o                 : out std_logic;	      -- Clock enable every 100 ms
-    EN1S_o                    : out std_logic 	      -- Clock enable every 1 s
+    RST_o                     : out std_logic;        -- Active high Syncronous Reset output
+    RST_N_o                   : out std_logic;        -- Active low Syncronous Reset output 
+    RST_LONG_o                : out std_logic;	      -- Active high Syncronous Long Duration Reset output
+    RST_LONG_N_o              : out std_logic; 	      -- Active low Syncronous Long Duration Reset output 
+    RST_ULONG_o               : out std_logic;	      -- Active high Syncronous Ultra-Long Duration Reset output
+    RST_ULONG_N_o             : out std_logic 	      -- Active low Syncronous Ultra-Long Duration Reset output 
     );
 end component;	
 
@@ -108,31 +92,24 @@ signal rst_long         : std_logic;
 signal rst_long_n       : std_logic; 
 signal rst_ulong        : std_logic; 
 signal rst_ulong_n      : std_logic; 
-signal en100ns          : std_logic;	
-signal en1us            : std_logic;	
-signal en10us           : std_logic;	
-signal en100us          : std_logic;	
 signal en1ms            : std_logic;
-signal en10ms           : std_logic;	
-signal en100ms          : std_logic;	
-signal en1s             : std_logic;		
+	
 
 
 begin 
 
 
-TIME_MACHINE_m : time_machine 
+RESET_MACHINE_m : reset_machine 
 generic map( 
-  CLK_PERIOD_NS_g           => 10.0,          -- Main Clock period
   CLR_POLARITY_g            => "LOW",         -- Active "HIGH" or "LOW"
   ARST_LONG_PERSISTANCE_g   => 16,            -- Persistance of Power-On reset (clock pulses)
   ARST_ULONG_DURATION_MS_g  => 10,            -- Duration of Ultrra-Long Reset (ms)
-  HAS_POR_g                 => TRUE,          -- If TRUE a Power On Reset is generated 
-  SIM_TIME_COMPRESSION_g    => FALSE          -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+  HAS_POR_g                 => TRUE           -- If TRUE a Power On Reset is generated 
   )
 port map(
  -- Clock in port
   CLK_i                     => clk_100,       -- Input Clock
+  EN1MS_i                   => en1ms,         -- Tick @ 1ms (for ultra-long reset generation)
   MCM_LOCKED_i              => clk_locked,    -- Clock locked flag
   CLR_i                     => clear_n,       -- Polarity controlled Asyncronous Clear input
   
@@ -144,22 +121,12 @@ port map(
   ARST_ULONG_o              => arst_ulong,    -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
   ARST_ULONG_N_o            => arst_ulong_n,  -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
  
-  RST_o                     => rst,           -- Syncronous Reset output
-  RST_N_o                   => rst_n,         -- Syncronous Reset output 
-  RST_LONG_o                => rst_long,      -- Syncronous Long Duration Reset output
-  RST_LONG_N_o              => rst_long_n,    -- Syncronous Long Duration Reset output 
-  RST_ULONG_o               => rst_ulong,     -- Syncronous Ultra-Long Duration Reset output
-  RST_ULONG_N_o             => rst_ulong_n,   -- Syncronous Ultra-Long Duration Reset output 
- 
-  -- Output ports for generated clock enables
-  EN100NS_o                 => en100ns,       -- Clock enable every 200 ns
-  EN1US_o                   => en1us,         -- Clock enable every 1 us
-  EN10US_o                  => en10us,        -- Clock enable every 10 us
-  EN100US_o                 => en100us,       -- Clock enable every 100 us
-  EN1MS_o                   => en1ms,         -- Clock enable every 1 ms
-  EN10MS_o                  => en10ms,        -- Clock enable every 10 ms
-  EN100MS_o                 => en100ms,       -- Clock enable every 100 ms
-  EN1S_o                    => en1s           -- Clock enable every 1 s
+  RST_o                     => rst,           -- Active high Syncronous Reset output
+  RST_N_o                   => rst_n,         -- Active low Syncronous Reset output 
+  RST_LONG_o                => rst_long,      -- Active high Syncronous Long Duration Reset output
+  RST_LONG_N_o              => rst_long_n,    -- Active low Syncronous Long Duration Reset output 
+  RST_ULONG_o               => rst_ulong,     -- Active high Syncronous Ultra-Long Duration Reset output
+  RST_ULONG_N_o             => rst_ulong_n    -- Active low Syncronous Ultra-Long Duration Reset output 
   );
 
  
@@ -167,13 +134,25 @@ port map(
 -- Stimulus process 
 
 Clock_Proc : process
-    begin
-        clk_100 <= '0';
-        loop
-            wait for (CLK_PERIOD_g/2 * 1 ns); 
-            clk_100 <= not clk_100;
-        end loop;
+begin
+  clk_100 <= '0';
+  loop
+    wait for (CLK_PERIOD_g/2 * 1 ns); 
+    clk_100 <= not clk_100;
+  end loop;
 end process Clock_Proc;
+
+En1ms_Proc : process
+begin
+  en1ms <= '0';
+  wait for (100000 * 1 ns);  
+  loop
+    en1ms <= '1'; 
+    wait for CLK_PERIOD_g * 1 ns;
+    en1ms <= '0';
+    wait for ((100000 - CLK_PERIOD_g) * 1 ns);
+  end loop;
+end process En1ms_Proc;
 
 Reset_Proc : process
 	begin

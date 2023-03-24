@@ -536,7 +536,7 @@ begin
       FAMILY_g                  =>  C_FAMILY,
       --
       USER_DATA_WIDTH_g         =>  C_OUTPUT_DSIZE,               -- Width of Data - Fabric side
-      USER_MESSAGE_WIDTH_g      =>    8,                          -- Width of Message - Fabric side 
+      USER_MESSAGE_WIDTH_g      =>  8,                            -- Width of Message - Fabric side 
       GT_DATA_WIDTH_g           =>  C_GTP_DSIZE,                  -- Width of Data - GTP side
       GT_TXUSRCLK2_PERIOD_NS_g  =>  C_GTP_TXUSRCLK2_PERIOD_NS,    -- TX GTP User clock period
       GT_RXUSRCLK2_PERIOD_NS_g  =>  C_GTP_RXUSRCLK2_PERIOD_NS,    -- RX GTP User clock period

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="reset_machine_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="reset_machine_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="7.500166666 ms"></ZoomStartTime>
+      <ZoomEndTime time="52.501166667 ms"></ZoomEndTime>
+      <Cursor1Time time="45.001000000 ms"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="273"></NameColumnWidth>
+      <ValueColumnWidth column_width="121"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="16" />
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/CLK_i" type="logic">
+      <obj_property name="ElementShortName">CLK_i</obj_property>
+      <obj_property name="ObjectShortName">CLK_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/EN1MS_i" type="logic">
+      <obj_property name="ElementShortName">EN1MS_i</obj_property>
+      <obj_property name="ObjectShortName">EN1MS_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/MCM_LOCKED_i" type="logic">
+      <obj_property name="ElementShortName">MCM_LOCKED_i</obj_property>
+      <obj_property name="ObjectShortName">MCM_LOCKED_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/CLR_i" type="logic">
+      <obj_property name="ElementShortName">CLR_i</obj_property>
+      <obj_property name="ObjectShortName">CLR_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/ARST_o" type="logic">
+      <obj_property name="ElementShortName">ARST_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/ARST_N_o" type="logic">
+      <obj_property name="ElementShortName">ARST_N_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_N_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/ARST_LONG_o" type="logic">
+      <obj_property name="ElementShortName">ARST_LONG_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_LONG_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/ARST_LONG_N_o" type="logic">
+      <obj_property name="ElementShortName">ARST_LONG_N_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_LONG_N_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/ARST_ULONG_o" type="logic">
+      <obj_property name="ElementShortName">ARST_ULONG_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_ULONG_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/ARST_ULONG_N_o" type="logic">
+      <obj_property name="ElementShortName">ARST_ULONG_N_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_ULONG_N_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/RST_o" type="logic">
+      <obj_property name="ElementShortName">RST_o</obj_property>
+      <obj_property name="ObjectShortName">RST_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/RST_N_o" type="logic">
+      <obj_property name="ElementShortName">RST_N_o</obj_property>
+      <obj_property name="ObjectShortName">RST_N_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/RST_LONG_o" type="logic">
+      <obj_property name="ElementShortName">RST_LONG_o</obj_property>
+      <obj_property name="ObjectShortName">RST_LONG_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/RST_LONG_N_o" type="logic">
+      <obj_property name="ElementShortName">RST_LONG_N_o</obj_property>
+      <obj_property name="ObjectShortName">RST_LONG_N_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/RST_ULONG_o" type="logic">
+      <obj_property name="ElementShortName">RST_ULONG_o</obj_property>
+      <obj_property name="ObjectShortName">RST_ULONG_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/reset_machine_tb/RESET_MACHINE_m/RST_ULONG_N_o" type="logic">
+      <obj_property name="ElementShortName">RST_ULONG_N_o</obj_property>
+      <obj_property name="ObjectShortName">RST_ULONG_N_o</obj_property>
+   </wvobject>
+</wave_config>

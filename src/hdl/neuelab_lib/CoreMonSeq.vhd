@@ -318,7 +318,8 @@ begin
 end process;
 
 
-p_WriteEventsTX : process (AxisClk_i, Reset_n_AxisClk_i) is
+-- p_WriteEventsTX : process (AxisClk_i, Reset_n_AxisClk_i) is
+p_WriteEventsTX : process (AxisClk_i, TxFifoReset) is
 begin
   if (TxFifoReset = '1') then
     TxFifoDinMsb <= (others => '0');

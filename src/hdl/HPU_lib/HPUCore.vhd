@@ -440,8 +440,10 @@ constant C_SYSCLK_PERIOD_NS        : real  := real(C_SYSCLK_PERIOD_PS) / 1000.0;
 -- -----------------------------------------------------------------------------
 -- Signals
 signal clear_n                   : std_logic;
-signal arst_n_clk_core           : std_logic;
-signal arst_n_clk_axis           : std_logic;
+signal arst_n_clk_core           : std_logic;  -- Active low asyncronous assertion, syncronous deassertion Reset
+-- signal rst_n_clk_core            : std_logic;  -- Active low Syncronous Reset
+-- signal arst_n_clk_axis           : std_logic;  -- Active low asyncronous assertion, syncronous deassertion Reset
+signal rst_n_clk_axis            : std_logic;  -- Active low Syncronous Reset
 
 signal i_dma_rxDataBuffer        : std_logic_vector(63 downto 0);
 signal i_dma_readRxBuffer        : std_logic;
@@ -634,7 +636,7 @@ TIME_MACHINE_CORECLK_m : time_machine
     -- Clock in port
     CLK_i                   => CLK_CORE_i,      -- Input clock,
     MCM_LOCKED_i            => '1',             -- Clock locked flag
-    CLR_i                   => clear_n,          -- Polarity controlled Asyncronous Clear input
+    CLR_i                   => clear_n,         -- Polarity controlled Asyncronous Clear input
 
     -- Reset output
     ARST_o                  => open,            -- Active high asyncronous assertion, syncronous deassertion Reset output
@@ -644,8 +646,15 @@ TIME_MACHINE_CORECLK_m : time_machine
     ARST_ULONG_o            => open,            -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
     ARST_ULONG_N_o          => open,            -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
 
+    RST_o                   => open,            -- Active high Syncronous Reset output
+    RST_N_o                 => open,            -- Active low Syncronous Reset output 
+    RST_LONG_o              => open,	          -- Active high Syncronous Long Duration Reset output
+    RST_LONG_N_o            => open, 	          -- Active low Syncronous Long Duration Reset output 
+    RST_ULONG_o             => open,	          -- Active high Syncronous Ultra-Long Duration Reset output
+    RST_ULONG_N_o           => open,	          -- Active low Syncronous Ultra-Long Duration Reset output 
+    
     -- Output ports for generated clock enables
-    EN200NS_o               => timing_CoreClk.en200ns,  -- Clock enable every 200 ns
+    EN100NS_o               => timing_CoreClk.en100ns,  -- Clock enable every 200 ns
     EN1US_o                 => timing_CoreClk.en1us,	  -- Clock enable every 1 us
     EN10US_o                => timing_CoreClk.en10us,	  -- Clock enable every 10 us
     EN100US_o               => timing_CoreClk.en100us,	-- Clock enable every 100 us
@@ -654,41 +663,36 @@ TIME_MACHINE_CORECLK_m : time_machine
     EN100MS_o               => timing_CoreClk.en100ms,	-- Clock enable every 100 ms
     EN1S_o                  => timing_CoreClk.en1s 	    -- Clock enable every 1 s
     );
-
-TIME_MACHINE_AXISCLK_m : time_machine 
-  generic map(
+ 
+RESET_MACHINE_AXISCLK_m : reset_machine 
+generic map( 
+  CLR_POLARITY_g            => "LOW",           -- Active "HIGH" or "LOW"
+  ARST_LONG_PERSISTANCE_g   => 16,              -- Persistance of Power-On reset (clock pulses)
+  ARST_ULONG_DURATION_MS_g  => 10,              -- Duration of Ultrra-Long Reset (ms)
+  HAS_POR_g                 => TRUE             -- If TRUE a Power On Reset is generated 
+  )
+port map(
+ -- Clock in port
+  CLK_i                     => CLK_AXIS_i,      -- Input Clock
+  EN1MS_i                   => '0',             -- Tick @ 1ms (for ultra-long reset generation)
+  MCM_LOCKED_i              => '1',             -- Clock locked flag
+  CLR_i                     => clear_n,         -- Polarity controlled Asyncronous Clear input
   
-    CLK_PERIOD_NS_g           => C_SYSCLK_PERIOD_NS,    -- Main Clock period
-    CLR_POLARITY_g            => "LOW",                 -- Active "HIGH" or "LOW"
-    ARST_LONG_PERSISTANCE_g   => 16,                    -- Persistance of Power-On reset (clock pulses)
-    ARST_ULONG_DURATION_MS_g  => 10,                    -- Duration of Ultrra-Long Reset (ms)
-    HAS_POR_g                 => TRUE,                  -- If TRUE a Power On Reset is generated 
-    SIM_TIME_COMPRESSION_g    => C_SIM_TIME_COMPRESSION -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
-    )
-  port map(
-    -- Clock in port
-    CLK_i                   => CLK_AXIS_i,      -- Input clock,
-    MCM_LOCKED_i            => '1',             -- Clock locked flag
-    CLR_i                   => clear_n,          -- Polarity controlled Asyncronous Clear input
-
-    -- Reset output
+  -- Reset output
     ARST_o                  => open,            -- Active high asyncronous assertion, syncronous deassertion Reset output
-    ARST_N_o                => arst_n_clk_axis, -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_N_o                => open,            -- Active low asyncronous assertion, syncronous deassertion Reset output 
     ARST_LONG_o             => open,            -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
     ARST_LONG_N_o           => open,            -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
     ARST_ULONG_o            => open,            -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
     ARST_ULONG_N_o          => open,            -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
-
-    -- Output ports for generated clock enables
-    EN200NS_o               => timing_AxisClk.en200ns,  -- Clock enable every 200 ns
-    EN1US_o                 => timing_AxisClk.en1us,	  -- Clock enable every 1 us
-    EN10US_o                => timing_AxisClk.en10us,	  -- Clock enable every 10 us
-    EN100US_o               => timing_AxisClk.en100us,	-- Clock enable every 100 us
-    EN1MS_o                 => timing_AxisClk.en1ms,	  -- Clock enable every 1 ms
-    EN10MS_o                => timing_AxisClk.en10ms,	  -- Clock enable every 10 ms
-    EN100MS_o               => timing_AxisClk.en100ms,	-- Clock enable every 100 ms
-    EN1S_o                  => timing_AxisClk.en1s 	    -- Clock enable every 1 s
-    );
+ 
+    RST_o                   => open,            -- Active high Syncronous Reset output
+    RST_N_o                 => rst_n_clk_axis,  -- Active low Syncronous Reset output 
+    RST_LONG_o              => open,	          -- Active high Syncronous Long Duration Reset output
+    RST_LONG_N_o            => open, 	          -- Active low Syncronous Long Duration Reset output 
+    RST_ULONG_o             => open,	          -- Active high Syncronous Ultra-Long Duration Reset output
+    RST_ULONG_N_o           => open 	          -- Active low Syncronous Ultra-Long Duration Reset output 
+  );
     
 ------------------------------------------------------
 -- NeuSerial AXI interfaces instantiation
@@ -907,7 +911,7 @@ AXILITE_m : axilite
 AXISTREAM_m : axistream
   port map (
     Clk                            => CLK_AXIS_i,                 
-    nRst                           => arst_n_clk_core,            
+    nRst                           => rst_n_clk_axis,               -- NOTE: synchronous reset
     --
     DMA_test_mode_i                => i_uP_DMA_test_mode,         
     EnableAxistreamIf_i            => i_uP_enableDmaIf,           
@@ -1063,7 +1067,7 @@ NEUSERIAL_CORE_m : neuserial_core
     Timing_i                              => timing_CoreClk,               -- in  time_tick;
     -- DMA Clock Domain
     AxisClk_i                             => CLK_AXIS_i,                   --     in  std_logic;
-    nRst_AxisClk_i                        => arst_n_clk_axis,               --     in  std_logic;
+    nRst_AxisClk_i                        => rst_n_clk_axis,               --     in  std_logic;
 
     -- HSSAER Clocks domain
     Clk_hs_p                              => CLK_HSSAER_HS_P_i,               -- in  std_logic;

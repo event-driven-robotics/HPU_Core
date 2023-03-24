@@ -27,7 +27,7 @@ library HPU_lib;
 package HPUComponents_pkg is
 
 type time_tick is record
-    en200ns               : std_logic;
+    en100ns               : std_logic;
     en1us                 : std_logic;
     en10us                : std_logic;
     en100us               : std_logic;
@@ -612,7 +612,7 @@ end component axilite;
 component axistream is
   port (
     Clk                    : in  std_logic;
-    nRst                   : in  std_logic;
+    nRst                   : in  std_logic;  -- NOTE: synchronous reset
     --
     DMA_test_mode_i        : in  std_logic;
     EnableAxistreamIf_i    : in  std_logic;
@@ -672,9 +672,16 @@ component time_machine is
     ARST_LONG_N_o             : out std_logic; 	      -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
     ARST_ULONG_o              : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
     ARST_ULONG_N_o            : out std_logic;	      -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+    
+    RST_o                     : out std_logic;        -- Active high Syncronous Reset output
+    RST_N_o                   : out std_logic;        -- Active low Syncronous Reset output 
+    RST_LONG_o                : out std_logic;	      -- Active high Syncronous Long Duration Reset output
+    RST_LONG_N_o              : out std_logic; 	      -- Active low Syncronous Long Duration Reset output 
+    RST_ULONG_o               : out std_logic;	      -- Active high Syncronous Ultra-Long Duration Reset output
+    RST_ULONG_N_o             : out std_logic;	      -- Active low Syncronous Ultra-Long Duration Reset output 
       
     -- Output ports for generated clock enables
-    EN200NS_o                 : out std_logic;	      -- Clock enable every 200 ns
+    EN100NS_o                 : out std_logic;	      -- Clock enable every 200 ns
     EN1US_o                   : out std_logic;	      -- Clock enable every 1 us
     EN10US_o                  : out std_logic;	      -- Clock enable every 10 us
     EN100US_o                 : out std_logic;	      -- Clock enable every 100 us
@@ -684,5 +691,35 @@ component time_machine is
     EN1S_o                    : out std_logic 	      -- Clock enable every 1 s
     );
 end component;
-       
+
+component reset_machine is
+  generic (
+    CLR_POLARITY_g            : string                 := "HIGH"; -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   : integer range 0 to 31  := 16;     -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  : integer range 0 to 255 := 10;     -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 : boolean                := TRUE    -- If TRUE a Power On Reset is generated 
+    );
+  port ( 
+    CLK_i                     : in  std_logic;        -- Input Clock
+    EN1MS_i                   : in  std_logic;        -- Tick @ 1ms (for ultra-long reset generation)
+    MCM_LOCKED_i              : in  std_logic := 'H'; -- Clock locked flag
+    CLR_i                     : in  std_logic := 'L'; -- Polarity controlled Asyncronous Clear input
+  
+    -- Reset output
+    ARST_o                    : out std_logic;        -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                  : out std_logic;        -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o               : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o             : out std_logic; 	      -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o              : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o            : out std_logic;	      -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+    
+    RST_o                     : out std_logic;        -- Active high Syncronous Reset output
+    RST_N_o                   : out std_logic;        -- Active low Syncronous Reset output 
+    RST_LONG_o                : out std_logic;	      -- Active high Syncronous Long Duration Reset output
+    RST_LONG_N_o              : out std_logic; 	      -- Active low Syncronous Long Duration Reset output 
+    RST_ULONG_o               : out std_logic;	      -- Active high Syncronous Ultra-Long Duration Reset output
+    RST_ULONG_N_o             : out std_logic 	      -- Active low Syncronous Ultra-Long Duration Reset output 
+  );
+end component;
+    
 end package HPUComponents_pkg;

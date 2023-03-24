@@ -263,31 +263,43 @@ end component;
 
 component GT_time_machine is
   generic ( 
-    CLK_PERIOD_NS_g         : real := 10.0;                   -- Main Clock period
-    CLEAR_POLARITY_g        : string := "LOW";                -- Active "HIGH" or "LOW"
-    PON_RESET_DURATION_MS_g : integer range 0 to 255 := 10;   -- Duration of Power-On reset  
-    SIM_TIME_COMPRESSION_g  : in boolean := FALSE             -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+    CLK_PERIOD_NS_g           : real                   := 10.0;   -- Main Clock period
+    CLR_POLARITY_g            : string                 := "HIGH"; -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   : integer range 0 to 31  := 16;     -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  : integer range 0 to 255 := 10;     -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 : boolean                := TRUE;   -- If TRUE a Power On Reset is generated 
+    SIM_TIME_COMPRESSION_g    : boolean                := FALSE   -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     );
   port (
     -- Clock in port
-    CLK_i                   : in  std_logic;   -- Input clock @ 50 MHz,
-    CLEAR_i                 : in  std_logic;   -- Asynchronous active low reset
+    CLK_i                     : in  std_logic;        -- Input Clock
+    MCM_LOCKED_i              : in  std_logic := 'H'; -- Clock locked flag
+    CLR_i                     : in  std_logic := 'L'; -- Polarity controlled Asyncronous Clear input
   
-    -- Output reset
-    RESET_o                 : out std_logic;    -- Reset out (active high)
-    RESET_N_o               : out std_logic;    -- Reset out (active low)
-    PON_RESET_OUT_o         : out std_logic;	  -- Power on Reset out (active high)
-    PON_RESET_N_OUT_o       : out std_logic;	  -- Power on Reset out (active low)
+    -- Reset output
+    ARST_o                    : out std_logic;        -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                  : out std_logic;        -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o               : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o             : out std_logic; 	      -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o              : out std_logic;	      -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o            : out std_logic;	      -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
     
+    RST_o                     : out std_logic;        -- Syncronous Reset output
+    RST_N_o                   : out std_logic;        -- Syncronous Reset output 
+    RST_LONG_o                : out std_logic;	      -- Syncronous Long Duration Reset output
+    RST_LONG_N_o              : out std_logic; 	      -- Syncronous Long Duration Reset output 
+    RST_ULONG_o               : out std_logic;	      -- Syncronous Ultra-Long Duration Reset output
+    RST_ULONG_N_o             : out std_logic;	      -- Syncronous Ultra-Long Duration Reset output 
+      
     -- Output ports for generated clock enables
-    EN200NS_o               : out std_logic;	  -- Clock enable every 200 ns
-    EN1US_o                 : out std_logic;	  -- Clock enable every 1 us
-    EN10US_o                : out std_logic;	  -- Clock enable every 10 us
-    EN100US_o               : out std_logic;	  -- Clock enable every 100 us
-    EN1MS_o                 : out std_logic;	  -- Clock enable every 1 ms
-    EN10MS_o                : out std_logic;	  -- Clock enable every 10 ms
-    EN100MS_o               : out std_logic;	  -- Clock enable every 100 ms
-    EN1S_o                  : out std_logic 	  -- Clock enable every 1 s
+    EN100NS_o                 : out std_logic;	      -- Clock enable every 200 ns
+    EN1US_o                   : out std_logic;	      -- Clock enable every 1 us
+    EN10US_o                  : out std_logic;	      -- Clock enable every 10 us
+    EN100US_o                 : out std_logic;	      -- Clock enable every 100 us
+    EN1MS_o                   : out std_logic;	      -- Clock enable every 1 ms
+    EN10MS_o                  : out std_logic;	      -- Clock enable every 10 ms
+    EN100MS_o                 : out std_logic;	      -- Clock enable every 100 ms
+    EN1S_o                    : out std_logic 	      -- Clock enable every 1 s
     );
 end component;
 
@@ -682,33 +694,48 @@ PLL_ALARM_o       <= cm_pll_alarm;
 tx_clear <= cm_pll_alarm or not RST_N_i;
 
 TIME_MACHINE_GCKTX_i : GT_time_machine
-  generic map( 
-    CLK_PERIOD_NS_g         =>  GT_TXUSRCLK2_PERIOD_NS_g,  -- Main Clock period
-    CLEAR_POLARITY_g        => "HIGH",                      -- Active "HIGH" or "LOW"
-    PON_RESET_DURATION_MS_g =>   10,                        -- Duration of Power-On reset (ms)
-    SIM_TIME_COMPRESSION_g  => SIM_TIME_COMPRESSION_g       -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+
+  generic map(
+  
+    CLK_PERIOD_NS_g           => GT_TXUSRCLK2_PERIOD_NS_g,  -- Main Clock period
+    CLR_POLARITY_g            => "HIGH",                    -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   => 16,                        -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  => 10,                        -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 => TRUE,                      -- If TRUE a Power On Reset is generated 
+    SIM_TIME_COMPRESSION_g    => SIM_TIME_COMPRESSION_g     -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     )
   port map(
     -- Clock in port
-    CLK_i                   => GTP_TXUSRCLK2_i,
-    CLEAR_i                 => tx_clear,
-  
-    -- Output reset
-    RESET_o                 => tx_rst_gcktx,
-    RESET_N_o               => tx_rst_n_gcktx,
-    PON_RESET_OUT_o         => open,
-    PON_RESET_N_OUT_o       => tx_pon_reset_n_gcktx,
+    CLK_i                     => GTP_TXUSRCLK2_i,      -- Input clock,
+    MCM_LOCKED_i              => '1',             -- Clock locked flag
+    CLR_i                     => tx_clear,         -- Polarity controlled Asyncronous Clear input
+
+    -- Reset output
+    ARST_o                    => tx_rst_gcktx,            -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                  => tx_rst_n_gcktx, -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o               => open,            -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o             => open,            -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o              => open,            -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o            => tx_pon_reset_n_gcktx,            -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+
+    RST_o                     => open,            -- Syncronous Reset output
+    RST_N_o                   => open,            -- Syncronous Reset output 
+    RST_LONG_o                => open,	          -- Syncronous Long Duration Reset output
+    RST_LONG_N_o              => open, 	          -- Syncronous Long Duration Reset output 
+    RST_ULONG_o               => open,	          -- Syncronous Ultra-Long Duration Reset output
+    RST_ULONG_N_o             => open,	          -- Syncronous Ultra-Long Duration Reset output 
     
     -- Output ports for generated clock enables
-    EN200NS_o               => open,
-    EN1US_o                 => open,
-    EN10US_o                => open,
-    EN100US_o               => tx_en100us_gcktx,
-    EN1MS_o                 => tx_en1ms_gcktx,
-    EN10MS_o                => open,
-    EN100MS_o               => open,
-    EN1S_o                  => open
+    EN100NS_o                 => open,  -- Clock enable every 200 ns
+    EN1US_o                   => open,  -- Clock enable every 1 us
+    EN10US_o                  => open,  -- Clock enable every 10 us
+    EN100US_o                 => tx_en100us_gcktx,	-- Clock enable every 100 us
+    EN1MS_o                   => tx_en1ms_gcktx,  -- Clock enable every 1 ms
+    EN10MS_o                  => open,  -- Clock enable every 10 ms
+    EN100MS_o                 => open,	-- Clock enable every 100 ms
+    EN1S_o                    => open   -- Clock enable every 1 s
     );
+
 
 ENABLE_SIGNAL_CDC_TX_i : GT_enable_signal_cdc
  port map(
@@ -1070,33 +1097,47 @@ end generate;
 rx_clear <= cm_pll_alarm or not RST_N_i;
 
 TIME_MACHINE_GCKRX_i : GT_time_machine
-  generic map( 
-    CLK_PERIOD_NS_g         =>  GT_RXUSRCLK2_PERIOD_NS_g,  -- Main Clock period
-    CLEAR_POLARITY_g        => "HIGH",                      -- Active "HIGH" or "LOW"
-    PON_RESET_DURATION_MS_g =>   10,                        -- Duration of Power-On reset (ms)
-    SIM_TIME_COMPRESSION_g  => SIM_TIME_COMPRESSION_g       -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
+  generic map(
+  
+    CLK_PERIOD_NS_g           => GT_RXUSRCLK2_PERIOD_NS_g,    -- Main Clock period
+    CLR_POLARITY_g            => "HIGH",                 -- Active "HIGH" or "LOW"
+    ARST_LONG_PERSISTANCE_g   => 16,                    -- Persistance of Power-On reset (clock pulses)
+    ARST_ULONG_DURATION_MS_g  => 10,                    -- Duration of Ultrra-Long Reset (ms)
+    HAS_POR_g                 => TRUE,                  -- If TRUE a Power On Reset is generated 
+    SIM_TIME_COMPRESSION_g    => SIM_TIME_COMPRESSION_g -- When "TRUE", simulation time is "compressed": frequencies of internal clock enables are speeded-up 
     )
   port map(
     -- Clock in port
-    CLK_i                   => rxusrclk2,
-    CLEAR_i                 => rx_clear,
-  
-    -- Output reset
-    RESET_o                 => rx_rst_gckrx,
-    RESET_N_o               => rx_rst_n_gckrx,
-    PON_RESET_OUT_o         => open,
-    PON_RESET_N_OUT_o       => rx_pon_reset_n_gckrx,
+    CLK_i                     => rxusrclk2,      -- Input clock,
+    MCM_LOCKED_i              => '1',             -- Clock locked flag
+    CLR_i                     => rx_clear,         -- Polarity controlled Asyncronous Clear input
+
+    -- Reset output
+    ARST_o                    => rx_rst_gckrx,            -- Active high asyncronous assertion, syncronous deassertion Reset output
+    ARST_N_o                  => rx_rst_n_gckrx, -- Active low asyncronous assertion, syncronous deassertion Reset output 
+    ARST_LONG_o               => open,            -- Active high asyncronous assertion, syncronous deassertion Long Duration Reset output
+    ARST_LONG_N_o             => open,            -- Active low asyncronous assertion, syncronous deassertion Long Duration Reset output 
+    ARST_ULONG_o              => open,            -- Active high asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output
+    ARST_ULONG_N_o            => rx_pon_reset_n_gckrx,            -- Active low asyncronous assertion, syncronous deassertion Ultra-Long Duration Reset output 
+
+    RST_o                     => open,            -- Syncronous Reset output
+    RST_N_o                   => open,            -- Syncronous Reset output 
+    RST_LONG_o                => open,	          -- Syncronous Long Duration Reset output
+    RST_LONG_N_o              => open, 	          -- Syncronous Long Duration Reset output 
+    RST_ULONG_o               => open,	          -- Syncronous Ultra-Long Duration Reset output
+    RST_ULONG_N_o             => open,	          -- Syncronous Ultra-Long Duration Reset output 
     
     -- Output ports for generated clock enables
-    EN200NS_o               => open,
-    EN1US_o                 => open,
-    EN10US_o                => open,
-    EN100US_o               => rx_en100us_gckrx,
-    EN1MS_o                 => rx_en1ms_gckrx,
-    EN10MS_o                => open,
-    EN100MS_o               => open,
-    EN1S_o                  => open
+    EN100NS_o                 => open,  -- Clock enable every 200 ns
+    EN1US_o                   => open,  -- Clock enable every 1 us
+    EN10US_o                  => open,  -- Clock enable every 10 us
+    EN100US_o                 => rx_en100us_gckrx,	-- Clock enable every 100 us
+    EN1MS_o                   => rx_en1ms_gckrx,  -- Clock enable every 1 ms
+    EN10MS_o                  => open,  -- Clock enable every 10 ms
+    EN100MS_o                 => open,	-- Clock enable every 100 ms
+    EN1S_o                    => open   -- Clock enable every 1 s
     );
+
 
 ENABLE_SIGNAL_CDC_i : GT_enable_signal_cdc
  port map(

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="time_machine_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="time_machine_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000000 ms"></ZoomStartTime>
+      <ZoomEndTime time="45.061812163 ms"></ZoomEndTime>
+      <Cursor1Time time="45.001000000 ms"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="273"></NameColumnWidth>
+      <ValueColumnWidth column_width="121"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="33" />
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/CLK_PERIOD_NS_g" type="other">
+      <obj_property name="ElementShortName">CLK_PERIOD_NS_g</obj_property>
+      <obj_property name="ObjectShortName">CLK_PERIOD_NS_g</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/CLR_POLARITY_g" type="array">
+      <obj_property name="ElementShortName">CLR_POLARITY_g[1:3]</obj_property>
+      <obj_property name="ObjectShortName">CLR_POLARITY_g[1:3]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/ARST_LONG_PERSISTANCE_g" type="other">
+      <obj_property name="ElementShortName">ARST_LONG_PERSISTANCE_g</obj_property>
+      <obj_property name="ObjectShortName">ARST_LONG_PERSISTANCE_g</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/ARST_ULONG_DURATION_MS_g" type="other">
+      <obj_property name="ElementShortName">ARST_ULONG_DURATION_MS_g</obj_property>
+      <obj_property name="ObjectShortName">ARST_ULONG_DURATION_MS_g</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/HAS_POR_g" type="other">
+      <obj_property name="ElementShortName">HAS_POR_g</obj_property>
+      <obj_property name="ObjectShortName">HAS_POR_g</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/SIM_TIME_COMPRESSION_g" type="other">
+      <obj_property name="ElementShortName">SIM_TIME_COMPRESSION_g</obj_property>
+      <obj_property name="ObjectShortName">SIM_TIME_COMPRESSION_g</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider554">
+      <obj_property name="label">Signals</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/CLK_i" type="logic">
+      <obj_property name="ElementShortName">CLK_i</obj_property>
+      <obj_property name="ObjectShortName">CLK_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/MCM_LOCKED_i" type="logic">
+      <obj_property name="ElementShortName">MCM_LOCKED_i</obj_property>
+      <obj_property name="ObjectShortName">MCM_LOCKED_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/CLR_i" type="logic">
+      <obj_property name="ElementShortName">CLR_i</obj_property>
+      <obj_property name="ObjectShortName">CLR_i</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider566">
+      <obj_property name="label">Reset Async/Sync</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/ARST_o" type="logic">
+      <obj_property name="ElementShortName">ARST_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/ARST_N_o" type="logic">
+      <obj_property name="ElementShortName">ARST_N_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_N_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/ARST_LONG_o" type="logic">
+      <obj_property name="ElementShortName">ARST_LONG_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_LONG_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/ARST_LONG_N_o" type="logic">
+      <obj_property name="ElementShortName">ARST_LONG_N_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_LONG_N_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/ARST_ULONG_o" type="logic">
+      <obj_property name="ElementShortName">ARST_ULONG_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_ULONG_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/ARST_ULONG_N_o" type="logic">
+      <obj_property name="ElementShortName">ARST_ULONG_N_o</obj_property>
+      <obj_property name="ObjectShortName">ARST_ULONG_N_o</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider565">
+      <obj_property name="label">Reset synchronous</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/RST_o" type="logic">
+      <obj_property name="ElementShortName">RST_o</obj_property>
+      <obj_property name="ObjectShortName">RST_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/RST_N_o" type="logic">
+      <obj_property name="ElementShortName">RST_N_o</obj_property>
+      <obj_property name="ObjectShortName">RST_N_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/RST_LONG_o" type="logic">
+      <obj_property name="ElementShortName">RST_LONG_o</obj_property>
+      <obj_property name="ObjectShortName">RST_LONG_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/RST_LONG_N_o" type="logic">
+      <obj_property name="ElementShortName">RST_LONG_N_o</obj_property>
+      <obj_property name="ObjectShortName">RST_LONG_N_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/RST_ULONG_o" type="logic">
+      <obj_property name="ElementShortName">RST_ULONG_o</obj_property>
+      <obj_property name="ObjectShortName">RST_ULONG_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/RST_ULONG_N_o" type="logic">
+      <obj_property name="ElementShortName">RST_ULONG_N_o</obj_property>
+      <obj_property name="ObjectShortName">RST_ULONG_N_o</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider564">
+      <obj_property name="label">Enable</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/EN100NS_o" type="logic">
+      <obj_property name="ElementShortName">EN100NS_o</obj_property>
+      <obj_property name="ObjectShortName">EN100NS_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/EN1US_o" type="logic">
+      <obj_property name="ElementShortName">EN1US_o</obj_property>
+      <obj_property name="ObjectShortName">EN1US_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/EN10US_o" type="logic">
+      <obj_property name="ElementShortName">EN10US_o</obj_property>
+      <obj_property name="ObjectShortName">EN10US_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/EN100US_o" type="logic">
+      <obj_property name="ElementShortName">EN100US_o</obj_property>
+      <obj_property name="ObjectShortName">EN100US_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/EN1MS_o" type="logic">
+      <obj_property name="ElementShortName">EN1MS_o</obj_property>
+      <obj_property name="ObjectShortName">EN1MS_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/EN10MS_o" type="logic">
+      <obj_property name="ElementShortName">EN10MS_o</obj_property>
+      <obj_property name="ObjectShortName">EN10MS_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/EN100MS_o" type="logic">
+      <obj_property name="ElementShortName">EN100MS_o</obj_property>
+      <obj_property name="ObjectShortName">EN100MS_o</obj_property>
+   </wvobject>
+   <wvobject fp_name="/time_machine_tb/TIME_MACHINE_m/EN1S_o" type="logic">
+      <obj_property name="ElementShortName">EN1S_o</obj_property>
+      <obj_property name="ObjectShortName">EN1S_o</obj_property>
+   </wvobject>
+</wave_config>
