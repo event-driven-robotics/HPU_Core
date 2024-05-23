@@ -81,6 +81,7 @@
 
 /* registers */
 #define HPU_CTRL_REG 		0x00
+#define HPU_LPBK_LR_CNFG_REG 	0x04
 #define HPU_RXDATA_REG 		0x08
 #define HPU_RXTIME_REG 		0x0C
 #define HPU_DMA_REG 		0x14
@@ -95,8 +96,19 @@
 #define HPU_TXCTRL_REG		0x44
 #define HPU_RXPAERCNFG_REG	0x48
 #define HPU_TXPAERCNFG_REG	0x4C
-#define HPU_IPCFONFIG_REG	0x50
+#define HPU_IPCONFIG_REG	0x50
+#define HPU_IPCONFIG_RXSAER	BIT(0)
+#define HPU_IPCONFIG_RXPAER	BIT(1)
+#define HPU_IPCONFIG_RXGTP	BIT(2)
+#define HPU_IPCONFIG_RXSPINN	BIT(3)
+#define HPU_IPCONFIG_RXSAERCH	4
+#define HPU_IPCONFIG_TXSAER	BIT(8)
+#define HPU_IPCONFIG_TXPAER	BIT(9)
+#define HPU_IPCONFIG_TXGTP	BIT(10)
+#define HPU_IPCONFIG_TXSPINN	BIT(11)
+#define HPU_IPCONFIG_TXSAERCH	12
 #define HPU_FIFOTHRESHOLD_REG	0x54
+#define HPU_LPBK_AUX_CNFG_REG 	0x58
 #define HPU_VER_REG		0x5C
 #define HPU_AUX_RXCTRL_REG	0x60
 #define HPU_AUX_RX_ERR_REG	0x64
@@ -116,7 +128,7 @@
 #define HPU_DATA_COUNT		0xA8
 
 /* magic constants */
-#define HPU_VER_MAGIC			0x48505536
+#define HPU_MAGIC			0x485055
 
 #define HPU_CTRL_DMA_RUNNING		0x0001
 #define HPU_CTRL_ENDMA			0x0002
@@ -124,11 +136,20 @@
 #define HPU_CTRL_FLUSH_RX_FIFO		BIT(4)
 #define HPU_CTRL_FLUSH_TX_FIFO		BIT(8)
 #define HPU_CTRL_AXIS_LAT		BIT(9)
-#define HPU_CTRL_RESETDMASTREAM 	0x1000
 #define HPU_CTRL_FULLTS			0x8000
-#define HPU_CTRL_LOOP_SPINN		(BIT(22) | BIT(23))
+#define HPU_CTRL_DISABLE_RX_TS		BIT(13)
+#define HPU_CTRL_DISABLE_TX_TS		BIT(14)
+#define HPU_CTRL_LOOP_SPINNL		BIT(22)
+#define HPU_CTRL_LOOP_SPINNR		BIT(23)
+#define HPU_CTRL_LOOP_SPINNAUX		(BIT(22) | BIT(23))
 #define HPU_CTRL_LOOP_LNEAR		BIT(25)
-
+#define HPU_CTRL_LOOP_SAERAUX		BIT(26)
+#define HPU_CTRL_LOOP_PAERAUX		BIT(27)
+#define HPU_CTRL_LOOP_SAERL       	BIT(28)
+#define HPU_CTRL_LOOP_SAERR		BIT(29)
+#define HPU_CTRL_LOOP_PAERL		BIT(30)
+#define HPU_CTRL_LOOP_PAERR		BIT(31)
+#define HPU_CTRL_LOOP_MASK              GENMASK(31, 25) | GENMASK(23, 22)
 #define HPU_DMA_LENGTH_MASK		0xFFFF
 #define HPU_DMA_TEST_ON			0x10000
 
@@ -262,9 +283,12 @@
 #define HPU_IOCTL_SET_SPINN_RX_MASK		37
 #define HPU_IOCTL_GET_HW_STATUS			38
 #define HPU_IOCTL_SET_SPINN_KEYS_EN_EX		39
+#define HPU_IOCTL_SET_RX_TS_ENABLE		40
+#define HPU_IOCTL_SET_TX_TS_ENABLE		41
 
 static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_CTRL_REG",		0x00},
+	{"HPU_LPBK_LR_CNFG_REG",        0x04},
 	{"HPU_RXDATA_REG",		0x08},
 	{"HPU_RXTIME_REG",		0x0C},
 	{"HPU_DMA_REG",			0x14},
@@ -279,8 +303,9 @@ static struct debugfs_reg32 hpu_regs[] = {
 	{"HPU_TXCTRL_REG",		0x44},
 	{"HPU_RXPAERCNFG_REG",		0x48},
 	{"HPU_TXPAERCNFG_REG",		0x4C},
-	{"HPU_IPCFONFIG_REG",		0x50},
+	{"HPU_IPCONFIG_REG",		0x50},
 	{"HPU_FIFOTHRESHOLD_REG",	0x54},
+	{"HPU_LPBK_AUX_CNFG_REG", 	0x58},
 	{"HPU_VER_REG",			0x5C},
 	{"HPU_AUX_RXCTRL_REG",		0x60},
 	{"HPU_AUX_RX_ERR_REG",		0x64},
@@ -379,10 +404,23 @@ typedef struct {
 } spinn_keys_enable_t;
 
 typedef enum {
+	/* order matters here! Must be consistent with the following array */
 	LOOP_NONE,
 	LOOP_LNEAR,
-	LOOP_LSPINN,
+	LOOP_LSPINN_AUX,
+	LOOP_LSPINN_LEFT,
+	LOOP_LSPINN_RIGHT,
+	LOOP_LPAER_AUX,
+	LOOP_LPAER_LEFT,
+	LOOP_LPAER_RIGHT,
+	LOOP_LSAER_AUX,
+	LOOP_LSAER_LEFT,
+	LOOP_LSAER_RIGHT
 } spinn_loop_t;
+u32 loop_bits[] = {0, HPU_CTRL_LOOP_LNEAR,
+	    HPU_CTRL_LOOP_SPINNAUX, HPU_CTRL_LOOP_SPINNL, HPU_CTRL_LOOP_SPINNR,
+	    HPU_CTRL_LOOP_PAERAUX, HPU_CTRL_LOOP_PAERL, HPU_CTRL_LOOP_PAERR,
+	    HPU_CTRL_LOOP_SAERAUX, HPU_CTRL_LOOP_SAERL, HPU_CTRL_LOOP_SAERR };
 
 typedef enum {
 	MASK_20BIT,
@@ -521,8 +559,16 @@ struct hpu_priv {
 	int axis_lat;
 	unsigned int rx_tlast_count;
 	unsigned int rx_data_count;
+
 	bool thread_exit;
+	bool can_disable_ts;
+	bool tx_ts_disable;
+	bool rx_ts_disable;
+	u32 can_loop;
 };
+
+
+/* *** FUNCTION NOW PRESENT IN KERNEL MAINLINE *** 
 
 static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
 		dma_addr_t *dma_handle, enum dma_data_direction dir, gfp_t gfp)
@@ -553,6 +599,10 @@ static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
 
 	return virt;
 }
+*/
+
+
+/* *** FUNCTION NOW PRESENT IN KERNEL MAINLINE *** 
 
 static inline void dma_free_noncoherent(struct device *dev, size_t size, void *virt,
 		dma_addr_t dma_handle, enum dma_data_direction dir)
@@ -570,6 +620,7 @@ static inline void dma_free_noncoherent(struct device *dev, size_t size, void *v
 		kfree(virt);
 	}
 }
+*/
 
 #define HPU_REG_LOG 0
 
@@ -855,13 +906,26 @@ static void hpu_rx_dma_callback(void *_buffer, const struct dmaengine_result *re
 	dma_sync_single_for_cpu(&priv->pdev->dev, buffer->phys, priv->dma_rx_pool.ps,
 				DMA_FROM_DEVICE);
 #endif
-	if ((len / 4) & 1) {
+
+	/*
+	 * The magic word 0xf0cacc1a is legal in the following three cases
+	 * - as an early buffer terminator (len < ps)
+	 * - as an early buffer terminator with len == ps, if 0xf0cacc1a fills
+	 *   last word of the buffer. This can happen only with RX TS disabled
+	 * - as a legal timestamp, which cannot be there when RX TS are disabled
+	 */
+	if (len != priv->dma_rx_pool.ps) {
 		priv->early_tlast++;
 		len -= 4;
 		word = ((u32*)buffer->virt)[len / 4];
 		if (unlikely(word != 0xf0cacc1a))
 			dev_err(&priv->pdev->dev, "Got early TLAST, but no magic word\n");
+	} else if (priv->rx_ts_disable) {
+		word = ((u32*)buffer->virt)[len / 4 - 1];
+		if (word == 0xf0cacc1a)
+			len -= 4;
 	}
+
 	priv->byte_rxed += len;
 	priv->pkt_rxed++;
 
@@ -957,6 +1021,11 @@ static ssize_t hpu_chardev_write(struct file *fp, const char __user *buf,
 						       DMA_MEM_TO_DEV,
 						       DMA_CTRL_ACK |
 						       DMA_PREP_INTERRUPT);
+		if (!dma_desc) {
+			i = -ENOMEM;
+			goto exit;
+		}
+
 		dma_desc->callback = hpu_tx_dma_callback;
 		dma_desc->callback_param = dma_buf;
 #ifdef HPU_DMA_STREAMING
@@ -1106,8 +1175,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			/* if we have read enough not to block then return now */
 			if (read >= priv->rx_blocking_threshold) {
 				spin_unlock_bh(&priv->dma_rx_pool.spin_lock);
-				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
-				return read;
+				goto exit;
 			}
 
 			/* drain away any completion leftover */
@@ -1118,12 +1186,12 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			ret = wait_for_completion_killable_timeout(&priv->dma_rx_pool.completion,
 									msecs_to_jiffies(rx_to));
 			if (unlikely(ret < 0)) {
-				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
-				return ret;
+				read = ret;
+				goto exit;
 			} else if (unlikely(ret == 0)) {
 				dev_err(&priv->pdev->dev, "DMA timed out\n");
-				mutex_unlock(&priv->dma_rx_pool.mutex_lock);
-				return -ETIMEDOUT;
+				read = -ETIMEDOUT;
+				goto exit;
 			}
 		}
 
@@ -1198,6 +1266,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 			break;
 	}
 
+exit:
 	if (submitted) {
 #ifdef HPU_DMA_DEFER_SUBMIT
 		hpu_rx_dma_wake_deferred(priv);
@@ -1774,36 +1843,41 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 {
 	unsigned long flags;
 
-	spin_lock_irqsave(&priv->irq_lock, flags);
-	switch (loop) {
-	case LOOP_LSPINN:
-		priv->loop_bits = HPU_CTRL_LOOP_SPINN;
-		break;
-
-	case LOOP_LNEAR:
-		priv->loop_bits = HPU_CTRL_LOOP_LNEAR;
-		break;
-
-	case LOOP_NONE:
-		priv->loop_bits = 0;
-		break;
-	default:
-		spin_unlock_irqrestore(&priv->irq_lock, flags);
+	if (loop >= ARRAY_SIZE(loop_bits)) {
 		dev_notice(&priv->pdev->dev,
 			   "set loop - invalid arg %d\n", loop);
 		return -EINVAL;
-		break;
 	}
 
+	if (! ((loop_bits[loop] & priv->can_loop) ||
+	       (loop == LOOP_NONE)))
+	    return -ENOTSUPP;
+
+	spin_lock_irqsave(&priv->irq_lock, flags);
+	priv->loop_bits = loop_bits[loop];
+
 	if (!hpu_rx_is_suspended(priv)) {
-		priv->ctrl_reg &= ~(HPU_CTRL_LOOP_LNEAR | HPU_CTRL_LOOP_SPINN);
+		priv->ctrl_reg &= ~HPU_CTRL_LOOP_MASK;
 		priv->ctrl_reg |= priv->loop_bits;
 		hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 	}
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
-	dev_dbg(&priv->pdev->dev, "set loop - CTRL reg 0x%x",
-		priv->ctrl_reg);
+	dev_dbg(&priv->pdev->dev, "set loop %d - bits: 0x%x, CTRL 0x%x",
+		 loop, priv->loop_bits, priv->ctrl_reg);
+
+	if (loop == LOOP_LSAER_LEFT)
+		hpu_reg_write(priv, 0xba98, HPU_LPBK_LR_CNFG_REG);
+
+	else if (loop == LOOP_LSAER_RIGHT)
+		hpu_reg_write(priv, 0xba980000, HPU_LPBK_LR_CNFG_REG);
+	else
+		hpu_reg_write(priv, 0x0, HPU_LPBK_LR_CNFG_REG);
+
+	if (loop == LOOP_LSAER_AUX)
+		hpu_reg_write(priv, 0xba90, HPU_LPBK_AUX_CNFG_REG);
+	else
+		hpu_reg_write(priv, 0x0, HPU_LPBK_AUX_CNFG_REG);
 
 	return 0;
 }
@@ -1950,6 +2024,38 @@ static void hpu_get_hw_status(struct hpu_priv *priv, hpu_hw_status_t *status)
 		status->auxspinn_parity_err = 1;
 }
 
+static int hpu_set_rx_ts_enable(struct hpu_priv *priv, unsigned int val)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->irq_lock, flags);
+	priv->rx_ts_disable = !val;
+	if (val)
+		priv->ctrl_reg &= ~HPU_CTRL_DISABLE_RX_TS;
+	else
+		priv->ctrl_reg |= HPU_CTRL_DISABLE_RX_TS;
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
+
+	return 0;
+}
+
+static int hpu_set_tx_ts_enable(struct hpu_priv *priv, unsigned int val)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&priv->irq_lock, flags);
+	if (val)
+		priv->ctrl_reg &= ~HPU_CTRL_DISABLE_TX_TS;
+	else
+		priv->ctrl_reg |= HPU_CTRL_DISABLE_TX_TS;
+
+	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
+	spin_unlock_irqrestore(&priv->irq_lock, flags);
+
+	return 0;
+}
+
 static int hpu_chardev_open(struct inode *i, struct file *f)
 {
 	int ret = 0;
@@ -1965,6 +2071,9 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 		return -EBUSY;
 	}
 
+#ifdef HPU_DMA_DEFER_SUBMIT
+	hpu_rx_dma_thread_create(priv);
+#endif
 	hpu_clk_enable(priv);
 
 	priv->rx_blocking_threshold = ~0;
@@ -2118,6 +2227,13 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	mutex_unlock(&priv->dma_rx_pool.mutex_lock);
 
 	cancel_work_sync(&priv->rx_housekeeping_work);
+
+#ifdef HPU_DMA_DEFER_SUBMIT
+	hpu_rx_dma_thread_terminate(priv);
+#endif
+
+	dmaengine_terminate_sync(priv->dma_rx_chan);
+	dmaengine_terminate_sync(priv->dma_tx_chan);
 
 	hpu_dma_release(priv);
 	priv->hpu_is_opened = 0;
@@ -2287,7 +2403,7 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 		hpu_reg_write(priv, 0, HPU_WRAP_REG);
 		break;
 
-	case _IOR(0x0, HPU_IOCTL_READVERSION, unsigned int):
+	case _IOR(0x0, HPU_IOCTL_READVERSION, unsigned int *):
 		ret = hpu_reg_read(priv, HPU_VER_REG);
 		if (copy_to_user(arg, &ret, sizeof(unsigned int)))
 			goto cfuser_err;
@@ -2486,6 +2602,24 @@ static long hpu_ioctl(struct file *fp, unsigned int cmd, unsigned long _arg)
 					    keys_enable.enable_aux);
 		break;
 
+	case _IOW(0x0, HPU_IOCTL_SET_RX_TS_ENABLE, unsigned int *):
+		if (!priv->can_disable_ts)
+			return -ENOTSUPP;
+
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
+			goto cfuser_err;
+		res = hpu_set_rx_ts_enable(priv, val);
+		break;
+
+	case _IOW(0x0, HPU_IOCTL_SET_TX_TS_ENABLE, unsigned int *):
+		if (!priv->can_disable_ts)
+			return -ENOTSUPP;
+
+		if (copy_from_user(&val, arg, sizeof(unsigned int)))
+			  goto cfuser_err;
+		res = hpu_set_tx_ts_enable(priv, val);
+		break;
+
 	default:
 		res = -EINVAL;
 	}
@@ -2544,9 +2678,6 @@ static int hpu_register_chardev(struct hpu_priv *priv)
 
 static int hpu_unregister_chardev(struct hpu_priv *priv)
 {
-#ifdef HPU_DMA_DEFER_SUBMIT
-	hpu_rx_dma_thread_terminate(priv);
-#endif
 	cdev_del(&priv->cdev);
 	device_destroy(hpu_class, priv->devt);
 	ida_simple_remove(&hpu_ida, priv->id);
@@ -2560,7 +2691,7 @@ static int hpu_probe(struct platform_device *pdev)
 	struct resource *res;
 	struct debugfs_regset32 *regset;
 	unsigned int result;
-	u32 ver;
+	u32 ver, tmp;
 	char buf[128];
 
 	/* FIXME: handle error path resource free */
@@ -2573,6 +2704,7 @@ static int hpu_probe(struct platform_device *pdev)
 	}
 	priv->hpu_is_opened = 0;
 	priv->rx_fifo_status = FIFO_OK;
+	priv->rx_ts_disable = priv->tx_ts_disable = false;
 
 	mutex_init(&priv->access_lock);
 	spin_lock_init(&priv->irq_lock);
@@ -2608,17 +2740,54 @@ static int hpu_probe(struct platform_device *pdev)
 	ver = hpu_reg_read(priv, HPU_VER_REG);
 	hpu_clk_disable(priv);
 
-	if (ver != HPU_VER_MAGIC) {
-		if ((ver >> 24) == 'B') {
-			dev_warn(&pdev->dev,
-				 "HPU IP is a _BETA_ version (0x%x)\n", ver);
-		} else {
-			dev_err(&pdev->dev,
-				"HPU IP has wrong version: 0x%x\n", ver);
-			kfree(priv);
-			return -ENODEV;
-		}
+	if ((ver >> 8) != HPU_MAGIC) {
+		dev_err(&pdev->dev, "HPU IP Magic not recognized (0x%x)", ver);
+		kfree(priv);
+		return -ENODEV;
 	}
+
+	switch (ver & 0xFF) {
+
+	case 'B':
+		dev_warn(&pdev->dev,
+			 "HPU IP is a _BETA_ version (0x%x)\n", ver);
+		break;
+	case 0x36:
+		dev_notice(&pdev->dev, "HPU ip version (0x%x) doesn't support all features\n", ver);
+		break;
+	case 0x40:
+		priv->can_disable_ts = true;
+		break; /* current version */
+	default:
+		dev_err(&pdev->dev,
+			"HPU IP has wrong version: 0x%x\n", ver);
+		kfree(priv);
+		return -ENODEV;
+	}
+
+	tmp = hpu_reg_read(priv, HPU_IPCONFIG_REG);
+	dev_info(&pdev->dev, "RX - PAER: %d, SAER: %d (ch %d), SPIN: %d, GTP: %d",
+		 !!(tmp & HPU_IPCONFIG_RXPAER),
+		 !!(tmp & HPU_IPCONFIG_RXSAER),
+		 ((tmp >> HPU_IPCONFIG_RXSAERCH) & 3) + 1,
+		 !!(tmp & HPU_IPCONFIG_RXSPINN),
+		 !!(tmp & HPU_IPCONFIG_RXGTP));
+	dev_info(&pdev->dev, "TX - PAER: %d, SAER: %d (ch %d), SPIN: %d, GTP: %d",
+		 !!(tmp & HPU_IPCONFIG_TXPAER),
+		 !!(tmp & HPU_IPCONFIG_TXSAER),
+		 ((tmp >> HPU_IPCONFIG_TXSAERCH) & 3) + 1,
+		 !!(tmp & HPU_IPCONFIG_TXSPINN),
+		 !!(tmp & HPU_IPCONFIG_TXGTP));
+
+	priv->can_loop = HPU_CTRL_LOOP_LNEAR;
+	if ((tmp & HPU_IPCONFIG_TXPAER) && (tmp & HPU_IPCONFIG_RXPAER))
+		priv->can_loop |= HPU_CTRL_LOOP_PAERAUX | HPU_CTRL_LOOP_PAERL | HPU_CTRL_LOOP_PAERR;
+
+	if ((tmp & HPU_IPCONFIG_TXSAER) && (tmp & HPU_IPCONFIG_RXSAER))
+		priv->can_loop |= HPU_CTRL_LOOP_SAERAUX | HPU_CTRL_LOOP_SAERL | HPU_CTRL_LOOP_SAERR;
+
+	if ((tmp & HPU_IPCONFIG_TXSPINN) && (tmp & HPU_IPCONFIG_RXSPINN))
+		priv->can_loop |= HPU_CTRL_LOOP_SPINNAUX | HPU_CTRL_LOOP_SPINNL | HPU_CTRL_LOOP_SPINNR;
 
 	priv->irq = platform_get_irq(pdev, 0);
 	if (priv->irq < 0) {
@@ -2660,9 +2829,6 @@ static int hpu_probe(struct platform_device *pdev)
 	init_completion(&priv->dma_rx_pool.completion);
 	init_completion(&priv->dma_tx_pool.completion);
 
-#ifdef HPU_DMA_DEFER_SUBMIT
-	hpu_rx_dma_thread_create(priv);
-#endif
 	hpu_register_chardev(priv);
 
 	if (hpu_debugfsdir) {

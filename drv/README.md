@@ -47,6 +47,8 @@ Here there is a list of the currently supported IOCTLs.
 |HPU_IOCTL_SET_SPINN_RX_MASK             |37| W |        unsigned int       |
 |HPU_IOCTL_GET_HW_STATUS                 |38| R |      hpu_hw_status_t      |
 |HPU_IOCTL_SET_SPINN_KEYS_EN_EX          |39| W |    spinn_keys_enable_t    |
+|HPU_IOCTL_SET_RX_TS_ENABLE              |40| W |        unsigned int       |
+|HPU_IOCTL_SET_TX_TS_ENABLE              |41| W |        unsigned int       |
 
 All ioctls have *zero* as magic number.
 
@@ -361,6 +363,13 @@ typedef enum {
 } fifo_status_t;
 
 ```
+
+## HPU_IOCTL_SET_RX_TS_ENABLE
+Enables/disables RX timestamping. When disabled all RX words contain events; timestamps are othewise interleaved.
+
+## HPU_IOCTL_SET_TX_TS_ENABLE
+Enables/disable specifying TX time in TX buffer. When disabled all TX words contain data; TX time is otherwise interleaved.
+
 
 Module parameters
 -----------------

@@ -1,7 +1,7 @@
 all: readwrite readtest
 
 readwrite: readwrite.c
-	gcc -Wall -O2 -g readwrite.c -o readwrite
+	gcc -Wall -O2 -g readwrite.c -o readwrite -lpthread
 
 readtest: readtest.c
 	gcc -Wall -O2 -g readtest.c -o readtest

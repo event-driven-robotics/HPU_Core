@@ -47,3 +47,10 @@ Vivado/*
 **/Vivado_bd/*/*                        
 !**/Vivado_bd/*/*.bd                            
 !**/Vivado_bd/*/synth/*.vhd  
+
+# Driver folder
+drv/**/*.*
+!drv/**/*.c
+drv/**/*.mod.c
+!drv/**/*.h
+!drv/**/*.ko
