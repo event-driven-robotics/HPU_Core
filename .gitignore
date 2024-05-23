@@ -51,3 +51,11 @@ src/Vivado_ip/**/*.*
 src/Vivado_bd/**/*.*                              
 !src/Vivado_bd/*/*.bd                            
 !src/Vivado_bd/*/*.ui 
+
+# Driver folder
+drv/**/*.*
+!drv/**/*.c
+drv/**/*.mod.c
+!drv/**/*.h
+!drv/**/*.ko
+

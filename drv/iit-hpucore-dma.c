@@ -567,6 +567,9 @@ struct hpu_priv {
 	u32 can_loop;
 };
 
+
+/* *** FUNCTION NOW PRESENT IN KERNEL MAINLINE *** 
+
 static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
 		dma_addr_t *dma_handle, enum dma_data_direction dir, gfp_t gfp)
 {
@@ -596,6 +599,10 @@ static inline void *dma_alloc_noncoherent(struct device *dev, size_t size,
 
 	return virt;
 }
+*/
+
+
+/* *** FUNCTION NOW PRESENT IN KERNEL MAINLINE *** 
 
 static inline void dma_free_noncoherent(struct device *dev, size_t size, void *virt,
 		dma_addr_t dma_handle, enum dma_data_direction dir)
@@ -613,6 +620,7 @@ static inline void dma_free_noncoherent(struct device *dev, size_t size, void *v
 		kfree(virt);
 	}
 }
+*/
 
 #define HPU_REG_LOG 0
 
