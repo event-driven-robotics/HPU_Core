@@ -740,7 +740,7 @@
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.TX_MESSAGE" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.TX_MESSAGE" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:busInterfaceInfo>
       </spirit:vendorExtensions>
@@ -880,7 +880,7 @@
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.ALIGN_REQUEST_IN" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.ALIGN_REQUEST_IN" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:busInterfaceInfo>
       </spirit:vendorExtensions>
@@ -983,7 +983,6 @@
       <spirit:busType spirit:vendor="iit.local" spirit:library="user" spirit:name="gtp_manager" spirit:version="1.0"/>
       <spirit:abstractionType spirit:vendor="iit.local" spirit:library="user" spirit:name="gtp_manager_rtl" spirit:version="1.0"/>
       <spirit:master/>
-      <spirit:connectionRequired>true</spirit:connectionRequired>
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
@@ -1053,7 +1052,7 @@
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTP_TX" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTP_TX" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:busInterfaceInfo>
       </spirit:vendorExtensions>
@@ -1182,7 +1181,7 @@
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTP_RX_LEFT" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTP_RX_LEFT" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:busInterfaceInfo>
       </spirit:vendorExtensions>
@@ -1311,7 +1310,7 @@
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTP_RX_RIGHT" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTP_RX_RIGHT" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:busInterfaceInfo>
       </spirit:vendorExtensions>
@@ -1430,7 +1429,7 @@
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTP_RX_AUX" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTP_RX_AUX" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:busInterfaceInfo>
       </spirit:vendorExtensions>
@@ -1533,7 +1532,7 @@
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTH_RX_LEFT" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTH_RX_LEFT" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:busInterfaceInfo>
       </spirit:vendorExtensions>
@@ -1646,7 +1645,7 @@
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTH_RX_RIGHT" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTH_RX_RIGHT" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:busInterfaceInfo>
       </spirit:vendorExtensions>
@@ -1749,7 +1748,7 @@
       <spirit:vendorExtensions>
         <xilinx:busInterfaceInfo>
           <xilinx:enablement>
-            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTH_RX_AUX" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+            <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="BUSIF_ENABLEMENT.GTH_RX_AUX" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
           </xilinx:enablement>
         </xilinx:busInterfaceInfo>
       </spirit:vendorExtensions>
@@ -2033,7 +2032,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>bdb05385</spirit:value>
+            <spirit:value>de5bb7b8</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2052,7 +2051,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>f5cff784</spirit:value>
+            <spirit:value>048a2ddd</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2067,7 +2066,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>c6d09352</spirit:value>
+            <spirit:value>5c06198c</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2081,7 +2080,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>6832620d</spirit:value>
+            <spirit:value>e78465f2</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2095,7 +2094,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ed79c7cc</spirit:value>
+            <spirit:value>ab6f3878</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2488,7 +2487,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_TxUsrClk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_TxUsrClk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2511,7 +2510,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_SoftResetTx_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_SoftResetTx_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2534,7 +2533,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_DataValid_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_DataValid_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2557,7 +2556,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_Txuserrdy_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_Txuserrdy_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2584,7 +2583,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_Txdata_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_Txdata_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2611,7 +2610,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_Txcharisk_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_Txcharisk_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2634,7 +2633,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_PllLock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_PllLock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2657,7 +2656,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_PllRefclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.Tx_GTP_PllRefclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_TX_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2926,7 +2925,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_RxUsrClk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_RxUsrClk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2949,7 +2948,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_SoftResetRx_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_SoftResetRx_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2972,7 +2971,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_DataValid_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_DataValid_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -2995,7 +2994,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxuserrdy_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxuserrdy_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3022,7 +3021,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxdata_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxdata_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3049,7 +3048,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxchariscomma_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxchariscomma_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3076,7 +3075,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxcharisk_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxcharisk_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3103,7 +3102,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxdisperr_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxdisperr_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3130,7 +3129,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxnotintable_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxnotintable_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3153,7 +3152,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3176,7 +3175,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3199,7 +3198,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_PllLock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_PllLock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3222,7 +3221,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_PllRefclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTP_PllRefclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3249,7 +3248,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_gtwiz_userclk_rx_usrclk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_gtwiz_userclk_rx_usrclk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3276,7 +3275,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_gtwiz_reset_all_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_gtwiz_reset_all_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3303,7 +3302,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_gtwiz_userdata_rx_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_gtwiz_userdata_rx_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3330,7 +3329,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxctrl2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxctrl2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3357,7 +3356,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxctrl0_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxctrl0_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3384,7 +3383,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxctrl1_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxctrl1_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3411,7 +3410,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxctrl3_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxctrl3_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3438,7 +3437,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3465,7 +3464,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3492,7 +3491,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Qpll_lock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Qpll_lock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3519,7 +3518,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Qpll_refclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.LRx_GTH_Qpll_refclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_L_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3788,7 +3787,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_RxUsrClk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_RxUsrClk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3811,7 +3810,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_SoftResetRx_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_SoftResetRx_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3834,7 +3833,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_DataValid_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_DataValid_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3857,7 +3856,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxuserrdy_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxuserrdy_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3884,7 +3883,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxdata_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxdata_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3911,7 +3910,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxchariscomma_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxchariscomma_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3938,7 +3937,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxcharisk_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxcharisk_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3965,7 +3964,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxdisperr_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxdisperr_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -3992,7 +3991,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxnotintable_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxnotintable_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4015,7 +4014,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4038,7 +4037,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4061,7 +4060,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_PllLock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_PllLock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4084,7 +4083,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_PllRefclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTP_PllRefclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4111,7 +4110,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_gtwiz_userclk_rx_usrclk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_gtwiz_userclk_rx_usrclk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4138,7 +4137,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_gtwiz_reset_all_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_gtwiz_reset_all_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4165,7 +4164,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_gtwiz_userdata_rx_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_gtwiz_userdata_rx_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4192,7 +4191,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxctrl2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxctrl2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4219,7 +4218,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxctrl0_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxctrl0_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4246,7 +4245,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxctrl1_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxctrl1_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4273,7 +4272,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxctrl3_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxctrl3_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4300,7 +4299,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4327,7 +4326,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4354,7 +4353,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Qpll_lock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Qpll_lock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4381,7 +4380,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Qpll_refclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.RRx_GTH_Qpll_refclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_R_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynquplus&quot;">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4650,7 +4649,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_RxUsrClk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_RxUsrClk2_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4673,7 +4672,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_SoftResetRx_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_SoftResetRx_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4696,7 +4695,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_DataValid_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_DataValid_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4719,7 +4718,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxuserrdy_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxuserrdy_o" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4746,7 +4745,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxdata_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxdata_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4773,7 +4772,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxchariscomma_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxchariscomma_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4800,7 +4799,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxcharisk_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxcharisk_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4827,7 +4826,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxdisperr_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxdisperr_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4854,7 +4853,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxnotintable_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxnotintable_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4877,7 +4876,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxbyteisaligned_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4900,7 +4899,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_Rxbyterealign_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4923,7 +4922,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_PllLock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_PllLock_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -4946,7 +4945,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_PllRefclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FAMILY&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.ARx_GTP_PllRefclklost_i" xilinx:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.C_RX_A_HAS_GTP&apos;)) = true() and spirit:decode(id(&apos;MODELPARAM_VALUE.C_FPGA_FAM&apos;)) = &quot;zynq&quot;">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -6354,8 +6353,9 @@
         <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_SYSCLK_PERIOD_PS" spirit:minimum="0" spirit:rangeType="long">10000</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="string">
-        <spirit:name>C_FAMILY</spirit:name>
-        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_FAMILY">zynquplus</spirit:value>
+        <spirit:name>C_FPGA_FAM</spirit:name>
+        <spirit:displayName>C Fpga Fam</spirit:displayName>
+        <spirit:value spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_FPGA_FAM">zynquplus</spirit:value>
       </spirit:modelParameter>
     </spirit:modelParameters>
   </spirit:model>
@@ -6364,6 +6364,11 @@
       <spirit:name>choice_list_07c83d4f</spirit:name>
       <spirit:enumeration>16</spirit:enumeration>
       <spirit:enumeration>32</spirit:enumeration>
+    </spirit:choice>
+    <spirit:choice>
+      <spirit:name>choice_list_28fbf084</spirit:name>
+      <spirit:enumeration>zynq</spirit:enumeration>
+      <spirit:enumeration>zynquplus</spirit:enumeration>
     </spirit:choice>
     <spirit:choice>
       <spirit:name>choice_list_99a1d2b9</spirit:name>
@@ -6636,17 +6641,24 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQ/FIFO_SAER_ZYNQ.xci</spirit:name>
+        <spirit:name>src/hdl/HPU_lib/HPUCore.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_e449003f</spirit:userFileType>
+        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+        <spirit:logicalName>HPU_lib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/constrs/HPU_Core_timing.xdc</spirit:name>
+        <spirit:userFileType>xdc</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/Vivado_ip/RXFIFO_HPU_ZYNQ/RXFIFO_HPU_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/Vivado_ip/TXFIFO_HPU_ZYNQ/TXFIFO_HPU_ZYNQ.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/Vivado_ip/RXFIFO_HPU_ZYNQ/RXFIFO_HPU_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -6661,17 +6673,7 @@
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQUPLUS/FIFO_SAER_ZYNQUPLUS.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQ/FIFO_SAER_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -6682,6 +6684,21 @@
       </spirit:file>
       <spirit:file>
         <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQ/FIFO_GT_DATA_ZYNQ.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQUPLUS/FIFO_SAER_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -6731,6 +6748,11 @@
         <spirit:logicalName>neuserial_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
+        <spirit:name>src/hdl/HPU_lib/reset_machine.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:logicalName>HPU_lib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>src/hdl/HPU_lib/sequencer.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
@@ -6749,23 +6771,6 @@
         <spirit:name>src/hdl/HPU_lib/timetagger.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_6436b64e</spirit:userFileType>
-        <spirit:logicalName>HPU_lib</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/constrs/HPU_Core_timing.xdc</spirit:name>
-        <spirit:userFileType>xdc</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/HPU_lib/HPUCore.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_e449003f</spirit:userFileType>
-        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
-        <spirit:logicalName>HPU_lib</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/HPU_lib/reset_machine.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_c8d58e8e</spirit:userFileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
@@ -7028,17 +7033,18 @@
         <spirit:logicalName>HPU_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQ/FIFO_SAER_ZYNQ.xci</spirit:name>
+        <spirit:name>src/hdl/HPU_lib/HPUCore.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
+        <spirit:logicalName>HPU_lib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/Vivado_ip/RXFIFO_HPU_ZYNQ/RXFIFO_HPU_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/Vivado_ip/TXFIFO_HPU_ZYNQ/TXFIFO_HPU_ZYNQ.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/Vivado_ip/RXFIFO_HPU_ZYNQ/RXFIFO_HPU_ZYNQ.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -7053,17 +7059,32 @@
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
+        <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQ/FIFO_SAER_ZYNQ.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_MSG_ZYNQ/FIFO_GT_MSG_ZYNQ.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQ/FIFO_GT_DATA_ZYNQ.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_MSG_ZYNQUPLUS/FIFO_GT_MSG_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQUPLUS/FIFO_SAER_ZYNQUPLUS.xci</spirit:name>
+        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQUPLUS/FIFO_GT_DATA_ZYNQUPLUS.xci</spirit:name>
+        <spirit:name>src/Vivado_ip/FIFO_SAER_ZYNQUPLUS/FIFO_SAER_ZYNQUPLUS.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
@@ -7113,6 +7134,11 @@
         <spirit:logicalName>neuserial_lib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
+        <spirit:name>src/hdl/HPU_lib/reset_machine.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:logicalName>HPU_lib</spirit:logicalName>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>src/hdl/HPU_lib/sequencer.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
@@ -7131,28 +7157,6 @@
         <spirit:name>src/hdl/HPU_lib/timetagger.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:logicalName>HPU_lib</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_MSG_ZYNQ/FIFO_GT_MSG_ZYNQ.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/GT_lib/Vivado_ip/FIFO_GT_DATA_ZYNQ/FIFO_GT_DATA_ZYNQ.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>src/hdl/HPU_lib/HPUCore.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
-        <spirit:logicalName>HPU_lib</spirit:logicalName>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>sim/reset_machine_tb.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -7235,13 +7239,19 @@
         <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
         <spirit:logicalName>work</spirit:logicalName>
       </spirit:file>
+      <spirit:file>
+        <spirit:name>sim/reset_machine_tb_behav.wcfg</spirit:name>
+        <spirit:fileType>unknown</spirit:fileType>
+        <spirit:userFileType>USED_IN_simulation</spirit:userFileType>
+        <spirit:logicalName>work</spirit:logicalName>
+      </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
         <spirit:name>xgui/HPU_Core_v4_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_6832620d</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_e78465f2</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -7315,7 +7325,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_TX_HAS_GTP</spirit:name>
-      <spirit:displayName>GTP TX</spirit:displayName>
+      <spirit:displayName>TX</spirit:displayName>
       <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_TX_HAS_GTP">false</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
@@ -7569,7 +7579,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_GTP_DSIZE</spirit:name>
-      <spirit:displayName>GTP Data Size</spirit:displayName>
+      <spirit:displayName>Port Data Size</spirit:displayName>
       <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_GTP_DSIZE" spirit:choiceRef="choice_list_07c83d4f">16</spirit:value>
       <spirit:vendorExtensions>
         <xilinx:parameterInfo>
@@ -7616,17 +7626,17 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_RX_L_HAS_GTP</spirit:name>
-      <spirit:displayName>GTP LEFT RX</spirit:displayName>
+      <spirit:displayName>Left RX</spirit:displayName>
       <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_L_HAS_GTP">true</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_RX_R_HAS_GTP</spirit:name>
-      <spirit:displayName>GTP RIGHT RX</spirit:displayName>
+      <spirit:displayName>Right RX</spirit:displayName>
       <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_R_HAS_GTP">true</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>C_RX_A_HAS_GTP</spirit:name>
-      <spirit:displayName>GTP AUX RX</spirit:displayName>
+      <spirit:displayName>Aux RX</spirit:displayName>
       <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.C_RX_A_HAS_GTP">true</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
@@ -7689,9 +7699,9 @@
       <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.C_SYSCLK_PERIOD_PS">10000</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
-      <spirit:name>C_FAMILY</spirit:name>
+      <spirit:name>C_FPGA_FAM</spirit:name>
       <spirit:displayName>FPGA Family</spirit:displayName>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.C_FAMILY">zynquplus</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.C_FPGA_FAM" spirit:choiceRef="choice_list_28fbf084">zynquplus</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -7712,8 +7722,8 @@
       </xilinx:xpmLibraries>
       <xilinx:vendorDisplayName>Istituto Italiano di Tecnologia</xilinx:vendorDisplayName>
       <xilinx:vendorURL>http://www.iit.it</xilinx:vendorURL>
-      <xilinx:coreRevision>17</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2024-05-24T10:01:48Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>18</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2024-05-27T17:45:40Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="ui.data.coregen.df@3e94cb16_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.df@755d4a91_ARCHIVE_LOCATION">d:/Projects/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
@@ -7760,16 +7770,91 @@
         <xilinx:tag xilinx:name="ui.data.coregen.df@7ae57fd5_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.df@42c9588f_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.df@25fc2fa5_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@598389db_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@71f9bc00_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@30d99900_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@37ef99d_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2a086ead_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@34e8c7c4_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@5e5f74a7_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@668dc6e9_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@41ee6f49_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@7cec06cc_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@73df7411_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@33ebb12d_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@6a5c239e_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@1b3bfad8_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@72de78ea_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@452f13cf_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@50a5afa7_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@161865d9_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@3d39dd47_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@7d753f60_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@15e3d114_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2c3b2b02_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@7ddf6beb_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@4244e4a6_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@d7a6e3d_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@7a2908db_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@733ba920_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@4895203e_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@3702dc69_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2b6e52c_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@7fe0177_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@6e64cf39_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@46ecd2da_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@6157ea23_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@5eb68d03_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@1e687077_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@62dfbc9_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@59fa8b7c_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@309126f7_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@5e7ed9c8_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@79e0186f_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@44b999fe_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@46c436e5_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@4fcbd61d_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@41d2bd49_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@384e35b6_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@5b44a8c0_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@3173ba3_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@7de820d3_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@4db0ebd_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@52aab614_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@59e31aeb_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2349a51b_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@d85cf7d_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@670c530e_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@10a122ed_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2480161d_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@50dc1f5a_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@22aa923e_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@41836c6b_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@464cc162_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@5e099db9_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@38b0d3b3_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@6ed268b2_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@a87fab3_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2fd39a5c_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@59daa474_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@36da584a_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@55ffab4_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2511bf9a_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2a5b3a0d_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@57dcba27_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@2552f191_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@18242efb_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.df@afa9c91_ARCHIVE_LOCATION">c:/Progetti/UZCB/fpga-uzcb/src/Vivado_repo/HPU_Core</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2021.1</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="4ff9c9a6"/>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="4f11aa76"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="871a59ce"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="a4207ef2"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="3daa22e7"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="d656a404"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="7615713d"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="daa73500"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="24ec1b2f"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="af09a99f"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="9f656b89"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

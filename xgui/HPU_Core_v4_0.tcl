@@ -5,6 +5,10 @@ source [file join [file dirname [file dirname [info script]]] gui/HPUCore_v3_0.g
 # Definitional proc to organize widgets for parameters.
 proc init_gui { IPINST } {
   ipgui::add_param $IPINST -name "Component_Name"
+  #Adding Group
+  set Device [ipgui::add_group $IPINST -name "Device" -display_name {Device Specification}]
+  ipgui::add_param $IPINST -name "C_FPGA_FAM" -parent ${Device} -widget comboBox
+
   #Adding Page
   set PippoPAER [ipgui::add_page $IPINST -name "PippoPAER" -display_name {PAER / SAER}]
   set_property tooltip {PAER Interface} ${PippoPAER}
@@ -93,32 +97,29 @@ proc init_gui { IPINST } {
 
 
 
-  #Adding Group
-  ipgui::add_group $IPINST -name "General" -parent ${PippoPAER}
-
 
   #Adding Page
-  set ToponilnoGTP [ipgui::add_page $IPINST -name "ToponilnoGTP" -display_name {GTP}]
+  set ToponilnoGTP [ipgui::add_page $IPINST -name "ToponilnoGTP" -display_name {Transceivers}]
   set_property tooltip {GTP Interface} ${ToponilnoGTP}
   set C_GTP_DSIZE [ipgui::add_param $IPINST -name "C_GTP_DSIZE" -parent ${ToponilnoGTP} -widget comboBox]
   set_property tooltip {Enter the GTP Data Size} ${C_GTP_DSIZE}
   #Adding Group
-  set GTP [ipgui::add_group $IPINST -name "GTP" -parent ${ToponilnoGTP} -display_name {GTP TX}]
-  set_property tooltip {GTP TX Interface} ${GTP}
+  set GTP [ipgui::add_group $IPINST -name "GTP" -parent ${ToponilnoGTP} -display_name {Transceiver TX}]
+  set_property tooltip {Transceiver TX Interface} ${GTP}
   set C_TX_HAS_GTP [ipgui::add_param $IPINST -name "C_TX_HAS_GTP" -parent ${GTP}]
   set_property tooltip {If checked, the GTP TX interface is exposed} ${C_TX_HAS_GTP}
   set C_GTP_TXUSRCLK2_PERIOD_PS [ipgui::add_param $IPINST -name "C_GTP_TXUSRCLK2_PERIOD_PS" -parent ${GTP}]
   set_property tooltip {Enter the value of TXUSRCLK2 from GTP block (picoseconds)} ${C_GTP_TXUSRCLK2_PERIOD_PS}
 
   #Adding Group
-  set GTP_RX [ipgui::add_group $IPINST -name "GTP RX" -parent ${ToponilnoGTP}]
-  set_property tooltip {GTP RX Interface} ${GTP_RX}
+  set GTP_RX [ipgui::add_group $IPINST -name "GTP RX" -parent ${ToponilnoGTP} -display_name {Transceiver RX}]
+  set_property tooltip {Transceiver RX Interface} ${GTP_RX}
   set C_RX_L_HAS_GTP [ipgui::add_param $IPINST -name "C_RX_L_HAS_GTP" -parent ${GTP_RX}]
-  set_property tooltip {If checked, the GTP LEFT RX interface is exposed} ${C_RX_L_HAS_GTP}
+  set_property tooltip {If checked, the Transceiver LEFT RX interface is exposed} ${C_RX_L_HAS_GTP}
   set C_RX_R_HAS_GTP [ipgui::add_param $IPINST -name "C_RX_R_HAS_GTP" -parent ${GTP_RX}]
-  set_property tooltip {If checked, the GTP RIGHT RX interface is exposed} ${C_RX_R_HAS_GTP}
+  set_property tooltip {If checked, the Tranceiver RIGHT RX interface is exposed} ${C_RX_R_HAS_GTP}
   set C_RX_A_HAS_GTP [ipgui::add_param $IPINST -name "C_RX_A_HAS_GTP" -parent ${GTP_RX}]
-  set_property tooltip {If checked, the GTP AUX RX interface is exposed} ${C_RX_A_HAS_GTP}
+  set_property tooltip {If checked, the Transceiver AUX RX interface is exposed} ${C_RX_A_HAS_GTP}
   set C_GTP_RXUSRCLK2_PERIOD_PS [ipgui::add_param $IPINST -name "C_GTP_RXUSRCLK2_PERIOD_PS" -parent ${GTP_RX}]
   set_property tooltip {Enter the value of RXUSRCLK2 from GTP block (picoseconds)} ${C_GTP_RXUSRCLK2_PERIOD_PS}
 
@@ -198,15 +199,15 @@ proc validate_PARAM_VALUE.C_GTP_RXUSRCLK2_PERIOD_PS { PARAM_VALUE.C_GTP_RXUSRCLK
 	return true
 }
 
-proc update_PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS { PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS PARAM_VALUE.C_TX_HAS_GTP PARAM_VALUE.C_FAMILY } {
+proc update_PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS { PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS PARAM_VALUE.C_TX_HAS_GTP PARAM_VALUE.C_FPGA_FAM } {
 	# Procedure called to update C_GTP_TXUSRCLK2_PERIOD_PS when any of the dependent parameters in the arguments change
 	
 	set C_GTP_TXUSRCLK2_PERIOD_PS ${PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS}
 	set C_TX_HAS_GTP ${PARAM_VALUE.C_TX_HAS_GTP}
-	set C_FAMILY ${PARAM_VALUE.C_FAMILY}
+	set C_FPGA_FAM ${PARAM_VALUE.C_FPGA_FAM}
 	set values(C_TX_HAS_GTP) [get_property value $C_TX_HAS_GTP]
-	set values(C_FAMILY) [get_property value $C_FAMILY]
-	if { [gen_USERPARAMETER_C_GTP_TXUSRCLK2_PERIOD_PS_ENABLEMENT $values(C_TX_HAS_GTP) $values(C_FAMILY)] } {
+	set values(C_FPGA_FAM) [get_property value $C_FPGA_FAM]
+	if { [gen_USERPARAMETER_C_GTP_TXUSRCLK2_PERIOD_PS_ENABLEMENT $values(C_TX_HAS_GTP) $values(C_FPGA_FAM)] } {
 		set_property enabled true $C_GTP_TXUSRCLK2_PERIOD_PS
 	} else {
 		set_property enabled false $C_GTP_TXUSRCLK2_PERIOD_PS
@@ -558,17 +559,17 @@ proc validate_PARAM_VALUE.C_RX_SAER3_R_SENS_ID { PARAM_VALUE.C_RX_SAER3_R_SENS_I
 	return true
 }
 
-proc update_PARAM_VALUE.C_TX_HAS_GTP { PARAM_VALUE.C_TX_HAS_GTP PARAM_VALUE.C_FAMILY } {
+proc update_PARAM_VALUE.C_TX_HAS_GTP { PARAM_VALUE.C_TX_HAS_GTP PARAM_VALUE.C_FPGA_FAM } {
 	# Procedure called to update C_TX_HAS_GTP when any of the dependent parameters in the arguments change
 	
 	set C_TX_HAS_GTP ${PARAM_VALUE.C_TX_HAS_GTP}
-	set C_FAMILY ${PARAM_VALUE.C_FAMILY}
-	set values(C_FAMILY) [get_property value $C_FAMILY]
-	if { [gen_USERPARAMETER_C_TX_HAS_GTP_ENABLEMENT $values(C_FAMILY)] } {
+	set C_FPGA_FAM ${PARAM_VALUE.C_FPGA_FAM}
+	set values(C_FPGA_FAM) [get_property value $C_FPGA_FAM]
+	if { [gen_USERPARAMETER_C_TX_HAS_GTP_ENABLEMENT $values(C_FPGA_FAM)] } {
 		set_property enabled true $C_TX_HAS_GTP
 	} else {
 		set_property enabled false $C_TX_HAS_GTP
-		set_property value [gen_USERPARAMETER_C_TX_HAS_GTP_VALUE $values(C_FAMILY)] $C_TX_HAS_GTP
+		set_property value [gen_USERPARAMETER_C_TX_HAS_GTP_VALUE $values(C_FPGA_FAM)] $C_TX_HAS_GTP
 	}
 }
 
@@ -595,12 +596,12 @@ proc validate_PARAM_VALUE.C_TX_HSSAER_N_CHAN { PARAM_VALUE.C_TX_HSSAER_N_CHAN } 
 	return true
 }
 
-proc update_PARAM_VALUE.C_FAMILY { PARAM_VALUE.C_FAMILY } {
-	# Procedure called to update C_FAMILY when any of the dependent parameters in the arguments change
+proc update_PARAM_VALUE.C_FPGA_FAM { PARAM_VALUE.C_FPGA_FAM } {
+	# Procedure called to update C_FPGA_FAM when any of the dependent parameters in the arguments change
 }
 
-proc validate_PARAM_VALUE.C_FAMILY { PARAM_VALUE.C_FAMILY } {
-	# Procedure called to validate C_FAMILY
+proc validate_PARAM_VALUE.C_FPGA_FAM { PARAM_VALUE.C_FPGA_FAM } {
+	# Procedure called to validate C_FPGA_FAM
 	return true
 }
 
@@ -1072,5 +1073,10 @@ proc update_MODELPARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS { MODELPARAM_VALUE.C_GTP_
 proc update_MODELPARAM_VALUE.C_SYSCLK_PERIOD_PS { MODELPARAM_VALUE.C_SYSCLK_PERIOD_PS PARAM_VALUE.C_SYSCLK_PERIOD_PS } {
 	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
 	set_property value [get_property value ${PARAM_VALUE.C_SYSCLK_PERIOD_PS}] ${MODELPARAM_VALUE.C_SYSCLK_PERIOD_PS}
+}
+
+proc update_MODELPARAM_VALUE.C_FPGA_FAM { MODELPARAM_VALUE.C_FPGA_FAM PARAM_VALUE.C_FPGA_FAM } {
+	# Procedure called to set VHDL generic/Verilog parameter value(s) based on TCL parameter value
+	set_property value [get_property value ${PARAM_VALUE.C_FPGA_FAM}] ${MODELPARAM_VALUE.C_FPGA_FAM}
 }
 

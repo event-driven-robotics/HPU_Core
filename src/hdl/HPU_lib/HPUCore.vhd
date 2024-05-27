@@ -91,7 +91,8 @@ entity HPUCore is
   generic (
     -- -----------------------    
     -- GENERAL
-    C_FAMILY                              : string                        := "zynquplus"; -- "zynq", "zynquplus" 
+    C_FPGA_FAM                            : string                        := "zynquplus"; -- "zynq", "zynquplus" 
+--    C_FAMILY                              : string                        := "zynquplus"; -- "zynq", "zynquplus" 
     -- -----------------------    
     -- PAER        
     C_RX_L_HAS_PAER                       : boolean                       := true;
@@ -1001,7 +1002,7 @@ NEUSERIAL_CORE_m : neuserial_core
   generic map (
     -- -----------------------    
     -- GENERIC
-    C_FAMILY                              => C_FAMILY,
+    C_FAMILY                              => C_FPGA_FAM,
     -- -----------------------    
     -- PAER        
     C_RX_L_HAS_PAER                       => C_RX_L_HAS_PAER,           -- : boolean                       := true;
