@@ -198,13 +198,15 @@ proc validate_PARAM_VALUE.C_GTP_RXUSRCLK2_PERIOD_PS { PARAM_VALUE.C_GTP_RXUSRCLK
 	return true
 }
 
-proc update_PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS { PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS PARAM_VALUE.C_TX_HAS_GTP } {
+proc update_PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS { PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS PARAM_VALUE.C_TX_HAS_GTP PARAM_VALUE.C_FAMILY } {
 	# Procedure called to update C_GTP_TXUSRCLK2_PERIOD_PS when any of the dependent parameters in the arguments change
 	
 	set C_GTP_TXUSRCLK2_PERIOD_PS ${PARAM_VALUE.C_GTP_TXUSRCLK2_PERIOD_PS}
 	set C_TX_HAS_GTP ${PARAM_VALUE.C_TX_HAS_GTP}
+	set C_FAMILY ${PARAM_VALUE.C_FAMILY}
 	set values(C_TX_HAS_GTP) [get_property value $C_TX_HAS_GTP]
-	if { [gen_USERPARAMETER_C_GTP_TXUSRCLK2_PERIOD_PS_ENABLEMENT $values(C_TX_HAS_GTP)] } {
+	set values(C_FAMILY) [get_property value $C_FAMILY]
+	if { [gen_USERPARAMETER_C_GTP_TXUSRCLK2_PERIOD_PS_ENABLEMENT $values(C_TX_HAS_GTP) $values(C_FAMILY)] } {
 		set_property enabled true $C_GTP_TXUSRCLK2_PERIOD_PS
 	} else {
 		set_property enabled false $C_GTP_TXUSRCLK2_PERIOD_PS
@@ -556,6 +558,25 @@ proc validate_PARAM_VALUE.C_RX_SAER3_R_SENS_ID { PARAM_VALUE.C_RX_SAER3_R_SENS_I
 	return true
 }
 
+proc update_PARAM_VALUE.C_TX_HAS_GTP { PARAM_VALUE.C_TX_HAS_GTP PARAM_VALUE.C_FAMILY } {
+	# Procedure called to update C_TX_HAS_GTP when any of the dependent parameters in the arguments change
+	
+	set C_TX_HAS_GTP ${PARAM_VALUE.C_TX_HAS_GTP}
+	set C_FAMILY ${PARAM_VALUE.C_FAMILY}
+	set values(C_FAMILY) [get_property value $C_FAMILY]
+	if { [gen_USERPARAMETER_C_TX_HAS_GTP_ENABLEMENT $values(C_FAMILY)] } {
+		set_property enabled true $C_TX_HAS_GTP
+	} else {
+		set_property enabled false $C_TX_HAS_GTP
+		set_property value [gen_USERPARAMETER_C_TX_HAS_GTP_VALUE $values(C_FAMILY)] $C_TX_HAS_GTP
+	}
+}
+
+proc validate_PARAM_VALUE.C_TX_HAS_GTP { PARAM_VALUE.C_TX_HAS_GTP } {
+	# Procedure called to validate C_TX_HAS_GTP
+	return true
+}
+
 proc update_PARAM_VALUE.C_TX_HSSAER_N_CHAN { PARAM_VALUE.C_TX_HSSAER_N_CHAN PARAM_VALUE.C_TX_HAS_HSSAER } {
 	# Procedure called to update C_TX_HSSAER_N_CHAN when any of the dependent parameters in the arguments change
 	
@@ -787,15 +808,6 @@ proc update_PARAM_VALUE.C_S_AXI_DATA_WIDTH { PARAM_VALUE.C_S_AXI_DATA_WIDTH } {
 
 proc validate_PARAM_VALUE.C_S_AXI_DATA_WIDTH { PARAM_VALUE.C_S_AXI_DATA_WIDTH } {
 	# Procedure called to validate C_S_AXI_DATA_WIDTH
-	return true
-}
-
-proc update_PARAM_VALUE.C_TX_HAS_GTP { PARAM_VALUE.C_TX_HAS_GTP } {
-	# Procedure called to update C_TX_HAS_GTP when any of the dependent parameters in the arguments change
-}
-
-proc validate_PARAM_VALUE.C_TX_HAS_GTP { PARAM_VALUE.C_TX_HAS_GTP } {
-	# Procedure called to validate C_TX_HAS_GTP
 	return true
 }
 

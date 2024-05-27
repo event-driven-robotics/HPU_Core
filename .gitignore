@@ -10,8 +10,9 @@
 # ignore stuff folders                            
 mug                                               
                                                   
-# ignore ZIP files                                
-*.zip                                             
+# ignore ZIP files but not the compressed IP                               
+*.zip       
+!*HPU_Core__V*.zip                                      
                                                   
 # ignore Vivado subfolders                        
 Vivado/*                                          

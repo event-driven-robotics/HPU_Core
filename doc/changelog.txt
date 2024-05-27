@@ -1,10 +1,10 @@
 ********************************************
-Version 4.0 Rev 0:  
-- GTP Interface (Serie7 architecture) 
-- GTH RX Interface (Ultrascale architecture) 
+Version 4.0 Rev 17:  
+- Compatibility extended to ZynqUplus 
+- GTP TX/RX Interface (Serie7 architecture) 
+- GTH RX Interface (Ultrascale architecture)
 - Timestamp removable from data streaming
 - AXI Stream dedicate clock domain
-- Compatibility extended to zynquplus
   (M. Casti - IIT)
 
 -- ********************************************
