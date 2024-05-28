@@ -2,7 +2,8 @@ Linux HPU Driver
 ================
 
 This is a char (i.e. [read/write]-oriented) Linux driver for the HPU core. A dmaengine-supported DMA core (Xilinx AXI dma, just to say one..) is required.
-
+  
+  
 IOCTLs
 ------
 

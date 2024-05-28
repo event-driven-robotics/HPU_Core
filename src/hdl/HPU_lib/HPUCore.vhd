@@ -1,5 +1,5 @@
 -- ********************************************
--- Version 4.0 Rev 0:  
+-- Version 4.0 Rev 18:  
 -- - GTP Interface (Serie7 architecture) 
 -- - GTH RX Interface (Ultrascale architecture) 
 -- - Timestamp removable from data streaming

@@ -1,5 +1,5 @@
 ********************************************
-Version 4.0 Rev 17:  
+Version 4.0 Rev 18:  
 - Compatibility extended to ZynqUplus 
 - GTP TX/RX Interface (Serie7 architecture) 
 - GTH RX Interface (Ultrascale architecture)
