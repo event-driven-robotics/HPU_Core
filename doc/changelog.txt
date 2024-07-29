@@ -1,4 +1,9 @@
 ********************************************
+Version 4.0 Rev 19:  
+- Fixes the lack of Product Guide and Vivado_if folder in packet .zip file
+  (M. Casti - IIT)
+
+-- ********************************************
 Version 4.0 Rev 18:  
 - Compatibility extended to ZynqUplus 
 - GTP TX/RX Interface (Serie7 architecture) 

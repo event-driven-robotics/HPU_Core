@@ -6,3 +6,4 @@ It offers an interface to
 - AER Devices
 - PAER Devices
 - SpiNNaker
+- Gigabit Transceivers
