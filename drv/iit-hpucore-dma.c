@@ -11,7 +11,7 @@
  * Electronic Design Lab.
  *
  */
-
+ 
 #ifndef CONFIG_ARM
 /*
  * On ARMv7 (i.e. Zynq7000) the cache invalidation operation required by the
@@ -54,6 +54,11 @@
 #include <linux/interrupt.h>
 #include <linux/stringify.h>
 #include <linux/version.h>
+
+/* For kernels that don't have the fallthrough macro, define it away. */
+#ifndef fallthrough
+#define fallthrough
+#endif
 
 /* max HPUs that can be handled */
 #define HPU_MINOR_COUNT 10
@@ -1140,8 +1145,7 @@ static ssize_t hpu_chardev_read(struct file *fp, char *buf, size_t length,
 				 * then we are OK and we can go on without fail.
 				 */
 				hpu_flush_rx(priv);
-
-				/* fall-through */
+				fallthrough;
 			case FIFO_STOPPED:
 				/*
 				 * An overflow has been fixed. We have to
@@ -1612,7 +1616,7 @@ static int hpu_set_rx_interface(struct hpu_priv *priv,
 	case INTERFACE_EYE_R:
 		bitfield <<= 16;
 		mask <<= 16;
-		/* fall through */
+		fallthrough;
 	case INTERFACE_EYE_L:
 		priv->rx_ctrl_reg &= ~mask;
 		priv->rx_ctrl_reg |= bitfield;
