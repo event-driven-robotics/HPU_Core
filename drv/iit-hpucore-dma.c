@@ -30,8 +30,6 @@
 #define HPU_DMA_DEFER_SUBMIT
 #endif
 
-#include <asm/io.h>
-#include <asm/uaccess.h>
 #include <linux/iopoll.h>
 #include <linux/cdev.h>
 #include <linux/idr.h>
@@ -54,6 +52,8 @@
 #include <linux/interrupt.h>
 #include <linux/stringify.h>
 #include <linux/version.h>
+#include <asm/io.h>
+#include <asm/uaccess.h>
 
 /* For kernels that don't have the fallthrough macro, define it away. */
 #ifndef fallthrough
