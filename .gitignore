@@ -54,4 +54,4 @@ drv/**/*.*
 !drv/**/*.c
 drv/**/*.mod.c
 !drv/**/*.h
-!drv/**/*.ko
+drv/**/*.ko
