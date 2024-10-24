@@ -10,6 +10,7 @@
 #define HPU_LPBK_LR_CNFG_REG          0x04
 #define HPU_RXDATA_REG                0x08
 #define HPU_RXTIME_REG                0x0C
+#define HPU_TXDATA_REG                0x10
 #define HPU_DMA_REG                   0x14
 #define HPU_STAT_RAW_REG              0x18
 #define HPU_IRQ_REG                   0x1C
@@ -39,9 +40,15 @@
 #define HPU_SPNN_TX_MASK_REG          0x88
 #define HPU_SPNN_RX_MASK_REG          0x8C
 #define HPU_SPNN_CTRL_REG             0x90
+#define HPU_SPNN_STATUS_REG           0x94
 #define HPU_TLASTTO_REG               0xA0
 #define HPU_TLASTCNT_REG              0xA4
 #define HPU_TDATACNT_REG              0xA8
+/*      Reserved                      0xAC */
+#define HPU_GTRX_LEFT_REG             0xB0
+#define HPU_GTRX_RIGHT_REG            0xB4
+#define HPU_GTRX_AUX_REG              0xB8
+#define HPU_GTTX_REG                  0xBC
 
 #define HPU_IPCONFIG_RXSAER     BIT(0)
 #define HPU_IPCONFIG_RXPAER     BIT(1)
