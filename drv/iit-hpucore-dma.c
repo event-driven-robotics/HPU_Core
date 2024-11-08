@@ -263,10 +263,10 @@ typedef enum {
 	LOOP_LSAER_LEFT,
 	LOOP_LSAER_RIGHT
 } spinn_loop_t;
-u32 loop_bits[] = {0, HPU_CTRL_LOOP_LNEAR,
-	    HPU_CTRL_LOOP_SPINNAUX, HPU_CTRL_LOOP_SPINNL, HPU_CTRL_LOOP_SPINNR,
-	    HPU_CTRL_LOOP_PAERAUX, HPU_CTRL_LOOP_PAERL, HPU_CTRL_LOOP_PAERR,
-	    HPU_CTRL_LOOP_SAERAUX, HPU_CTRL_LOOP_SAERL, HPU_CTRL_LOOP_SAERR };
+u32 loop_bits[] = {0, HPU_CTRL_LOC_NEAR_LPBK,
+	    HPU_CTRL_LOC_FAR_SPINN_LPBK_AUX, HPU_CTRL_LOC_FAR_SPINN_LPBK_L, HPU_CTRL_LOC_FAR_SPINN_LPBK_R,
+	    HPU_CTRL_LOC_FAR_AUX_PAER_LPBK, HPU_CTRL_LOC_FAR_LPAER_LPBK, HPU_CTRL_LOC_FAR_RPAER_LPBK,
+	    HPU_CTRL_LOC_FAR_AUX_SAER_LPBK, HPU_CTRL_LOC_FAR_LSAER_LPBK, HPU_CTRL_LOC_FAR_RSAER_LPBK};
 
 typedef enum {
 	MASK_20BIT,
@@ -580,7 +580,7 @@ static void _hpu_stop_dma_uh(struct hpu_priv *priv)
 	/* Make the DMA stop ASAP */
 	hpu_reg_write(priv, 1, HPU_TLASTTO_REG);
 
-	priv->ctrl_reg &= ~HPU_CTRL_ENDMA;
+	priv->ctrl_reg &= ~HPU_CTRL_EN_DMA;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 }
 
@@ -589,7 +589,7 @@ static void _hpu_stop_dma_bh(struct hpu_priv *priv)
 {
 	ktime_t time;
 
-	BUG_ON(priv->ctrl_reg & HPU_CTRL_ENDMA);
+	BUG_ON(priv->ctrl_reg & HPU_CTRL_EN_DMA);
 
 	/*
 	 * Keep on draining RX DMA descriptor to make sure the IP is
@@ -612,7 +612,7 @@ static void hpu_start_dma(struct hpu_priv *priv)
 	unsigned long flags;
 
 	spin_lock_irqsave(&priv->irq_lock, flags);
-	priv->ctrl_reg |= HPU_CTRL_ENDMA;
+	priv->ctrl_reg |= HPU_CTRL_EN_DMA;
 
 	/*
 	 * Restore AXI latency setting. Note that hpu_do_set_axis_lat()
@@ -907,7 +907,7 @@ static void hpu_rx_suspend(struct hpu_priv *priv)
 	priv->rx_suspended = 1;
 	hpu_reg_write(priv, 0, HPU_RX_CTRL_REG);
 	hpu_reg_write(priv, 0, HPU_AUX_RX_CTRL_REG);
-	priv->ctrl_reg &= ~HPU_CTRL_LOOP_LNEAR;
+	priv->ctrl_reg &= ~HPU_CTRL_LOC_NEAR_LPBK;
 	hpu_reg_write(priv, priv->ctrl_reg , HPU_CTRL_REG);
 }
 
@@ -1702,7 +1702,7 @@ static int hpu_set_loop_cfg(struct hpu_priv *priv, spinn_loop_t loop)
 	priv->loop_bits = loop_bits[loop];
 
 	if (!hpu_rx_is_suspended(priv)) {
-		priv->ctrl_reg &= ~HPU_CTRL_LOOP_MASK;
+		priv->ctrl_reg &= ~HPU_CTRL_LPBK_MASK;
 		priv->ctrl_reg |= priv->loop_bits;
 		hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 	}
@@ -1738,7 +1738,7 @@ static void _hpu_do_set_axis_lat(struct hpu_priv *priv)
 	 * restarted this function will be called again to apply the user
 	 * setting
 	 */
-	if (!(priv->ctrl_reg & HPU_CTRL_ENDMA))
+	if (!(priv->ctrl_reg & HPU_CTRL_EN_DMA))
 		return;
 
 	lat = priv->clk_rate / 1000 * priv->axis_lat;
@@ -1794,9 +1794,9 @@ static int hpu_set_timestamp(struct hpu_priv *priv, unsigned int val)
 	spin_lock_irqsave(&priv->irq_lock, flags);
 	/* if dma is enabled then disable and also flush fifo */
 	if (val)
-		priv->ctrl_reg |= HPU_CTRL_FULLTS;
+		priv->ctrl_reg |= HPU_CTRL_FULL_TS;
 	else
-		priv->ctrl_reg &= ~HPU_CTRL_FULLTS;
+		priv->ctrl_reg &= ~HPU_CTRL_FULL_TS;
 
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
@@ -1876,9 +1876,9 @@ static int hpu_set_rx_ts_enable(struct hpu_priv *priv, unsigned int val)
 	spin_lock_irqsave(&priv->irq_lock, flags);
 	priv->rx_ts_disable = !val;
 	if (val)
-		priv->ctrl_reg &= ~HPU_CTRL_DISABLE_RX_TS;
+		priv->ctrl_reg &= ~HPU_CTRL_ONLY_EVENTS_RX;
 	else
-		priv->ctrl_reg |= HPU_CTRL_DISABLE_RX_TS;
+		priv->ctrl_reg |= HPU_CTRL_ONLY_EVENTS_RX;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
@@ -1891,9 +1891,9 @@ static int hpu_set_tx_ts_enable(struct hpu_priv *priv, unsigned int val)
 
 	spin_lock_irqsave(&priv->irq_lock, flags);
 	if (val)
-		priv->ctrl_reg &= ~HPU_CTRL_DISABLE_TX_TS;
+		priv->ctrl_reg &= ~HPU_CTRL_ONLY_EVENTS_TX;
 	else
-		priv->ctrl_reg |= HPU_CTRL_DISABLE_TX_TS;
+		priv->ctrl_reg |= HPU_CTRL_ONLY_EVENTS_TX;
 
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
@@ -1986,7 +1986,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	hpu_reg_write(priv, priv->tx_ctrl_reg, HPU_TX_CTRL_REG);
 
 	/* Initialize HPU with full TS, no loop */
-	priv->ctrl_reg = HPU_CTRL_FULLTS;
+	priv->ctrl_reg = HPU_CTRL_FULL_TS;
 	priv->loop_bits = 0;
 	hpu_reg_write(priv, priv->ctrl_reg |
 		      HPU_CTRL_FLUSH_TX_FIFO | HPU_CTRL_FLUSH_RX_FIFO,
@@ -2020,7 +2020,7 @@ static int hpu_chardev_open(struct inode *i, struct file *f)
 	/* clear all INTs */
 	hpu_reg_write(priv, 0xffffffff, HPU_IRQ_REG);
 
-	priv->ctrl_reg |= HPU_CTRL_ENINT | HPU_CTRL_AXIS_LAT;
+	priv->ctrl_reg |= HPU_CTRL_EN_INT | HPU_CTRL_AXISTREAM_LATENCY;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
 	/* this will also set TLAST timeout */
@@ -2058,7 +2058,7 @@ static int hpu_chardev_close(struct inode *i, struct file *fp)
 	spin_unlock_irqrestore(&priv->irq_lock, flags);
 
 	/* Disable interrupts */
-        priv->ctrl_reg &= ~HPU_CTRL_ENINT;
+        priv->ctrl_reg &= ~HPU_CTRL_EN_INT;
 	hpu_reg_write(priv, priv->ctrl_reg, HPU_CTRL_REG);
 
 	hpu_stop_dma(priv);
@@ -2624,15 +2624,15 @@ static int hpu_probe(struct platform_device *pdev)
 		 !!(tmp & HPU_IPCONFIG_TXSPINN),
 		 !!(tmp & HPU_IPCONFIG_TXGTP));
 
-	priv->can_loop = HPU_CTRL_LOOP_LNEAR;
+	priv->can_loop = HPU_CTRL_LOC_NEAR_LPBK;
 	if ((tmp & HPU_IPCONFIG_TXPAER) && (tmp & HPU_IPCONFIG_RXPAER))
-		priv->can_loop |= HPU_CTRL_LOOP_PAERAUX | HPU_CTRL_LOOP_PAERL | HPU_CTRL_LOOP_PAERR;
+		priv->can_loop |= HPU_CTRL_LOC_FAR_AUX_PAER_LPBK | HPU_CTRL_LOC_FAR_LPAER_LPBK | HPU_CTRL_LOC_FAR_RPAER_LPBK;
 
 	if ((tmp & HPU_IPCONFIG_TXSAER) && (tmp & HPU_IPCONFIG_RXSAER))
-		priv->can_loop |= HPU_CTRL_LOOP_SAERAUX | HPU_CTRL_LOOP_SAERL | HPU_CTRL_LOOP_SAERR;
+		priv->can_loop |= HPU_CTRL_LOC_FAR_AUX_SAER_LPBK | HPU_CTRL_LOC_FAR_LSAER_LPBK | HPU_CTRL_LOC_FAR_RSAER_LPBK;
 
 	if ((tmp & HPU_IPCONFIG_TXSPINN) && (tmp & HPU_IPCONFIG_RXSPINN))
-		priv->can_loop |= HPU_CTRL_LOOP_SPINNAUX | HPU_CTRL_LOOP_SPINNL | HPU_CTRL_LOOP_SPINNR;
+		priv->can_loop |= HPU_CTRL_LOC_FAR_SPINN_LPBK_AUX | HPU_CTRL_LOC_FAR_SPINN_LPBK_L | HPU_CTRL_LOC_FAR_SPINN_LPBK_R;
 
 	priv->irq = platform_get_irq(pdev, 0);
 	if (priv->irq < 0) {
